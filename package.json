@@ -6,6 +6,9 @@
   "scripts": {
     "push": "git push github master"
   },
+  "bin": {
+    "freyr": "cli.js"
+  },
   "files": [
     "src",
     "typings"
@@ -33,11 +36,29 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "^3.7.2",
+    "commander": "^4.0.1",
     "conf": "^6.2.0",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "hh-mm-ss": "^1.2.0",
+    "is-online": "^8.2.1",
     "keytar": "^5.0.0",
+    "libeaes": "^1.3.0",
+    "libxget": "^0.6.1",
+    "merge2": "^1.3.0",
+    "mkdirp": "^1.0.3",
     "node-cache": "^5.1.0",
+    "open": "^7.0.0",
+    "pretty-ms": "^6.0.0",
     "spotify-uri": "^1.1.0",
     "spotify-web-api-node": "^4.0.0",
+    "stringd": "^1.5.1",
+    "stringd-colors": "^1.7.0",
+    "tmp": "^0.1.0",
+    "xbytes": "^1.5.0",
+    "xprogress": "^0.15.1",
     "youtube-dl": "^2.3.0",
     "yt-search": "^0.4.1"
   },
