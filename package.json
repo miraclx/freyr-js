@@ -1,0 +1,45 @@
+{
+  "name": "freyr",
+  "version": "0.4.5",
+  "description": "Versatile Multi-Service Music Downloader with NodeJS",
+  "main": "src/freyr.js",
+  "scripts": {
+    "push": "git push github master"
+  },
+  "files": [
+    "src",
+    "typings"
+  ],
+  "directories": {
+    "lib": "src"
+  },
+  "keywords": [
+    "spotify",
+    "music-streaming",
+    "music",
+    "manager",
+    "download",
+    "track",
+    "album",
+    "artist",
+    "playlist",
+    "iTunes",
+    "mpeg-4",
+    "m4a",
+    "audio",
+    "320kbps"
+  ],
+  "author": "Miraculous Owonubi",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "conf": "^6.2.0",
+    "keytar": "^5.0.0",
+    "node-cache": "^5.1.0",
+    "spotify-uri": "^1.1.0",
+    "spotify-web-api-node": "^4.0.0",
+    "youtube-dl": "^2.3.0",
+    "yt-search": "^0.4.1"
+  },
+  "devDependencies": {}
+}
