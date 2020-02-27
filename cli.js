@@ -372,7 +372,9 @@ async function init(queries, options) {
                             }),
                             '--overWrite',
                           ],
-                          (err, stderr) => (imageFile.removeCallback(), err ? rej(((err._code = 3), stderr)) : res({wroteImage})),
+                          (err, stderr) => (
+                            imageFile.removeCallback(), err ? rej(Object.assign(err, {_code: 3, stderr})) : res({wroteImage})
+                          ),
                         );
                       });
                   })
