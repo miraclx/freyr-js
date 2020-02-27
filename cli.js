@@ -520,7 +520,7 @@ async function init(queries, options) {
             : err._code === 3
             ? `Error embedding metadata`
             : `That's weird, I don't know what happened`;
-        embedLogger.error(`[\u2717] ${refName} [${trackSlice.meta.uri}] (failed: [${reason}])`);
+        embedLogger.error(`\u2022 [\u2717] ${refName} [${trackSlice.meta.uri}] (failed: [${reason}])`);
       }
       return {
         meta: trackSlice.meta,
