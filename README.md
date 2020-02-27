@@ -28,7 +28,7 @@ v0.4.5
 ### CLI
 
 ``` text
-Usage: freyr [options] <query...>
+Usage: freyr [options] [query...]
 ```
 
 Example
