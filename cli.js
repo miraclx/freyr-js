@@ -167,6 +167,25 @@ async function init(queries, options) {
   )
     process.exit(3);
 
+  function createPlaylist(stats, logger, directory, filename, playlistTitle) {
+    if (options.playlist) {
+      const validStats = stats.flat(Infinity).filter(Boolean);
+      if (validStats.length) {
+        logger.print('[\u2022] Creating playlist...');
+        const playlistFile = xpath.join(directory, `${filename}.m3u8`);
+        const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
+        plStream.write('#EXTM3U\n');
+        if (playlistTitle) plStream.write(`#PLAYLIST:${playlistTitle}\n`);
+        validStats.forEach(({meta: {name, artists, duration}, outputFile}) =>
+          plStream.write(`\n#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}\n${outputFile}\n`),
+        );
+        plStream.close();
+        logger.write('[done]\n');
+        logger.log(`[\u2022] Playlist file: [${playlistFile}]`);
+      }
+    } else logger.log(`[\u2022] Skipped playlist creation`);
+  }
+
   async function processTrackFeed(collationLogger, service, meta) {
     const trackFileName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}`;
     const trackLogger = collationLogger.log(`\u2022 [${trackFileName}]`);
@@ -492,24 +511,22 @@ async function init(queries, options) {
         embedLogger.error(`[\u2717] ${refName} [${trackSlice.meta.uri}] (failed: [${reason}])`);
       }
       return {
+        meta: trackSlice.meta,
         outputFile: trackSlice.outFilePath,
         netBytesRead: trackSlice.netBytesRead,
-        fileSize: fs.statSync(trackSlice.outFilePath).size,
+        fileSize: encoderInspector.isFulfilled() ? fs.statSync(trackSlice.outFilePath).size : 0,
       };
     });
+    if (collection)
+      createPlaylist(
+        stats,
+        queryLogger,
+        BASE_DIRECTORY,
+        `${meta.name}${meta.owner_name ? `-${meta.owner_name}` : ''}`,
+        `${meta.name}${meta.owner_name ? ` by ${meta.owner_name}` : ''}`,
+        true,
+      );
     stackLogger.log('[\u2022] Collation Complete');
-    if (collection) {
-      const validStats = stats.flat(Infinity).filter(Boolean);
-      if (validStats.length) {
-        stackLogger.print('[\u2022] Creating playlist...');
-        const playlistFile = xpath.join(BASE_DIRECTORY, `${meta.name}-${meta.owner_name}.m3u`);
-        const plStream = fs.createWriteStream(playlistFile);
-        plStream.write('#EXTM3U\n');
-        validStats.forEach(({outputFile}) => plStream.write(`${xpath.resolve(outputFile)}\n`));
-        plStream.close();
-        stackLogger.write('[done]\n').log(`[\u2022] Playlist file: [${playlistFile}]`);
-      }
-    }
     return stats;
   });
   const validQueriesStat = queriesStat.flat(Infinity).filter(Boolean);
@@ -556,7 +573,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
-  .option('-p, --no-playlist', 'skip creating a playlist file for collections (unimplemented)')
+  .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-f, --filter <SEQ>', 'Filter matches (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'Filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in format [PREFIX/]<ARTIST>/<ALBUM>/<TRACK>")
