@@ -190,6 +190,16 @@ async function init(queries, options) {
     const trackFileName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}`;
     const trackLogger = collationLogger.log(`\u2022 [${trackFileName}]`);
     trackLogger.indent += 2;
+    const outFileName = `${trackFileName}.m4a`;
+    const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [meta.artists[0], meta.album] : []));
+    const outFilePath = xpath.join(outFileDir, outFileName);
+    if (fs.existsSync(outFilePath)) {
+      if (options.force) trackLogger.log('| [\u2022] Track exists. Overwriting...');
+      else {
+        trackLogger.log('| [\u2717] Track exists. Skipping...');
+        return {meta, trackFileName};
+      }
+    }
     const albumObject = await processPromise(service.getAlbum(meta.album_uri), trackLogger, {
       pre: '| \u2b9e Requesting album data...',
     });
@@ -291,9 +301,6 @@ async function init(queries, options) {
         const audioFileStream = fs.createWriteStream(file.name);
         audioStream.pipe(audioFileStream).on('finish', () => {
           trackLogger.log(`| [\u2714] Got raw track file`);
-          const outFileName = `${trackFileName}.m4a`;
-          const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [meta.artists[0], meta.album] : []));
-          const outFilePath = xpath.join(outFileDir, outFileName);
           trackLogger.log(`| [\u2022] Asynchronously encoding...`);
           res({
             meta,
@@ -575,6 +582,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
+  .option('-f, --force', 'force overwrite of existing files')
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-f, --filter <SEQ>', 'Filter matches (unimplemented)')
