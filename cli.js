@@ -530,6 +530,8 @@ async function init(queries, options) {
     return stats;
   });
   const validQueriesStat = queriesStat.flat(Infinity).filter(Boolean);
+  if (options.playlist && typeof options.playlist === 'string')
+    createPlaylist(validQueriesStat, stackLogger, BASE_DIRECTORY, options.playlist);
   const stats = validQueriesStat.reduce(
     (tx, cx) => {
       if (cx) {
@@ -573,6 +575,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
+  .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-f, --filter <SEQ>', 'Filter matches (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'Filter collections by single/album/appears_on/compilation (unimplemented)')
