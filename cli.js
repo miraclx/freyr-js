@@ -85,11 +85,12 @@ function prepProgressGen(options) {
   };
 }
 
-async function processPromise(px, logger, {pre, post, err} = {}) {
+async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
   if (rex.isRejected()) logger.write(...(err ? [err] : [`(failed%s)\n`, rex.reason() ? `: [${rex.reason().message}]` : '']));
-  else if (post || rex.value()) logger.write(`${post || '[done]'}\n`);
+  else if (xerr && !rex.value()) logger.write(`${xerr}\n`);
+  else logger.write(`${post || '[done]'}\n`);
   return rex.isFulfilled() ? rex.value() : null;
 }
 
@@ -180,6 +181,7 @@ async function init(queries, options) {
     if (!trackFeats) return {meta, trackFileName};
     const audioSource = await processPromise(freyrCore.getYoutubeSource(meta), trackLogger, {
       pre: '| \u2b9e Awaiting stream source...',
+      xerr: '[zero sources found]',
     });
     if (!audioSource) return {meta, trackFileName};
     const audioFeeds = await processPromise(freyrCore.getYoutubeStream(audioSource), trackLogger, {
