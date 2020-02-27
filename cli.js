@@ -225,28 +225,31 @@ async function init(queries, options) {
       const imageFile = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4i'});
       ({label: meta.label, genres: meta.genres, copyrights: meta.copyrights} = albumObject);
       ({tempo: meta.tempo} = trackFeats);
-      const audioFeed =
+      const getAudioFeedStream =
         feedMeta.protocol !== 'http_dash_segments'
-          ? xget(feedMeta.url, {chunks: options.chunks, size: feedMeta.size || null, retries: options.tries})
-              .on(
-                'error',
-                err => (
-                  trackLogger.log(`| [\u2717] Failed to get raw media stream: ${err.code}`),
-                  (err = {err, meta, trackFileName}),
-                  rej(err)
-                ),
-              )
-              .with('progressBar', ({size, chunkStack}) =>
-                progressGen(
-                  size,
-                  chunkStack.map(chunk => chunk.size),
-                  {tag: `[‘${trackFileName}’]`},
-                  trackLogger.indent,
-                ),
-              )
-              .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
-              .on('retry', data => data.store.get('progressBar').print(trackLogger.getText(`| ${getRetryMessage(data)}`)))
-              .on('end', () => audioFeed.store.get('progressBar').end(''))
+          ? () => {
+              const req = xget(feedMeta.url, {chunks: options.chunks, size: feedMeta.size || null, retries: options.tries})
+                .on(
+                  'error',
+                  err => (
+                    trackLogger.log(`| [\u2717] Failed to get raw media stream: ${err.code}`),
+                    (err = {err, meta, trackFileName}),
+                    rej(err)
+                  ),
+                )
+                .with('progressBar', ({size, chunkStack}) =>
+                  progressGen(
+                    size,
+                    chunkStack.map(chunk => chunk.size),
+                    {tag: `[‘${trackFileName}’]`},
+                    trackLogger.indent,
+                  ),
+                )
+                .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
+                .on('retry', data => data.store.get('progressBar').print(trackLogger.getText(`| ${getRetryMessage(data)}`)))
+                .on('end', () => req.store.get('progressBar').end(''));
+              return req;
+            }
           : () => {
               const parsed_fragments = feedMeta.fragments.map(({path}) => ({
                 url: `${feedMeta.fragment_base_url}${path}`,
@@ -297,7 +300,7 @@ async function init(queries, options) {
         );
       const imageFileStream = fs.createWriteStream(imageFile.name);
       imageFeed.pipe(imageFileStream).on('finish', () => {
-        const audioStream = typeof audioFeed === 'function' ? audioFeed() : audioFeed;
+        const audioStream = getAudioFeedStream();
         const audioFileStream = fs.createWriteStream(file.name);
         audioStream.pipe(audioFileStream).on('finish', () => {
           trackLogger.log(`| [\u2714] Got raw track file`);
