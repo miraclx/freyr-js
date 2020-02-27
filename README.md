@@ -44,6 +44,28 @@ $ freyr -v
 v0.4.5
 ```
 
+## Authorization
+
+Using [libeaes], encrypt your keys JSON format with the service name as the key and the value as the credentials
+
+Encryption Key: `a591337828d2cce184152d010206babb88af3ddc13970eccb89528d6c2885156`
+
+Encrypted file: auth_keys.enc
+
+``` json
+{
+  "spotify": {
+    "client_id": "<CLIENT ID>",
+    "client_secret": "<CLIENT SECRET>"
+  }
+}
+```
+
+``` bash
+libeaes enc auth_keys.json auth_keys.enc
+rm auth_keys.json
+```
+
 ## Usage
 
 ### CLI
@@ -81,6 +103,8 @@ npm run build
 [npm]:  https://github.com/npm/cli "The Node Package Manager"
 [license]:  LICENSE "Apache 2.0 License"
 [author-url]: https://github.com/miraclx
+
+[libeaes]: https://github.com/miraclx/libeaes-js
 
 [npm-url]: https://npmjs.org/package/freyr
 [npm-image]: https://badgen.net/npm/node/freyr
