@@ -7,6 +7,27 @@
 
 [![NPM][npm-image-url]][npm-url]
 
+## Requirements
+
+Make sure to have installed the latest versions of the following
+
+* ffmpeg >= 0.9
+  * Windows
+    * <https://ffmpeg.zeranoe.com/builds/>
+    * set `FFMPEG_PATH` to explicitly specify binary to use
+    * otherwise, must be defined within PATH
+  * POSIX
+    * the pre-included version within the `libav-tools` package should be compatible.
+    * else, either;
+      * compile from source or fetch a pre-built .deb package at <https://ffmpeg.org/download.html>
+      * or for debian, the `ppa:mc3man/trusty-media` PPA provides recent builds.
+* youtube-dl@latest
+  * automatically fetched by installing this package
+  * optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your path
+* AtomicParsley >= 0.9.6
+  * Windows: <https://chocolatey.org/packages/atomicparsley>
+  * Posix: check individual distro package managers mostly as `atomicparsley`
+
 ## Installing
 
 Via [NPM][npm]:
