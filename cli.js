@@ -16,8 +16,8 @@ const isOnline = require('is-online');
 const prettyMs = require('pretty-ms');
 const commander = require('commander');
 const TimeFormat = require('hh-mm-ss');
-const {execFile} = require('child_process');
 const ProgressBar = require('xprogress');
+const {spawn, spawnSync} = require('child_process');
 
 const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
@@ -30,6 +30,32 @@ function parseMeta(params) {
       Array.isArray(value) ? value.map(tx => [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])]) : [`--${key}`, value],
     )
     .flat(Infinity);
+}
+
+function extendPathOnEnv(path) {
+  return {...process.env, PATH: [process.env.PATH, path].join(process.platform === 'win32' ? ';' : ':')};
+}
+
+function check_bin_is_existent(bin, path) {
+  const isWin = process.platform === 'win32';
+  const command = isWin ? 'where' : 'which';
+  const {status} = spawnSync(command, [bin], {
+    env: extendPathOnEnv(path),
+  });
+  if ([127, null].includes(status)) throw Error(`Unable to locate the command [${command}] within your PATH`);
+  return status === 0;
+}
+
+function atomicParsley(file, args, cb) {
+  const err = new Error('Unable to find AtomicParsley. Please install.');
+  const isWin = process.platform === 'win32';
+  const path = xpath.relative(__dirname, xpath.join('./bins', isWin ? 'windows' : 'posix'));
+  if (!check_bin_is_existent('AtomicParsley', path))
+    if (typeof file === 'boolean') throw err;
+    else return cb(err);
+
+  if (typeof file === 'string')
+    spawn('AtomicParsley', [file, ...parseMeta(args), '--overWrite'], {env: extendPathOnEnv(path)}).on('close', cb);
 }
 
 function getRetryMessage({index, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -144,6 +170,7 @@ async function init(queries, options) {
   const progressGen = prepProgressGen(options);
 
   try {
+    atomicParsley(true);
     options.tries = CHECK_FLAG_IS_NUM(
       `${options.tries}`.toLowerCase() === 'infinite' ? Infinity : options.tries,
       '-t, --tries',
@@ -336,45 +363,39 @@ async function init(queries, options) {
                       .on('error', err => rej(((err._code = 2), err)))
                       .on('end', () => {
                         file.removeCallback();
-                        execFile(
-                          './AtomicParsley',
-                          [
-                            outFilePath,
-                            ...parseMeta({
-                              title: meta.name,
-                              artist: meta.artists[0],
-                              albumArtist: meta.album_artist,
-                              album: meta.album,
-                              disk: `${meta.disc_number}/${meta.disc_number}`,
-                              artwork: imageFile.name,
-                              year: meta.release_date,
-                              encodingTool: 'fr3yrcl1',
-                              tracknum: `${meta.track_number}/${meta.total_tracks}`,
-                              bpm: meta.tempo,
-                              encodedBy: 'd3vc0dr',
-                              Rating: meta.explicit ? 'explicit' : 'clean',
-                              // composer:
-                              advisory: meta.explicit ? 'Explicit Content' : 'Inoffensive',
-                              stik: 'Normal',
-                              genre: (meta.genre || [])[0] || '',
-                              rDNSatom: [
-                                ['CD', 'name=LABEL', 'domain=com.apple.iTunes'],
-                                [meta.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-                                [meta.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-                                ...meta.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
-                              ],
-                              apID: 'cli@freyr.git',
-                              gapless: false,
-                              // sortOrder???:
-                              copyright: meta.copyrights.find(({type}) => type === 'P').text,
-                              purchaseDate: 'timestamp',
-                              comment: `URI: ${meta.uri}\nYouTube Stream ID: ${audioFeeds.id}`,
-                            }),
-                            '--overWrite',
-                          ],
-                          (err, stderr) => (
-                            imageFile.removeCallback(), err ? rej(Object.assign(err, {_code: 3, stderr})) : res({wroteImage})
-                          ),
+                        atomicParsley(
+                          outFilePath,
+                          {
+                            title: meta.name,
+                            artist: meta.artists[0],
+                            albumArtist: meta.album_artist,
+                            album: meta.album,
+                            disk: `${meta.disc_number}/${meta.disc_number}`,
+                            artwork: imageFile.name,
+                            year: meta.release_date,
+                            encodingTool: 'fr3yrcl1',
+                            tracknum: `${meta.track_number}/${meta.total_tracks}`,
+                            bpm: meta.tempo,
+                            encodedBy: 'd3vc0dr',
+                            Rating: meta.explicit ? 'explicit' : 'clean',
+                            // composer:
+                            advisory: meta.explicit ? 'Explicit Content' : 'Inoffensive',
+                            stik: 'Normal',
+                            genre: (meta.genre || [])[0] || '',
+                            rDNSatom: [
+                              ['CD', 'name=LABEL', 'domain=com.apple.iTunes'],
+                              [meta.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
+                              [meta.label, 'name=LABEL', 'domain=com.apple.iTunes'],
+                              ...meta.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
+                            ],
+                            apID: 'cli@freyr.git',
+                            gapless: false,
+                            // sortOrder???:
+                            copyright: meta.copyrights.find(({type}) => type === 'P').text,
+                            purchaseDate: 'timestamp',
+                            comment: `URI: ${meta.uri}\nYouTube Stream ID: ${audioFeeds.id}`,
+                          },
+                          err => (imageFile.removeCallback(), err ? rej(((err._code = 3), err)) : res({wroteImage})),
                         );
                       });
                   })
