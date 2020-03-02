@@ -500,7 +500,7 @@ async function init(queries, options) {
         trackMeta.value && trackMeta.reason ? (trackMeta.isFulfilled() ? trackMeta.value() : trackMeta.reason()) : trackMeta;
       const refName = `${trackSlice.trackFileName}${collection ? ` ‒ ${trackSlice.meta.artists.join(', ')}` : ''}`;
       if (!trackSlice.promise) {
-        embedLogger.error(`\u2022 [\u2717] ${refName}`);
+        embedLogger.error(`\u2022 [\u2717] ${refName}${trackSlice.err ? ` [${trackSlice.err}]` : ''}`);
         return;
       }
       const encoderInspector = await trackSlice.promise.reflect();
