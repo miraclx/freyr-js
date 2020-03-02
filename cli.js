@@ -88,8 +88,9 @@ function prepProgressGen(options) {
 async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
-  if (rex.isRejected()) logger.write(...(err ? [err] : [`(failed%s)\n`, rex.reason() ? `: [${rex.reason().message}]` : '']));
-  else if (xerr && !rex.value()) logger.write(`${xerr}\n`);
+  if (rex.isRejected())
+    logger.write(...(err ? [err, '\n'] : [`(failed%s)\n`, rex.reason() ? `: [${rex.reason().message}]` : '']));
+  else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr}\n`);
   else logger.write(`${post || '[done]'}\n`);
   return rex.isFulfilled() ? rex.value() : null;
 }
@@ -215,10 +216,9 @@ async function init(queries, options) {
     if (!audioSource) return {meta, trackFileName};
     const audioFeeds = await processPromise(freyrCore.getYoutubeStream(audioSource), trackLogger, {
       pre: '| \u2b9e Awaiting audiofeeds...',
-      err: '[Unable to retrieve stream]',
+      xerr: '[Unable to retrieve stream]',
     });
-    if (!audioFeeds) return {meta, trackFileName};
-    // eslint-disable-next-line no-async-promise-executor
+    if (!audioFeeds || audioFeeds.err) return {meta, err: audioFeeds.err, trackFileName};
     return new Promise((res, rej) => {
       const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
       const file = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
