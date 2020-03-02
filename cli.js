@@ -601,7 +601,7 @@ const command = commander
   .usage('[options] [query...]')
   .arguments('[query...]')
   .description(packageJson.description)
-  .option('-i, --input <FILE>', 'use URIs found in the specified FILE\nsize limit: 1 MiB')
+  .option('-i, --input <FILE>', 'use URIs found in the specified FILE (size limit: 1 MiB)')
   .option('-b, --bitrate <N>', 'set bitrate for audio encoding\n(valid: [96, 128, 160, 192, 256, 320])', '320k')
   .option('-d, --directory-prefix <PREFIX>', 'save tracks to PREFIX/..', '.')
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
@@ -616,7 +616,7 @@ const command = commander
   .option('-T, --no-tree', "don't organise tracks in format [PREFIX/]<ARTIST>/<ALBUM>/<TRACK>")
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
-  .option('--single-bar', 'show a single bar for the download, hide chunk-view [default when n(chunks) exceed printable space]')
+  .option('--single-bar', 'show a single bar for the download, hide chunk-view\n[default when n(chunks) exceed printable space]')
   .version(`v${packageJson.version}`, '-v, --version')
   .action(processArgs);
 
