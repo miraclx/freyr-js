@@ -4,6 +4,7 @@ const util = require('util');
 const Conf = require('conf');
 const crypto = require('crypto');
 const keytar = require('keytar');
+const Promise = require('bluebird');
 const youtubedl = require('youtube-dl');
 
 const YouTube = require('./youtube');
@@ -112,8 +113,10 @@ class FreyrCore {
   }
 
   async getYoutubeStream(ytInfo) {
-    const {id, formats} = await this.ytdlGet(ytInfo.videoId);
-    return {id, formats: formats.filter(format => format.acodec !== 'none')};
+    const data = await Promise.resolve(this.ytdlGet(ytInfo.videoId)).reflect();
+    return data.isFulfilled()
+      ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
+      : {err: data.reason()};
   }
 
   async downloadActiveSpotifyTrack() {
