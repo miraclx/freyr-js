@@ -155,7 +155,7 @@ function PROCESS_INPUT_ARG(input_arg) {
 }
 
 async function init(queries, options) {
-  const initTimeStamp = new Date();
+  const initTimeStamp = Date.now();
   const stackLogger = new StackLogger({indentSize: 1});
   if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(2);
   if (!Array.isArray(queries)) stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid Query'), process.exit(2);
