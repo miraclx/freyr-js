@@ -492,15 +492,10 @@ async function init(queries, options) {
       rxPromise = Promise.mapSeries([albums, singles], async stack => {
         if (!stack.items.length) return;
         const cxLogger = collationLogger.log(`[\u2022] ${stack.desc}`);
-        return Promise.mapSeries(stack.items, async (album, index) => {
-          const albumLogger = cxLogger.log(`${prePadNum(index + 1, stack.items.length)} [${album.name}]`);
-          const albumObject = await processPromise(service.getAlbum(album.uri), albumLogger, {
-            pre: `[\u2022] Getting album information...`,
-          });
-          if (!albumObject) return;
-          albumLogger.indent += 1;
-          return Promise.mapSeries(albumObject.tracks, track => processTrackFeed(albumLogger, service, track));
-        });
+        cxLogger.indent += 1;
+        return Promise.mapSeries(stack.items, album =>
+          Promise.mapSeries(album.tracks, track => processTrackFeed(cxLogger, service, track)),
+        );
       });
     } else if (contentType === 'playlist') {
       metaLogger.log(`\u2bc8 Playlist Name: ${meta.name}`);
