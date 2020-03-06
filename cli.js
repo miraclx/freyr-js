@@ -27,7 +27,7 @@ const packageJson = require('./package.json');
 function parseMeta(params) {
   return Object.entries(params)
     .map(([key, value]) =>
-      Array.isArray(value) ? value.map(tx => [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])]) : [`--${key}`, value],
+      Array.isArray(value) ? value.map(tx => (tx ? [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])] : '')) : [`--${key}`, value],
     )
     .flat(Infinity);
 }
