@@ -35,6 +35,7 @@
   "author": "Miraculous Owonubi",
   "license": "Apache-2.0",
   "dependencies": {
+    "@yujinakayama/apple-music": "^0.3.0",
     "bluebird": "^3.7.2",
     "commander": "^4.0.1",
     "conf": "^6.2.0",
