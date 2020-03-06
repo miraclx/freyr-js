@@ -485,7 +485,7 @@ async function init(queries, options) {
       });
       if (!albumsStack) return;
       artistLogger.print(' > Sorting collections...');
-      const {albums, singles} = albumsStack.reduce((tx, v) => (tx[`${v.album_type}s`].items.push(v), tx), {
+      const {albums, singles} = albumsStack.reduce((tx, v) => (tx[`${v.type}s`].items.push(v), tx), {
         singles: {desc: 'Singles & EPs', items: []},
         albums: {desc: 'Albums', items: []},
       });
