@@ -372,7 +372,7 @@ async function init(queries, options) {
                             album: meta.album,
                             disk: `${meta.disc_number}/${meta.disc_number}`,
                             artwork: imageFile.name,
-                            year: meta.release_date,
+                            year: new Date(meta.release_date).toISOString().split('T')[0],
                             encodingTool: 'fr3yrcl1',
                             tracknum: `${meta.track_number}/${meta.total_tracks}`,
                             bpm: meta.tempo,
