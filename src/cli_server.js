@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 const cors = require('cors');
-const util = require('util');
 const crypto = require('crypto');
 const events = require('events');
 const express = require('express');
@@ -35,24 +34,26 @@ class AuthServer extends events.EventEmitter {
   }
 
   async init(gFn) {
-    this.express_app
-      .get('/', (req, res) => {
-        const state = crypto.randomBytes(8).toString('hex');
-        res.cookie(this.stateKey, state);
-        res.redirect(gFn(state));
-      })
-      .get(this.callback_route, (req, res) => {
-        const code = req.query.code || null;
-        const state = req.query.state || null;
-        const storedState = req.cookies ? req.cookies[this.stateKey] : null;
-        res.clearCookie(this.stateKey);
-        if (code == null || state === null || state !== storedState)
-          res.send(wrapHTML({service: this.serviceName, color: '#d0190c', msg: 'Authentication Failed'}));
-        else res.send(wrapHTML({service: this.serviceName, color: '#1ae822;', msg: 'Successfully Authenticated'}));
-        this.emit('code', code);
-      });
-    await util.promisify(this.express_app.listen.bind(this.express_app))(this._port);
-    return this.base_url;
+    return new Promise(resolve => {
+      const server = this.express_app
+        .get('/', (_req, res) => {
+          const state = crypto.randomBytes(8).toString('hex');
+          res.cookie(this.stateKey, state);
+          res.redirect(gFn(state));
+        })
+        .get(this.callback_route, (req, res) => {
+          const code = req.query.code || null;
+          const state = req.query.state || null;
+          const storedState = req.cookies ? req.cookies[this.stateKey] : null;
+          res.clearCookie(this.stateKey);
+          if (code == null || state === null || state !== storedState)
+            res.end(wrapHTML({service: this.serviceName, color: '#d0190c', msg: 'Authentication Failed'}));
+          else res.end(wrapHTML({service: this.serviceName, color: '#1ae822;', msg: 'Successfully Authenticated'}));
+          server.close();
+          this.emit('code', code);
+        })
+        .listen(this._port, () => resolve(this.base_url));
+    });
   }
 
   async getCode() {

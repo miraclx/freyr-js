@@ -422,25 +422,29 @@ async function init(queries, options) {
     async function coreAuth(loginLogger) {
       const authStack = service.newAuth();
       const url = await authStack.getUrl;
-      loginLogger.log(`[•] Attempting to open [ ${url} ] within browser...`);
-      await open(url);
-      loginLogger.log(`[•] Awaiting user authentication...`);
-      const {refresh_token, expiry} = await authStack.userToAuth();
-      freyrCore.config.set(`services.${service.ID}.expiry`, expiry);
-      freyrCore.config.set(`services.${service.ID}.refresh_token`, refresh_token);
-      return !!refresh_token;
+      await processPromise(open(url), loginLogger, {pre: `[\u2022] Attempting to open [ ${url} ] within browser...`});
+      const data = await processPromise(authStack.userToAuth(), loginLogger, {
+        pre: '[\u2022] Awaiting user authentication...',
+      });
+      if (!data) return false;
+      freyrCore.config.set(`services.${service.ID}.expiry`, data.expiry);
+      freyrCore.config.set(`services.${service.ID}.refresh_token`, data.refresh_token);
+      return !!data.refresh_token;
     }
     if (service.isAuthed()) authLogger.write('[authenticated]\n');
     else {
       authLogger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
       const config = freyrCore.config.get(`services.${service.ID}`);
       const loginLogger = queryLogger.log(`[${service.DESC} Login]`);
-      const logged_in = await (config.refresh_token
-        ? processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'}) || coreAuth(loginLogger)
-        : coreAuth(loginLogger));
-      if (!logged_in) return;
+      config.refresh_token
+        ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
+          (await coreAuth(loginLogger))
+        : await coreAuth(loginLogger);
     }
-    if (!service.isAuthed()) return;
+    if (!service.isAuthed()) {
+      queryLogger.log('[\u2717] Failed to authenticate client!');
+      return;
+    }
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
     const metaLogger = queryLogger.print(`Obtaining metadata...`);
