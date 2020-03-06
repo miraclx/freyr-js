@@ -472,7 +472,7 @@ async function init(queries, options) {
       rxPromise = Promise.mapSeries([meta], track => processTrackFeed(collationLogger, service, track));
     } else if (contentType === 'album') {
       metaLogger.log(`\u2bc8 Album Name: ${meta.name}`);
-      metaLogger.log(`\u2bc8 Artist: ${meta.artists[0].name}`);
+      metaLogger.log(`\u2bc8 Artist: ${meta.artists[0]}`);
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       metaLogger.log(`\u2bc8 Tracks: ${meta.total_tracks}`);
       collationLogger = queryLogger.log(`[\u2022] Collating [${meta.name}]...`);

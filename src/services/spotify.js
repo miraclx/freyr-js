@@ -97,7 +97,7 @@ class Spotify {
       album_uri: albumInfo.uri,
       image: albumInfo.images[0].url,
       duration: trackInfo.duration_ms,
-      album_artist: albumInfo.artists[0].name,
+      album_artist: albumInfo.artists[0],
       track_number: trackInfo.track_number,
       total_tracks: albumInfo.total_tracks,
       release_date: albumInfo.release_date,
@@ -111,7 +111,7 @@ class Spotify {
     const wrapped = {
       uri: albumObject.uri,
       name: albumObject.name,
-      artists: albumObject.artists,
+      artists: albumObject.artists.map(artist => artist.name),
       copyrights: albumObject.copyrights,
       genres: albumObject.genres,
       images: albumObject.images,
