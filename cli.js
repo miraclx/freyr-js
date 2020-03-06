@@ -228,14 +228,13 @@ async function init(queries, options) {
         return {meta, trackFileName};
       }
     }
-    const albumObject = await processPromise(service.getAlbum(meta.album_uri), trackLogger, {
-      pre: '| \u2b9e Requesting album data...',
-    });
-    if (!albumObject) return {meta, trackFileName};
-    const trackFeats = await processPromise(service.getExtraTrackProps(meta.id), trackLogger, {
-      pre: '| \u2b9e Requesting track feats...',
-    });
-    if (!trackFeats) return {meta, trackFileName};
+    let trackFeats;
+    if (service.getExtraTrackProps) {
+      trackFeats = await processPromise(service.getExtraTrackProps(meta.id), trackLogger, {
+        pre: '| \u2b9e Requesting track feats...',
+      });
+      if (!trackFeats) return {meta, trackFileName};
+    }
     const audioSource = await processPromise(freyrCore.getYoutubeSource(meta), trackLogger, {
       pre: '| \u2b9e Awaiting stream source...',
       xerr: '[zero sources found]',
@@ -250,8 +249,7 @@ async function init(queries, options) {
       const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
       const file = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
       const imageFile = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4i'});
-      ({label: meta.label, genres: meta.genres, copyrights: meta.copyrights} = albumObject);
-      ({tempo: meta.tempo} = trackFeats);
+      if (trackFeats) ({tempo: meta.tempo} = trackFeats);
       const getAudioFeedStream =
         feedMeta.protocol !== 'http_dash_segments'
           ? () => {
