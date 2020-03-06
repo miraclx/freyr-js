@@ -381,7 +381,7 @@ async function init(queries, options) {
                             // composer:
                             advisory: meta.explicit ? 'Explicit Content' : 'Inoffensive',
                             stik: 'Normal',
-                            genre: (meta.genre || [])[0] || '',
+                            genre: (meta.genres || [])[0] || '',
                             rDNSatom: [
                               ['CD', 'name=LABEL', 'domain=com.apple.iTunes'],
                               [meta.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
