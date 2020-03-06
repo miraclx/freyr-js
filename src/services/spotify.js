@@ -157,8 +157,14 @@ class Spotify {
     const parsedURI = this.parseURI(uri);
     uri = spotifyUri.formatURI(parsedURI);
     if (!this.cache.has(uri)) {
-      const {body} = await this.core.getTrack(parsedURI.id);
-      this.cache.set(uri, this.wrapTrackMeta(body, body.album));
+      const {body: rawTrackData} = await this.core.getTrack(parsedURI.id);
+      this.cache.set(
+        uri,
+        Object.assign(
+          (await this.getAlbum(rawTrackData.album.uri)).tracks.find(({id}) => id === parsedURI.id),
+          {isrc: rawTrackData.external_ids.isrc},
+        ),
+      );
     }
     return this.cache.get(uri);
   }
