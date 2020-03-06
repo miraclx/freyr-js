@@ -390,7 +390,6 @@ async function init(queries, options) {
                             ],
                             apID: 'cli@freyr.git',
                             gapless: false,
-                            // sortOrder???:
                             copyright: meta.copyrights.find(({type}) => type === 'P').text,
                             purchaseDate: 'timestamp',
                             comment: `URI: ${meta.uri}\nYouTube Stream ID: ${audioFeeds.id}`,
