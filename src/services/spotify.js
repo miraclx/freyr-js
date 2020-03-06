@@ -117,7 +117,7 @@ class Spotify {
       genres: albumObject.genres,
       images: albumObject.images,
       label: albumObject.label,
-      release_date: albumObject.release_date,
+      release_date: new Date(albumObject.release_date),
       total_tracks: albumObject.total_tracks,
     };
     if (albumObject.tracks) wrapped.tracks = albumObject.tracks.items.map(track => this.wrapTrackMeta(track, wrapped));
