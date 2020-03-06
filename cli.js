@@ -373,10 +373,10 @@ async function init(queries, options) {
                             year: new Date(meta.release_date).toISOString().split('T')[0],
                             encodingTool: 'fr3yrcl1',
                             tracknum: `${meta.track_number}/${meta.total_tracks}`,
-                            bpm: meta.tempo,
+                            bpm: meta.tempo || '',
                             encodedBy: 'd3vc0dr',
                             Rating: meta.explicit ? 'explicit' : 'clean',
-                            // composer:
+                            composer: meta.composers || '',
                             advisory: meta.explicit ? 'Explicit Content' : 'Inoffensive',
                             stik: 'Normal',
                             genre: (meta.genres || [])[0] || '',
