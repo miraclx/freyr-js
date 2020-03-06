@@ -104,6 +104,9 @@ class Spotify {
       disc_number: trackInfo.disc_number,
       explicit: trackInfo.explicit,
       isrc: (trackInfo.external_ids || {}).isrc,
+      genres: albumInfo.genres,
+      label: albumInfo.label,
+      copyrights: albumInfo.copyrights,
     };
   }
 
