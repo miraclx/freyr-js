@@ -9,6 +9,7 @@ const youtubedl = require('youtube-dl');
 
 const YouTube = require('./youtube');
 const Spotify = require('./services/spotify');
+const AppleMusic = require('./services/apple_music');
 
 class FreyrCore {
   constructor(Authkeys, AuthServer) {
@@ -19,6 +20,7 @@ class FreyrCore {
         ConfFile: Authkeys.spotify,
         AuthServer,
       }),
+      new AppleMusic(),
     ];
   }
 
@@ -68,11 +70,7 @@ class FreyrCore {
               type: 'object',
               additionalProperties: false,
               properties: {
-                name: {type: 'string'},
-                email: {type: 'string', format: 'email'},
                 expiry: {type: 'integer'},
-                country: {type: 'string', pattern: '^[A-Z]{2}$'},
-                subscription: {type: 'string', pattern: '^(open|premium)$'},
                 access_token: {type: 'string'},
                 refresh_token: {type: 'string'},
               },
@@ -81,7 +79,7 @@ class FreyrCore {
               type: 'object',
               additionalProperties: false,
               properties: {
-                username: {type: 'string'},
+                developerToken: {type: 'string'},
               },
             },
             apple_music: {
