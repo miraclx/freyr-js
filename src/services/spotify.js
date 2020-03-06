@@ -196,17 +196,22 @@ class Spotify {
   async getArtistAlbums(uri) {
     const {id} = this.parseURI(uri);
     const uId = `spotify:artist_albums:${id}`;
-    if (!this.cache.has(uId))
+    if (!this.cache.has(uId)) {
       this.cache.set(
         uId,
         (
-          await this._gatherCompletely(
-            (offset, limit) => this.core.getArtistAlbums(id, {offset, limit, include_groups: 'album,single'}),
-            0,
-            50,
+          await this.core.getAlbums(
+            (
+              await this._gatherCompletely(
+                (offset, limit) => this.core.getArtistAlbums(id, {offset, limit, include_groups: 'album,single'}),
+                0,
+                50,
+              )
+            ).map(album => album.id),
           )
-        ).map(item => ({album_type: item.album_type, ...this.wrapAlbumData(item)})),
+        ).body.albums.map(album => this.wrapAlbumData(album)),
       );
+    }
     return this.cache.get(uId);
   }
 
