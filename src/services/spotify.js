@@ -11,7 +11,7 @@ class Spotify {
   DESC = 'Spotify';
 
   // https://www.debuggex.com/r/mrPLQQIORTxQzE9J
-  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)?(?:(?:(?:open|embed)\.)spotify.com).+)|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
+  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|embed)\.)spotify.com).+)|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
 
   isAuthenticated = false;
 
