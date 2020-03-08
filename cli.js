@@ -464,6 +464,7 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       if (meta.genres.length) metaLogger.log(`\u2bc8 Genres: ${meta.genres.join(', ')}`);
       metaLogger.log(`\u2bc8 Tracks: ${meta.total_tracks}`);
+      if (meta.type === 'collection') collection = meta;
       collationLogger = queryLogger.log(`[\u2022] Collating [${meta.name}]...`);
       const tracks = await processPromise(service.getAlbumTracks(meta.uri), collationLogger, {
         pre: '[\u2022] Inquiring tracks...',
