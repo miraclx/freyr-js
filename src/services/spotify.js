@@ -133,6 +133,7 @@ class Spotify {
       uri: artistObject.uri,
       name: artistObject.name,
       genres: artistObject.genres,
+      followers: artistObject.followers.total,
     };
   }
 
