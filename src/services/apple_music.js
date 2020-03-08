@@ -84,7 +84,14 @@ class AppleMusic {
       album_artist: trackInfo.attributes.artistName,
       track_number: trackInfo.attributes.trackNumber,
       total_tracks: albumInfo.total_tracks,
-      release_date: (day => day.getTime() - day.getTimezoneOffset() * 60000)(trackInfo.attributes.releaseDate.toUTCDate()),
+      release_date: (date =>
+        [
+          [date.year, 4],
+          [date.month, 2],
+          [date.day, 2],
+        ]
+          .map(([val, size]) => val.toString().padStart(size, '0'))
+          .join('-'))(trackInfo.attributes.releaseDate),
       disc_number: trackInfo.attributes.discNumber,
       explicit: trackInfo.attributes.contentRating === 'explicit',
       isrc: trackInfo.attributes.isrc,
@@ -106,7 +113,14 @@ class AppleMusic {
       copyrights: [{type: 'P', text: albumObject.attributes.copyright}],
       images: albumObject.attributes.artwork.url.replace('{w}x{h}', '640x640'),
       label: albumObject.attributes.recordLabel,
-      release_date: (day => day.getTime() - day.getTimezoneOffset() * 60000)(albumObject.attributes.releaseDate.toUTCDate()),
+      release_date: (date =>
+        [
+          [date.year, 4],
+          [date.month, 2],
+          [date.day, 2],
+        ]
+          .map(([val, size]) => val.toString().padStart(size, '0'))
+          .join('-'))(albumObject.attributes.releaseDate),
       total_tracks: albumObject.attributes.trackCount,
     };
     wrapped.tracks = albumObject.relationships.tracks.data.map(track => this.wrapTrackMeta(track, wrapped));
