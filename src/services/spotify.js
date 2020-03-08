@@ -113,12 +113,13 @@ class Spotify {
 
   wrapAlbumData(albumObject) {
     const wrapped = {
+      id: albumObject.id,
       uri: albumObject.uri,
       name: albumObject.name,
       artists: albumObject.artists.map(artist => artist.name),
       type: albumObject.album_type,
-      copyrights: albumObject.copyrights,
       genres: albumObject.genres,
+      copyrights: albumObject.copyrights,
       images: albumObject.images,
       label: albumObject.label,
       release_date: new Date(albumObject.release_date),

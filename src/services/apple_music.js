@@ -86,10 +86,12 @@ class AppleMusic {
       total_tracks: albumInfo.total_tracks,
       release_date: (day => day.getTime() - day.getTimezoneOffset() * 60000)(trackInfo.attributes.releaseDate.toUTCDate()),
       disc_number: trackInfo.attributes.discNumber,
-      genres: trackInfo.attributes.genreNames,
       explicit: trackInfo.attributes.contentRating === 'explicit',
-      composers: trackInfo.attributes.composerName,
       isrc: trackInfo.attributes.isrc,
+      genres: trackInfo.attributes.genreNames,
+      label: albumInfo.label,
+      copyrights: albumInfo.copyrights,
+      composers: trackInfo.attributes.composerName,
     };
   }
 
