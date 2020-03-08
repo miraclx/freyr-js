@@ -473,7 +473,11 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       metaLogger.log(`\u2bc8 Tracks: ${meta.total_tracks}`);
       collationLogger = queryLogger.log(`[\u2022] Collating [${meta.name}]...`);
-      rxPromise = Promise.mapSeries(meta.tracks, track => processTrackFeed(collationLogger, service, track));
+      const tracks = await processPromise(service.getAlbumTracks(meta.uri), collationLogger, {
+        pre: '[\u2022] Inquiring tracks...',
+      });
+      collationLogger.indent += 1;
+      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, service, track));
     } else if (contentType === 'artist') {
       const artistLogger = metaLogger.log(`\u2bc8 Artist: ${meta.name}`);
       if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
@@ -494,9 +498,15 @@ async function init(queries, options) {
         if (!stack.items.length) return;
         const cxLogger = collationLogger.log(`[\u2022] ${stack.desc}`);
         cxLogger.indent += 1;
-        return Promise.mapSeries(stack.items, album =>
-          Promise.mapSeries(album.tracks, track => processTrackFeed(cxLogger, service, track)),
-        );
+        return Promise.mapSeries(stack.items, async (album, index) => {
+          const albumLogger = cxLogger.log(`(${prePadNum(index + 1, stack.items.length)}) [${album.name}]`);
+          const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
+            pre: '[\u2022] Inquiring tracks...',
+          });
+          if (tracks && !tracks.length) return;
+          albumLogger.indent += 1;
+          return Promise.mapSeries(tracks, track => processTrackFeed(albumLogger, service, track));
+        });
       });
     } else if (contentType === 'playlist') {
       metaLogger.log(`\u2bc8 Playlist Name: ${meta.name}`);
@@ -507,7 +517,11 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Tracks: ${meta.tracks.length}`);
       collationLogger = queryLogger.log(`[\u2022] Collating...`);
       collection = meta;
-      rxPromise = Promise.mapSeries(meta.tracks, track => processTrackFeed(collationLogger, service, track));
+      const tracks = await processPromise(service.getPlaylistTracks(meta.uri), collationLogger, {
+        pre: '[\u2022] Inquiring tracks...',
+      });
+      collationLogger.indent += 1;
+      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, service, track));
     }
     const qList = (await rxPromise).flat(Infinity).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
