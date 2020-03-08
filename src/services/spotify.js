@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this */
+const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 const spotifyUri = require('spotify-uri');
 const SpotifyWebApi = require('spotify-web-api-node');
