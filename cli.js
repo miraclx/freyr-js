@@ -115,7 +115,7 @@ async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
   if (rex.isRejected())
-    logger.write(...(err ? [err, '\n'] : [`(failed%s)\n`, rex.reason() ? `: [${rex.reason().message}]` : '']));
+    logger.write(...(err ? [err, '\n'] : [`(failed%s)\n`, (_err => (_err ? `: [${_err.message || _err}]` : ''))(rex.reason())]));
   else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr}\n`);
   else logger.write(`${post || '[done]'}\n`);
   return rex.isFulfilled() ? rex.value() : null;
