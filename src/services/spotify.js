@@ -153,7 +153,8 @@ class Spotify {
   }
 
   async processData(uris, max, coreFn) {
-    uris = (Array.isArray(uris) ? uris : [uris]).map(uri => {
+    const wasArr = Array.isArray(uris);
+    uris = (wasArr ? uris : [uris]).map(uri => {
       const parsedURI = this.parseURI(uri);
       uri = spotifyUri.formatURI(parsedURI);
       return [parsedURI.id, this.cache.get(uri)];
@@ -174,7 +175,7 @@ class Spotify {
         .forEach(item => (this.cache.set(item.uri, item), (uris[this.parseURI(item.uri).id] = item)));
 
     const ret = Object.values(uris);
-    return ret.length === 1 ? ret[0] : ret;
+    return !wasArr ? ret[0] : ret;
   }
 
   async getTrack(uris) {
