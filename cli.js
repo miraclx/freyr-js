@@ -228,13 +228,6 @@ async function init(queries, options) {
         return {meta, trackFileName};
       }
     }
-    let trackFeats;
-    if (service.getExtraTrackProps) {
-      trackFeats = await processPromise(service.getExtraTrackProps(meta.id), trackLogger, {
-        pre: '| \u2b9e Requesting track feats...',
-      });
-      if (!trackFeats) return {meta, trackFileName};
-    }
     const audioSource = await processPromise(freyrCore.getYoutubeSource(meta), trackLogger, {
       pre: '| \u2b9e Awaiting stream source...',
       xerr: '[zero sources found]',
@@ -249,7 +242,6 @@ async function init(queries, options) {
       const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
       const file = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
       const imageFile = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4i'});
-      if (trackFeats) ({tempo: meta.tempo} = trackFeats);
       const getAudioFeedStream =
         feedMeta.protocol !== 'http_dash_segments'
           ? () => {
@@ -373,7 +365,6 @@ async function init(queries, options) {
                             year: new Date(meta.release_date).toISOString().split('T')[0],
                             encodingTool: 'fr3yrcl1',
                             tracknum: `${meta.track_number}/${meta.total_tracks}`,
-                            bpm: meta.tempo || '',
                             encodedBy: 'd3vc0dr',
                             Rating: meta.explicit ? 'explicit' : 'clean',
                             composer: meta.composers || '',

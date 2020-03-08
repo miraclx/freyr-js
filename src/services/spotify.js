@@ -148,14 +148,8 @@ class Spotify {
       owner_id: playlistObject.owner.id,
       owner_name: playlistObject.owner.display_name,
       public: playlistObject.public,
-      tracks: playlistObject.tracks.items.map(item => this.wrapTrackMeta(item.track)),
+      tracks: playlistObject.tracks.items.map(item => item.track),
     };
-  }
-
-  async getExtraTrackProps(trackId) {
-    const uId = `spotify:track_props:${trackId}`;
-    if (!this.cache.has(uId)) this.cache.set(uId, (await this.core.getAudioFeaturesForTrack(trackId)).body);
-    return this.cache.get(uId);
   }
 
   async processData(uris, max, coreFn) {
