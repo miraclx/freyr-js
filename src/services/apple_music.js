@@ -178,6 +178,10 @@ class AppleMusic {
     return this.cache.get(uri);
   }
 
+  async getAlbumTracks(url, store) {
+    return (await this.getAlbum(url, store)).tracks;
+  }
+
   async getArtist(url) {
     const {uri, refID, storefront} = this.parseURI(url);
     if (!this.cache.has(uri))
