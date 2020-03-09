@@ -379,6 +379,7 @@ async function init(queries, options) {
                               ['CD', 'name=MEDIA', 'domain=com.apple.iTunes'],
                               [meta.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
                               [meta.label, 'name=LABEL', 'domain=com.apple.iTunes'],
+                              [service.DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
                               ...meta.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
                             ],
                             apID: 'cli@freyr.git',
