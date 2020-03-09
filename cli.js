@@ -169,10 +169,6 @@ async function init(queries, options) {
 
   const progressGen = prepProgressGen(options);
 
-  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
-    options.directoryPrefix,
-  );
-
   try {
     atomicParsley(true);
     options.tries = CHECK_FLAG_IS_NUM(
@@ -184,11 +180,17 @@ async function init(queries, options) {
     options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = PROCESS_INPUT_ARG(options.input);
-    if (!fs.existsSync(BASE_DIRECTORY)) throw new Error(`Working directory [${BASE_DIRECTORY}] isn't existent`);
   } catch (er) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
     process.exit(1);
   }
+
+  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
+    options.directoryPrefix,
+  );
+
+  if (!fs.existsSync(BASE_DIRECTORY))
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] isn't existent`), process.exit(3);
 
   if (
     (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.F_OK), stackLogger, {
