@@ -108,6 +108,7 @@ class Spotify {
       genres: albumInfo.genres,
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,
+      compilation: albumInfo.type === 'compilation',
     };
   }
 
