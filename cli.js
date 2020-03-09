@@ -383,7 +383,7 @@ async function init(queries, options) {
                               ...meta.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
                             ],
                             apID: 'cli@freyr.git',
-                            gapless: false,
+                            compilation: meta.compilation,
                             copyright: meta.copyrights.find(({type}) => type === 'P').text,
                             purchaseDate: 'timestamp',
                             comment: `URI: ${meta.uri}\nYouTube Stream ID: ${audioFeeds.id}`,
