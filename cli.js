@@ -467,7 +467,7 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Album Name: ${meta.name}`);
       metaLogger.log(`\u2bc8 Artist: ${meta.artists[0]}`);
       metaLogger.log(`\u2bc8 Tracks: ${meta.total_tracks}`);
-      metaLogger.log(`\u2bc8 Type: ${meta.type === 'collection' ? 'Collection' : 'Album'}`);
+      metaLogger.log(`\u2bc8 Type: ${meta.type === 'compilation' ? 'Compilation' : 'Album'}`);
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       if (meta.genres.length) metaLogger.log(`\u2bc8 Genres: ${meta.genres.join(', ')}`);
       if (meta.type === 'collection') collection = meta;
