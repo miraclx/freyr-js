@@ -108,7 +108,12 @@ class AppleMusic {
       uri: albumObject.attributes.url,
       name: albumObject.attributes.name,
       artists: [albumObject.attributes.artistName],
-      type: albumObject.attributes.isSingle ? 'single' : 'album',
+      type:
+        albumObject.attributes.artistName === 'Various Artists' && albumObject.relationships.artists.data.length === 0
+          ? 'compilation'
+          : albumObject.attributes.isSingle
+          ? 'single'
+          : 'album',
       genres: albumObject.attributes.genreNames,
       copyrights: [{type: 'P', text: albumObject.attributes.copyright}],
       images: albumObject.attributes.artwork.url.replace('{w}x{h}', '640x640'),
