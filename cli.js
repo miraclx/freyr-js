@@ -485,14 +485,15 @@ async function init(queries, options) {
       });
       if (!albumsStack) return;
       artistLogger.print(' > Sorting collections...');
-      const {albums, singles} = albumsStack.reduce((tx, v) => (tx[`${v.type}s`].items.push(v), tx), {
-        singles: {desc: 'Singles & EPs', items: []},
+      const {albums, singles, compilations} = albumsStack.reduce((tx, v) => (tx[`${v.type}s`].items.push(v), tx), {
         albums: {desc: 'Albums', items: []},
+        singles: {desc: 'Singles & EPs', items: []},
+        compilations: {desc: 'Compilations', items: []},
       });
       artistLogger.write('[done]\n');
-      metaLogger.log(`\u2bc8 ${[albums, singles].map(stack => `${stack.desc}: ${stack.items.length}`).join(', ')}`);
+      metaLogger.log(`\u2bc8 ${[albums, singles, compilations].map(stack => `${stack.desc}: ${stack.items.length}`).join(', ')}`);
       collationLogger = queryLogger.log(`[\u2022] Collating...`);
-      rxPromise = Promise.mapSeries([albums, singles], async stack => {
+      rxPromise = Promise.mapSeries([albums, singles, compilations], async stack => {
         if (!stack.items.length) return;
         const cxLogger = collationLogger.log(`[\u2022] ${stack.desc}`);
         cxLogger.indent += 1;
