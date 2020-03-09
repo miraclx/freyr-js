@@ -224,7 +224,7 @@ class Spotify {
         await this.getAlbum(
           (
             await this._gatherCompletely(
-              (offset, limit) => this.core.getArtistAlbums(id, {offset, limit, include_groups: 'album,single'}),
+              (offset, limit) => this.core.getArtistAlbums(id, {offset, limit, include_groups: 'album,single,compilation'}),
               {offset: 0, limit: 50, sel: 'items'},
             )
           ).map(album => album.uri),
