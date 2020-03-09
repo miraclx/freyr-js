@@ -106,7 +106,7 @@ class AppleMusic {
     const wrapped = {
       id: albumObject.id,
       uri: albumObject.attributes.url,
-      name: albumObject.attributes.name,
+      name: albumObject.attributes.name.replace(/\s-\s(Single|EP)$/, ''),
       artists: [albumObject.attributes.artistName],
       type:
         albumObject.attributes.artistName === 'Various Artists' && albumObject.relationships.artists.data.length === 0
