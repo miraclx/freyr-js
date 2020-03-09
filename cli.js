@@ -214,30 +214,33 @@ async function init(queries, options) {
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
 
-  async function processTrackFeed(collationLogger, service, meta) {
+  async function processTrackFeed(collationLogger, meta, service) {
+    const trackName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name} ${
+      meta.compilation && meta.album_artist === 'Various Artists' ? `\u2012 ${meta.artists.join(', ')}` : ''
+    }`;
     const trackFileName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}`;
-    const trackLogger = collationLogger.log(`\u2022 [${trackFileName}]`);
+    const trackLogger = collationLogger.log(`\u2022 [${trackName}]`);
     trackLogger.indent += 2;
     const outFileName = `${trackFileName}.m4a`;
-    const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [meta.artists[0], meta.album] : []));
+    const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [meta.album_artist, meta.album] : []));
     const outFilePath = xpath.join(outFileDir, outFileName);
     if (fs.existsSync(outFilePath)) {
       if (options.force) trackLogger.log('| [\u2022] Track exists. Overwriting...');
       else {
         trackLogger.log('| [\u2717] Track exists. Skipping...');
-        return {meta, trackFileName};
+        return {meta, trackName};
       }
     }
     const audioSource = await processPromise(freyrCore.getYoutubeSource(meta), trackLogger, {
       pre: '| \u2b9e Awaiting stream source...',
       xerr: '[zero sources found]',
     });
-    if (!audioSource) return {meta, trackFileName};
+    if (!audioSource) return {meta, trackName};
     const audioFeeds = await processPromise(freyrCore.getYoutubeStream(audioSource), trackLogger, {
       pre: '| \u2b9e Awaiting audiofeeds...',
       xerr: '[Unable to retrieve stream]',
     });
-    if (!audioFeeds || audioFeeds.err) return {meta, err: audioFeeds.err, trackFileName};
+    if (!audioFeeds || audioFeeds.err) return {meta, err: audioFeeds.err, trackName};
     return new Promise((res, rej) => {
       const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
       const file = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
@@ -250,7 +253,7 @@ async function init(queries, options) {
                   'error',
                   err => (
                     trackLogger.log(`| [\u2717] Failed to get raw media stream: ${err.code}`),
-                    (err = {err, meta, trackFileName}),
+                    (err = {err, meta, trackName, trackFileName}),
                     rej(err)
                   ),
                 )
@@ -258,7 +261,7 @@ async function init(queries, options) {
                   progressGen(
                     size,
                     chunkStack.map(chunk => chunk.size),
-                    {tag: `[‘${trackFileName}’]`},
+                    {tag: `[‘${trackName}’]`},
                     trackLogger.indent,
                   ),
                 )
@@ -275,7 +278,7 @@ async function init(queries, options) {
               const barGen = progressGen(
                 parsed_fragments.reduce((total, {size}) => total + size, 0),
                 parsed_fragments.map(({size}) => size),
-                {tag: `[‘${trackFileName}’] (fragment: [:{frag_v}/:{frag_ct}])`},
+                {tag: `[‘${trackName}’] (fragment: [:{frag_v}/:{frag_ct}])`},
                 trackLogger.indent,
               );
               const nextFragmentStream = ((i = -1, frag) => () =>
@@ -287,7 +290,7 @@ async function init(queries, options) {
                         err => (
                           (err.segment_index = i),
                           barGen.end(trackLogger.getText(`| [\u2717] Segment error while getting raw media: ${err.code}\n`)),
-                          (err = {err, meta, trackFileName}),
+                          (err = {err, meta, trackName, trackFileName}),
                           rej(err)
                         ),
                       )
@@ -313,7 +316,7 @@ async function init(queries, options) {
         .on('end', () => imageFeed.store.get('progressBar').end(trackLogger.getText(`| [\u2714] Got album art\n`)))
         .on(
           'error',
-          err => (trackLogger.log('| [\u2717] Failed to get album art'), (err = {err, meta, trackFileName}), rej(err)),
+          err => (trackLogger.log('| [\u2717] Failed to get album art'), (err = {err, meta, trackName, trackFileName}), rej(err)),
         );
       const imageFileStream = fs.createWriteStream(imageFile.name);
       imageFeed.pipe(imageFileStream).on('finish', () => {
@@ -324,6 +327,7 @@ async function init(queries, options) {
           trackLogger.log(`| [\u2022] Asynchronously encoding...`);
           res({
             meta,
+            trackName,
             outFileDir,
             outFileName,
             outFilePath,
@@ -457,7 +461,7 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       metaLogger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(meta.duration, 'mm:ss').match(/(\d{2}:\d{2}).+/)[1]}`);
       collationLogger = queryLogger.log('[\u2022] Collating...');
-      rxPromise = Promise.mapSeries([meta], track => processTrackFeed(collationLogger, service, track));
+      rxPromise = Promise.mapSeries([meta], track => processTrackFeed(collationLogger, track, service));
     } else if (contentType === 'album') {
       metaLogger.log(`\u2bc8 Album Name: ${meta.name}`);
       metaLogger.log(`\u2bc8 Artist: ${meta.artists[0]}`);
@@ -470,7 +474,7 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, service, track));
+      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, track, service));
     } else if (contentType === 'artist') {
       const artistLogger = metaLogger.log(`\u2bc8 Artist: ${meta.name}`);
       if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
@@ -498,7 +502,7 @@ async function init(queries, options) {
           });
           if (tracks && !tracks.length) return;
           albumLogger.indent += 1;
-          return Promise.mapSeries(tracks, track => processTrackFeed(albumLogger, service, track));
+          return Promise.mapSeries(tracks, track => processTrackFeed(albumLogger, track, service));
         });
       });
     } else if (contentType === 'playlist') {
@@ -514,7 +518,7 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, service, track));
+      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, track, service));
     }
     const qList = (await rxPromise).flat(Infinity).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
@@ -523,7 +527,7 @@ async function init(queries, options) {
     const stats = await Promise.mapSeries(qList, async trackMeta => {
       const trackSlice =
         trackMeta.value && trackMeta.reason ? (trackMeta.isFulfilled() ? trackMeta.value() : trackMeta.reason()) : trackMeta;
-      const refName = `${trackSlice.trackFileName}${collection ? ` ‒ ${trackSlice.meta.artists.join(', ')}` : ''}`;
+      const refName = `${trackSlice.trackName}`;
       if (!trackSlice.promise) {
         embedLogger.error(`\u2022 [\u2717] ${refName}${trackSlice.err ? ` [${trackSlice.err}]` : ''}`);
         return;
