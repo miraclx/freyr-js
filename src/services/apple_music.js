@@ -193,6 +193,10 @@ class AppleMusic {
     throw Error('Unimplemented: [AppleMusic:getPlaylist()]');
   }
 
+  async getPlaylistTracks() {
+    throw Error('Unimplemented: [AppleMusic:getPlaylistTracks()]');
+  }
+
   async getArtistAlbums(url) {
     const {uri: artistUri, refID} = this.parseURI(url);
     const uri = `spotify:artist_albums:${refID}`;
