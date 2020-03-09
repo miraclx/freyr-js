@@ -99,6 +99,7 @@ class AppleMusic {
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,
       composers: trackInfo.attributes.composerName,
+      compilation: albumInfo.type === 'compilation',
     };
   }
 
