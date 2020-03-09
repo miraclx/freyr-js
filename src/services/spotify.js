@@ -117,7 +117,7 @@ class Spotify {
       uri: albumObject.uri,
       name: albumObject.name,
       artists: albumObject.artists.map(artist => artist.name),
-      type: albumObject.album_type,
+      type: albumObject.artists[0].id === '0LyfQWJT6nXafLPZqxe9Of' ? 'compilation' : albumObject.album_type,
       genres: albumObject.genres,
       copyrights: albumObject.copyrights,
       images: albumObject.images,
