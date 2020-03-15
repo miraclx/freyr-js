@@ -195,17 +195,15 @@ class AppleMusic {
   }
 
   async getTrack(uris, store) {
-    return this.processData(uris, 300, async (items, storefront) =>
-      Promise.mapSeries(
-        (
-          await this.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {
-            storefront: store || storefront,
-          })
-        ).data,
-        async track =>
-          this.wrapTrackMeta(track, await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`)),
-      ),
-    );
+    return this.processData(uris, 300, async (items, storefront) => {
+      const {data: tracks} = await this.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {
+        storefront: store || storefront,
+      });
+      await this.getAlbum(items.map(item => `apple_music:album:${item.refID}`));
+      return Promise.mapSeries(tracks, async track =>
+        this.wrapTrackMeta(track, await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`)),
+      );
+    });
   }
 
   async getAlbum(uris, store) {

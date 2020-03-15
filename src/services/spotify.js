@@ -188,11 +188,11 @@ class Spotify {
   }
 
   async getTrack(uris) {
-    return this.processData(uris, 50, async ids =>
-      Promise.map((await this.core.getTracks(ids)).body.tracks, async track =>
-        this.wrapTrackMeta(track, await this.getAlbum(track.album.uri)),
-      ),
-    );
+    return this.processData(uris, 50, async ids => {
+      const {tracks} = (await this.core.getTracks(ids)).body;
+      await this.getAlbum(tracks.map(track => track.album.uri));
+      return Promise.map(tracks, async track => this.wrapTrackMeta(track, await this.getAlbum(track.album.uri)));
+    });
   }
 
   async getAlbum(uris) {
