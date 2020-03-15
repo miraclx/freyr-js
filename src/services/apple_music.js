@@ -235,12 +235,21 @@ class AppleMusic {
     );
   }
 
-  async getPlaylist() {
-    throw Error('Unimplemented: [AppleMusic:getPlaylist()]');
+  async getPlaylist(uris, store) {
+    return this.processData(uris, 25, async (items, storefront) =>
+      Promise.mapSeries(
+        (await this.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront: store || storefront}))
+          .data,
+        playlist => this.wrapPlaylistData(playlist),
+      ),
+    );
   }
 
-  async getPlaylistTracks() {
-    throw Error('Unimplemented: [AppleMusic:getPlaylistTracks()]');
+  async getPlaylistTracks(uris, store) {
+    return this.getTrack(
+      (await this.getPlaylist(uris, store)).tracks.map(track => track.attributes.url),
+      store,
+    );
   }
 
   async getArtistAlbums(uris, store) {
