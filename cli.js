@@ -526,7 +526,7 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, track, service, true));
+      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, service, track));
     }
     const qList = (await rxPromise).flat(Infinity).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
