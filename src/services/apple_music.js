@@ -1,6 +1,7 @@
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
 const xurl = require('url');
 const path = require('path');
+const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 const {Client} = require('@yujinakayama/apple-music');
 
@@ -158,37 +159,82 @@ class AppleMusic {
     };
   }
 
-  async getTrack(url) {
-    const {id, uri, refID, storefront} = this.parseURI(url);
-    if (!this.cache.has(uri))
-      this.cache.set(
-        uri,
-        (
-          await this.getAlbum(
-            `apple_music:album:${refID || (await this.core.songs.get(id, {storefront})).data[0].relationships.albums.data[0].id}`,
-            storefront,
-          )
-        ).tracks.find(track => track.id === id),
-      );
-    return this.cache.get(uri);
+  async processData(uris, max, coreFn) {
+    const wasArr = Array.isArray(uris);
+    uris = (wasArr ? uris : [uris]).map(_uri => {
+      const parsed = this.parseURI(_uri);
+      parsed.value = this.cache.get(parsed.uri);
+      return [parsed.id || parsed.refID, parsed];
+    });
+    const packs = uris.filter(([, {value}]) => !value).map(([, parsed]) => parsed);
+    uris = Object.fromEntries(uris);
+    if (packs.length)
+      (
+        await Promise.mapSeries(
+          Object.entries(
+            // organise by storefront
+            packs.reduce(
+              (all, item) => (((all[item.storefront] = all[item.storefront] || []), all[item.storefront].push(item)), all),
+              {},
+            ),
+          ),
+          async ([store, _items]) =>
+            Promise.mapSeries(
+              // cut to maximum query length
+              ((f, c) => (
+                (c = Math.min(c, f.length)), [...Array(Math.ceil(f.length / c))].map((_, i) => f.slice(i * c, i * c + c))
+              ))(_items, max || Infinity),
+              async items => coreFn(items, store), // request select collection
+            ),
+        )
+      )
+        .flat(2)
+        .forEach(item => this.cache.set(uris[item.id].uri, (uris[item.id].value = item)));
+    const ret = Object.values(uris).map(item => item.value);
+    return !wasArr ? ret[0] : ret;
   }
 
-  async getAlbum(url, store) {
-    const {uri, refID, storefront} = this.parseURI(url);
-    if (!this.cache.has(uri))
-      this.cache.set(uri, this.wrapAlbumData((await this.core.albums.get(refID, {storefront: store || storefront})).data[0]));
-    return this.cache.get(uri);
+  async getTrack(uris, store) {
+    return this.processData(uris, 300, async (items, storefront) =>
+      Promise.mapSeries(
+        (
+          await this.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {
+            storefront: store || storefront,
+          })
+        ).data,
+        async track =>
+          this.wrapTrackMeta(track, await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`)),
+      ),
+    );
+  }
+
+  async getAlbum(uris, store) {
+    return this.processData(uris, 100, async (items, storefront) =>
+      Promise.mapSeries(
+        (
+          await this.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {
+            storefront: store || storefront,
+          })
+        ).data,
+        album => this.wrapAlbumData(album),
+      ),
+    );
   }
 
   async getAlbumTracks(url, store) {
-    return (await this.getAlbum(url, store)).tracks;
+    return this.getTrack(
+      (await this.getAlbum(url, store)).tracks.map(track => track.attributes.url),
+      store,
+    );
   }
 
-  async getArtist(url) {
-    const {uri, refID, storefront} = this.parseURI(url);
-    if (!this.cache.has(uri))
-      this.cache.set(uri, this.wrapArtistData((await this.core.artists.get(refID, {storefront})).data[0]));
-    return this.cache.get(uri);
+  async getArtist(uris, store) {
+    return this.processData(uris, 25, async (items, storefront) =>
+      Promise.mapSeries(
+        (await this.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront: store || storefront})).data,
+        artist => this.wrapArtistData(artist),
+      ),
+    );
   }
 
   async getPlaylist() {
@@ -199,17 +245,16 @@ class AppleMusic {
     throw Error('Unimplemented: [AppleMusic:getPlaylistTracks()]');
   }
 
-  async getArtistAlbums(url) {
-    const {uri: artistUri, refID} = this.parseURI(url);
-    const uri = `spotify:artist_albums:${refID}`;
-    if (!this.cache.has(uri))
-      this.cache.set(
-        uri,
-        (
-          await this.core.albums.get(`?ids=${(await this.getArtist(artistUri)).albums.join(',')}`, {storefront: 'us'})
-        ).data.map(album => this.wrapAlbumData(album)),
-      );
-    return this.cache.get(uri);
+  async getArtistAlbums(uris, store) {
+    return this.processData(
+      (await this.getArtist(uris)).albums.map(album => `apple_music:album:${album}`),
+      100,
+      async (items, storefront) =>
+        Promise.mapSeries(
+          (await this.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront: store || storefront})).data,
+          album => this.wrapAlbumData(album),
+        ),
+    );
   }
 }
 
