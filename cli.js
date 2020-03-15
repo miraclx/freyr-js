@@ -253,7 +253,12 @@ async function init(queries, options) {
       const getAudioFeedStream =
         feedMeta.protocol !== 'http_dash_segments'
           ? () => {
-              const req = xget(feedMeta.url, {chunks: options.chunks, size: feedMeta.size || null, retries: options.tries})
+              const req = xget(feedMeta.url, {
+                chunks: options.chunks,
+                size: feedMeta.size || null,
+                retries: options.tries,
+                timeout: options.timeout,
+              })
                 .on(
                   'error',
                   err => (
@@ -633,6 +638,7 @@ const command = commander
   .option('-x, --filter <SEQ>', 'filter matches (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in format [PREFIX/]<ARTIST>/<ALBUM>/<TRACK>")
+  .option('--timeout', 'network inactivity timeout (ms)', 10000)
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
   .option('--single-bar', 'show a single bar for the download, hide chunk-view\n[default when n(chunks) exceed printable space]')
