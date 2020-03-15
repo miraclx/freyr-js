@@ -79,7 +79,7 @@ function prePadNum(val, total, min = 2) {
 }
 
 function prepProgressGen(options) {
-  return (size, slots, opts, indentLen) => {
+  return (size, slots, opts, indentLen, isFragment) => {
     const forceFirst = options.singleBar || slots.length === 1 || slots.length > 20;
     return ProgressBar.stream(size, slots, {
       forceFirst,
@@ -89,13 +89,14 @@ function prepProgressGen(options) {
       // eslint-disable-next-line prettier/prettier
       template: [
         ':{indent} [:{bullet}] :{label} :{flipper}',
-        ':{indent}  | :{bullet} :{tag}',
+        ':{indent}  | :{bullet} :{_tag}',
         ':{bars}'
       ],
       clean: true,
       flipper: [...Array(10)].map((...[, i]) => `:{color}${':{bullet}'.repeat(i + 1)}:{color:close}`),
       label: 'Downloading',
       variables: {
+        _tag: `:{tag} (${isFragment ? 'fragments' : 'chunks'}: ${slots.length})`,
         bullet: '\u2022',
         bars: ({total}) =>
           (Number.isFinite(total) && !forceFirst
@@ -103,7 +104,6 @@ function prepProgressGen(options) {
             : [`:{indent}  | [:{bar}]${Number.isFinite(total) ? ' [:3{percentage}%]' : ''} [:{speed}] (:{eta}) [:{size}]`]
           ).join('\n'),
         size: (stack, _size, total) => ((total = stack.total), `${stack.size()}${total !== Infinity ? `/:{size:total}` : ''}`),
-        frag_v: ({frag_i, frag_ct}) => prePadNum(frag_i, frag_ct),
         indent: ` `.repeat(indentLen),
         ...opts,
       },
@@ -268,6 +268,7 @@ async function init(queries, options) {
                     chunkStack.map(chunk => chunk.size),
                     {tag: `[‘${trackName}’]`},
                     trackLogger.indent,
+                    false,
                   ),
                 )
                 .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
@@ -283,29 +284,26 @@ async function init(queries, options) {
               const barGen = progressGen(
                 parsed_fragments.reduce((total, {size}) => total + size, 0),
                 parsed_fragments.map(({size}) => size),
-                {tag: `[‘${trackName}’] (fragment: [:{frag_v}/:{frag_ct}])`},
+                {tag: `[‘${trackName}’]`},
                 trackLogger.indent,
+                true,
               );
-              const nextFragmentStream = ((i = -1, frag) => () =>
-                (frag = parsed_fragments[(i += 1)])
-                  ? xget(frag.url, {chunks: 2, retries: options.retries})
-                      .on('retry', data => barGen.print(trackLogger.getText(`| ${getRetryMessage(data)}`)))
-                      .on(
-                        'error',
-                        err => (
-                          (err.segment_index = i),
-                          barGen.end(trackLogger.getText(`| [\u2717] Segment error while getting raw media: ${err.code}\n`)),
-                          (err = {err, meta, trackName, trackFileName}),
-                          rej(err)
-                        ),
-                      )
-                      .pipe(barGen.next(frag.size, {variables: {frag_i: i + 1, frag_ct: parsed_fragments.length}}))
-                  : null)();
-              const merged = merge2({end: false})
-                .once('resume', () => merged.add(nextFragmentStream()))
-                .on('queueDrain', next => ((next = nextFragmentStream()) ? merged.add(next) : merged.end()))
-                .once('end', () => barGen.end(''));
-              return merged;
+              return merge2(
+                ...parsed_fragments.map((frag, i) =>
+                  xget(frag.url, {chunks: 2, retries: options.tries, timeout: options.timeout})
+                    .on('retry', data => barGen.print(trackLogger.getText(`| ${getRetryMessage(data)}`)))
+                    .on(
+                      'error',
+                      err => (
+                        (err.segment_index = i),
+                        barGen.end(trackLogger.getText(`| [\u2717] Segment error while getting raw media: ${err.code}\n`)),
+                        (err = {err, meta, trackName, trackFileName}),
+                        rej(err)
+                      ),
+                    )
+                    .pipe(barGen.next(frag.size)),
+                ),
+              ).once('end', () => barGen.end(''));
             };
 
       const imageFeed = xget(meta.image, {chunks: options.chunks, retries: options.tries})
@@ -315,6 +313,7 @@ async function init(queries, options) {
             chunkStack.map(chunk => chunk.size),
             {tag: '[Retrieving album art]...'},
             trackLogger.indent,
+            false,
           ),
         )
         .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
