@@ -72,22 +72,3 @@ class StackLogger {
 }
 
 module.exports = StackLogger;
-
-(function main(params) {
-  const logger = new StackLogger();
-  logger.log('hey');
-  logger.log('Yo');
-  logger
-    .log('10')
-    .log(10)
-    .log('yo');
-  const x = logger.print('a');
-  x.print('f');
-  console.log('hey');
-  const f = x.log('Whats up?');
-  f.write('10')
-    .write('name')
-    .log();
-  logger.print('Entering stage...');
-  logger.log('done');
-});
