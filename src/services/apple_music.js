@@ -147,14 +147,14 @@ class AppleMusic {
   wrapPlaylistData(playlistObject) {
     return {
       id: playlistObject.id,
-      uri: playlistObject.uri,
-      name: playlistObject.name,
-      followers: playlistObject.followers.total,
-      description: playlistObject.description,
-      owner_id: playlistObject.owner.id,
-      owner_name: playlistObject.owner.display_name,
+      uri: playlistObject.attributes.url,
+      name: playlistObject.attributes.name,
+      followers: null,
+      description: playlistObject.attributes.description.short,
+      owner_id: null,
+      owner_name: playlistObject.attributes.curatorName,
       type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
-      tracks: playlistObject.tracks.items.map(item => this.wrapTrackMeta(item.track)),
+      tracks: playlistObject.relationships.tracks.data,
     };
   }
 
