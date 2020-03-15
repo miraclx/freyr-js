@@ -89,69 +89,76 @@ class Spotify {
   }
 
   wrapTrackMeta(trackInfo, albumInfo = trackInfo.album) {
-    return {
-      id: trackInfo.id,
-      uri: trackInfo.uri,
-      name: trackInfo.name,
-      artists: trackInfo.artists.map(artist => artist.name),
-      album: albumInfo.name,
-      album_uri: albumInfo.uri,
-      image: albumInfo.images[0].url,
-      duration: trackInfo.duration_ms,
-      album_artist: albumInfo.artists[0],
-      track_number: trackInfo.track_number,
-      total_tracks: albumInfo.total_tracks,
-      release_date: albumInfo.release_date,
-      disc_number: trackInfo.disc_number,
-      explicit: trackInfo.explicit,
-      isrc: (trackInfo.external_ids || {}).isrc,
-      genres: albumInfo.genres,
-      label: albumInfo.label,
-      copyrights: albumInfo.copyrights,
-      compilation: albumInfo.type === 'compilation',
-    };
+    return trackInfo
+      ? {
+          id: trackInfo.id,
+          uri: trackInfo.uri,
+          name: trackInfo.name,
+          artists: trackInfo.artists.map(artist => artist.name),
+          album: albumInfo.name,
+          album_uri: albumInfo.uri,
+          image: albumInfo.images[0].url,
+          duration: trackInfo.duration_ms,
+          album_artist: albumInfo.artists[0],
+          track_number: trackInfo.track_number,
+          total_tracks: albumInfo.total_tracks,
+          release_date: albumInfo.release_date,
+          disc_number: trackInfo.disc_number,
+          explicit: trackInfo.explicit,
+          isrc: (trackInfo.external_ids || {}).isrc,
+          genres: albumInfo.genres,
+          label: albumInfo.label,
+          copyrights: albumInfo.copyrights,
+          compilation: albumInfo.type === 'compilation',
+        }
+      : null;
   }
 
   wrapAlbumData(albumObject) {
-    const wrapped = {
-      id: albumObject.id,
-      uri: albumObject.uri,
-      name: albumObject.name,
-      artists: albumObject.artists.map(artist => artist.name),
-      type: albumObject.artists[0].id === '0LyfQWJT6nXafLPZqxe9Of' ? 'compilation' : albumObject.album_type,
-      genres: albumObject.genres,
-      copyrights: albumObject.copyrights,
-      images: albumObject.images,
-      label: albumObject.label,
-      release_date: new Date(albumObject.release_date),
-      total_tracks: albumObject.total_tracks,
-      tracks: albumObject.tracks.items,
-    };
-    return wrapped;
+    return albumObject
+      ? {
+          id: albumObject.id,
+          uri: albumObject.uri,
+          name: albumObject.name,
+          artists: albumObject.artists.map(artist => artist.name),
+          type: albumObject.artists[0].id === '0LyfQWJT6nXafLPZqxe9Of' ? 'compilation' : albumObject.album_type,
+          genres: albumObject.genres,
+          copyrights: albumObject.copyrights,
+          images: albumObject.images,
+          label: albumObject.label,
+          release_date: new Date(albumObject.release_date),
+          total_tracks: albumObject.total_tracks,
+          tracks: albumObject.tracks.items,
+        }
+      : null;
   }
 
   wrapArtistData(artistObject) {
-    return {
-      id: artistObject.id,
-      uri: artistObject.uri,
-      name: artistObject.name,
-      genres: artistObject.genres,
-      followers: artistObject.followers.total,
-    };
+    return artistObject
+      ? {
+          id: artistObject.id,
+          uri: artistObject.uri,
+          name: artistObject.name,
+          genres: artistObject.genres,
+          followers: artistObject.followers.total,
+        }
+      : null;
   }
 
   wrapPlaylistData(playlistObject) {
-    return {
-      id: playlistObject.id,
-      uri: playlistObject.uri,
-      name: playlistObject.name,
-      followers: playlistObject.followers.total,
-      description: playlistObject.description,
-      owner_id: playlistObject.owner.id,
-      owner_name: playlistObject.owner.display_name,
-      type: `${playlistObject.public ? 'Public' : 'Private'}${playlistObject.collaborative ? ' (Collaborative)' : ''}`,
-      tracks: playlistObject.tracks.items.map(item => item.track),
-    };
+    return playlistObject
+      ? {
+          id: playlistObject.id,
+          uri: playlistObject.uri,
+          name: playlistObject.name,
+          followers: playlistObject.followers.total,
+          description: playlistObject.description,
+          owner_id: playlistObject.owner.id,
+          owner_name: playlistObject.owner.display_name,
+          type: `${playlistObject.public ? 'Public' : 'Private'}${playlistObject.collaborative ? ' (Collaborative)' : ''}`,
+          tracks: playlistObject.tracks.items.map(item => item.track),
+        }
+      : null;
   }
 
   async processData(uris, max, coreFn) {

@@ -456,7 +456,10 @@ async function init(queries, options) {
         : service.getPlaylist(query),
       queryLogger,
     );
-    if (!meta) return;
+    if (!meta) {
+      queryLogger.error('\x1b[31m[i]\x1b[0m Invalid query');
+      return;
+    }
     let rxPromise;
     let collection;
     let collationLogger;
