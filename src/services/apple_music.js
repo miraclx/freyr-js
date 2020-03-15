@@ -129,8 +129,8 @@ class AppleMusic {
           .map(([val, size]) => val.toString().padStart(size, '0'))
           .join('-'))(albumObject.attributes.releaseDate),
       total_tracks: albumObject.attributes.trackCount,
+      tracks: albumObject.relationships.tracks.data,
     };
-    wrapped.tracks = albumObject.relationships.tracks.data.map(track => this.wrapTrackMeta(track, wrapped));
     return wrapped;
   }
 
