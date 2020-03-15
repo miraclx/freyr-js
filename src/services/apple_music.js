@@ -79,7 +79,7 @@ class AppleMusic {
       name: trackInfo.attributes.name,
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
-      album_uri: `apple_music:album:${albumInfo.id || trackInfo.relationships.albums.data[0].id}`,
+      album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
       image: trackInfo.attributes.artwork.url.replace('{w}x{h}', '640x640'),
       duration: trackInfo.attributes.durationInMillis,
       album_artist: albumInfo.artists[0],
