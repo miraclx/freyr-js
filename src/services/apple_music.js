@@ -189,7 +189,7 @@ class AppleMusic {
         )
       )
         .flat(2)
-        .forEach(item => this.cache.set(uris[item.id].uri, (uris[item.id].value = item)));
+        .forEach(item => (item ? this.cache.set(uris[item.id].uri, (uris[item.id].value = item)) : null));
     const ret = Object.values(uris).map(item => item.value);
     return !wasArr ? ret[0] : ret;
   }

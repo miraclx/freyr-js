@@ -180,8 +180,8 @@ class Spotify {
           coreFn,
         )
       )
-        .flat()
-        .forEach(item => (this.cache.set(item.uri, item), (uris[this.parseURI(item.uri).id] = item)));
+        .flat(1)
+        .forEach(item => (!item ? null : (this.cache.set(item.uri, item), (uris[item.id] = item))));
 
     const ret = Object.values(uris);
     return !wasArr ? ret[0] : ret;
