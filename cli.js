@@ -219,9 +219,9 @@ async function init(queries, options) {
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
 
-  async function processTrackFeed(collationLogger, meta, service) {
-    const trackName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name} ${
-      meta.compilation && meta.album_artist === 'Various Artists' ? `\u2012 ${meta.artists.join(', ')}` : ''
+  async function processTrackFeed(collationLogger, meta, service, isPlaylist = false) {
+    const trackName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}${
+      isPlaylist || (meta.compilation && meta.album_artist === 'Various Artists') ? ` \u2012 ${meta.artists.join(', ')}` : ''
     }`;
     const trackFileName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}`;
     const trackLogger = collationLogger.log(`\u2022 [${trackName}]`);
@@ -526,7 +526,7 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, track, service));
+      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, track, service, true));
     }
     const qList = (await rxPromise).flat(Infinity).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
