@@ -517,7 +517,7 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Playlist Name: ${meta.name}`);
       metaLogger.log(`\u2bc8 By: ${meta.owner_name}`);
       if (meta.description) metaLogger.log(`\u2bc8 Description: ${meta.description}`);
-      metaLogger.log(`\u2bc8 Type: ${meta.public ? 'Public' : 'Private'}`);
+      metaLogger.log(`\u2bc8 Type: ${meta.type}`);
       metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
       metaLogger.log(`\u2bc8 Tracks: ${meta.tracks.length}`);
       collationLogger = queryLogger.log(`[\u2022] Collating...`);

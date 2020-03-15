@@ -152,7 +152,7 @@ class AppleMusic {
       description: playlistObject.description,
       owner_id: playlistObject.owner.id,
       owner_name: playlistObject.owner.display_name,
-      public: playlistObject.public,
+      type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
       tracks: playlistObject.tracks.items.map(item => this.wrapTrackMeta(item.track)),
     };
   }
