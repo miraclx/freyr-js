@@ -8,6 +8,7 @@ const Promise = require('bluebird');
 const youtubedl = require('youtube-dl');
 
 const YouTube = require('./youtube');
+const Deezer = require('./services/deezer');
 const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');
 
@@ -21,6 +22,7 @@ class FreyrCore {
         AuthServer,
       }),
       new AppleMusic(),
+      new Deezer(),
     ];
   }
 
