@@ -106,7 +106,7 @@ class AppleMusic {
   }
 
   wrapAlbumData(albumObject) {
-    const wrapped = {
+    return {
       id: albumObject.id,
       uri: albumObject.attributes.url,
       name: albumObject.attributes.name.replace(/\s-\s(Single|EP)$/, ''),
@@ -132,7 +132,6 @@ class AppleMusic {
       total_tracks: albumObject.attributes.trackCount,
       tracks: albumObject.relationships.tracks.data,
     };
-    return wrapped;
   }
 
   wrapArtistData(artistObject) {
