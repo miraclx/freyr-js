@@ -8,7 +8,7 @@ const {Client} = require('@yujinakayama/apple-music');
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
 class AppleMusic {
-  ID = 'apple-music';
+  ID = 'apple_music';
 
   DESC = 'Apple Music';
 
