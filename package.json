@@ -53,6 +53,7 @@
     "node-cache": "^5.1.0",
     "open": "^7.0.0",
     "pretty-ms": "^6.0.0",
+    "request": "^2.88.2",
     "spotify-uri": "^1.1.0",
     "spotify-web-api-node": "^4.0.0",
     "stringd": "^1.5.1",
