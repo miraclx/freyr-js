@@ -472,7 +472,7 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Album: ${meta.album}`);
       metaLogger.log(`\u2bc8 Artist: ${meta.album_artist}`);
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
-      metaLogger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(meta.duration, 'mm:ss').match(/(\d{2}:\d{2}).+/)[1]}`);
+      metaLogger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(meta.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
       collationLogger = queryLogger.log('[\u2022] Collating...');
       rxPromise = Promise.mapSeries([meta], track => processTrackFeed(collationLogger, track, service));
     } else if (contentType === 'album') {
