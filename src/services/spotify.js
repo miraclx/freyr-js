@@ -22,11 +22,9 @@ class Spotify {
   };
 
   constructor(config, authServer) {
-    config = config || {};
+    config = config || this.DEFAULT_AUTH;
     this.AuthServer = authServer;
-    this.core = new SpotifyWebApi(
-      config.client_id ? {clientId: config.client_id, clientSecret: config.client_secret} : this.DEFAULT_AUTH,
-    );
+    this.core = new SpotifyWebApi({clientId: config.client_id, clientSecret: config.client_secret});
     this.cache = new NodeCache();
   }
 
