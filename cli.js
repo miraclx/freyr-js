@@ -171,8 +171,15 @@ async function init(queries, options) {
     process.exit(4);
   }
 
-  const freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
-  await freyrCore.init();
+  let freyrCore;
+  try {
+    freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
+    await freyrCore.init();
+  } catch (e) {
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Failed to initialize a Freyr Instance`);
+    stackLogger.error(e);
+    process.exit(4);
+  }
 
   const progressGen = prepProgressGen(options);
 
