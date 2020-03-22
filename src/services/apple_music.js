@@ -39,6 +39,10 @@ class AppleMusic {
     throw Error('Unimplemented: [AppleMusic:newAuth()]');
   }
 
+  canTryLogin() {
+    return !!this.core.configuration.developerToken;
+  }
+
   async login() {
     throw Error('Unimplemented: [AppleMusic:login()]');
   }

@@ -482,7 +482,7 @@ async function init(queries, options) {
       authLogger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
       const config = freyrCore.config.get(`services.${service.ID}`);
       const loginLogger = queryLogger.log(`[${service.DESC} Login]`);
-      config.refresh_token
+      service.canTryLogin(config)
         ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
           (await coreAuth(loginLogger))
         : await coreAuth(loginLogger);

@@ -110,6 +110,10 @@ class Deezer {
     throw Error('Unimplemented: [Deezer:newAuth()]');
   }
 
+  canTryLogin() {
+    return true;
+  }
+
   async login() {
     throw Error('Unimplemented: [Deezer:login()]');
   }

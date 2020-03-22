@@ -57,6 +57,10 @@ class Spotify {
     this.expiry = Date.now() + expiry * 1000;
   }
 
+  canTryLogin(config) {
+    return !!(this.core.getRefreshToken() || config.refresh_token);
+  }
+
   async login(config) {
     this.core.setRefreshToken(config.refresh_token);
     const data = await this.core.refreshAccessToken();
