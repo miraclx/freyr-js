@@ -544,7 +544,8 @@ async function init(queries, options) {
         if (!stack.items.length) return;
         const cxLogger = collationLogger.log(`[\u2022] ${stack.desc}`);
         cxLogger.indent += 1;
-        return Promise.mapSeries(stack.items, async (album, index) => {
+        return Promise.mapSeries(stack.items, async ({uri}, index) => {
+          const album = await service.getAlbum(uri);
           const albumLogger = cxLogger.log(`(${prePadNum(index + 1, stack.items.length)}) [${album.name}]`);
           const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
             pre: '[\u2022] Inquiring tracks...',
