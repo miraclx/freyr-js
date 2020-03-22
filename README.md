@@ -136,6 +136,15 @@ Authentication unrequired. API is freely accessible.
 * 5: Network error
 * 6: Failed to initialize a freyr instance
 
+## Service Support
+
+| Service | Track | Album | Artist | Playlist |
+| :-----: | :---: | :---: | :----: | :------: |
+| [Spotify](src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    |
+| [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    |
+| [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✗    |
+| Youtube Music |   ✗   |   ✗   |    ✗   |     ✗    |
+
 ## Development
 
 ### Building
