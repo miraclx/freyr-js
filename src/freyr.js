@@ -13,16 +13,13 @@ const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');
 
 class FreyrCore {
-  constructor(Authkeys, AuthServer) {
+  constructor(ServiceConfig, AuthServer) {
     this.youtube = new YouTube();
     this.ytdlGet = util.promisify(youtubedl.getInfo);
     this.engines = [
-      new Spotify({
-        ConfFile: Authkeys.spotify,
-        AuthServer,
-      }),
-      new AppleMusic(),
-      new Deezer(),
+      new Deezer(ServiceConfig.deezer, AuthServer),
+      new Spotify(ServiceConfig.spotify, AuthServer),
+      new AppleMusic(ServiceConfig.apple_music, AuthServer),
     ];
   }
 

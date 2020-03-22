@@ -21,16 +21,11 @@ class Spotify {
     client_secret: '84e7ab36abed48318bfb2eae7b32415d',
   };
 
-  constructor(args) {
-    const {AuthServer, ConfFile} = {ConfFile: {client_id: '', client_secret: ''}, ...args};
-    this.AuthServer = AuthServer;
+  constructor(config, authServer) {
+    config = config || {};
+    this.AuthServer = authServer;
     this.core = new SpotifyWebApi(
-      ConfFile.client_id
-        ? {
-            clientId: ConfFile.client_id,
-            clientSecret: ConfFile.client_secret,
-          }
-        : this.DEFAULT_AUTH,
+      config.client_id ? {clientId: config.client_id, clientSecret: config.client_secret} : this.DEFAULT_AUTH,
     );
     this.cache = new NodeCache();
   }

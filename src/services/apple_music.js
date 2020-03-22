@@ -22,9 +22,9 @@ class AppleMusic {
       'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTgyMTQzMTIxLCJleHAiOjE1OTc2OTUxMjF9.j3MAuNa0ZfVVOsBtsGFBmNwT4jPrKu2Alp5PzdhQC3Id--pboI9GqrysOSj2bfg0P-iJboXsg3R_dWr1TQ3pwg',
   };
 
-  constructor() {
+  constructor(config) {
     this.cache = new NodeCache();
-    this.core = new Client({developerToken: this.DEFAULT_AUTH.developerToken});
+    this.core = new Client({developerToken: (config || this.DEFAULT_AUTH).developerToken});
     this.isAuthenticated = !!this.DEFAULT_AUTH.developerToken;
   }
 
