@@ -162,7 +162,7 @@ async function init(queries, options) {
   let Config = {};
   if (fs.existsSync('./conf.json')) Config = JSON.parse(fs.readFileSync('./conf.json'));
 
-  const freyrCore = new FreyrCore(Config.services, AuthServer);
+  const freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
   await freyrCore.init();
 
   const progressGen = prepProgressGen(options);
