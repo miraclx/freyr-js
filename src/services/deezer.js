@@ -23,7 +23,7 @@ class DeezerCore {
     return new Promise((res, rej) =>
       request.get(ref, {baseUrl: `https://${this.hostname}/`, json: true, qs: {...opts, output: 'json'}}, (err, response) => {
         return err
-          ? rej(new WebapiError(`${err.syscall} ${err.code} ${err.hostname}`))
+          ? rej(new WebapiError(`${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`))
           : response.body && typeof response.body === 'object' && 'error' in response.body
           ? rej(
               new WebapiError(
