@@ -116,20 +116,6 @@ class FreyrCore {
       ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
       : {err: data.reason()};
   }
-
-  async downloadActiveSpotifyTrack() {
-    if (!this.spotify.isAuthenticated) console.log('[!] Please authenticate the spotify client first'), process.exit();
-    const info = await this.spotify.getActiveTrackInfo();
-    if (!info) return console.log('[i] No actively playing track detected');
-    await this.downloadMusicFromYoutube(info);
-    return true;
-  }
-
-  async downloadSpotifyTrack(uri) {
-    if (!this.spotify.isAuthenticated) console.log('[!] Please authenticate the spotify client first'), process.exit();
-    const info = await this.spotify.getTrackInfo(uri);
-    await this.downloadMusicFromYoutube(info);
-  }
 }
 
 module.exports = FreyrCore;
