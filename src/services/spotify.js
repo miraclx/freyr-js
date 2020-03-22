@@ -16,13 +16,7 @@ class Spotify {
 
   isAuthenticated = false;
 
-  DEFAULT_AUTH = {
-    client_id: '888aa4540c09464abc9ed8bbe2a5f18a',
-    client_secret: '84e7ab36abed48318bfb2eae7b32415d',
-  };
-
   constructor(config, authServer, serverOpts) {
-    config = config || this.DEFAULT_AUTH;
     [this.AuthServer, this.serverOpts] = [authServer, serverOpts];
     this.core = new SpotifyWebApi({clientId: config.client_id, clientSecret: config.client_secret});
     this.cache = new NodeCache();
