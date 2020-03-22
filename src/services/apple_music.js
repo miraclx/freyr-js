@@ -18,6 +18,10 @@ class AppleMusic {
   isAuthenticated = false;
 
   constructor(config) {
+    if (!config) throw new Error(`[AppleMusic] Please define a configuration object`);
+    if (typeof config !== 'object') throw new Error(`[AppleMusic] Please define a configuration as an object`);
+    if (!config.developerToken)
+      throw new Error(`[AppleMusic] Please define [developerToken] as a property within the configuration`);
     this.cache = new NodeCache();
     this.core = new Client({developerToken: config.developerToken});
     this.isAuthenticated = !!config.developerToken;
