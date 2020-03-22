@@ -504,7 +504,9 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       metaLogger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(meta.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
       collationLogger = queryLogger.log('[\u2022] Collating...');
-      rxPromise = Promise.mapSeries([meta], track => processTrackFeed(collationLogger, track, service));
+      rxPromise = Promise.mapSeries(asynchronouslyPrepareTracks([meta]), track =>
+        processTrackFeed(collationLogger, track, service),
+      );
     } else if (contentType === 'album') {
       metaLogger.log(`\u2bc8 Album Name: ${meta.name}`);
       metaLogger.log(`\u2bc8 Artist: ${meta.artists[0]}`);
@@ -518,7 +520,9 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, track, service));
+      rxPromise = Promise.mapSeries(asynchronouslyPrepareTracks(tracks), track =>
+        processTrackFeed(collationLogger, track, service),
+      );
     } else if (contentType === 'artist') {
       const artistLogger = metaLogger.log(`\u2bc8 Artist: ${meta.name}`);
       if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
@@ -547,7 +551,7 @@ async function init(queries, options) {
           });
           if (tracks && !tracks.length) return;
           albumLogger.indent += 1;
-          return Promise.mapSeries(tracks, track => processTrackFeed(albumLogger, track, service));
+          return Promise.mapSeries(asynchronouslyPrepareTracks(tracks), track => processTrackFeed(albumLogger, track, service));
         });
       });
     } else if (contentType === 'playlist') {
@@ -563,7 +567,9 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(tracks, track => processTrackFeed(collationLogger, service, track));
+      rxPromise = Promise.mapSeries(asynchronouslyPrepareTracks(tracks), track =>
+        processTrackFeed(collationLogger, track, service),
+      );
     }
     const qList = (await rxPromise).flat(Infinity).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
