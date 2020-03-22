@@ -160,7 +160,16 @@ async function init(queries, options) {
   if (!Array.isArray(queries)) stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid Query'), process.exit(2);
 
   let Config = {};
-  if (fs.existsSync('./conf.json')) Config = JSON.parse(fs.readFileSync('./conf.json'));
+  try {
+    if (fs.existsSync('./conf.json')) Config = JSON.parse(fs.readFileSync('./conf.json'));
+    else {
+      stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
+      process.exit(4);
+    }
+  } catch (_) {
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
+    process.exit(4);
+  }
 
   const freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
   await freyrCore.init();
