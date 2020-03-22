@@ -17,12 +17,13 @@ function wrapHTML(opts) {
 }
 
 class AuthServer extends events.EventEmitter {
-  constructor(serviceName) {
+  constructor(opts) {
     super();
-    this._port = 36346;
-    this.serviceName = serviceName;
+    this._port = opts.port || 36346;
+    this._hostname = opts.hostname || 'localhost';
+    this.serviceName = opts.serviceName;
     this.stateKey = 'auth_state';
-    this.base_url = `http://localhost:${this._port}`;
+    this.base_url = `http${opts.useHttps ? 's' : ''}://${this._hostname}:${this._port}`;
     this.callback_route = '/callback';
     this.express_app = express()
       .use(cors())
@@ -52,7 +53,7 @@ class AuthServer extends events.EventEmitter {
           server.close();
           this.emit('code', code);
         })
-        .listen(this._port, () => resolve(this.base_url));
+        .listen(this._port, this._hostname, () => resolve(this.base_url));
     });
   }
 
