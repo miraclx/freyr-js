@@ -21,9 +21,9 @@ class Spotify {
     client_secret: '84e7ab36abed48318bfb2eae7b32415d',
   };
 
-  constructor(config, authServer) {
+  constructor(config, authServer, serverOpts) {
     config = config || this.DEFAULT_AUTH;
-    this.AuthServer = authServer;
+    [this.AuthServer, this.serverOpts] = [authServer, serverOpts];
     this.core = new SpotifyWebApi({clientId: config.client_id, clientSecret: config.client_secret});
     this.cache = new NodeCache();
   }
@@ -37,7 +37,7 @@ class Spotify {
   }
 
   newAuth() {
-    const server = new this.AuthServer('Spotify');
+    const server = new this.AuthServer({...this.serverOpts, serviceName: 'Spotify'});
     this.core.setRedirectURI(server.getRedirectURL());
     const scope = ['user-read-private', 'user-read-email', 'user-read-playback-state'];
     const authCode = Promise.resolve(server.getCode());
