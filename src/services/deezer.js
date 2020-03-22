@@ -24,7 +24,7 @@ class DeezerCore {
       request.get(ref, {baseUrl: `https://${this.hostname}/`, json: true, qs: {...opts, output: 'json'}}, (err, response) => {
         return err
           ? rej(new WebapiError(`${err.syscall} ${err.code} ${err.hostname}`))
-          : 'error' in response.body
+          : response.body && typeof response.body === 'object' && 'error' in response.body
           ? rej(
               new WebapiError(
                 `${response.body.error.code} [${response.body.error.type}]: ${response.body.error.message}`,
