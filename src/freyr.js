@@ -14,6 +14,7 @@ const AppleMusic = require('./services/apple_music');
 
 class FreyrCore {
   constructor(ServiceConfig, AuthServer) {
+    ServiceConfig = ServiceConfig || {};
     this.youtube = new YouTube();
     this.ytdlGet = util.promisify(youtubedl.getInfo);
     this.engines = [
