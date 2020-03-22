@@ -80,8 +80,11 @@ This file should be of `JSON` format and is to be structured as such.
   },
   "services": {
     "spotify": {
-      "client_id": "e9ac6d6fdb4dfc629d6b5827d18cd829",
-      "client_secret": "32e2a7217671b8dbaab471a3e6b13ef3"
+      "client_id": "CLIENT_ID",
+      "client_secret": "CLIENT_SECRET"
+    },
+    "apple_music": {
+      "developerToken": "DEVELOPER_TOKEN"
     }
   }
 }
