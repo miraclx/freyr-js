@@ -106,7 +106,7 @@ If you wish to create and use custom keys, [See [Spotify API Authorization](#spo
 2. Click `CREATE A CLIENT ID` and create an app
 3. Now click `Edit Settings`
 4. Add `http://localhost:36346/callback` to the Redirect URIs
-5. Include the `client_id` and the `client_secret` from the dashboard in the `services` object of the `conf.json` file. [[See Confiuration](#configuration)]
+5. Include the `client_id` and the `client_secret` from the dashboard in the `spotify` object that is a property of the `services` object of the `conf.json` file. [[See Confiuration](#configuration)]
 6. You are now ready to authenticate with Spotify!
 
 #### Apple Music
