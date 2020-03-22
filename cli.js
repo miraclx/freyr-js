@@ -219,29 +219,59 @@ async function init(queries, options) {
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
 
-  async function processTrackFeed(collationLogger, meta, service, isPlaylist = false) {
+  function asynchronouslyPrepareTracks(tracks) {
+    return tracks.map(track => {
+      const trackFileName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
+      const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
+      const outFileName = `${trackFileName}.m4a`;
+      const outFilePath = xpath.join(outFileDir, outFileName);
+      const fileExists = fs.existsSync(outFilePath);
+      const processTrack = !fileExists || options.force;
+      let psource;
+      let pstream;
+      if (processTrack) {
+        psource = Promise.resolve(freyrCore.getYoutubeSource(track));
+        pstream = Promise.resolve(
+          (async () => {
+            const source = await psource.reflect();
+            if (source.isFulfilled() && source.value()) return freyrCore.getYoutubeStream(source.value());
+          })(),
+        );
+      }
+      return {track, psource, pstream, trackFileName, outFileDir, outFileName, outFilePath, fileExists, processTrack};
+    });
+  }
+
+  async function processTrackFeed(collationLogger, trackObject, service, isPlaylist = false) {
+    const {
+      track: meta,
+      psource,
+      pstream,
+      trackFileName,
+      outFileDir,
+      outFileName,
+      outFilePath,
+      fileExists,
+      processTrack,
+    } = trackObject;
     const trackName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}${
       isPlaylist || (meta.compilation && meta.album_artist === 'Various Artists') ? ` \u2012 ${meta.artists.join(', ')}` : ''
     }`;
-    const trackFileName = `${prePadNum(meta.track_number, meta.total_tracks, 2)} ${meta.name}`;
     const trackLogger = collationLogger.log(`\u2022 [${trackName}]`);
     trackLogger.indent += 2;
-    const outFileName = `${trackFileName}.m4a`;
-    const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [meta.album_artist, meta.album] : []));
-    const outFilePath = xpath.join(outFileDir, outFileName);
-    if (fs.existsSync(outFilePath)) {
-      if (options.force) trackLogger.log('| [\u2022] Track exists. Overwriting...');
+    if (fileExists) {
+      if (processTrack) trackLogger.log('| [\u2022] Track exists. Overwriting...');
       else {
         trackLogger.log('| [\u2717] Track exists. Skipping...');
         return {meta, trackName};
       }
     }
-    const audioSource = await processPromise(freyrCore.getYoutubeSource(meta), trackLogger, {
+    const audioSource = await processPromise(psource, trackLogger, {
       pre: '| \u2b9e Awaiting stream source...',
       xerr: '[zero sources found]',
     });
     if (!audioSource) return {meta, trackName};
-    const audioFeeds = await processPromise(freyrCore.getYoutubeStream(audioSource), trackLogger, {
+    const audioFeeds = await processPromise(pstream, trackLogger, {
       pre: '| \u2b9e Awaiting audiofeeds...',
       xerr: '[Unable to retrieve stream]',
     });
