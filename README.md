@@ -117,7 +117,10 @@ To create a custom developer token, please refer to the Apple Music documentatio
 
 ##### Apple Music API Authorization
 
-[See [Apple Music](#apple-music)]
+[See [Apple Music API: Getting Keys and Creating Tokens
+](https://developer.apple.com/documentation/applemusicapi/getting_keys_and_creating_tokens)]
+
+After successfully acquiring the developer token, include the `developerToken` to the `apple_music` object that's a property of the `services` object in the `conf.json` file. [[See Confiuration](#configuration)]
 
 #### Deezer
 
