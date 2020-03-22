@@ -126,6 +126,16 @@ After successfully acquiring the developer token, include the `developerToken` t
 
 Authentication unrequired. API is freely accessible.
 
+### Return Codes
+
+* 0: OK
+* 1: Invalid query
+* 2: Invalid flag value
+* 3: Error with working directory
+* 4: Invalid / Inexistent configuration file
+* 5: Network error
+* 6: Failed to initialize a freyr instance
+
 ## Development
 
 ### Building
