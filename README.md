@@ -92,11 +92,11 @@ This file should be of `JSON` format and is to be structured as such.
 
 ### Service Configuration
 
+The `conf.json` file already includes some API tokens for service authentication and should work right out of the box.
+
 #### Spotify
 
 Spotify requires a `client_id` and a `client_secret` that can be gotten from their developer dashboard.
-
-For the purpose of this binary, the script has been pre-authenticated to allow direct access.
 
 If you wish to create and use custom keys, [See [Spotify API Authorization](#spotify-api-authorization)].
 
