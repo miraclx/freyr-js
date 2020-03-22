@@ -44,29 +44,7 @@ $ freyr -v
 v0.4.5
 ```
 
-## Authorization
-
-Using [libeaes], encrypt your keys JSON format with the service name as the key and the value as the credentials
-
-Encryption Key: `a591337828d2cce184152d010206babb88af3ddc13970eccb89528d6c2885156`
-
-Encrypted file: auth_keys.enc
-
-``` json
-{
-  "spotify": {
-    "client_id": "<CLIENT ID>",
-    "client_secret": "<CLIENT SECRET>"
-  }
-}
-```
-
-``` bash
-libeaes enc auth_keys.json auth_keys.enc
-rm auth_keys.json
-```
-
-## Usage
+## Binary Documentation
 
 ### CLI
 
@@ -77,10 +55,70 @@ Usage: freyr [options] [query...]
 Example
 
 ``` bash
-freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01 https://open.spotify.com/track/1NNnmmBEaId0uoWfvtNd8F
+freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01 https://music.apple.com/us/album/stupid-love/1500499210?i=1500499216
 ```
 
-Use `--help` to see full usage documentation.
+Use the `--help` flag to see full usage documentation.
+
+### Configuration
+
+All configuration is to be defined within a `conf.json` file in the root of the project.
+This file should be of `JSON` format and is to be structured as such.
+
+* `server`: &lt;object&gt;
+  * `hostname`: &lt;string&gt;
+  * `port`: &lt;number&gt;
+* `services`: &lt;[ServiceConfiguration](#service-configuration): object&gt;
+
+```json
+// Example: conf.json
+{
+  "server": {
+    "hostname": "localhost",
+    "port": 36346,
+    "useHttps": false
+  },
+  "services": {
+    "spotify": {
+      "client_id": "e9ac6d6fdb4dfc629d6b5827d18cd829",
+      "client_secret": "32e2a7217671b8dbaab471a3e6b13ef3"
+    }
+  }
+}
+```
+
+### Service Configuration
+
+#### Spotify
+
+Spotify requires a `client_id` and a `client_secret` that can be gotten from their developer dashboard.
+
+For the purpose of this binary, the script has been pre-authenticated to allow direct access.
+
+If you wish to create and use custom keys, [See [Spotify API Authorization](#spotify-api-authorization)].
+
+##### Spotify API Authorization
+
+1. Sign in to the [Spotify Dashboard](https://developer.spotify.com/dashboard/)
+2. Click `CREATE A CLIENT ID` and create an app
+3. Now click `Edit Settings`
+4. Add `http://localhost:36346/callback` to the Redirect URIs
+5. Include the `client_id` and the `client_secret` from the dashboard in the `services` object of the `conf.json` file. [[See Confiuration](#configuration)]
+6. You are now ready to authenticate with Spotify!
+
+#### Apple Music
+
+This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
+
+To create a custom developer token, please refer to the Apple Music documentation on this topic.
+
+##### Apple Music API Authorization
+
+[See [Apple Music](#apple-music)]
+
+#### Deezer
+
+Authentication unrequired. API is freely accessible.
 
 ## Development
 
@@ -103,8 +141,6 @@ npm run build
 [npm]:  https://github.com/npm/cli "The Node Package Manager"
 [license]:  LICENSE "Apache 2.0 License"
 [author-url]: https://github.com/miraclx
-
-[libeaes]: https://github.com/miraclx/libeaes-js
 
 [npm-url]: https://npmjs.org/package/freyr
 [npm-image]: https://badgen.net/npm/node/freyr
