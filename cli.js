@@ -9,7 +9,6 @@ const ffmpeg = require('fluent-ffmpeg');
 const merge2 = require('merge2');
 const mkdirp = require('mkdirp');
 const xbytes = require('xbytes');
-const libeaes = require('libeaes');
 const Promise = require('bluebird');
 const cStringd = require('stringd-colors');
 const isOnline = require('is-online');
@@ -160,11 +159,10 @@ async function init(queries, options) {
   if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(2);
   if (!Array.isArray(queries)) stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid Query'), process.exit(2);
 
-  const AuthKeys = JSON.parse(
-    libeaes.decrypt(fs.readFileSync('./auth_keys.enc'), 'a591337828d2cce184152d010206babb88af3ddc13970eccb89528d6c2885156'),
-  );
+  let Config = {};
+  if (fs.existsSync('./conf.json')) Config = JSON.parse(fs.readFileSync('./conf.json'));
 
-  const freyrCore = new FreyrCore(AuthKeys, AuthServer);
+  const freyrCore = new FreyrCore(Config.services, AuthServer);
   await freyrCore.init();
 
   const progressGen = prepProgressGen(options);
