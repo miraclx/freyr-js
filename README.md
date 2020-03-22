@@ -46,7 +46,7 @@ v0.4.5
 
 ## Binary Documentation
 
-### CLI
+### Usage
 
 ``` text
 Usage: freyr [options] [query...]
