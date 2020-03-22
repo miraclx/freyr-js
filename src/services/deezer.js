@@ -158,25 +158,25 @@ class Deezer {
   }
 
   wrapAlbumData(albumObject) {
-    console.log(albumObject);
+    const artistObject = albumObject.artist || {};
     return {
       id: albumObject.id,
       uri: albumObject.link,
       name: albumObject.title,
-      artists: [albumObject.artist.name],
+      artists: [artistObject.name],
       type:
-        albumObject.artist.name === 'Various Artists' && albumObject.artist.id === 5080
+        artistObject.name === 'Various Artists' && artistObject.id === 5080
           ? 'compilation'
           : albumObject.record_type === 'single'
           ? 'single'
           : 'album',
-      genres: albumObject.genres.data.map(genre => genre.name),
+      genres: ((albumObject.genres || {}).data || []).map(genre => genre.name),
       copyrights: [{type: 'P', text: albumObject.copyright}], // find workaround
       images: [albumObject.cover_big.replace('500x500', '640x640')],
       label: albumObject.label,
       release_date: new Date(albumObject.release_date),
       total_tracks: albumObject.nb_tracks,
-      tracks: albumObject.tracks.data,
+      tracks: (albumObject.tracks || {}).data,
     };
   }
 
@@ -255,7 +255,11 @@ class Deezer {
   }
 
   async getArtistAlbums(uris) {
-    throw Error('Unimplemented: [Deezer:getArtistAlbums()]');
+    const artist = await this.getArtist(uris);
+    return Promise.mapSeries(
+      this._gatherCompletely(() => this.core.getArtistAlbums(artist.id)),
+      async _album => this.wrapAlbumData(_album, artist),
+    );
   }
 
   async _gatherCompletely(fn, sel = 'data') {
