@@ -45,25 +45,11 @@ class FreyrCore {
       fileExtension: 'enc',
       encryptionKey: await this.getEncryptionKey(),
       schema: {
-        settings: {
-          type: 'object',
-          default: {format: 'm4a', bitrate: '320kbps', save_dir: './Music', export_list_file: true},
-          additionalProperties: false,
-          properties: {
-            format: {type: 'string', pattern: '^(m4a|mp4)$'},
-            bitrate: {type: 'string', pattern: '(\\d+)kbps'},
-            save_dir: {type: 'string'},
-            export_list_file: {type: 'boolean'},
-          },
-        },
         services: {
           type: 'object',
           additionalProperties: false,
           default: {
-            deezer: {},
             spotify: {},
-            apple_music: {},
-            youtube_music: {},
           },
           properties: {
             spotify: {
@@ -73,27 +59,6 @@ class FreyrCore {
                 expiry: {type: 'integer'},
                 access_token: {type: 'string'},
                 refresh_token: {type: 'string'},
-              },
-            },
-            deezer: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                developerToken: {type: 'string'},
-              },
-            },
-            apple_music: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                username: {type: 'string'},
-              },
-            },
-            youtube_music: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                username: {type: 'string'},
               },
             },
           },
