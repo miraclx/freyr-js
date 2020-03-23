@@ -161,7 +161,8 @@ async function init(queries, options) {
 
   let Config = {};
   try {
-    if (fs.existsSync('./conf.json')) Config = JSON.parse(fs.readFileSync('./conf.json'));
+    const confFile = xpath.join(__dirname, 'conf.json');
+    if (fs.existsSync(confFile)) Config = JSON.parse(fs.readFileSync(confFile));
     else {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
       process.exit(4);
