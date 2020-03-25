@@ -92,7 +92,7 @@ This file should be of `JSON` format and is to be structured as such.
 
 ### Service Configuration
 
-The `conf.json` file already includes some API tokens for service authentication and should work right out of the box.
+The [conf.json](conf.json) file already includes some API tokens for service authentication and should work right out of the box.
 
 #### Spotify
 
