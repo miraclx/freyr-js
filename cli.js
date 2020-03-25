@@ -684,6 +684,7 @@ const command = commander
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-f, --force', 'force overwrite of existing files')
+  .option('-o, --options <file>', 'use alternative conf file (unimplemented)')
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-s, --storefront <COUNTRY>', 'country storefront code (unimplemented)', 'US')
