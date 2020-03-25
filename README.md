@@ -81,7 +81,8 @@ This file should be of `JSON` format and is to be structured as such.
   "services": {
     "spotify": {
       "client_id": "CLIENT_ID",
-      "client_secret": "CLIENT_SECRET"
+      "client_secret": "CLIENT_SECRET",
+      "refresh_token": "OPTIONAL_REFRESH_TOKEN"
     },
     "apple_music": {
       "developerToken": "DEVELOPER_TOKEN"
@@ -101,6 +102,8 @@ Spotify requires a `client_id` and a `client_secret` that can be gotten from the
 If you wish to create and use custom keys, [See [Spotify API Authorization](#spotify-api-authorization)].
 
 An optional `refresh_token` option can be defined which can be used to authenticate a session without necessarily requesting explicit permissions. The `refresh_token` is already bound to a pre-authenticated account.
+
+An invalid `refresh_token`, when specified, would fallback to requesting account access which in-turn would request re-authentication of the users' account.
 
 ##### Spotify API Authorization
 
