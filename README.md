@@ -62,6 +62,16 @@ Use the `--help` flag to see full usage documentation.
 
 ### Configuration
 
+#### User / Session specific configuration
+
+Persistent configuration such as authentication keys and their validity period are stored within a session specific configuration file.
+
+This configuration file resides within the user config directory per-platform. e.g `$HOME/.config/FreyrCLI/d3fault.enc` for Linux.
+
+The JSON-formatted file is encrypted with a 64-character random hex that, in-turn is stored within the [Native Password Node Module](https://github.com/atom/node-keytar).
+
+#### Project specific configuration
+
 All configuration is to be defined within a `conf.json` file in the root of the project.
 This file should be of `JSON` format and is to be structured as such.
 
