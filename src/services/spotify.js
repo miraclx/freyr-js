@@ -22,7 +22,11 @@ class Spotify {
     if (!config.client_id) throw new Error(`[Spotify] Please define [client_id] as a property within the configuration`);
     if (!config.client_secret) throw new Error(`[Spotify] Please define [client_secret] as a property within the configuration`);
     [this.AuthServer, this.serverOpts] = [authServer, serverOpts];
-    this.core = new SpotifyWebApi({clientId: config.client_id, clientSecret: config.client_secret});
+    this.core = new SpotifyWebApi({
+      clientId: config.client_id,
+      clientSecret: config.client_secret,
+      refreshToken: config.refresh_token,
+    });
     this.cache = new NodeCache();
   }
 
@@ -62,7 +66,7 @@ class Spotify {
   }
 
   async login(config) {
-    this.core.setRefreshToken(config.refresh_token);
+    if (config.refresh_token) this.core.setRefreshToken(config.refresh_token);
     const data = await this.core.refreshAccessToken();
     this.core.setAccessToken(data.body.access_token);
     this.setExpiry(data.body.expires_in);
