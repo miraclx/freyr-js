@@ -76,15 +76,20 @@ class Spotify {
   getProps() {
     return {
       expiry: this.expiry,
+      access_token: this.core.getAccessToken(),
       refresh_token: this.core.getRefreshToken(),
     };
   }
 
   async login(config) {
     if (config.refresh_token) this.core.setRefreshToken(config.refresh_token);
-    const data = await this.core.refreshAccessToken();
-    this.core.setAccessToken(data.body.access_token);
-    this.setExpiry(data.body.expires_in);
+    this.setExpiry(config.expires_in);
+    if (this.accessTokenIsValid()) this.core.setAccessToken(config.access_token);
+    else {
+      const data = await this.core.refreshAccessToken();
+      this.core.setAccessToken(data.body.access_token);
+      this.setExpiry(data.body.expires_in);
+    }
     return (this.isAuthenticated = true);
   }
 
