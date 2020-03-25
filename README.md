@@ -100,6 +100,8 @@ Spotify requires a `client_id` and a `client_secret` that can be gotten from the
 
 If you wish to create and use custom keys, [See [Spotify API Authorization](#spotify-api-authorization)].
 
+An optional `refresh_token` option can be defined which can be used to authenticate a session without necessarily requesting explicit permissions. The `refresh_token` is already bound to a pre-authenticated account.
+
 ##### Spotify API Authorization
 
 1. Sign in to the [Spotify Dashboard](https://developer.spotify.com/dashboard/)
