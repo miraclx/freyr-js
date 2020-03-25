@@ -65,6 +65,17 @@ class Spotify {
     return !!(this.core.getRefreshToken() || config.refresh_token);
   }
 
+  hasProps() {
+    return true;
+  }
+
+  getProps() {
+    return {
+      expiry: this.expiry,
+      refresh_token: this.core.getRefreshToken(),
+    };
+  }
+
   async login(config) {
     if (config.refresh_token) this.core.setRefreshToken(config.refresh_token);
     const data = await this.core.refreshAccessToken();

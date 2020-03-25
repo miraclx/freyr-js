@@ -470,13 +470,9 @@ async function init(queries, options) {
       const authStack = service.newAuth();
       const url = await authStack.getUrl;
       await processPromise(open(url), loginLogger, {pre: `[\u2022] Attempting to open [ ${url} ] within browser...`});
-      const data = await processPromise(authStack.userToAuth(), loginLogger, {
+      await processPromise(authStack.userToAuth(), loginLogger, {
         pre: '[\u2022] Awaiting user authentication...',
       });
-      if (!data) return false;
-      freyrCore.config.set(`services.${service.ID}.expiry`, data.expiry);
-      freyrCore.config.set(`services.${service.ID}.refresh_token`, data.refresh_token);
-      return !!data.refresh_token;
     }
     if (service.isAuthed()) authLogger.write('[authenticated]\n');
     else {
@@ -492,6 +488,7 @@ async function init(queries, options) {
       queryLogger.log('[\u2717] Failed to authenticate client!');
       return;
     }
+    if (service.hasProps()) freyrCore.config.set(`services.${service.ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
     const metaLogger = queryLogger.print(`Obtaining metadata...`);

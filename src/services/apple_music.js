@@ -43,6 +43,14 @@ class AppleMusic {
     return !!this.core.configuration.developerToken;
   }
 
+  hasProps() {
+    return false;
+  }
+
+  getProps() {
+    throw Error('Unimplemented: [AppleMusic:getProps()]');
+  }
+
   async login() {
     throw Error('Unimplemented: [AppleMusic:login()]');
   }

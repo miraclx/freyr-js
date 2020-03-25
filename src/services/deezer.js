@@ -114,6 +114,14 @@ class Deezer {
     return true;
   }
 
+  hasProps() {
+    return false;
+  }
+
+  getProps() {
+    throw Error('Unimplemented: [Deezer:getProps()]');
+  }
+
   async login() {
     throw Error('Unimplemented: [Deezer:login()]');
   }
