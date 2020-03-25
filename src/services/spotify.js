@@ -34,8 +34,12 @@ class Spotify {
     return this.isAuthenticated;
   }
 
+  accessTokenIsValid() {
+    return Date.now() < this.expiry;
+  }
+
   isAuthed() {
-    return this.isAuthenticated && Date.now() < this.expiry;
+    return this.isAuthenticated && this.accessTokenIsValid();
   }
 
   newAuth() {
