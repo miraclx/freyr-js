@@ -680,6 +680,7 @@ const command = commander
   .option('-b, --bitrate <N>', 'set bitrate for audio encoding\n(valid: [96, 128, 160, 192, 256, 320])', '320k')
   .option('-d, --directory-prefix <PREFIX>', 'save tracks to PREFIX/..', '.')
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
+  .option('-z, --concurrency <num>', 'number of tracks to download together (unimplemented)')
   .option('-C, --no-cover', 'skip saving a cover art')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
