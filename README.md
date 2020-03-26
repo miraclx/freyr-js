@@ -107,6 +107,8 @@ The [conf.json](conf.json) file already includes some API tokens for service aut
 
 #### Spotify
 
+* key: `spotify`
+
 Spotify requires a `client_id` and a `client_secret` that can be gotten from their developer dashboard.
 
 If you wish to create and use custom keys, [See [Spotify API Authorization](#spotify-api-authorization)].
@@ -125,6 +127,8 @@ An invalid `refresh_token`, when specified, would fallback to requesting account
 6. You are now ready to authenticate with Spotify!
 
 #### Apple Music
+
+* key: `apple_music`
 
 This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
