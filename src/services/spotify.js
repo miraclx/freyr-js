@@ -19,13 +19,13 @@ class Spotify {
   constructor(config, authServer, serverOpts) {
     if (!config) throw new Error(`[Spotify] Please define a configuration object`);
     if (typeof config !== 'object') throw new Error(`[Spotify] Please define a configuration as an object`);
-    if (!config.client_id) throw new Error(`[Spotify] Please define [client_id] as a property within the configuration`);
-    if (!config.client_secret) throw new Error(`[Spotify] Please define [client_secret] as a property within the configuration`);
+    if (!config.clientId) throw new Error(`[Spotify] Please define [clientId] as a property within the configuration`);
+    if (!config.clientSecret) throw new Error(`[Spotify] Please define [clientSecret] as a property within the configuration`);
     [this.AuthServer, this.serverOpts] = [authServer, serverOpts];
     this.core = new SpotifyWebApi({
-      clientId: config.client_id,
-      clientSecret: config.client_secret,
-      refreshToken: config.refresh_token,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret,
+      refreshToken: config.refreshToken,
     });
     this.cache = new NodeCache();
   }

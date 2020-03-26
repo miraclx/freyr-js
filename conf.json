@@ -6,9 +6,9 @@
   },
   "services": {
     "spotify": {
-      "client_id": "888aa4540c09464abc9ed8bbe2a5f18a",
-      "client_secret": "84e7ab36abed48318bfb2eae7b32415d",
-      "refresh_token": "AQARHDcUz57eA9O30HIrpMJPoVMtAIkYEuuRSpFCOlYYUfyYeqQ6wiagiOwRxhIySl_p_r4tcXuwvwxr9cvFG8wHOJo5D6jcn5EqV6kaFxPWeT2ktUFQWV_06AABatyj6II"
+      "clientId": "888aa4540c09464abc9ed8bbe2a5f18a",
+      "clientSecret": "84e7ab36abed48318bfb2eae7b32415d",
+      "refreshToken": "AQARHDcUz57eA9O30HIrpMJPoVMtAIkYEuuRSpFCOlYYUfyYeqQ6wiagiOwRxhIySl_p_r4tcXuwvwxr9cvFG8wHOJo5D6jcn5EqV6kaFxPWeT2ktUFQWV_06AABatyj6II"
     },
     "apple_music": {
       "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTgyMTQzMTIxLCJleHAiOjE1OTc2OTUxMjF9.j3MAuNa0ZfVVOsBtsGFBmNwT4jPrKu2Alp5PzdhQC3Id--pboI9GqrysOSj2bfg0P-iJboXsg3R_dWr1TQ3pwg"

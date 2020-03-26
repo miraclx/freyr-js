@@ -130,15 +130,18 @@ The [conf.json](conf.json) file already includes some API tokens for service aut
 
 #### Spotify
 
-* key: `spotify`
+* `spotify`: &lt;object&gt;
+  * `clientId`: &lt;string&gt;
+  * `clientSecret`: &lt;string&gt;
+  * `refreshToken`: &lt;string&gt;
 
-Spotify requires a `client_id` and a `client_secret` that can be gotten from their developer dashboard.
+Spotify requires a `clientId` and a `clientSecret` that can be gotten from their developer dashboard.
 
 If you wish to create and use custom keys, [See [Spotify API Authorization](#spotify-api-authorization)].
 
-An optional `refresh_token` option can be defined which can be used to authenticate a session without necessarily requesting explicit permissions. The `refresh_token` is already bound to a pre-authenticated account.
+An optional `refreshToken` option can be defined which can be used to authenticate a session without necessarily requesting explicit permissions. The `refreshToken` is already bound to a pre-authenticated account.
 
-An invalid `refresh_token`, when specified, would fallback to requesting account access which in-turn would request re-authentication of the users' account.
+An invalid `refreshToken`, when specified, would fallback to requesting account access which in-turn would request re-authentication of the users' account.
 
 ##### Spotify API Authorization
 
@@ -146,12 +149,13 @@ An invalid `refresh_token`, when specified, would fallback to requesting account
 2. Click `CREATE A CLIENT ID` and create an app
 3. Now click `Edit Settings`
 4. Add `http://localhost:36346/callback` to the Redirect URIs
-5. Include the `client_id` and the `client_secret` from the dashboard in the `spotify` object that is a property of the `services` object of the `conf.json` file. [See [Confiuration](#configuration)]
+5. Include the `clientId` and the `clientSecret` from the dashboard in the `spotify` object that is a property of the `services` object of the `conf.json` file. [See [Confiuration](#configuration)]
 6. You are now ready to authenticate with Spotify!
 
 #### Apple Music
 
-* key: `apple_music`
+* `apple_music`: &lt;object&gt;
+  * `developerToken`: &lt;string&gt;
 
 This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
