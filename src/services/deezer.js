@@ -290,3 +290,4 @@ class Deezer {
 }
 
 module.exports = Deezer;
+module.exports.DeezerCore = DeezerCore;
