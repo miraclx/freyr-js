@@ -123,7 +123,7 @@ An invalid `refresh_token`, when specified, would fallback to requesting account
 2. Click `CREATE A CLIENT ID` and create an app
 3. Now click `Edit Settings`
 4. Add `http://localhost:36346/callback` to the Redirect URIs
-5. Include the `client_id` and the `client_secret` from the dashboard in the `spotify` object that is a property of the `services` object of the `conf.json` file. [[See Confiuration](#configuration)]
+5. Include the `client_id` and the `client_secret` from the dashboard in the `spotify` object that is a property of the `services` object of the `conf.json` file. [See [Confiuration](#configuration)]
 6. You are now ready to authenticate with Spotify!
 
 #### Apple Music
@@ -139,7 +139,7 @@ To create a custom developer token, please refer to the Apple Music documentatio
 [See [Apple Music API: Getting Keys and Creating Tokens
 ](https://developer.apple.com/documentation/applemusicapi/getting_keys_and_creating_tokens)]
 
-After successfully acquiring the developer token, include the `developerToken` to the `apple_music` object that's a property of the `services` object in the `conf.json` file. [[See Confiuration](#configuration)]
+After successfully acquiring the developer token, include the `developerToken` to the `apple_music` object that's a property of the `services` object in the `conf.json` file. [See [Confiuration](#configuration)]
 
 #### Deezer
 
