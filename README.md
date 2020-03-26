@@ -155,11 +155,14 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
 #### Apple Music
 
 * `apple_music`: &lt;object&gt;
+  * `storefront`: &lt;string&gt;
   * `developerToken`: &lt;string&gt;
 
 This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
 To create a custom developer token, please refer to the Apple Music documentation on this topic.
+
+The `storefront` option defines the default storefront to be used in the absence of a specification.
 
 ##### Apple Music API Authorization
 

@@ -24,6 +24,7 @@ class AppleMusic {
       throw new Error(`[AppleMusic] Please define [developerToken] as a property within the configuration`);
     this.cache = new NodeCache();
     this.core = new Client({developerToken: config.developerToken});
+    this.defaultStorefront = config.storefront || 'us';
     this.isAuthenticated = !!config.developerToken;
   }
 
@@ -79,7 +80,7 @@ class AppleMusic {
       refID,
       key: match[3] || null,
       uri: `apple_music:${type}:${id || refID}`,
-      storefront: match[1] || storefront || 'us',
+      storefront: match[1] || storefront || this.defaultStorefront,
       collection_type,
     };
   }
