@@ -69,7 +69,7 @@ Use the `--help` flag to see full usage documentation.
 * Concurrent track processing (in progress)
 * Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
 * Album art embedding & export
-* Proper track organisation i.e FOLDER/\<Artist Name\>/\<Album Name\>/\<Track Name\>
+* Proper track organisation i.e `FOLDER/\<Artist Name\>/\<Album Name\>/\<Track Name\>`
 * Resilient visual progressbar per track download powered by [[xprogress](https://github.com/miraclx/xprogress)]
 * Stats on runtime completion
   * runtime duration
