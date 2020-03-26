@@ -42,6 +42,7 @@
     "conf": "^6.2.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
+    "country-data": "0.0.31",
     "express": "^4.17.1",
     "fluent-ffmpeg": "^2.1.2",
     "hh-mm-ss": "^1.2.0",

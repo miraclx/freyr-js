@@ -16,6 +16,7 @@ const prettyMs = require('pretty-ms');
 const commander = require('commander');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
+const countryData = require('country-data');
 const {spawn, spawnSync} = require('child_process');
 
 const FreyrCore = require('./src/freyr');
@@ -195,6 +196,11 @@ async function init(queries, options) {
     options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = PROCESS_INPUT_ARG(options.input);
+    if (options.storefront) {
+      const data = countryData.lookup.countries({alpha2: options.storefront.toUpperCase()});
+      if (data.length) options.storefront = data[0].alpha2.toLowerCase();
+      else throw new Error('Country specification with the `--storefront` option is invalid');
+    }
   } catch (er) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
     process.exit(2);
@@ -494,12 +500,12 @@ async function init(queries, options) {
     const metaLogger = queryLogger.print(`Obtaining metadata...`);
     const meta = await processPromise(
       contentType === 'track'
-        ? service.getTrack(query)
+        ? service.getTrack(query, options.storefront)
         : contentType === 'artist'
-        ? service.getArtist(query)
+        ? service.getArtist(query, options.storefront)
         : contentType === 'album'
-        ? service.getAlbum(query)
-        : service.getPlaylist(query),
+        ? service.getAlbum(query, options.storefront)
+        : service.getPlaylist(query, options.storefront),
       queryLogger,
     );
     if (!meta) {
@@ -685,7 +691,7 @@ const command = commander
   .option('-o, --options <file>', 'use alternative conf file (unimplemented)')
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
-  .option('-s, --storefront <COUNTRY>', 'country storefront code (unimplemented)', 'US')
+  .option('-s, --storefront <COUNTRY>', 'country storefront code', 'US')
   .option('-x, --filter <SEQ>', 'filter matches (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in format [PREFIX/]<ARTIST>/<ALBUM>/<TRACK>")
