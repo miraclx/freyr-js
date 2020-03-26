@@ -169,10 +169,10 @@ class AppleMusic {
     };
   }
 
-  async processData(uris, max, coreFn) {
+  async processData(uris, max, store, coreFn) {
     const wasArr = Array.isArray(uris);
     uris = (wasArr ? uris : [uris]).map(_uri => {
-      const parsed = this.parseURI(_uri);
+      const parsed = this.parseURI(_uri, store);
       parsed.value = this.cache.get(parsed.uri);
       return [parsed.id || parsed.refID, parsed];
     });
@@ -188,13 +188,13 @@ class AppleMusic {
               {},
             ),
           ),
-          async ([store, _items]) =>
+          async ([storefront, _items]) =>
             Promise.mapSeries(
               // cut to maximum query length
               ((f, c) => (
                 (c = Math.min(c, f.length)), [...Array(Math.ceil(f.length / c))].map((_, i) => f.slice(i * c, i * c + c))
               ))(_items, max || Infinity),
-              async items => coreFn(items, store), // request select collection
+              async items => coreFn(items, storefront), // request select collection
             ),
         )
       )
@@ -205,10 +205,8 @@ class AppleMusic {
   }
 
   async getTrack(uris, store) {
-    return this.processData(uris, 300, async (items, storefront) => {
-      const {data: tracks} = await this.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {
-        storefront: store || storefront,
-      });
+    return this.processData(uris, 300, store, async (items, storefront) => {
+      const {data: tracks} = await this.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront});
       await this.getAlbum(items.map(item => `apple_music:album:${item.refID}`));
       return Promise.mapSeries(tracks, async track =>
         this.wrapTrackMeta(track, await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`)),
@@ -217,13 +215,9 @@ class AppleMusic {
   }
 
   async getAlbum(uris, store) {
-    return this.processData(uris, 100, async (items, storefront) =>
+    return this.processData(uris, 100, store, async (items, storefront) =>
       Promise.mapSeries(
-        (
-          await this.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {
-            storefront: store || storefront,
-          })
-        ).data,
+        (await this.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
         album => this.wrapAlbumData(album),
       ),
     );
@@ -237,19 +231,18 @@ class AppleMusic {
   }
 
   async getArtist(uris, store) {
-    return this.processData(uris, 25, async (items, storefront) =>
+    return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront: store || storefront})).data,
+        (await this.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
         artist => this.wrapArtistData(artist),
       ),
     );
   }
 
   async getPlaylist(uris, store) {
-    return this.processData(uris, 25, async (items, storefront) =>
+    return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront: store || storefront}))
-          .data,
+        (await this.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
         playlist => this.wrapPlaylistData(playlist),
       ),
     );
@@ -266,9 +259,10 @@ class AppleMusic {
     return this.processData(
       (await this.getArtist(uris)).albums.map(album => `apple_music:album:${album}`),
       100,
+      store,
       async (items, storefront) =>
         Promise.mapSeries(
-          (await this.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront: store || storefront})).data,
+          (await this.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
           album => this.wrapAlbumData(album),
         ),
     );
