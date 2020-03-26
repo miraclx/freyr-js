@@ -45,7 +45,7 @@ class Spotify {
   newAuth() {
     const server = new this.AuthServer({...this.serverOpts, serviceName: 'Spotify'});
     this.core.setRedirectURI(server.getRedirectURL());
-    const scope = ['user-read-private', 'user-read-email', 'user-read-playback-state'];
+    const scope = ['user-read-private', 'user-read-email'];
     const authCode = Promise.resolve(server.getCode());
     return {
       getUrl: server.init(state => this.core.createAuthorizeURL(scope, state)),
