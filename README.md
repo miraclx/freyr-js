@@ -78,6 +78,7 @@ This file should be of `JSON` format and is to be structured as such.
 * `server`: &lt;object&gt;
   * `hostname`: &lt;string&gt;
   * `port`: &lt;number&gt;
+  * `useHttps`: &lt;boolean&gt;
 * `services`: &lt;[ServiceConfiguration](#service-configuration): object&gt;
 
 ```json
