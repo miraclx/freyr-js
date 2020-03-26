@@ -438,7 +438,7 @@ async function init(queries, options) {
                             ],
                             apID: 'cli@freyr.git',
                             compilation: meta.compilation,
-                            copyright: meta.copyrights.find(({type}) => type === 'P').text,
+                            copyright: meta.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text,
                             purchaseDate: 'timestamp',
                             comment: `URI: ${meta.uri}\nYouTube Stream ID: ${audioFeeds.id}`,
                           },
