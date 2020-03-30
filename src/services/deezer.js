@@ -203,7 +203,18 @@ class Deezer {
   }
 
   wrapPlaylistData(playlistObject) {
-    throw Error('Unimplemented: [Deezer:wrapPlaylistData()]');
+    return {
+      id: playlistObject.id,
+      uri: playlistObject.link,
+      name: playlistObject.title,
+      followers: playlistObject.fans,
+      description: playlistObject.description,
+      owner_id: playlistObject.creator.id,
+      owner_name: playlistObject.creator.name,
+      type: `${playlistObject.public ? 'Public' : 'Private'}${playlistObject.collaborative ? ' (Collaborative)' : ''}`,
+      ntracks: playlistObject.nb_tracks,
+      tracks: playlistObject.tracks,
+    };
   }
 
   async processData(uris, max, coreFn) {
@@ -256,12 +267,15 @@ class Deezer {
     );
   }
 
-  async getPlaylist(uris, store) {
-    throw Error('Unimplemented: [Deezer:getPlaylist()]');
+  async getPlaylist(uris) {
+    return this.processData(uris, 25, async items =>
+      Promise.mapSeries(await this.core.getPlaylists(items), playlist => this.wrapPlaylistData(playlist)),
+    );
   }
 
-  async getPlaylistTracks(uris, store) {
-    throw Error('Unimplemented: [Deezer:getPlaylistTracks()]');
+  async getPlaylistTracks(uri) {
+    const playlist = await this.getPlaylist(uri);
+    return this.getTrack((await this._gatherCompletely(playlist.tracks, 'data')).map(track => track.link));
   }
 
   async getArtistAlbums(uris) {
