@@ -175,6 +175,7 @@ class Spotify {
           owner_id: playlistObject.owner.id,
           owner_name: playlistObject.owner.display_name,
           type: `${playlistObject.public ? 'Public' : 'Private'}${playlistObject.collaborative ? ' (Collaborative)' : ''}`,
+          ntracks: playlistObject.tracks.total,
           tracks: playlistObject.tracks.items.map(item => item.track),
         }
       : null;

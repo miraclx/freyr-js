@@ -166,6 +166,7 @@ class AppleMusic {
       owner_id: null,
       owner_name: playlistObject.attributes.curatorName,
       type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
+      ntracks: playlistObject.relationships.tracks.data.length,
       tracks: playlistObject.relationships.tracks.data,
     };
   }
