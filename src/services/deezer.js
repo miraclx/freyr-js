@@ -274,17 +274,9 @@ class Deezer {
     );
   }
 
-  async _gatherCompletely(fn, sel = 'data') {
-    const data = await fn();
-
-    async function gatherAllContents(nextFn) {
-      if (!nextFn) return [];
-      const _data = await nextFn();
-      if (_data.next === 'function') return _data[sel].concat(await gatherAllContents(_data.next));
-      return _data[sel];
-    }
-
-    if (data.next) data[sel].concat(await gatherAllContents(data.next));
+  async _gatherCompletely(fnOrObject, sel = 'data') {
+    const data = typeof fnOrObject === 'object' ? fnOrObject : await fnOrObject();
+    if (data.next) data[sel].concat(await this._gatherCompletely(data.next, sel));
     return data[sel];
   }
 }
