@@ -188,7 +188,7 @@ class Deezer {
       label: albumObject.label,
       release_date: new Date(albumObject.release_date),
       total_tracks: albumObject.nb_tracks,
-      tracks: (albumObject.tracks || {}).data,
+      tracks: albumObject.tracks,
     };
   }
 
@@ -247,9 +247,7 @@ class Deezer {
 
   async getAlbumTracks(uri) {
     const album = await this.getAlbum(uri);
-    return this.getTrack(
-      (await this._gatherCompletely(() => this.core.getAlbumTracks(album.id), 'data')).map(track => track.link),
-    );
+    return this.getTrack((await this._gatherCompletely(album.tracks, 'data')).map(track => track.link));
   }
 
   async getArtist(uris) {
