@@ -42,6 +42,7 @@ class YouTube {
             [artists, track, [], 5],
           ],
           query => Promise.resolve(this.search(...query)).reflect(),
+          {concurrency: 2},
         )
       ).map(ret => (ret.isFulfilled() ? ret.value() : [])),
       artists,
