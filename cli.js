@@ -544,7 +544,7 @@ async function init(queries, options) {
     } else if (contentType === 'artist') {
       const artistLogger = metaLogger.log(`\u2bc8 Artist: ${meta.name}`);
       if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
-      if (meta.genres.length) metaLogger.log(`\u2bc8 Genres: ${meta.genres.join(', ')}`);
+      if (meta.genres && meta.genres.length) metaLogger.log(`\u2bc8 Genres: ${meta.genres.join(', ')}`);
       const albumsStack = await processPromise(service.getArtistAlbums(meta.uri), artistLogger, {
         pre: ' > Gathering collections...',
       });

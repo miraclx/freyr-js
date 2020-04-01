@@ -197,7 +197,7 @@ class Deezer {
       id: artistObject.id,
       uri: artistObject.link,
       name: artistObject.name,
-      genres: [],
+      genres: null,
       followers: artistObject.nb_fan,
     };
   }
