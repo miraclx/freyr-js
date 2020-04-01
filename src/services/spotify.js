@@ -214,13 +214,15 @@ class Spotify {
         tracks.map(track => track.album.uri),
         country,
       );
-      return Promise.map(tracks, async track => this.wrapTrackMeta(track, await this.getAlbum(track.album.uri, country)));
+      return Promise.mapSeries(tracks, async track => this.wrapTrackMeta(track, await this.getAlbum(track.album.uri, country)));
     });
   }
 
   async getAlbum(uris, country) {
     return this.processData(uris, 20, async ids =>
-      Promise.map((await this.core.getAlbums(ids, {market: country})).body.albums, async album => this.wrapAlbumData(album)),
+      Promise.mapSeries((await this.core.getAlbums(ids, {market: country})).body.albums, async album =>
+        this.wrapAlbumData(album),
+      ),
     );
   }
 
@@ -230,7 +232,7 @@ class Spotify {
 
   async getArtist(uris) {
     return this.processData(uris, 50, async ids =>
-      Promise.map((await this.core.getArtists(ids)).body.artists, async artist => this.wrapArtistData(artist)),
+      Promise.mapSeries((await this.core.getArtists(ids)).body.artists, async artist => this.wrapArtistData(artist)),
     );
   }
 
