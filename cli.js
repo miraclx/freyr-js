@@ -21,6 +21,7 @@ const {spawn, spawnSync} = require('child_process');
 
 const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
+const AsyncQueue = require('./src/async_queue');
 const StackLogger = require('./src/stack_logger');
 const packageJson = require('./package.json');
 
@@ -240,8 +241,8 @@ async function init(queries, options) {
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
 
-  function asynchronouslyPrepareTracks(tracks) {
-    return tracks.map(track => {
+  function asynchronouslyProcessTracks(tracks, logger, service, isPlaylist) {
+    const queue = new AsyncQueue(4, track => {
       const trackFileName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
       const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
       const outFileName = `${trackFileName}.m4a`;
@@ -261,9 +262,11 @@ async function init(queries, options) {
       }
       return {track, psource, pstream, trackFileName, outFileDir, outFileName, outFilePath, fileExists, processTrack};
     });
+    return Promise.mapSeries(queue.push(tracks), track => processTrackFeed(logger, track, service, isPlaylist));
   }
 
   async function processTrackFeed(collationLogger, trackObject, service, isPlaylist = false) {
+    trackObject = await processPromise(trackObject, collationLogger, {pre: '| \u2b9e Pre-processing track information...'});
     const {
       track: meta,
       psource,
@@ -522,9 +525,7 @@ async function init(queries, options) {
       metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
       metaLogger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(meta.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
       collationLogger = queryLogger.log('[\u2022] Collating...');
-      rxPromise = Promise.mapSeries(asynchronouslyPrepareTracks([meta]), track =>
-        processTrackFeed(collationLogger, track, service),
-      );
+      rxPromise = asynchronouslyProcessTracks([meta], collationLogger, service);
     } else if (contentType === 'album') {
       metaLogger.log(`\u2bc8 Album Name: ${meta.name}`);
       metaLogger.log(`\u2bc8 Artist: ${meta.artists[0]}`);
@@ -538,9 +539,7 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(asynchronouslyPrepareTracks(tracks), track =>
-        processTrackFeed(collationLogger, track, service),
-      );
+      rxPromise = asynchronouslyProcessTracks(tracks, collationLogger, service);
     } else if (contentType === 'artist') {
       const artistLogger = metaLogger.log(`\u2bc8 Artist: ${meta.name}`);
       if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
@@ -570,7 +569,7 @@ async function init(queries, options) {
           });
           if (tracks && !tracks.length) return;
           albumLogger.indent += 1;
-          return Promise.mapSeries(asynchronouslyPrepareTracks(tracks), track => processTrackFeed(albumLogger, track, service));
+          return asynchronouslyProcessTracks(tracks, albumLogger, service);
         });
       });
     } else if (contentType === 'playlist') {
@@ -586,9 +585,7 @@ async function init(queries, options) {
         pre: '[\u2022] Inquiring tracks...',
       });
       collationLogger.indent += 1;
-      rxPromise = Promise.mapSeries(asynchronouslyPrepareTracks(tracks), track =>
-        processTrackFeed(collationLogger, track, service),
-      );
+      rxPromise = asynchronouslyProcessTracks(tracks, collationLogger, service, true);
     }
     const qList = (await rxPromise).flat(Infinity).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
