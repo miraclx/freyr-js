@@ -27,6 +27,7 @@ const packageJson = require('./package.json');
 
 function parseMeta(params) {
   return Object.entries(params)
+    .filter(([, value]) => value !== undefined)
     .map(([key, value]) =>
       Array.isArray(value) ? value.map(tx => (tx ? [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])] : '')) : [`--${key}`, value],
     )
@@ -434,10 +435,10 @@ async function init(queries, options) {
                             tracknum: `${meta.track_number}/${meta.total_tracks}`,
                             encodedBy: 'd3vc0dr',
                             advisory: meta.explicit ? 'explicit' : 'clean',
-                            composer: meta.composers || '',
+                            composer: meta.composers,
                             Rating: meta.explicit ? 'Explicit Content' : 'Inoffensive',
                             stik: 'Normal',
-                            genre: (meta.genres || [])[0] || '',
+                            genre: (meta.genres || [])[0],
                             rDNSatom: [
                               ['CD', 'name=MEDIA', 'domain=com.apple.iTunes'],
                               [meta.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
