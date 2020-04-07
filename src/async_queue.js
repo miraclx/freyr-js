@@ -26,6 +26,18 @@ class AsyncQueue {
    */
   constructor(concurrency, worker) {
     this.queue = async.queue(({data, args}, cb) => {
+      function handleErr(err) {
+        cb(
+          Object.defineProperty(Object(err), 'source', {
+            value: function soure() {
+              return data;
+            },
+            configurable: false,
+            writable: false,
+            enumerable: true,
+          }),
+        );
+      }
       try {
         (async () =>
           worker
@@ -34,9 +46,9 @@ class AsyncQueue {
             ? data.apply(null, args ? (Array.isArray(args) ? args : [args]) : [])
             : null)()
           .then(res => cb(null, res))
-          .catch(cb);
+          .catch(handleErr);
       } catch (err) {
-        cb(err);
+        handleErr(err);
       }
     }, concurrency || 1);
   }
