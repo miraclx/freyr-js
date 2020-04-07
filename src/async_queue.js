@@ -1,6 +1,5 @@
 /* eslint-disable prefer-spread */
 const async = require('async');
-const Promise = require('bluebird');
 
 class AsyncQueue {
   /**
