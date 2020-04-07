@@ -30,7 +30,7 @@ class StackLogger {
     if (typeof indent === 'object' && !Array.isArray(indent)) ({msgs, indent} = indent);
     if (Array.isArray(indent)) [msgs, indent] = [indent, msgs];
     if (typeof indent === 'string') [msgs, indent] = [[indent], this.indent];
-    if (!(typeof indent === 'number' && msgs)) throw new Error('Arg value parse error');
+    indent = typeof indent !== 'number' ? this.indent : indent;
     msgs = indent ? [this.indentor.repeat(indent - 1), ...msgs] : msgs;
     return util.formatWithOptions({colors: true}, ...msgs);
   }
