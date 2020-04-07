@@ -243,7 +243,9 @@ async function init(queries, options) {
   }
 
   function asynchronouslyProcessTracks(tracks, logger, service, isPlaylist) {
-    const queue = new AsyncQueue(4, track => {
+    const sourceQueue = new AsyncQueue(4, track => freyrCore.getYoutubeSource(track));
+    const feedQueue = new AsyncQueue(4, async psource => freyrCore.getYoutubeStream(await psource));
+    const trackQueue = new AsyncQueue(4, track => {
       const trackFileName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
       const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
       const outFileName = `${trackFileName}.m4a`;
@@ -253,21 +255,18 @@ async function init(queries, options) {
       let psource;
       let pstream;
       if (processTrack) {
-        psource = Promise.resolve(freyrCore.getYoutubeSource(track));
-        pstream = Promise.resolve(
-          (async () => {
-            const source = await psource.reflect();
-            if (source.isFulfilled() && source.value()) return freyrCore.getYoutubeStream(source.value());
-          })(),
-        );
+        psource = sourceQueue.push(track);
+        pstream = feedQueue.push(psource);
       }
       return {track, psource, pstream, trackFileName, outFileDir, outFileName, outFilePath, fileExists, processTrack};
     });
-    return Promise.mapSeries(queue.push(tracks), track => processTrackFeed(logger, track, service, isPlaylist));
+    return Promise.mapSeries(trackQueue.push(tracks), trackPromise =>
+      processTrackFeed(logger, trackPromise, service, isPlaylist),
+    );
   }
 
-  async function processTrackFeed(collationLogger, trackObject, service, isPlaylist = false) {
-    trackObject = await processPromise(trackObject, collationLogger, {pre: '| \u2b9e Pre-processing track information...'});
+  async function processTrackFeed(collationLogger, trackPromise, service, isPlaylist = false) {
+    const trackObject = await trackPromise;
     const {
       track: meta,
       psource,
