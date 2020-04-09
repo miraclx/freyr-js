@@ -265,6 +265,7 @@ async function init(queries, options) {
       return {track, psource, pstream, trackFileName, outFileDir, outFileName, outFilePath, fileExists, processTrack};
     });
     return Promise.mapSeries(trackQueue.push(tracks), trackPromise =>
+      // eslint-disable-next-line no-use-before-define
       processTrackFeed(logger, trackPromise, service, isPlaylist),
     );
   }
