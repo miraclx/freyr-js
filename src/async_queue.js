@@ -12,10 +12,11 @@ const async = require('async');
      * Tasks added to the `queue` are processed in parallel (up to the `concurrency` limit).
      * If all available `worker`s are in progress, tasks are queued until one becomes available.
      * Once a `worker` completes a `task`, its promise handle is fulfilled.
+     * @param {string} [name] A string identifier for better error handling
      * @param {number} [concurrency=1] An integer for determining how many cuncurrent operations to execute in parallel
      * @param {(data, args) => void} worker An async function for processing a queued task (default: method executor)
      * @example
-     * const q = new AsyncQueue(3);
+     * const q = new AsyncQueue("queue0", 3);
      *
      * q.push(() => Promise.delay(5000, 'a')).then(console.log);
      * q.push(() => Promise.delay(2000, 'b')).then(console.log);
@@ -72,7 +73,7 @@ const async = require('async');
      * @param {any} meta
      * @returns {Promise<any>}
      * @example
-     * const q = new AsyncQueue(3);
+     * const q = new AsyncQueue("queue1", 3);
      *
      * q.push([
      *   [(t, v) => Promise.delay(t, v), [2500, 1]],
@@ -85,7 +86,7 @@ const async = require('async');
      * // item> 3
      * // item> 1
      *
-     * const q2 = new AsyncQueue(4, t => Promise.delay(2000, [t, t ** 2]));
+     * const q2 = new AsyncQueue("multiplier", 4, t => Promise.delay(2000, [t, t ** 2]));
      * q2.push([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).map(item =>
      *   item.then(([val, srq]) => console.log(`${val}^2 = ${srq}`))
      * );
