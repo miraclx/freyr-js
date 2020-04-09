@@ -23,7 +23,8 @@ class AsyncQueue {
    * // c
    * // a
    */
-  constructor(concurrency, worker) {
+  constructor(name, concurrency, worker) {
+    this.name = name;
     this.queue = async.queue(({data, args}, cb) => {
       (async () =>
         worker
@@ -35,6 +36,12 @@ class AsyncQueue {
         .catch(err => {
           cb(
             Object.defineProperties(Object(err), {
+              queue: {
+                value: this.name,
+                configurable: true,
+                writable: false,
+                enumerable: true,
+              },
               source: {
                 value: function source() {
                   return data;
