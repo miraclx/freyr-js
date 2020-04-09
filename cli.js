@@ -247,9 +247,9 @@ async function init(queries, options) {
   }
 
   function asynchronouslyProcessTracks(tracks, logger, service, isPlaylist) {
-    const sourceQueue = new AsyncQueue(4, track => freyrCore.getYoutubeSource(track));
-    const feedQueue = new AsyncQueue(4, async psource => freyrCore.getYoutubeStream(await psource));
-    const trackQueue = new AsyncQueue(4, track => {
+    const sourceQueue = new AsyncQueue('cli:preprocessor:sourceQueue', 4, track => freyrCore.getYoutubeSource(track));
+    const feedQueue = new AsyncQueue('cli:preprocessor:feedQueue', 4, async psource => freyrCore.getYoutubeStream(await psource));
+    const trackQueue = new AsyncQueue('cli:preprocessor:trackQueue', 4, track => {
       const trackFileName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
       const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
       const outFileName = `${trackFileName}.m4a`;
