@@ -40,21 +40,15 @@ class DeezerCore {
     return (id, opts) => this.request(gnFn(id), opts);
   }
 
-  processIDs(gnFn) {
-    return (ids, opts) => Promise.mapSeries(ids, id => gnFn(id, opts));
-  }
-
-  wrapPagination(id, wrpFnx, pagedURL, opts) {
-    return pagedURL
-      ? () => wrpFnx(id, (({index, limit}) => ({index, limit: limit || opts.limit}))(url.parse(pagedURL, true).query))
-      : null;
-  }
-
   processList(gnFn) {
+    const wrapPagination = (id, wrpFnx, pagedURL, opts) =>
+      pagedURL
+        ? () => wrpFnx(id, (({index, limit}) => ({index, limit: limit || opts.limit}))(url.parse(pagedURL, true).query))
+        : null;
     const decoyProcessor = async (id, opts = {}) => {
       const itemObject = await gnFn(id, {index: opts.index || 0, limit: opts.limit || 100});
-      itemObject.next = this.wrapPagination(id, decoyProcessor, itemObject.next, opts);
-      itemObject.prev = this.wrapPagination(id, decoyProcessor, itemObject.prev, opts);
+      itemObject.next = wrapPagination(id, decoyProcessor, itemObject.next, opts);
+      itemObject.prev = wrapPagination(id, decoyProcessor, itemObject.prev, opts);
       return itemObject;
     };
     return decoyProcessor;
