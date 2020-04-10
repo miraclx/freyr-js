@@ -6,6 +6,8 @@ const request = require('request');
 const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 
+const AsyncQueue = require('../async_queue');
+
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
 function WebapiError(message, statusCode) {
@@ -61,14 +63,6 @@ class DeezerCore {
   getArtist = this.processID(id => `artist/${id}`);
 
   getPlaylist = this.processID(id => `playlist/${id}`);
-
-  getTracks = this.processIDs(this.getTrack);
-
-  getAlbums = this.processIDs(this.getAlbum);
-
-  getArtists = this.processIDs(this.getArtist);
-
-  getPlaylists = this.processIDs(this.getPlaylist);
 
   getAlbumTracks = this.processList((id, opts) => this.getAlbum(`${id}/tracks`, opts));
 
@@ -211,79 +205,82 @@ class Deezer {
     };
   }
 
-  async processData(uris, max, coreFn) {
-    const wasArr = Array.isArray(uris);
-    uris = (wasArr ? uris : [uris]).map(_uri => {
-      const parsed = this.parseURI(_uri);
-      parsed.value = this.cache.get(parsed.uri);
-      return [parsed.id, parsed];
-    });
-    const packs = uris.filter(([, {value}]) => !value);
-    uris = Object.fromEntries(uris);
-    if (packs.length)
-      (
-        await Promise.mapSeries(
-          ((f, c) => ((c = Math.min(c, f.length)), [...Array(Math.ceil(f.length / c))].map((_, i) => f.slice(i * c, i * c + c))))(
-            packs.map(([id]) => id),
-            max || Infinity,
-          ),
-          coreFn,
-        )
-      )
-        .flat(1)
-        .forEach(item => (item ? this.cache.set(uris[item.id].uri, (uris[item.id].value = item)) : null));
-    const ret = Object.values(uris).map(item => item.value);
-    return !wasArr ? ret[0] : ret;
+  createDataProcessor(coreFn) {
+    return async uri => {
+      const parsed = this.parseURI(uri);
+      if (!this.cache.has(parsed.uri)) this.cache.set(parsed.uri, await coreFn(parsed.id));
+      return this.cache.get(parsed.uri);
+    };
   }
+
+  trackQueue = new AsyncQueue(
+    'deezer:trackQueue',
+    4,
+    this.createDataProcessor(async id => {
+      const track = await this.core.getTrack(id);
+      return this.wrapTrackMeta(track, await this.getAlbum(`deezer:album:${track.album.id}`));
+    }),
+  );
 
   async getTrack(uris) {
-    return this.processData(uris, 300, async items =>
-      Promise.mapSeries(this.core.getTracks(items), async track =>
-        this.wrapTrackMeta(track, await this.getAlbum(`deezer:album:${track.album.id}`)),
-      ),
-    );
+    return this.trackQueue.push(uris);
   }
 
+  albumQueue = new AsyncQueue(
+    'deezer:albumQueue',
+    4,
+    this.createDataProcessor(async id => this.wrapAlbumData(await this.core.getAlbum(id))),
+  );
+
   async getAlbum(uris) {
-    return this.processData(uris, 100, async items =>
-      Promise.mapSeries(this.core.getAlbums(items), async album => this.wrapAlbumData(album)),
-    );
+    return this.albumQueue.push(uris);
+  }
+
+  artistQueue = new AsyncQueue(
+    'deezer:artistQueue',
+    4,
+    this.createDataProcessor(async id => this.wrapArtistData(await this.core.getArtist(id))),
+  );
+
+  async getArtist(uris) {
+    return this.artistQueue.push(uris);
+  }
+
+  playlistQueue = new AsyncQueue(
+    'deezer:playlistQueue',
+    4,
+    this.createDataProcessor(async id => this.wrapPlaylistData(await this.core.getPlaylist(id))),
+  );
+
+  async getPlaylist(uris) {
+    return this.playlistQueue.push(uris);
   }
 
   async getAlbumTracks(uri) {
     const album = await this.getAlbum(uri);
-    return this.getTrack((await this._gatherCompletely(album.tracks, 'data')).map(track => track.link));
-  }
-
-  async getArtist(uris) {
-    return this.processData(uris, 25, async items =>
-      Promise.mapSeries(this.core.getArtists(items), async artist => this.wrapArtistData(artist)),
+    return this.wrapPagination(
+      () => this.core.getAlbumTracks(album.id),
+      data => this.trackQueue.push(data.map(track => track.link)),
     );
-  }
-
-  async getPlaylist(uris) {
-    return this.processData(uris, 25, async items =>
-      Promise.mapSeries(await this.core.getPlaylists(items), playlist => this.wrapPlaylistData(playlist)),
-    );
-  }
-
-  async getPlaylistTracks(uri) {
-    const playlist = await this.getPlaylist(uri);
-    return this.getTrack((await this._gatherCompletely(playlist.tracks, 'data')).map(track => track.link));
   }
 
   async getArtistAlbums(uris) {
     const artist = await this.getArtist(uris);
-    return Promise.mapSeries(
-      this._gatherCompletely(() => this.core.getArtistAlbums(artist.id)),
-      async _album => this.wrapAlbumData(_album, artist),
+    return this.wrapPagination(() => this.core.getArtistAlbums(artist.id));
+  }
+
+  async getPlaylistTracks(uri) {
+    const playlist = await this.getPlaylist(uri);
+    return this.wrapPagination(
+      () => this.core.getPlaylistTracks(playlist.id),
+      data => this.trackQueue.push(data.map(track => track.link)),
     );
   }
 
-  async _gatherCompletely(fnOrObject, sel = 'data') {
-    const data = typeof fnOrObject === 'object' ? fnOrObject : await fnOrObject();
-    if (data.next) data[sel].concat(await this._gatherCompletely(data.next, sel));
-    return data[sel];
+  async wrapPagination(genFn, processor) {
+    const object = await genFn();
+    const result = processor ? await processor(object.data) : processor;
+    return object.next ? result.concat(await this.wrapPagination(object.next, processor)) : result;
   }
 }
 
