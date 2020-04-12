@@ -135,7 +135,7 @@ class AsyncQueue {
    * Return the number of tasks waiting to be processed
    */
   length() {
-    get(this).queue.length();
+    return get(this).queue.length();
   }
 
   /**
