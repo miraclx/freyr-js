@@ -114,7 +114,10 @@ class AsyncQueue {
   push(objects, meta) {
     const promises = (Array.isArray(objects) ? objects : [[objects, meta]]).map(objectBlocks => {
       const [data, args] = Array.isArray(objectBlocks) ? objectBlocks : [objectBlocks, meta];
-      return get(this).queue.pushAsync({data: insulate(data), args: insulate(args)});
+      return get(this).queue.pushAsync({
+        data: insulate(data),
+        args: insulate(args !== undefined ? (Array.isArray(args) ? args : [args]) : []),
+      });
     });
     return Array.isArray(objects) ? promises : promises[0];
   }
