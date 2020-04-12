@@ -48,12 +48,7 @@ class AsyncQueue {
       throw TypeError('the <worker> argument, if specified must be a `function`');
     get(this).name = name || 'AsyncQueue';
     get(this).queue = async.queue(({data, args}, cb) => {
-      (async () =>
-        worker
-          ? worker(data, args)
-          : typeof data === 'function'
-          ? data.apply(null, args ? (Array.isArray(args) ? args : [args]) : [])
-          : data)()
+      (async () => (worker ? worker(data, ...args) : typeof data === 'function' ? data.apply(null, args) : data))()
         .then(res => cb(null, res))
         .catch(err => {
           err = Object(err);
