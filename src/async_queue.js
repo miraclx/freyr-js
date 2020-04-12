@@ -59,7 +59,7 @@ class AsyncQueue {
               writable: false,
               enumerable: true,
             });
-          err[get(this.constructor).debugStack].push({queueName: get(this).name, sourceTask: data});
+          err[get(this.constructor).debugStack].push({queueName: get(this).name, sourceTask: data, sourceArgs: args});
           cb(err);
         });
     }, concurrency || 1);
