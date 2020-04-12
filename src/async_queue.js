@@ -32,6 +32,15 @@ class AsyncQueue {
    * // a
    */
   constructor(name, concurrency, worker) {
+    if (typeof name === 'number') [name, concurrency] = [concurrency, name];
+    if (typeof name === 'function') [name, worker] = [worker, name];
+    if (typeof concurrency === 'function') [concurrency, worker] = [worker, concurrency];
+    if (typeof concurrency === 'string') [concurrency, name] = [name, concurrency];
+    if (name !== undefined && typeof name !== 'string') throw Error('the <name> parameter, if specified must be a `string`');
+    if (concurrency !== undefined && typeof concurrency !== 'number')
+      throw TypeError('the <concurrency> argument, if specified must be a `number`');
+    if (worker !== undefined && typeof worker !== 'function')
+      throw TypeError('the <worker> argument, if specified must be a `function`');
     get(this).name = name;
     get(this).queue = async.queue(({data, args}, cb) => {
       (async () =>
