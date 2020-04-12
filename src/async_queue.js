@@ -41,7 +41,7 @@ class AsyncQueue {
       throw TypeError('the <concurrency> argument, if specified must be a `number`');
     if (worker !== undefined && typeof worker !== 'function')
       throw TypeError('the <worker> argument, if specified must be a `function`');
-    get(this).name = name;
+    get(this).name = name || 'AsyncQueue';
     get(this).queue = async.queue(({data, args}, cb) => {
       (async () =>
         worker
