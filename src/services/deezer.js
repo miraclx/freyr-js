@@ -21,7 +21,7 @@ WebapiError.prototype = Error.prototype;
 class DeezerCore {
   hostname = 'api.deezer.com';
 
-  async request(ref, opts) {
+  request(ref, opts) {
     return new Promise((res, rej) =>
       request.get(ref, {baseUrl: `https://${this.hostname}/`, json: true, qs: {...opts, output: 'json'}}, (err, response) => {
         return err
