@@ -6,6 +6,11 @@ const get = (store => self => {
   return store.get(self);
 })(new WeakMap());
 
+function insulate(items) {
+  Promise.allSettled(Array.isArray(items) ? items : [items]);
+  return items;
+}
+
 class AsyncQueue {
   static debugStack = (get(this).debugStack = Symbol('AsyncQueueStack'));
 
