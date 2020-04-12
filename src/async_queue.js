@@ -7,6 +7,8 @@ const get = (store => self => {
 })(new WeakMap());
 
 class AsyncQueue {
+  static debugStack = (get(this).debugStack = Symbol('AsyncQueueStack'));
+
   /**
    * Creates an async queue with a defined `concurrency`.
    * Tasks added to the `queue` are processed in parallel (up to the `concurrency` limit).
@@ -40,24 +42,16 @@ class AsyncQueue {
           : data)()
         .then(res => cb(null, res))
         .catch(err => {
-          cb(
-            Object.defineProperties(Object(err), {
-              queue: {
-                value: get(this).name,
-                configurable: true,
-                writable: false,
-                enumerable: true,
-              },
-              source: {
-                value: function source() {
-                  return data;
-                },
-                configurable: true,
-                writable: false,
-                enumerable: true,
-              },
-            }),
-          );
+          err = Object(err);
+          if (!err[get(this.constructor).debugStack])
+            Object.defineProperty(err, get(this.constructor).debugStack, {
+              value: [],
+              configurable: false,
+              writable: false,
+              enumerable: true,
+            });
+          err[get(this.constructor).debugStack].push({queueName: get(this).name, sourceTask: data});
+          cb(err);
         });
     }, concurrency || 1);
   }
