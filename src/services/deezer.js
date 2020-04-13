@@ -278,9 +278,13 @@ class Deezer {
   }
 
   async wrapPagination(genFn, processor) {
-    const object = await genFn();
-    const result = processor ? await processor(object.data) : processor;
-    return object.next ? result.concat(await this.wrapPagination(object.next, processor)) : result;
+    const collateAllPages = async px => {
+      const page = await px();
+      if (page.next) page.data.push(...(await collateAllPages(page.next)));
+      return page.data;
+    };
+    const results = await collateAllPages(genFn);
+    return processor ? processor(results) : results;
   }
 }
 
