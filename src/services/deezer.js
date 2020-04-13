@@ -2,7 +2,7 @@
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
 const url = require('url');
 const path = require('path');
-const request = require('request');
+const axios = require('axios');
 const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 
@@ -19,23 +19,22 @@ function WebapiError(message, statusCode) {
 WebapiError.prototype = Error.prototype;
 
 class DeezerCore {
-  hostname = 'api.deezer.com';
+  axiosInstance = axios.default.create({
+    baseURL: 'https://api.deezer.com',
+    responseType: 'json',
+    params: {output: 'json'},
+  });
 
-  request(ref, opts) {
-    return new Promise((res, rej) =>
-      request.get(ref, {baseUrl: `https://${this.hostname}/`, json: true, qs: {...opts, output: 'json'}}, (err, response) => {
-        return err
-          ? rej(new WebapiError(`${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`))
-          : response.body && typeof response.body === 'object' && 'error' in response.body
-          ? rej(
-              new WebapiError(
-                `${response.body.error.code} [${response.body.error.type}]: ${response.body.error.message}`,
-                response.body.error.code,
-              ),
-            )
-          : res(response.body);
-      }),
-    );
+  async request(ref, opts) {
+    const response = await this.axiosInstance.get(ref, {params: opts}).catch(err => {
+      throw new WebapiError(`${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`);
+    });
+    if (response.data && typeof response.data === 'object' && 'error' in response.data)
+      throw new WebapiError(
+        `${response.data.error.code} [${response.data.error.type}]: ${response.data.error.message}`,
+        response.data.error.code,
+      );
+    return response.data;
   }
 
   processID(gnFn) {

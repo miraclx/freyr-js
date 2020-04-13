@@ -38,6 +38,7 @@
   "dependencies": {
     "@yujinakayama/apple-music": "^0.3.0",
     "async": "^3.2.0",
+    "axios": "^0.19.2",
     "bluebird": "^3.7.2",
     "commander": "^4.0.1",
     "conf": "^6.2.0",
@@ -55,7 +56,6 @@
     "node-cache": "^5.1.0",
     "open": "^7.0.0",
     "pretty-ms": "^6.0.0",
-    "request": "^2.88.2",
     "spotify-uri": "^1.1.0",
     "spotify-web-api-node": "^4.0.0",
     "stringd": "^1.5.1",
