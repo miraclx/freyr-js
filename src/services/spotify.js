@@ -120,7 +120,7 @@ class Spotify {
           duration: trackInfo.duration_ms,
           album_artist: albumInfo.artists[0],
           track_number: trackInfo.track_number,
-          total_tracks: albumInfo.total_tracks,
+          total_tracks: albumInfo.ntracks,
           release_date: albumInfo.release_date,
           disc_number: trackInfo.disc_number,
           explicit: trackInfo.explicit,
@@ -146,7 +146,7 @@ class Spotify {
           images: albumObject.images,
           label: albumObject.label,
           release_date: new Date(albumObject.release_date),
-          total_tracks: albumObject.total_tracks,
+          ntracks: albumObject.total_tracks,
           tracks: albumObject.tracks.items,
         }
       : null;
@@ -159,6 +159,7 @@ class Spotify {
           uri: artistObject.uri,
           name: artistObject.name,
           genres: artistObject.genres,
+          nalbum: null,
           followers: artistObject.followers.total,
         }
       : null;

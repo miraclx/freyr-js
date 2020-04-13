@@ -97,7 +97,7 @@ class AppleMusic {
       duration: trackInfo.attributes.durationInMillis,
       album_artist: albumInfo.artists[0],
       track_number: trackInfo.attributes.trackNumber,
-      total_tracks: albumInfo.total_tracks,
+      total_tracks: albumInfo.ntracks,
       release_date: (date =>
         [
           [date.year, 4],
@@ -141,7 +141,7 @@ class AppleMusic {
         ]
           .map(([val, size]) => val.toString().padStart(size, '0'))
           .join('-'))(albumObject.attributes.releaseDate),
-      total_tracks: albumObject.attributes.trackCount,
+      ntracks: albumObject.attributes.trackCount,
       tracks: albumObject.relationships.tracks.data,
     };
   }
@@ -153,6 +153,7 @@ class AppleMusic {
       name: artistObject.attributes.name,
       genres: artistObject.attributes.genreNames,
       albums: artistObject.relationships.albums.data.map(album => album.id),
+      nalbums: null,
     };
   }
 

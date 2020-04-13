@@ -144,7 +144,7 @@ class Deezer {
       duration: trackInfo.duration * 1000,
       album_artist: albumInfo.artists[0],
       track_number: trackInfo.track_position,
-      total_tracks: albumInfo.total_tracks,
+      total_tracks: albumInfo.ntracks,
       release_date: new Date(trackInfo.release_date),
       disc_number: trackInfo.disk_number,
       explicit: !!trackInfo.explicit_lyrics,
@@ -175,7 +175,7 @@ class Deezer {
       images: [albumObject.cover_big.replace('500x500', '640x640')],
       label: albumObject.label,
       release_date: new Date(albumObject.release_date),
-      total_tracks: albumObject.nb_tracks,
+      ntracks: albumObject.nb_tracks,
       tracks: albumObject.tracks,
     };
   }
@@ -186,6 +186,7 @@ class Deezer {
       uri: artistObject.link,
       name: artistObject.name,
       genres: null,
+      nalbum: artistObject.nb_album,
       followers: artistObject.nb_fan,
     };
   }
