@@ -250,7 +250,7 @@ class Deezer {
   playlistQueue = new AsyncQueue(
     'deezer:playlistQueue',
     4,
-    this.createDataProcessor(async id => this.wrapPlaylistData(await this.core.getPlaylist(id))),
+    this.createDataProcessor(async id => this.wrapPlaylistData(await this.core.getPlaylist(id, {limit: 1}))),
   );
 
   async getPlaylist(uris) {
