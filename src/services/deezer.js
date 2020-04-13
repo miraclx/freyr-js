@@ -47,7 +47,7 @@ class DeezerCore {
         ? () => wrpFnx(id, (({index, limit}) => ({index, limit: limit || opts.limit}))(url.parse(pagedURL, true).query))
         : null;
     const decoyProcessor = async (id, opts = {}) => {
-      const itemObject = await gnFn(id, {index: opts.index || 0, limit: opts.limit || 100});
+      const itemObject = await gnFn(id, {index: opts.index || 0, limit: Math.min(opts.limit, 300) || 300});
       itemObject.next = wrapPagination(id, decoyProcessor, itemObject.next, opts);
       itemObject.prev = wrapPagination(id, decoyProcessor, itemObject.prev, opts);
       return itemObject;
@@ -266,13 +266,15 @@ class Deezer {
 
   async getArtistAlbums(uris) {
     const artist = await this.getArtist(uris);
-    return this.wrapPagination(() => this.core.getArtistAlbums(artist.id));
+    return this.wrapPagination(() =>
+      this.core.getArtistAlbums(artist.id, {limit: Math.min(artist.nalbum, Math.max(300, artist.nalbum / 4))}),
+    );
   }
 
   async getPlaylistTracks(uri) {
     const playlist = await this.getPlaylist(uri);
     return this.wrapPagination(
-      () => this.core.getPlaylistTracks(playlist.id),
+      () => this.core.getPlaylistTracks(playlist.id, {limit: Math.min(playlist.ntracks, Math.max(300, playlist.ntracks / 4))}),
       data => this.trackQueue.push(data.map(track => track.link)),
     );
   }
