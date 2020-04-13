@@ -258,10 +258,7 @@ class Deezer {
 
   async getAlbumTracks(uri) {
     const album = await this.getAlbum(uri);
-    return this.wrapPagination(
-      () => this.core.getAlbumTracks(album.id),
-      data => this.trackQueue.push(data.map(track => track.link)),
-    );
+    return this.trackQueue.push(album.tracks.data.map(track => track.link));
   }
 
   async getArtistAlbums(uris) {
