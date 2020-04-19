@@ -174,7 +174,7 @@ async function init(queries, options) {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
       process.exit(4);
     }
-  } catch (_) {
+  } catch {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
     process.exit(4);
   }
