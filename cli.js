@@ -200,6 +200,7 @@ async function init(queries, options) {
     );
     options.cover = options.cover && xpath.basename(options.cover);
     options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
+    options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = PROCESS_INPUT_ARG(options.input);
     if (options.storefront) {
@@ -698,7 +699,7 @@ const command = commander
   .option('-x, --filter <SEQ>', 'filter matches (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in format [PREFIX/]<ARTIST>/<ALBUM>/<TRACK>")
-  .option('--timeout', 'network inactivity timeout (ms)', 10000)
+  .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
   .option('--single-bar', 'show a single bar for the download, hide chunk-view\n[default when n(chunks) exceed printable space]')
