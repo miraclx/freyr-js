@@ -278,18 +278,18 @@ async function init(queries, options) {
           )
           .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.next))
           .on('end', () => {
-            if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.successMessage());
-            else logger.write(opts.successMessage());
+            if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.successMessage(), '\n');
+            else logger.log(opts.successMessage());
           })
           .on('retry', data => {
             if (opts.retryMessage !== false) {
               if (feed.store.has('progressBar')) data.store.get('progressBar').print(opts.retryMessage(data));
-              else logger.write(opts.retryMessage(data));
+              else logger.log(opts.retryMessage(data));
             }
           })
           .on('error', err => {
-            if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err));
-            else logger.write(opts.failureMessage(err));
+            if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err), '\n');
+            else logger.log(opts.failureMessage(err));
             opts.errorHandler(err);
             rej(err);
           });
@@ -310,14 +310,14 @@ async function init(queries, options) {
               })
               .on('error', err => {
                 err.segment_index = i;
-                barGen.end(opts.failureMessage(err));
+                barGen.end(opts.failureMessage(err), '\n');
                 opts.errorHandler(err);
                 rej(err);
               })
               .pipe(barGen.next(frag.size)),
           ),
         )
-          .once('end', () => barGen.end(opts.successMessage()))
+          .once('end', () => barGen.end(opts.successMessage(), '\n'))
           .pipe(writeStream)
           .on('finish', () => res(writeStream.bytesWritten));
       }
@@ -335,7 +335,7 @@ async function init(queries, options) {
         errorHandler: () => imageFile.removeCallback(),
         retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
         failureMessage: () => trackLogger.getText('| [\u2717] Failed to get album art'),
-        successMessage: trackLogger.getText(`| [\u2714] Got album art\n`),
+        successMessage: trackLogger.getText(`| [\u2714] Got album art`),
       },
     }).catch(err => Promise.reject({err, code: 3}));
     const rawAudio = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
@@ -348,13 +348,16 @@ async function init(queries, options) {
             tag: `[‘${meta.trackName}’]`,
             errorHandler: () => rawAudio.removeCallback(),
             retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-            successMessage: trackLogger.getText('`| [\u2714] Got raw track file`'),
+            successMessage: trackLogger.getText('| [\u2714] Got raw track file'),
           },
         },
         feedMeta.protocol !== 'http_dash_segments'
           ? {
               urlOrFragments: feedMeta.url,
-              opts: {failureMessage: err => trackLogger.getText(`| [\u2717] Failed to get raw media stream: ${err.code}`)},
+              opts: {
+                failureMessage: err =>
+                  trackLogger.getText(`| [\u2717] Failed to get raw media stream [${(err && err.code) || err}]`),
+              },
             }
           : {
               urlOrFragments: feedMeta.fragments.map(({path}) => ({
@@ -362,7 +365,8 @@ async function init(queries, options) {
                 ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
               })),
               opts: {
-                failureMessage: err => trackLogger.getText(`| [\u2717] Segment error while getting raw media: ${err.code}\n`),
+                failureMessage: err =>
+                  trackLogger.getText(`| [\u2717] Segment error while getting raw media [${(err && err.code) || err}]`),
               },
             },
       ),
