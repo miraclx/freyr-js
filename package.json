@@ -33,7 +33,10 @@
     "audio",
     "320kbps"
   ],
-  "author": "Miraculous Owonubi",
+  "author": {
+    "name": "Miraculous Owonubi",
+    "email": "omiraculous@gmail.com"
+  },
   "license": "Apache-2.0",
   "dependencies": {
     "@yujinakayama/apple-music": "^0.3.0",
