@@ -760,6 +760,7 @@ const command = commander
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory-prefix <PREFIX>', 'save tracks to PREFIX/..', '.')
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
+  .option('--cover-size <size>', 'preferred cover art dimensions (unimplemented)', '640x640')
   .option('-C, --no-cover', 'skip saving a cover art')
   .option('-z, --concurrency <num>', 'number of tracks to download together (unimplemented)')
   .option('-f, --force', 'force overwrite of existing files')
