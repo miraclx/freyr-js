@@ -731,12 +731,15 @@ async function init(queries, options) {
     stackLogger.log('========== Stats ==========');
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
+    stackLogger.log(`     \u23e9  Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
+    stackLogger.log(`     \u2714  Passed: [${prePadNum(finalStats.passed, 10)}]`);
+    stackLogger.log(`     \u2717  Failed: [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
     stackLogger.log(` [\u2022] Cover Art: ${options.cover}`);
     stackLogger.log(` [\u2022] Total Output size: ${xbytes(finalStats.outSize)}`);
     stackLogger.log(` [\u2022] Total Network Usage: ${xbytes(finalStats.netSize)}`);
-    stackLogger.log(`   \u2022 Media: ${xbytes(stats.mediaSize)}`);
-    stackLogger.log(`   \u2022 Album Art: ${xbytes(stats.imageSize)}`);
+    stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
+    stackLogger.log(`     \u25b6 Album Art: ${xbytes(finalStats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===========================');
   }
