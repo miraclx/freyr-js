@@ -76,7 +76,9 @@ class FreyrCore {
   }
 
   async getYoutubeStream(ytInfo) {
-    const data = await Promise.resolve(this.ytdlGet(ytInfo.videoId, ['--socket-timeout=20', '--retries=20'])).reflect();
+    const data = await Promise.resolve(
+      this.ytdlGet(ytInfo.videoId, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
+    ).reflect();
     return data.isFulfilled()
       ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
       : {err: data.reason()};
