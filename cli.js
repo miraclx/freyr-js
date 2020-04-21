@@ -21,6 +21,7 @@ const ProgressBar = require('xprogress');
 const countryData = require('country-data');
 const {spawn, spawnSync} = require('child_process');
 
+const pFlatten = require('./src/p_flatten');
 const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
 const AsyncQueue = require('./src/async_queue');
@@ -232,15 +233,17 @@ async function init(queries, options) {
 
   function createPlaylist(stats, logger, directory, filename, playlistTitle) {
     if (options.playlist) {
-      const validStats = stats.flat(Infinity).filter(Boolean);
+      const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
         const playlistFile = xpath.join(directory, `${filename}.m3u8`);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST:${playlistTitle}\n`);
-        validStats.forEach(({meta: {name, artists, duration}, outputFile}) =>
-          plStream.write(`\n#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}\n${outputFile}\n`),
+        validStats.forEach(({meta: {track: {name, artists, duration}, outFilePath}}) =>
+          plStream.write(
+            `\n#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}\n${xpath.relative(directory, outFilePath)}\n`,
+          ),
         );
         plStream.close();
         logger.write('[done]\n');
@@ -421,18 +424,23 @@ async function init(queries, options) {
   });
 
   const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, feedMeta}) => {
+    const wroteImage =
+      !!options.cover &&
+      (outArtPath =>
+        !(fs.existsSync(outArtPath) && !fs.statSync(outArtPath).isFile()) &&
+        (fs.copyFileSync(files.image.file.name, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
     await encodeQueue.push({track, meta, files});
     await embedQueue.push({track, meta, files, feedMeta});
-    return fs.statSync(meta.outFilePath).size;
+    return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
   });
 
-  const trackQueue = new AsyncQueue('cli:trackQueue', 4, async ({track, meta, props}) => {
+  const trackQueue = new AsyncQueue('cli:trackQueue', 1, async ({track, meta, props}) => {
     const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`);
     trackLogger.indent += 2;
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u2717] Track exists. Skipping...');
-        return {meta};
+        return {meta, code: 0};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
@@ -453,16 +461,14 @@ async function init(queries, options) {
       .catch(errObject => Promise.reject({meta, code: 5, ...errObject}));
     trackLogger.log(`| [\u2022] Asynchronously encoding...`);
     return {
-      meta,
       files,
-      postprocess: postProcessor.push({track, meta, files, feedMeta}).catch(errObject => {
-        console.log('f', errObject);
-        Promise.resolve({meta, code: 9, ...errObject});
-      }),
+      postprocess: postProcessor
+        .push({track, meta, files, feedMeta})
+        .catch(errObject => Promise.resolve({code: 9, ...errObject})),
     };
   });
 
-  const trackBroker = new AsyncQueue('cli:trackBroker', 4, async (track, logger, service, isPlaylist) => {
+  const trackBroker = new AsyncQueue('cli:trackBroker', 4, async (track, {logger, service, isPlaylist}) => {
     track = await track;
     const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
     const trackName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}${
@@ -478,14 +484,129 @@ async function init(queries, options) {
       psource = sourceQueue.push(track);
       pstream = feedQueue.push(psource);
     }
-    const meta = {trackName, outFileDir, outFilePath, service};
+    const meta = {trackName, outFileDir, outFilePath, track, service};
     return trackQueue
       .push({track, meta, props: {psource, pstream, fileExists, processTrack, logger}})
+      .then(trackObject => ({...trackObject, meta}))
       .catch(errObject => Promise.resolve({meta, code: 10, ...errObject}));
   });
 
-  // eslint-disable-next-line consistent-return
-  const queriesStat = await Promise.mapSeries(options.input.concat(queries), async query => {
+  async function trackHandler(query, {service, queryLogger}) {
+    const logger = queryLogger.print(`Obtaining track metadata...`);
+    const track = await processPromise(service.getTrack(query, options.storefront), queryLogger);
+    if (!track) return Promise.reject();
+    logger.log(`\u2bc8 Title: ${track.name}`);
+    logger.log(`\u2bc8 Album: ${track.album}`);
+    logger.log(`\u2bc8 Artist: ${track.album_artist}`);
+    logger.log(`\u2bc8 Year: ${new Date(track.release_date).getFullYear()}`);
+    logger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(track.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
+    const collationLogger = queryLogger.log('[\u2022] Collating...');
+    return {
+      meta: track,
+      isCollection: false,
+      tracks: trackBroker.push([track], {
+        logger: collationLogger,
+        service,
+        isPlaylist: false,
+      }),
+    };
+  }
+  async function albumHandler(query, {service, queryLogger}) {
+    const logger = queryLogger.print(`Obtaining album metadata...`);
+    const album = await processPromise(service.getAlbum(query, options.storefront), queryLogger);
+    if (!album) return Promise.reject();
+    logger.log(`\u2bc8 Album Name: ${album.name}`);
+    logger.log(`\u2bc8 Artist: ${album.artists[0]}`);
+    logger.log(`\u2bc8 Tracks: ${album.ntracks}`);
+    logger.log(`\u2bc8 Type: ${album.type === 'compilation' ? 'Compilation' : 'Album'}`);
+    logger.log(`\u2bc8 Year: ${new Date(album.release_date).getFullYear()}`);
+    if (album.genres.length) logger.log(`\u2bc8 Genres: ${album.genres.join(', ')}`);
+    const collationLogger = queryLogger.log(`[\u2022] Collating [${album.name}]...`);
+    const tracks = await processPromise(service.getAlbumTracks(album.uri), collationLogger, {
+      pre: '[\u2022] Inquiring tracks...',
+    });
+    collationLogger.indent += 1;
+    return {
+      meta: album,
+      isCollection: album.type === 'collection',
+      tracks: trackBroker.push(tracks, {
+        logger: collationLogger,
+        service,
+        isPlaylist: false,
+      }),
+    };
+  }
+  async function artistHandler(query, {service, queryLogger}) {
+    const logger = queryLogger.print(`Obtaining artist metadata...`);
+    const artist = await processPromise(service.getArtist(query, options.storefront), queryLogger);
+    if (!artist) return Promise.reject();
+    const artistLogger = logger.log(`\u2bc8 Artist: ${artist.name}`);
+    if (artist.followers) logger.log(`\u2bc8 Followers: ${`${artist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
+    if (artist.genres && artist.genres.length) logger.log(`\u2bc8 Genres: ${artist.genres.join(', ')}`);
+    const albumsStack = await processPromise(service.getArtistAlbums(artist.uri), artistLogger, {
+      pre: ' > Gathering collections...',
+    });
+    if (!albumsStack) return;
+    artistLogger.print(' > Sorting collections...');
+    const {albums, singles, compilations} = albumsStack.reduce((tx, v) => (tx[`${v.type}s`].items.push(v), tx), {
+      albums: {desc: 'Albums', items: []},
+      singles: {desc: 'Singles & EPs', items: []},
+      compilations: {desc: 'Compilations', items: []},
+    });
+    artistLogger.write('[done]\n');
+    logger.log(`\u2bc8 ${[albums, singles, compilations].map(stack => `${stack.desc}: ${stack.items.length}`).join(', ')}`);
+    const collationLogger = queryLogger.log(`[\u2022] Collating...`);
+    return Promise.mapSeries([albums, singles, compilations], async stack => {
+      if (!stack.items.length) return;
+      const cxLogger = collationLogger.log(`[\u2022] ${stack.desc}`);
+      cxLogger.indent += 1;
+      return Promise.mapSeries(stack.items, async ({uri}, index) => {
+        const album = await service.getAlbum(uri);
+        const albumLogger = cxLogger.log(`(${prePadNum(index + 1, stack.items.length)}) [${album.name}]`);
+        const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
+          pre: '[\u2022] Inquiring tracks...',
+        });
+        if (tracks && !tracks.length) return;
+        albumLogger.indent += 1;
+        return {
+          meta: album,
+          isCollection: album.type === 'collection',
+          tracks: trackBroker.push(tracks, {
+            logger: albumLogger,
+            service,
+            isPlaylist: false,
+          }),
+        };
+      });
+    });
+  }
+  async function playlistHandler(query, {service, queryLogger}) {
+    const logger = queryLogger.print(`Obtaining playlist metadata...`);
+    const playlist = await processPromise(service.getPlaylist(query, options.storefront), queryLogger);
+    if (!playlist) return Promise.reject();
+    logger.log(`\u2bc8 Playlist Name: ${playlist.name}`);
+    logger.log(`\u2bc8 By: ${playlist.owner_name}`);
+    if (playlist.description) logger.log(`\u2bc8 Description: ${playlist.description}`);
+    logger.log(`\u2bc8 Type: ${playlist.type}`);
+    if (playlist.followers) logger.log(`\u2bc8 Followers: ${`${playlist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
+    logger.log(`\u2bc8 Tracks: ${playlist.ntracks}`);
+    const collationLogger = queryLogger.log(`[\u2022] Collating...`);
+    const tracks = await processPromise(service.getPlaylistTracks(playlist.uri), collationLogger, {
+      pre: '[\u2022] Inquiring tracks...',
+    });
+    collationLogger.indent += 1;
+    return {
+      meta: playlist,
+      isCollection: false,
+      tracks: trackBroker.push(tracks, {
+        logger: collationLogger,
+        service,
+        isPlaylist: true,
+      }),
+    };
+  }
+
+  const queryQueue = new AsyncQueue('cli:queryQueue', 1, async query => {
     const queryLogger = stackLogger.log(`[${query}]`);
     queryLogger.print('[\u2022] Identifying service...');
     const service = freyrCore.identifyService(query);
@@ -521,166 +642,95 @@ async function init(queries, options) {
     if (service.hasProps()) freyrCore.config.set(`services.${service.ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
-    const metaLogger = queryLogger.print(`Obtaining metadata...`);
-    const meta = await processPromise(
-      contentType === 'track'
-        ? service.getTrack(query, options.storefront)
-        : contentType === 'artist'
-        ? service.getArtist(query, options.storefront)
-        : contentType === 'album'
-        ? service.getAlbum(query, options.storefront)
-        : service.getPlaylist(query, options.storefront),
-      queryLogger,
-    );
-    if (!meta) {
-      queryLogger.error('\x1b[31m[i]\x1b[0m Invalid query');
-      return;
-    }
-    let rxPromise;
-    let collection;
-    let collationLogger;
-    if (contentType === 'track') {
-      metaLogger.log(`\u2bc8 Title: ${meta.name}`);
-      metaLogger.log(`\u2bc8 Album: ${meta.album}`);
-      metaLogger.log(`\u2bc8 Artist: ${meta.album_artist}`);
-      metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
-      metaLogger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(meta.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
-      collationLogger = queryLogger.log('[\u2022] Collating...');
-      rxPromise = asynchronouslyProcessTracks([meta], collationLogger, service);
-    } else if (contentType === 'album') {
-      metaLogger.log(`\u2bc8 Album Name: ${meta.name}`);
-      metaLogger.log(`\u2bc8 Artist: ${meta.artists[0]}`);
-      metaLogger.log(`\u2bc8 Tracks: ${meta.ntracks}`);
-      metaLogger.log(`\u2bc8 Type: ${meta.type === 'compilation' ? 'Compilation' : 'Album'}`);
-      metaLogger.log(`\u2bc8 Year: ${new Date(meta.release_date).getFullYear()}`);
-      if (meta.genres.length) metaLogger.log(`\u2bc8 Genres: ${meta.genres.join(', ')}`);
-      if (meta.type === 'collection') collection = meta;
-      collationLogger = queryLogger.log(`[\u2022] Collating [${meta.name}]...`);
-      const tracks = await processPromise(service.getAlbumTracks(meta.uri), collationLogger, {
-        pre: '[\u2022] Inquiring tracks...',
-      });
-      collationLogger.indent += 1;
-      rxPromise = asynchronouslyProcessTracks(tracks, collationLogger, service);
-    } else if (contentType === 'artist') {
-      const artistLogger = metaLogger.log(`\u2bc8 Artist: ${meta.name}`);
-      if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
-      if (meta.genres && meta.genres.length) metaLogger.log(`\u2bc8 Genres: ${meta.genres.join(', ')}`);
-      const albumsStack = await processPromise(service.getArtistAlbums(meta.uri), artistLogger, {
-        pre: ' > Gathering collections...',
-      });
-      if (!albumsStack) return;
-      artistLogger.print(' > Sorting collections...');
-      const {albums, singles, compilations} = albumsStack.reduce((tx, v) => (tx[`${v.type}s`].items.push(v), tx), {
-        albums: {desc: 'Albums', items: []},
-        singles: {desc: 'Singles & EPs', items: []},
-        compilations: {desc: 'Compilations', items: []},
-      });
-      artistLogger.write('[done]\n');
-      metaLogger.log(`\u2bc8 ${[albums, singles, compilations].map(stack => `${stack.desc}: ${stack.items.length}`).join(', ')}`);
-      collationLogger = queryLogger.log(`[\u2022] Collating...`);
-      rxPromise = Promise.mapSeries([albums, singles, compilations], async stack => {
-        if (!stack.items.length) return;
-        const cxLogger = collationLogger.log(`[\u2022] ${stack.desc}`);
-        cxLogger.indent += 1;
-        return Promise.mapSeries(stack.items, async ({uri}, index) => {
-          const album = await service.getAlbum(uri);
-          const albumLogger = cxLogger.log(`(${prePadNum(index + 1, stack.items.length)}) [${album.name}]`);
-          const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
-            pre: '[\u2022] Inquiring tracks...',
-          });
-          if (tracks && !tracks.length) return;
-          albumLogger.indent += 1;
-          return asynchronouslyProcessTracks(tracks, albumLogger, service);
-        });
-      });
-    } else if (contentType === 'playlist') {
-      metaLogger.log(`\u2bc8 Playlist Name: ${meta.name}`);
-      metaLogger.log(`\u2bc8 By: ${meta.owner_name}`);
-      if (meta.description) metaLogger.log(`\u2bc8 Description: ${meta.description}`);
-      metaLogger.log(`\u2bc8 Type: ${meta.type}`);
-      if (meta.followers) metaLogger.log(`\u2bc8 Followers: ${`${meta.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
-      metaLogger.log(`\u2bc8 Tracks: ${meta.ntracks}`);
-      collationLogger = queryLogger.log(`[\u2022] Collating...`);
-      collection = meta;
-      const tracks = await processPromise(service.getPlaylistTracks(meta.uri), collationLogger, {
-        pre: '[\u2022] Inquiring tracks...',
-      });
-      collationLogger.indent += 1;
-      rxPromise = asynchronouslyProcessTracks(tracks, collationLogger, service, true);
-    }
-    const qList = (await rxPromise).flat(Infinity).filter(Boolean);
+    const queryStats = await (contentType === 'track'
+      ? trackHandler
+      : contentType === 'album'
+      ? albumHandler
+      : contentType === 'artist'
+      ? artistHandler
+      : playlistHandler)(query, {service, queryLogger}).catch(err => {
+      queryLogger.error('\x1b[31m[i]\x1b[0m An error occurred while processing the query', err);
+    });
     queryLogger.log('[\u2022] Download Complete');
-    if (!qList.length) return;
+    const source = queryStats.meta;
+    const trackStats = await pFlatten(queryStats.tracks);
     const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
-    const stats = await Promise.mapSeries(qList, async trackMeta => {
-      const trackSlice =
-        trackMeta.value && trackMeta.reason ? (trackMeta.isFulfilled() ? trackMeta.value() : trackMeta.reason()) : trackMeta;
-      const refName = `${trackSlice.trackName}`;
-      if (!trackSlice.promise) {
-        embedLogger.error(`\u2022 [\u2717] ${refName}${trackSlice.err ? ` [${trackSlice.err}]` : ''}`);
-        return;
+    await Promise.mapSeries(trackStats, async trackStat => {
+      if (trackStat.postprocess) {
+        trackStat.postprocess = await trackStat.postprocess;
+        if ('code' in trackStat.postprocess) trackStat.code = trackStat.postprocess.code;
       }
-      const encoderInspector = await trackSlice.promise.reflect();
-      if (encoderInspector.isFulfilled())
+      if (trackStat.code) {
+        const reason =
+          trackStat.code === 1
+            ? 'Zero sources found'
+            : trackStat.code === 2
+            ? 'Error while retrieving sources'
+            : trackStat.code === 3
+            ? 'Error downloading album art'
+            : trackStat.code === 4
+            ? 'Error downloading raw audio'
+            : trackStat.code === 5
+            ? 'Unknown Download Error'
+            : trackStat.code === 6
+            ? 'Error ensuring directory integrity'
+            : trackStat.code === 7
+            ? 'Error while encoding audio'
+            : trackStat.code === 8
+            ? 'Failed while embedding metadata'
+            : trackStat.code === 9
+            ? 'Unknown postprocessing error'
+            : 'Unknown track processing error';
+        embedLogger.error(`\u2022 [\u2717] ${trackStat.meta.trackName} [${trackStat.meta.track.uri}] (failed: [${reason}])`);
+      } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
+      else
         embedLogger.log(
-          `\u2022 [\u2714] ${refName}${
-            !!options.cover && !encoderInspector.value().wroteImage ? ' [(i) unable to write cover art]' : ''
+          `\u2022 [\u2714] ${trackStat.meta.trackName}${
+            !!options.cover && !trackStat.postprocess.wroteImage ? ' [(i) unable to write cover art]' : ''
           }`,
         );
-      else {
-        const err = encoderInspector.reason();
-        const reason =
-          err._code === 1
-            ? `Error creating directory`
-            : err._code === 2
-            ? `Error encoding audio`
-            : err._code === 3
-            ? `Error embedding metadata`
-            : `That's weird, I don't know what happened`;
-        embedLogger.error(`\u2022 [\u2717] ${refName} [${trackSlice.meta.uri}] (failed: [${reason}])`);
-      }
-      return {
-        meta: trackSlice.meta,
-        outputFile: trackSlice.outFilePath,
-        netBytesRead: trackSlice.netBytesRead,
-        fileSize: encoderInspector.isFulfilled() ? fs.statSync(trackSlice.outFilePath).size : 0,
-      };
     });
-    if (collection)
+    if (queryStats.isCollection)
       createPlaylist(
-        stats,
+        trackStats,
         queryLogger,
         BASE_DIRECTORY,
-        `${meta.name}${meta.owner_name ? `-${meta.owner_name}` : ''}`,
-        `${meta.name}${meta.owner_name ? ` by ${meta.owner_name}` : ''}`,
-        true,
+        `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
+        `${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
       );
     stackLogger.log('[\u2022] Collation Complete');
-    return stats;
+    return trackStats;
   });
-  const validQueriesStat = queriesStat.flat(Infinity).filter(Boolean);
+  const trackStats = await pFlatten(queryQueue.push([...options.input, ...queries]));
   if (options.playlist && typeof options.playlist === 'string')
-    createPlaylist(validQueriesStat, stackLogger, BASE_DIRECTORY, options.playlist);
-  const stats = validQueriesStat.reduce(
-    (tx, cx) => {
-      if (cx) {
-        tx.outSize += cx.fileSize;
-        tx.mediaSize += cx.netBytesRead.media;
-        tx.imageSize += cx.netBytesRead.image;
-        tx.netSize += cx.netBytesRead.media + cx.netBytesRead.image;
+    createPlaylist(trackStats, stackLogger, BASE_DIRECTORY, options.playlist);
+  const finalStats = trackStats.reduce(
+    (total, current) => {
+      if (current.postprocess && current.postprocess.finalSize) {
+        total.outSize += current.postprocess.finalSize;
       }
-      return tx;
+      if (current.files) {
+        const audio = current.files.audio ? current.files.audio.bytesWritten : 0;
+        const image = current.files.image ? current.files.image.bytesWritten : 0;
+        total.netSize += audio + image;
+        total.mediaSize += audio;
+        total.imageSize += image;
+      }
+      if (current.code === 0) total.skipped += 1;
+      else if (!('code' in current)) total.passed += 1;
+      else total.failed += 1;
+      return total;
     },
-    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0},
+    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, failed: 0, skipped: 0},
   );
   if (options.stats) {
     stackLogger.log('========== Stats ==========');
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
-    stackLogger.log(` [\u2022] Total tracks: [${prePadNum(validQueriesStat.length, 10)}]`);
+    stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
     stackLogger.log(` [\u2022] Cover Art: ${options.cover}`);
-    stackLogger.log(` [\u2022] Output size: ${xbytes(stats.outSize)}`);
-    stackLogger.log(` [\u2022] Network Usage: ${xbytes(stats.netSize)}`);
+    stackLogger.log(` [\u2022] Total Output size: ${xbytes(finalStats.outSize)}`);
+    stackLogger.log(` [\u2022] Total Network Usage: ${xbytes(finalStats.netSize)}`);
     stackLogger.log(`   \u2022 Media: ${xbytes(stats.mediaSize)}`);
     stackLogger.log(`   \u2022 Album Art: ${xbytes(stats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
