@@ -463,7 +463,7 @@ async function init(queries, options) {
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
       .catch(errObject => Promise.reject({meta, code: 5, ...errObject}));
-    trackLogger.log(`| [\u2022] Asynchronously encoding...`);
+    trackLogger.log(`| [\u2022] Post Processing...`);
     return {
       files,
       postprocess: postProcessor
