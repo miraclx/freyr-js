@@ -768,7 +768,7 @@ const command = commander
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-s, --storefront <COUNTRY>', 'country storefront code')
-  .option('-x, --filter <SEQ>', 'filter matches (unimplemented)')
+  .option('-x, --filter <SEQ>', 'filter matches [explicit] (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in format [PREFIX/]<ARTIST>/<ALBUM>/<TRACK>")
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
