@@ -420,7 +420,6 @@ async function init(queries, options) {
   });
 
   const encodeQueue = new AsyncQueue('cli:postprocessor:encodeQueue', 4, async ({track, meta, files}) => {
-    await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
     return new Promise((res, rej) =>
       ffmpeg()
         .addInput(files.audio.file.name)
@@ -436,6 +435,7 @@ async function init(queries, options) {
   });
 
   const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, feedMeta}) => {
+    await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
     const wroteImage =
       !!options.cover &&
       (outArtPath =>
