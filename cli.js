@@ -837,11 +837,7 @@ function main(argv) {
     const credits = `libxget v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
     console.log(credits);
     console.log('-'.repeat(credits.length));
-    if (
-      (props => props.args.length === 2 && props.unknown.length === 0)(command.parseOptions(argv)) &&
-      !['-i', '--input'].some(flag => argv.includes(flag))
-    )
-      return commander.outputHelp();
+    if (argv.length === 2) return commander.outputHelp();
   }
   command.parse(argv);
 }
