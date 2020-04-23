@@ -815,7 +815,9 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
-    'specify key-value concurrency pairs (`-z 3` for 3 concurrent tracks; `-z queries=2 -z track=4` for extraspecific configuration) (unimplemented)',
+    'specify key-value concurrency pairs (`-z 3` for 3 concurrent tracks; `-z queries=2 -z track=4` for extraspecific configuration)',
+    (spec, stack) => stack.concat(spec.split(',')),
+    [],
   )
   .option('-f, --force', 'force overwrite of existing files')
   .option('-o, --options <file>', 'use alternative conf file (unimplemented)')
