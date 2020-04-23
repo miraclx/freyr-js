@@ -289,6 +289,7 @@ async function init(queries, options) {
             }
           })
           .on('error', err => {
+            err = Object(err);
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err), '\n');
             else logger.log(opts.failureMessage(err));
             opts.errorHandler(err);
@@ -314,6 +315,7 @@ async function init(queries, options) {
               })
               .once('error', err => {
                 if (has_erred) return feed.destroy();
+                err = Object(err);
                 has_erred = true;
                 err.segment_index = i;
                 barGen.end(opts.failureMessage(err), '\n');
