@@ -670,7 +670,10 @@ async function init(queries, options) {
     await Promise.mapSeries(trackStats, async trackStat => {
       if (trackStat.postprocess) {
         trackStat.postprocess = await trackStat.postprocess;
-        if ('code' in trackStat.postprocess) trackStat.code = trackStat.postprocess.code;
+        if ('code' in trackStat.postprocess) {
+          trackStat.code = trackStat.postprocess.code;
+          trackStat.err = trackStat.postprocess.err;
+        }
       }
       if (trackStat.code) {
         const reason =
@@ -693,7 +696,11 @@ async function init(queries, options) {
             : trackStat.code === 9
             ? 'Unknown postprocessing error'
             : 'Unknown track processing error';
-        embedLogger.error(`\u2022 [\u2717] ${trackStat.meta.trackName} [${trackStat.meta.track.uri}] (failed: [${reason}])`);
+        embedLogger.error(
+          `\u2022 [\u2717] ${trackStat.meta.trackName} [${trackStat.meta.track.uri}] (failed: ${reason}${
+            trackStat.err ? ` [${trackStat.err}]` : ''
+          })`,
+        );
       } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
       else
         embedLogger.log(
