@@ -342,7 +342,7 @@ async function init(queries, options) {
         tag: '[Retrieving album art]...',
         errorHandler: () => imageFile.removeCallback(),
         retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-        failureMessage: () => trackLogger.getText('| [\u2717] Failed to get album art'),
+        failureMessage: err => trackLogger.getText(`| [\u2717] Failed to get album art [${(err && err.code) || err}]`),
         successMessage: trackLogger.getText(`| [\u2714] Got album art`),
       },
     }).catch(err => Promise.reject({err, code: 3}));
