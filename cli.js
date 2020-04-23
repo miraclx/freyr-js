@@ -303,20 +303,25 @@ async function init(queries, options) {
           logger.indent,
           true,
         );
+
+        let has_erred = false;
+
         merge2(
-          ...urlOrFragments.map((frag, i) =>
-            xget(frag.url, {chunks: 1, retries: options.tries, timeout: options.timeout})
+          ...urlOrFragments.map((frag, i) => {
+            const feed = xget(frag.url, {chunks: 1, retries: options.tries, timeout: options.timeout})
               .on('retry', data => {
                 if (opts.retryMessage !== false) barGen.print(opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data}));
               })
-              .on('error', err => {
+              .once('error', err => {
+                if (has_erred) return feed.destroy();
+                has_erred = true;
                 err.segment_index = i;
                 barGen.end(opts.failureMessage(err), '\n');
                 opts.errorHandler(err);
                 rej(err);
-              })
-              .pipe(barGen.next(frag.size)),
-          ),
+              });
+            return feed.pipe(barGen.next(frag.size));
+          }),
         )
           .once('end', () => barGen.end(opts.successMessage(), '\n'))
           .pipe(writeStream)
