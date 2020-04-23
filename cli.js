@@ -385,7 +385,7 @@ async function init(queries, options) {
     };
   });
 
-  const embedQueue = new AsyncQueue('cli:postprocessor:embedQueue', 4, async ({track, meta, files, feedMeta}) => {
+  const embedQueue = new AsyncQueue('cli:postprocessor:embedQueue', 4, async ({track, meta, files, audioSource}) => {
     return Promise.promisify(atomicParsley)(meta.outFilePath, {
       title: track.name,
       artist: track.artists[0],
@@ -413,7 +413,7 @@ async function init(queries, options) {
       compilation: track.compilation,
       copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text,
       purchaseDate: 'timestamp',
-      comment: `URI: ${track.uri}\nYouTube Stream ID: ${feedMeta.id}`,
+      comment: `URI: ${track.uri}\nYouTube Stream ID: ${audioSource.videoId}`,
     })
       .finally(() => files.image.file.removeCallback())
       .catch(err => Promise.reject({err, code: 8}));
@@ -434,7 +434,7 @@ async function init(queries, options) {
     ).finally(() => files.audio.file.removeCallback());
   });
 
-  const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, feedMeta}) => {
+  const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, audioSource}) => {
     await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
     const wroteImage =
       !!options.cover &&
@@ -442,7 +442,7 @@ async function init(queries, options) {
         !(fs.existsSync(outArtPath) && !fs.statSync(outArtPath).isFile()) &&
         (fs.copyFileSync(files.image.file.name, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
     await encodeQueue.push({track, meta, files});
-    await embedQueue.push({track, meta, files, feedMeta});
+    await embedQueue.push({track, meta, files, audioSource});
     return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
   });
 
@@ -475,7 +475,7 @@ async function init(queries, options) {
     return {
       files,
       postprocess: postProcessor
-        .push({track, meta, files, feedMeta})
+        .push({track, meta, files, audioSource})
         .catch(errObject => Promise.resolve({code: 9, ...errObject})),
     };
   });
