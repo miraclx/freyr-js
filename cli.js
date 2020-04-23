@@ -169,10 +169,16 @@ async function init(queries, options) {
   if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
   if (!Array.isArray(queries)) stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid Query'), process.exit(1);
 
-  let Config = {};
+  let Config = {
+    server: {
+      hostname: 'localhost',
+      port: 36346,
+      useHttps: false,
+    },
+  };
   try {
     const confFile = xpath.join(__dirname, 'conf.json');
-    if (fs.existsSync(confFile)) Config = JSON.parse(fs.readFileSync(confFile));
+    if (fs.existsSync(confFile)) Config = merge(Config, JSON.parse(fs.readFileSync(confFile)));
     else {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
       process.exit(4);
