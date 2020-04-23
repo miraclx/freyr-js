@@ -222,6 +222,15 @@ async function init(queries, options) {
     options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = PROCESS_INPUT_ARG(options.input);
+    options.concurrency = Object.fromEntries(
+      options.concurrency
+        .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
+        .map(([k, v]) => {
+          if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder', 'sources', 'feeds'].includes(k))
+            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [${k}]`);
+          return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
+        }),
+    );
     if (options.storefront) {
       const data = countryData.lookup.countries({alpha2: options.storefront.toUpperCase()});
       if (data.length) options.storefront = data[0].alpha2.toLowerCase();
@@ -231,6 +240,8 @@ async function init(queries, options) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
     process.exit(2);
   }
+
+  Config.concurrency = merge(Config.concurrency, options.concurrency);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
     options.directoryPrefix,
