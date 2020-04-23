@@ -63,11 +63,11 @@ function atomicParsley(file, args, cb) {
     spawn('AtomicParsley', [file, ...parseMeta(args), '--overWrite'], {env: extendPathOnEnv(path)}).on('close', cb);
 }
 
-function getRetryMessage({index, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
+function getRetryMessage({ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
   return cStringd(
     [
       ':{color(red)}{⯈}:{color:close(red)} ',
-      `:{color(cyan)}@${index + 1}:{color:close(cyan)}`,
+      `:{color(cyan)}@${ref}:{color:close(cyan)}`,
       `{:{color(yellow)}${retryCount}:{color:close(yellow)}${
         Number.isFinite(maxRetries) ? `/:{color(yellow)}${maxRetries}:{color:close(yellow)}` : ''
       }}: `,
@@ -283,7 +283,8 @@ async function init(queries, options) {
           })
           .on('retry', data => {
             if (opts.retryMessage !== false) {
-              if (feed.store.has('progressBar')) data.store.get('progressBar').print(opts.retryMessage(data));
+              if (feed.store.has('progressBar'))
+                data.store.get('progressBar').print(opts.retryMessage({ref: data.index + 1, ...data}));
               else logger.log(opts.retryMessage(data));
             }
           })
@@ -306,7 +307,7 @@ async function init(queries, options) {
           ...urlOrFragments.map((frag, i) =>
             xget(frag.url, {chunks: 1, retries: options.tries, timeout: options.timeout})
               .on('retry', data => {
-                if (opts.retryMessage !== false) barGen.print(opts.retryMessage(data));
+                if (opts.retryMessage !== false) barGen.print(opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data}));
               })
               .on('error', err => {
                 err.segment_index = i;
