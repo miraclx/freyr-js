@@ -97,7 +97,9 @@ The JSON-formatted file is encrypted with a 64-character random hex that, in-tur
 All configuration is to be defined within a `conf.json` file in the root of the project.
 This file should be of `JSON` format and is to be structured as such.
 
-* `server`: &lt;object&gt;
+Defaults are in the [conf.json](conf.json) file.
+
+* `server`: &lt;object&gt; The server URL configuration same as on an individual services' callback option.
   * `hostname`: &lt;string&gt;
   * `port`: &lt;number&gt;
   * `useHttps`: &lt;boolean&gt;
@@ -113,7 +115,7 @@ This file should be of `JSON` format and is to be structured as such.
 * `services`: &lt;[ServiceConfiguration](#service-configuration): object&gt;
 
 ```json
-// Example: conf.json
+// Example
 {
   "server": {
     "hostname": "localhost",
