@@ -101,6 +101,15 @@ This file should be of `JSON` format and is to be structured as such.
   * `hostname`: &lt;string&gt;
   * `port`: &lt;number&gt;
   * `useHttps`: &lt;boolean&gt;
+* `concurrency`: &lt;object&gt;
+  * `queries`: &lt;number&gt; The number of queries to be processed concurrently. **Default**: ``
+  * `tracks`: &lt;number&gt; The number of tracks to be actively processed in parallel.
+  * `trackStage`: &lt;number&gt; The number of tracks to concurrently preprocess before being pushed to the main trackQueue.
+  * `downloader`: &lt;number&gt; The number of tracks to be concurrently downloaded in parallel.
+  * `encoder`: &lt;number&gt; The total number of tracks to be concurrently undergo encoding.
+  * `embedder`: &lt;number&gt; The total number of tracks to be concurrently embedded in parallel.
+  * `sources`: &lt;number&gt; The number of tracks whose sources should be concurrently collated.
+  * `feeds`: &lt;number&gt; The number of tracks whose source feeds should be concurrently gotten.
 * `services`: &lt;[ServiceConfiguration](#service-configuration): object&gt;
 
 ```json
