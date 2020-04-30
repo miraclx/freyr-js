@@ -9,10 +9,11 @@ const AsyncQueue = require('../async_queue');
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
-function WebapiError(message, statusCode) {
+function WebapiError(message, statusCode, status) {
   this.name = 'WebapiError';
   this.message = message || '';
-  this.statusCode = statusCode;
+  if (status) this.status = status;
+  if (statusCode) this.statusCode = statusCode;
 }
 
 WebapiError.prototype = Error.prototype;
@@ -32,11 +33,15 @@ class DeezerCore {
         searchParams: opts,
       })
       .catch(err => {
-        throw new WebapiError(`${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`);
+        throw new WebapiError(
+          `${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`,
+          err.response.statusCode,
+        );
       });
     if (response.body && typeof response.body === 'object' && 'error' in response.body)
       throw new WebapiError(
         `${response.body.error.code} [${response.body.error.type}]: ${response.body.error.message}`,
+        null,
         response.body.error.code,
       );
     return response.body;
