@@ -1,9 +1,8 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
+const got = require('got').default;
 const url = require('url');
 const path = require('path');
-const axios = require('axios');
-const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 
 const AsyncQueue = require('../async_queue');
@@ -19,26 +18,32 @@ function WebapiError(message, statusCode) {
 WebapiError.prototype = Error.prototype;
 
 class DeezerCore {
-  axiosInstance = axios.default.create({
-    baseURL: 'https://api.deezer.com',
+  legacyApiUrl = 'https://api.deezer.com';
+
+  requestObject = got.extend({
     responseType: 'json',
-    params: {output: 'json'},
+    searchParams: {output: 'json'},
   });
 
-  async request(ref, opts) {
-    const response = await this.axiosInstance.get(ref, {params: opts}).catch(err => {
-      throw new WebapiError(`${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`);
-    });
-    if (response.data && typeof response.data === 'object' && 'error' in response.data)
+  async legacyApiCall(ref, opts) {
+    const response = await this.requestObject
+      .get(ref, {
+        prefixUrl: this.legacyApiUrl,
+        searchParams: opts,
+      })
+      .catch(err => {
+        throw new WebapiError(`${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`);
+      });
+    if (response.body && typeof response.body === 'object' && 'error' in response.body)
       throw new WebapiError(
-        `${response.data.error.code} [${response.data.error.type}]: ${response.data.error.message}`,
-        response.data.error.code,
+        `${response.body.error.code} [${response.body.error.type}]: ${response.body.error.message}`,
+        response.body.error.code,
       );
-    return response.data;
+    return response.body;
   }
 
   processID(gnFn) {
-    return (id, opts) => this.request(gnFn(id), opts);
+    return (id, opts) => this.legacyApiCall(gnFn(id), opts);
   }
 
   processList(gnFn) {
