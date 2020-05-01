@@ -36,7 +36,7 @@ Make sure to have installed the latest versions of the following
 
       ```bash
       # download the tarball
-      $ curl https://bitbucket.org/wez/atomicparsley/get/0.9.6.tar.gz -o wez-atomicparsley-da2f6e4fc120
+      $ curl https://bitbucket.org/wez/atomicparsley/get/0.9.6.tar.gz -o wez-atomicparsley-da2f6e4fc120.tar.gz
 
       # gunzip and untar
       $ tar -xzvf wez-atomicparsley-da2f6e4fc120.tar.gz
