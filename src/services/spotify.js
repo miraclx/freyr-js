@@ -116,7 +116,7 @@ class Spotify {
           artists: trackInfo.artists.map(artist => artist.name),
           album: albumInfo.name,
           album_uri: albumInfo.uri,
-          image: albumInfo.images[0].url,
+          images: albumInfo.images,
           duration: trackInfo.duration_ms,
           album_artist: albumInfo.artists[0],
           track_number: trackInfo.track_number,
@@ -129,6 +129,7 @@ class Spotify {
           label: albumInfo.label,
           copyrights: albumInfo.copyrights,
           compilation: albumInfo.type === 'compilation',
+          getImage: albumInfo.getImage,
         }
       : null;
   }
@@ -148,6 +149,12 @@ class Spotify {
           release_date: new Date(albumObject.release_date),
           ntracks: albumObject.total_tracks,
           tracks: albumObject.tracks.items,
+          getImage(width, height) {
+            const {images} = albumObject;
+            return images
+              .sort((a, b) => (a.width > b.width && a.height > b.height ? 1 : -1))
+              .find((image, index) => index === images.length - 1 || (image.height >= height && image.width >= width)).url;
+          },
         }
       : null;
   }

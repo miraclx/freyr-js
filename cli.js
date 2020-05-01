@@ -367,7 +367,7 @@ async function init(queries, options) {
     async ({track, meta, feedMeta, trackLogger}) => {
       const imageFile = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4i'});
       const imageBytesWritten = await downloadToStream({
-        urlOrFragments: track.image,
+        urlOrFragments: track.getImage(640, 640),
         writeStream: fs.createWriteStream(imageFile.name),
         logger: trackLogger,
         opts: {

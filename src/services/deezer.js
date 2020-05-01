@@ -149,7 +149,7 @@ class Deezer {
       name: trackInfo.title,
       artists: [trackInfo.artist.name],
       album: albumInfo.name,
-      image: albumInfo.images[0],
+      images: albumInfo.images,
       duration: trackInfo.duration * 1000,
       album_artist: albumInfo.artists[0],
       track_number: trackInfo.track_position,
@@ -163,6 +163,7 @@ class Deezer {
       copyrights: albumInfo.copyrights,
       composers: trackInfo.contributors.map(composer => composer.name).join(', '),
       compilation: albumInfo.type === 'compilation',
+      getImage: albumInfo.getImage,
     };
   }
 
@@ -181,11 +182,18 @@ class Deezer {
           : 'album',
       genres: ((albumObject.genres || {}).data || []).map(genre => genre.name),
       copyrights: [{type: 'P', text: albumObject.copyright}], // find workaround
-      images: [albumObject.cover_big.replace('500x500', '640x640')],
+      images: [albumObject.cover_small, albumObject.cover_medium, albumObject.cover_big, albumObject.cover_xl],
       label: albumObject.label,
       release_date: new Date(albumObject.release_date),
       ntracks: albumObject.nb_tracks,
       tracks: albumObject.tracks,
+      getImage(width, height) {
+        const min = (val, max) => Math.min(max, val) || max;
+        return this.images
+          .slice()
+          .pop()
+          .replace(/(?<=.+\/)\d+x\d+(?=.+$)/g, `${min(width, 1800)}x${min(height, 1800)}`);
+      },
     };
   }
 

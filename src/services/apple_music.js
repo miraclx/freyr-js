@@ -93,7 +93,7 @@ class AppleMusic {
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
       album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
-      image: trackInfo.attributes.artwork.url.replace('{w}x{h}', '640x640'),
+      images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
       album_artist: albumInfo.artists[0],
       track_number: trackInfo.attributes.trackNumber,
@@ -114,6 +114,7 @@ class AppleMusic {
       copyrights: albumInfo.copyrights,
       composers: trackInfo.attributes.composerName,
       compilation: albumInfo.type === 'compilation',
+      getImage: albumInfo.getImage,
     };
   }
 
@@ -131,7 +132,7 @@ class AppleMusic {
           : 'album',
       genres: albumObject.attributes.genreNames,
       copyrights: [{type: 'P', text: albumObject.attributes.copyright}],
-      images: albumObject.attributes.artwork.url.replace('{w}x{h}', '640x640'),
+      images: albumObject.attributes.artwork,
       label: albumObject.attributes.recordLabel,
       release_date: (date =>
         [
@@ -143,6 +144,11 @@ class AppleMusic {
           .join('-'))(albumObject.attributes.releaseDate),
       ntracks: albumObject.attributes.trackCount,
       tracks: albumObject.relationships.tracks.data,
+      getImage(width, height) {
+        const min = (val, max) => Math.min(max, val) || max;
+        const images = albumObject.attributes.artwork;
+        return images.url.replace('{w}x{h}', `${min(width, images.width)}x${min(height, images.height)}`);
+      },
     };
   }
 
