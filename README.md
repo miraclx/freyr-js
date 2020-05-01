@@ -60,7 +60,13 @@ Make sure to have installed the latest versions of the following
 Via [NPM][npm]:
 
 ``` bash
-npm install freyr
+npm install --global freyr
+```
+
+Via Git:
+
+``` bash
+npm install --global git+https://github.com/miraclx/freyr-js.git
 ```
 
 This installs a CLI binary accessible with the `freyr` command.
