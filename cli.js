@@ -162,7 +162,7 @@ function PROCESS_INPUT_ARG(input_arg) {
 }
 
 function PROCESS_IMAGE_SIZE(value) {
-  if (!['string', 'number'].includes(typeof value)) return value;
+  if (!['string', 'number'].includes(typeof value)) value = `${value.width}x${value.height}`;
   let parts = value.toString().split(/(?<=\d+)x(?=\d+)/);
   if (parts.some(part => parseInt(part, 10).toString() !== part)) return false;
   parts = parts.map(part => parseInt(part, 10));
@@ -203,7 +203,7 @@ async function init(queries, options) {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
       process.exit(4);
     }
-    const errMessage = `[key: image, value: ${Config.image}]`;
+    const errMessage = `[key: image, value: ${JSON.stringify(Config.image)}]`;
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
   } catch (e) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted (${e})`);
