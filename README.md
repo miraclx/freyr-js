@@ -136,6 +136,9 @@ Defaults are in the [conf.json](conf.json) file.
   * `hostname`: &lt;string&gt;
   * `port`: &lt;number&gt;
   * `useHttps`: &lt;boolean&gt;
+* `image`: &lt;object|number|string&gt; An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
+  * `width`: &lt;number|string&gt;
+  * `height`: &lt;number|string&gt;
 * `concurrency`: &lt;object&gt;
   * `queries`: &lt;number&gt; The number of queries to be processed concurrently. **Default**: ``
   * `tracks`: &lt;number&gt; The number of tracks to be actively processed in parallel.
