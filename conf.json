@@ -14,6 +14,10 @@
     "sources": 4,
     "feeds": 4
   },
+  "image": {
+    "width": 640,
+    "height": 640
+  },
   "services": {
     "spotify": {
       "clientId": "888aa4540c09464abc9ed8bbe2a5f18a",

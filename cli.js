@@ -161,6 +161,14 @@ function PROCESS_INPUT_ARG(input_arg) {
   return contents;
 }
 
+function PROCESS_IMAGE_SIZE(value) {
+  if (!['string', 'number'].includes(typeof value)) return value;
+  let parts = value.toString().split(/(?<=\d+)x(?=\d+)/);
+  if (parts.some(part => parseInt(part, 10).toString() !== part)) return false;
+  parts = parts.map(part => parseInt(part, 10));
+  return {width: parts[0], height: parts[1] || parts[0]};
+}
+
 async function init(queries, options) {
   const initTimeStamp = Date.now();
   const stackLogger = new StackLogger({indentSize: 1});
@@ -172,6 +180,10 @@ async function init(queries, options) {
       hostname: 'localhost',
       port: 36346,
       useHttps: false,
+    },
+    image: {
+      width: 640,
+      height: 640,
     },
     concurrency: {
       queries: 1,
@@ -191,8 +203,10 @@ async function init(queries, options) {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
       process.exit(4);
     }
-  } catch {
-    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
+    const errMessage = `[key: image, value: ${Config.image}]`;
+    if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
+  } catch (e) {
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted (${e})`);
     process.exit(4);
   }
 
@@ -234,11 +248,19 @@ async function init(queries, options) {
       if (data.length) options.storefront = data[0].alpha2.toLowerCase();
       else throw new Error('Country specification with the `--storefront` option is invalid');
     }
+
+    if (options.coverSize) {
+      const err = new Error(
+        `Invalid \`--cover-size\` specification [${options.coverSize}]. (expected: <width>x<height> or <size> as <size>x<size>)`,
+      );
+      if (!(options.coverSize = PROCESS_IMAGE_SIZE(options.coverSize))) throw err;
+    }
   } catch (er) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
     process.exit(2);
   }
 
+  Config.image = merge(Config.image, options.coverSize);
   Config.concurrency = merge(Config.concurrency, options.concurrency);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
@@ -367,7 +389,7 @@ async function init(queries, options) {
     async ({track, meta, feedMeta, trackLogger}) => {
       const imageFile = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4i'});
       const imageBytesWritten = await downloadToStream({
-        urlOrFragments: track.getImage(640, 640),
+        urlOrFragments: track.getImage(Config.image.width, Config.image.height),
         writeStream: fs.createWriteStream(imageFile.name),
         logger: trackLogger,
         opts: {
@@ -820,7 +842,11 @@ const command = commander
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory-prefix <PREFIX>', 'save tracks to PREFIX/..', '.')
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
-  .option('--cover-size <size>', 'preferred cover art dimensions (unimplemented)', '640x640')
+  .option(
+    '--cover-size <size>',
+    'preferred cover art dimensions (format: <width>x<height> or <size> as <size>x<size>)',
+    '640x640',
+  )
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
