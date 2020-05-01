@@ -44,15 +44,13 @@ function extendPathOnEnv(path) {
 function check_bin_is_existent(bin, path) {
   const isWin = process.platform === 'win32';
   const command = isWin ? 'where' : 'which';
-  const {status} = spawnSync(command, [bin], {
-    env: extendPathOnEnv(path),
-  });
+  const {status} = spawnSync(command, [bin], {env: extendPathOnEnv(path)});
   if ([127, null].includes(status)) throw Error(`Unable to locate the command [${command}] within your PATH`);
   return status === 0;
 }
 
 function atomicParsley(file, args, cb) {
-  const err = new Error('Unable to find AtomicParsley. Please install.');
+  const err = new Error('Unable to find an executable AtomicParsley binary. Please install.');
   const isWin = process.platform === 'win32';
   const path = xpath.relative(__dirname, xpath.join('./bins', isWin ? 'windows' : 'posix'));
   if (!check_bin_is_existent('AtomicParsley', path))
