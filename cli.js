@@ -221,7 +221,7 @@ async function init(queries, options) {
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = PROCESS_INPUT_ARG(options.input);
     options.concurrency = Object.fromEntries(
-      options.concurrency
+      (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
           if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder', 'sources', 'feeds'].includes(k))
@@ -825,8 +825,7 @@ const command = commander
   .option(
     '-z, --concurrency <SPEC>',
     'specify key-value concurrency pairs (`-z 3` for 3 concurrent tracks; `-z queries=2 -z track=4` for extraspecific configuration)',
-    (spec, stack) => stack.concat(spec.split(',')),
-    [],
+    (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
   .option('-o, --options <file>', 'use alternative conf file (unimplemented)')
