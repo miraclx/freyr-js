@@ -35,7 +35,15 @@
   ],
   "author": {
     "name": "Miraculous Owonubi",
-    "email": "omiraculous@gmail.com"
+    "email": "omiraculous@gmail.com",
+    "url": "https://about.me/miraclx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:miraclx/freyr-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/miraclx/freyr-js/issues"
   },
   "license": "Apache-2.0",
   "dependencies": {
