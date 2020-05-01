@@ -238,7 +238,7 @@ Authentication unrequired. API is freely accessible.
 | :-----: | :---: | :---: | :----: | :------: |
 | [Spotify](src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    |
 | [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    |
-| [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✗    |
+| [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    |
 | Youtube Music |   ✗   |   ✗   |    ✗   |     ✗    |
 
 ## Development
