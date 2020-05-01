@@ -12,21 +12,48 @@
 Make sure to have installed the latest versions of the following
 
 * ffmpeg >= 0.9
-  * Windows
-    * <https://ffmpeg.zeranoe.com/builds/>
-    * set `FFMPEG_PATH` to explicitly specify binary to use
-    * otherwise, must be defined within PATH
-  * POSIX
-    * the pre-included version within the `libav-tools` package should be compatible.
-    * else, either;
-      * compile from source or fetch a pre-built .deb package at <https://ffmpeg.org/download.html>
-      * or for debian, the `ppa:mc3man/trusty-media` PPA provides recent builds.
+  * Windows + macOS
+    * Download: <https://ffmpeg.zeranoe.com/builds/>
+    * must be defined within your `PATH`
+    * otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
+  * Linux _(check individual package managers)_
+    * Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
+    * Arch Linux: `sudo pacman -S ffmpeg`
+    * otherwise, compile from source, fetch a pre-built static binary or package at <https://ffmpeg.org/download.html>
 * youtube-dl@latest
   * automatically fetched by installing this package
-  * optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your path
+  * optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your `PATH`
 * AtomicParsley >= 0.9.6
-  * Windows: <https://chocolatey.org/packages/atomicparsley>
-  * Posix: check individual distro package managers mostly as `atomicparsley`
+  * Windows:
+    * Chocolatey: <https://chocolatey.org/packages/atomicparsley>
+    * Manually:
+      * Download: <https://bitbucket.org/jonhedgerows/atomicparsley/downloads/AtomicParsley-0.9.6-hg109.9183fff907bf.zip>
+      * unzip and place the `AtomicParsley.exe` in your `PATH` or the `bins/windows` folder. Create the folders if unexistent.
+  * POSIX: _(check individual package managers)_
+    * Debian: `sudo apt-get install atomicparsley`
+    * Arch Linux: `sudo pacman -S atomicparsley`
+    * Build from source:
+
+      ```bash
+      # download the tarball
+      $ curl https://bitbucket.org/wez/atomicparsley/get/0.9.6.tar.gz -o wez-atomicparsley-da2f6e4fc120
+
+      # gunzip and untar
+      $ tar -xzvf wez-atomicparsley-da2f6e4fc120.tar.gz
+
+      # build
+      $ cd wez-atomicparsley-da2f6e4fc120
+      $ ./autogen.sh
+      $ ./configure
+      $ make
+
+      # To install locally (project only)
+      $ mkdir -p $PROJECT_DIR/bins/posix # ensure directory exists
+      $ cp ./AtomicParsley $PROJECT_DIR/bins/posix
+
+      # To install globally
+      $ sudo make install
+      ```
 
 ## Installing
 
