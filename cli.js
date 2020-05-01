@@ -225,7 +225,7 @@ async function init(queries, options) {
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
           if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder', 'sources', 'feeds'].includes(k))
-            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [${k}]`);
+            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
           return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
         }),
     );
