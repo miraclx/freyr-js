@@ -99,7 +99,7 @@ Use the `--help` flag to see full usage documentation.
 * Playlist generation (per playlist (default) / per query (optional))
 * Batch download from queue file
 * Simultaneous chunked downloads powered by [[libxget-js](https://github.com/miraclx/libxget-js)]
-* Concurrent track processing (in progress)
+* Efficient concurrency
 * Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
 * Album art embedding & export
 * Proper track organisation i.e `FOLDER/\<Artist Name\>/\<Album Name\>/\<Track Name\>`
