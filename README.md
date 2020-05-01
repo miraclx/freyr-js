@@ -98,12 +98,12 @@ Use the `--help` flag to see full usage documentation.
 * Multi-service support [See [Service Support](#service-support)]
 * Playlist generation (per playlist (default) / per query (optional))
 * Batch download from queue file
-* Simultaneous chunked downloads powered by [[libxget-js](https://github.com/miraclx/libxget-js)]
+* Simultaneous chunked downloads (powered by [[libxget-js](https://github.com/miraclx/libxget-js)])
 * Efficient concurrency
 * Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
 * Album art embedding & export
 * Proper track organisation i.e `FOLDER/\<Artist Name\>/\<Album Name\>/\<Track Name\>`
-* Resilient visual progressbar per track download powered by [[xprogress](https://github.com/miraclx/xprogress)]
+* Resilient visual progressbar per track download (powered by [[xprogress](https://github.com/miraclx/xprogress)])
 * Stats on runtime completion
   * runtime duration
   * number of successfully processed tracks
