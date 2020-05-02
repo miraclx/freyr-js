@@ -10,10 +10,16 @@
 ## Requirements
 
 <details>
-<summary>nodejs >= v13.0.0</summary>
+<summary>nodejs >= v12.0.0</summary>
 
-* automatically fetched by installing this package
-* optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your `PATH`
+<https://nodejs.org/en/download/>
+
+POSIX: [nvm](https://github.com/nvm-sh/nvm) recommended.
+
+``` bash
+# install node with this nvm command
+$ nvm install v12
+```
 
 </details>
 
@@ -72,6 +78,15 @@
     # To install globally
     $ sudo make install
     ```
+
+</details>
+
+<details>
+<summary>(linux) libsecret @ latest</summary>
+
+* Debian: `sudo apt-get install libsecret-1-dev`
+* Red Hat-based: `sudo yum install libsecret-devel`
+* Arch Linux: `sudo pacman -S libsecret`
 
 </details>
 
