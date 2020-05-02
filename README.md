@@ -7,7 +7,20 @@
 
 [![NPM][npm-image-url]][npm-url]
 
-## Requirements
+## Installation
+
+Ensure all [requirements](#requirements) are satisfied before installing.
+
+``` bash
+npm install -g git+https://github.com/miraclx/freyr-js.git
+
+# alternatively, with yarn
+yarn global add https://github.com/miraclx/freyr-js.git
+```
+
+## Getting Started
+
+### Requirements
 
 <details>
 <summary>nodejs >= v12.0.0</summary>
@@ -58,7 +71,7 @@ $ nvm install v12
   * Arch Linux: `sudo pacman -S atomicparsley`
   * Build from source:
 
-    ```bash
+    ``` bash
     # download the tarball
     $ curl https://bitbucket.org/wez/atomicparsley/get/0.9.6.tar.gz -o wez-atomicparsley-da2f6e4fc120.tar.gz
 
@@ -89,28 +102,6 @@ $ nvm install v12
 * Arch Linux: `sudo pacman -S libsecret`
 
 </details>
-
-## Installing
-
-Via [NPM][npm]:
-
-``` bash
-npm install --global freyr
-```
-
-Via Git:
-
-``` bash
-npm install --global git+https://github.com/miraclx/freyr-js.git
-```
-
-This installs a CLI binary accessible with the `freyr` command.
-
-``` bash
-# Check if the freyr command has been installed and accessible on your path
-$ freyr -v
-v0.4.5
-```
 
 ## Binary Documentation
 
