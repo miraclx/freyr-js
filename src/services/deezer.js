@@ -35,7 +35,7 @@ class DeezerCore {
       .catch(err => {
         throw new WebapiError(
           `${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`,
-          err.response.statusCode,
+          err.response ? err.response.statusCode : null,
         );
       });
     if (response.body && typeof response.body === 'object' && 'error' in response.body)
