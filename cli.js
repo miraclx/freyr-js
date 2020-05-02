@@ -730,9 +730,9 @@ async function init(queries, options) {
       : playlistHandler)(query, {service, queryLogger}).catch(err => {
       queryLogger.error('\x1b[31m[i]\x1b[0m An error occurred while processing the query', err);
     });
-    queryLogger.log('[\u2022] Download Complete');
     const source = queryStats.meta;
     const trackStats = await pFlatten(queryStats.tracks);
+    queryLogger.log('[\u2022] Download Complete');
     const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
     await Promise.mapSeries(trackStats, async trackStat => {
       if (trackStat.postprocess) {
