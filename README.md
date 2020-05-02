@@ -103,19 +103,39 @@ $ nvm install v12
 
 </details>
 
-## Binary Documentation
-
 ### Usage
 
 ``` text
 Usage: freyr [options] [query...]
 ```
 
-Example
+[See [Service Support](#service-support)].
+
+#### Download a Spotify track
 
 ``` bash
-freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01 https://music.apple.com/us/album/stupid-love/1500499210?i=1500499216
+freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01
 ```
+
+#### Download an Apple Music album
+
+``` bash
+freyr https://music.apple.com/us/album/stupid-love/1500499210
+```
+
+#### Download a Deezer Artist
+
+``` bash
+freyr https://deezer.com/artist/1089097
+```
+
+Queries can be collated to be processed at once.
+
+``` bash
+freyr query1 query2 ... queryN
+```
+
+Or list them, line by line into a file and use the `-i, --input <FILE>` flag.
 
 Use the `--help` flag to see full usage documentation.
 
@@ -143,15 +163,18 @@ Use the `--help` flag to see full usage documentation.
 
 ### Configuration
 
-#### User / Session specific configuration
+<details>
+<summary>User / Session specific configuration</summary>
 
 Persistent configuration such as authentication keys and their validity period are stored within a session specific configuration file.
 
 This configuration file resides within the user config directory per-platform. e.g `$HOME/.config/FreyrCLI/d3fault.enc` for Linux.
 
 The JSON-formatted file is encrypted with a 64-character random hex that, in-turn is stored within the [Native Password Node Module](https://github.com/atom/node-keytar).
+</details>
 
-#### Project specific configuration
+<details>
+<summary id='project-specific-configuration'>Project specific configuration</summary>
 
 All configuration is to be defined within a `conf.json` file in the root of the project.
 This file should be of `JSON` format and is to be structured as such.
@@ -166,7 +189,7 @@ Defaults are in the [conf.json](conf.json) file.
   * `width`: &lt;number|string&gt;
   * `height`: &lt;number|string&gt;
 * `concurrency`: &lt;object&gt;
-  * `queries`: &lt;number&gt; The number of queries to be processed concurrently. **Default**: ``
+  * `queries`: &lt;number&gt; The number of queries to be processed concurrently.
   * `tracks`: &lt;number&gt; The number of tracks to be actively processed in parallel.
   * `trackStage`: &lt;number&gt; The number of tracks to concurrently preprocess before being pushed to the main trackQueue.
   * `downloader`: &lt;number&gt; The number of tracks to be concurrently downloaded in parallel.
@@ -176,8 +199,10 @@ Defaults are in the [conf.json](conf.json) file.
   * `feeds`: &lt;number&gt; The number of tracks whose source feeds should be concurrently gotten.
 * `services`: &lt;[ServiceConfiguration](#service-configuration): object&gt;
 
+<details>
+<summary>Example JSON</summary>
+
 ```json
-// Example
 {
   "server": {
     "hostname": "localhost",
@@ -201,11 +226,16 @@ Defaults are in the [conf.json](conf.json) file.
 }
 ```
 
+</details>
+
+</details>
+
 ### Service Configuration
 
-The [conf.json](conf.json) file already includes some API tokens for service authentication and should work right out of the box.
+The [conf.json](conf.json) file already includes some API tokens for service authentication and should work right out of the box. [See [Project specific configuration](#project-specific-configuration)]
 
-#### Spotify
+<details>
+<summary>Spotify</summary>
 
 * `spotify`: &lt;object&gt;
   * `clientId`: &lt;string&gt;
@@ -220,7 +250,7 @@ An optional `refreshToken` option can be defined which can be used to authentica
 
 An invalid `refreshToken`, when specified, would fallback to requesting account access which in-turn would request re-authentication of the users' account.
 
-##### Spotify API Authorization
+#### Spotify API Authorization
 
 1. Sign in to the [Spotify Dashboard](https://developer.spotify.com/dashboard/)
 2. Click `CREATE A CLIENT ID` and create an app
@@ -229,7 +259,10 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
 5. Include the `clientId` and the `clientSecret` from the dashboard in the `spotify` object that is a property of the `services` object of the `conf.json` file. [See [Confiuration](#configuration)]
 6. You are now ready to authenticate with Spotify!
 
-#### Apple Music
+</details>
+
+<details>
+<summary>Apple Music</summary>
 
 * `apple_music`: &lt;object&gt;
   * `storefront`: &lt;string&gt;
@@ -241,16 +274,20 @@ To create a custom developer token, please refer to the Apple Music documentatio
 
 The `storefront` option defines the default storefront to be used in the absence of a specification.
 
-##### Apple Music API Authorization
+#### Apple Music API Authorization
 
 [See [Apple Music API: Getting Keys and Creating Tokens
 ](https://developer.apple.com/documentation/applemusicapi/getting_keys_and_creating_tokens)]
 
 After successfully acquiring the developer token, include the `developerToken` to the `apple_music` object that's a property of the `services` object in the `conf.json` file. [See [Confiuration](#configuration)]
+</details>
 
-#### Deezer
+<details>
+<summary>Deezer</summary>
 
 Authentication unrequired. API is freely accessible.
+
+</details>
 
 ### Return Codes
 
