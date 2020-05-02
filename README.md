@@ -184,6 +184,10 @@ Defaults are in the [conf.json](conf.json) file.
     "port": 36346,
     "useHttps": false
   },
+  "image": {
+    "width": 640,
+    "height": 640
+  },
   "services": {
     "spotify": {
       "client_id": "CLIENT_ID",
