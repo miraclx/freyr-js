@@ -61,15 +61,19 @@ function atomicParsley(file, args, cb) {
     spawn('AtomicParsley', [file, ...parseMeta(args), '--overWrite'], {env: extendPathOnEnv(path)}).on('close', cb);
 }
 
-function getRetryMessage({ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
+function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
   return cStringd(
     [
       ':{color(red)}{⯈}:{color:close(red)} ',
-      `:{color(cyan)}@${ref}:{color:close(cyan)}`,
+      `:{color(cyan)}@${meta ? 'meta' : ref}:{color:close(cyan)}`,
       `{:{color(yellow)}${retryCount}:{color:close(yellow)}${
         Number.isFinite(maxRetries) ? `/:{color(yellow)}${maxRetries}:{color:close(yellow)}` : ''
       }}: `,
-      `[:{color(yellow)}${(lastErr && lastErr.code) || lastErr}:{color:close(yellow)}] `,
+      lastErr
+        ? `${
+            lastErr.code ? `[:{color(yellow)}${lastErr.code}:{color:close(yellow)}] ` : ''
+          }(:{color(yellow)}${lastErr}:{color:close(yellow)}) `
+        : '',
       `(:{color(cyan)}${
         Number.isFinite(totalBytes) ? `${bytesRead}`.padStart(`${totalBytes}`.length, ' ') : bytesRead
       }:{color:close(cyan)}${Number.isFinite(totalBytes) ? `/:{color(cyan)}${totalBytes}:{color:close(cyan)}` : ''})`,
