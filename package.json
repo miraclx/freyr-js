@@ -9,6 +9,9 @@
   "bin": {
     "freyr": "cli.js"
   },
+  "engines": {
+    "node": ">=12"
+  },
   "files": [
     "src",
     "typings",
@@ -61,7 +64,7 @@
     "hh-mm-ss": "^1.2.0",
     "is-online": "^8.3.0",
     "keytar": "^5.5.0",
-    "libxget": "^0.7.1",
+    "libxget": "^0.7.3",
     "lodash.merge": "^4.6.2",
     "merge2": "^1.3.0",
     "mkdirp": "^1.0.4",
@@ -73,6 +76,7 @@
     "stringd": "^2.0.0",
     "stringd-colors": "^1.8.0",
     "tmp": "^0.1.0",
+    "tough-cookie": "^4.0.0",
     "xbytes": "^1.6.0",
     "xprogress": "^0.17.1",
     "youtube-dl": "^2.3.0",
