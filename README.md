@@ -11,6 +11,8 @@
 
 [![Ascii Demo](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup.svg)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2)
 
+(Or as [GIF](media/demo.gif))
+
 ## Installation
 
 Ensure all [requirements](#requirements) are satisfied before installing.
