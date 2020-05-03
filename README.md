@@ -7,6 +7,10 @@
 
 [![NPM][npm-image-url]][npm-url]
 
+## Demo
+
+[![Ascii Demo](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup.svg)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2)
+
 ## Installation
 
 Ensure all [requirements](#requirements) are satisfied before installing.
