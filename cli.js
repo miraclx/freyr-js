@@ -74,9 +74,11 @@ function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalByt
             lastErr.code ? `[:{color(yellow)}${lastErr.code}:{color:close(yellow)}] ` : ''
           }(:{color(yellow)}${lastErr}:{color:close(yellow)}) `
         : '',
-      `(:{color(cyan)}${
-        Number.isFinite(totalBytes) ? `${bytesRead}`.padStart(`${totalBytes}`.length, ' ') : bytesRead
-      }:{color:close(cyan)}${Number.isFinite(totalBytes) ? `/:{color(cyan)}${totalBytes}:{color:close(cyan)}` : ''})`,
+      totalBytes
+        ? `(:{color(cyan)}${
+            Number.isFinite(totalBytes) ? `${bytesRead}`.padStart(`${totalBytes}`.length, ' ') : bytesRead
+          }:{color:close(cyan)}${Number.isFinite(totalBytes) ? `/:{color(cyan)}${totalBytes}:{color:close(cyan)}` : ''})`
+        : '',
     ].join(''),
   );
 }
@@ -121,14 +123,14 @@ function prepProgressGen(options) {
 async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
-  if (rex.isRejected())
+  if (rex.isRejected() && err !== false)
     logger.write(
       ...(err
         ? [typeof err === 'function' ? err(rex.reason()) : err, '\n']
-        : [`(failed%s)\n`, (_err => (_err ? `: [${_err.message || _err}]` : ''))(rex.reason())]),
+        : [`(failed%s)\n`, (_err => (_err ? `: [${_err.stack || _err}]` : ''))(rex.reason())]),
     );
   else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr}\n`);
-  else logger.write(`${post || '[done]'}\n`);
+  else if (post !== false) logger.write(`${post || '[done]'}\n`);
   return rex.isFulfilled() ? rex.value() : null;
 }
 
@@ -193,6 +195,7 @@ async function init(queries, options) {
       queries: 1,
       tracks: 1,
       trackStage: 6,
+      requests: 4,
       downloader: 4,
       encoder: 6,
       embedder: 10,
@@ -537,7 +540,7 @@ async function init(queries, options) {
     const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
-      .catch(errObject => Promise.reject({meta, code: 5, ...errObject}));
+      .catch(errObject => Promise.reject({meta, code: 5, ...(errObject.code ? errObject : {err: errObject})}));
     trackLogger.log(`| [\u2022] Post Processing...`);
     return {
       files,
@@ -696,7 +699,7 @@ async function init(queries, options) {
     if (!service) {
       queryLogger.write('failed\n');
       queryLogger.log(`\x1b[33m[i]\x1b[0m Invalid query`);
-      return;
+      return [];
     }
     queryLogger.write(`[${service.DESC}]\n`);
     const authLogger = queryLogger.print('[\u2022] Checking authenticated user...');
@@ -732,7 +735,8 @@ async function init(queries, options) {
       : contentType === 'artist'
       ? artistHandler
       : playlistHandler)(query, {service, queryLogger}).catch(err => {
-      queryLogger.error('\x1b[31m[i]\x1b[0m An error occurred while processing the query', err);
+      queryLogger.error(`\x1b[31m[i]\x1b[0m An error occurred while processing the query${err || ''}`);
+      return Promise.reject(err);
     });
     const source = queryStats.meta;
     const trackStats = await pFlatten(queryStats.tracks);
@@ -769,7 +773,7 @@ async function init(queries, options) {
             : 'Unknown track processing error';
         embedLogger.error(
           `\u2022 [\u2717] ${trackStat.meta.trackName} [${trackStat.meta.track.uri}] (failed: ${reason}${
-            trackStat.err ? ` [${trackStat.err}]` : ''
+            trackStat.err ? ` [${trackStat.err.stack}]` : ''
           })`,
         );
       } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
@@ -791,7 +795,7 @@ async function init(queries, options) {
     stackLogger.log('[\u2022] Collation Complete');
     return trackStats;
   });
-  const trackStats = await pFlatten(queryQueue.push([...options.input, ...queries]));
+  const trackStats = (await pFlatten(queryQueue.push([...options.input, ...queries]))).filter(Boolean);
   if (options.playlist && typeof options.playlist === 'string')
     createPlaylist(trackStats, stackLogger, BASE_DIRECTORY, options.playlist);
   const finalStats = trackStats.reduce(
@@ -854,7 +858,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
-    'specify key-value concurrency pairs (`-z 3` for 3 concurrent tracks; `-z queries=2 -z track=4` for extraspecific configuration)',
+    'specify key-value concurrency pairs (format: <key=value>), repeat to add more options <value> implies track concurrency',
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
