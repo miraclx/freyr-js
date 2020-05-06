@@ -181,6 +181,44 @@ async function init(queries, options) {
   if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
   if (!Array.isArray(queries)) stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid Query'), process.exit(1);
 
+  try {
+    atomicParsley(true);
+    options.tries = CHECK_FLAG_IS_NUM(
+      `${options.tries}`.toLowerCase() === 'infinite' ? Infinity : options.tries,
+      '-t, --tries',
+      'number',
+    );
+    options.cover = options.cover && xpath.basename(options.cover);
+    options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
+    options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
+    options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
+    options.input = PROCESS_INPUT_ARG(options.input);
+    options.concurrency = Object.fromEntries(
+      (options.concurrency || [])
+        .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
+        .map(([k, v]) => {
+          if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder', 'sources', 'feeds'].includes(k))
+            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
+          return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
+        }),
+    );
+    if (options.storefront) {
+      const data = countryData.lookup.countries({alpha2: options.storefront.toUpperCase()});
+      if (data.length) options.storefront = data[0].alpha2.toLowerCase();
+      else throw new Error('Country specification with the `--storefront` option is invalid');
+    }
+
+    if (options.coverSize) {
+      const err = new Error(
+        `Invalid \`--cover-size\` specification [${options.coverSize}]. (expected: <width>x<height> or <size> as <size>x<size>)`,
+      );
+      if (!(options.coverSize = PROCESS_IMAGE_SIZE(options.coverSize))) throw err;
+    }
+  } catch (er) {
+    stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
+    process.exit(2);
+  }
+
   let Config = {
     server: {
       hostname: 'localhost',
@@ -228,44 +266,6 @@ async function init(queries, options) {
   }
 
   const progressGen = prepProgressGen(options);
-
-  try {
-    atomicParsley(true);
-    options.tries = CHECK_FLAG_IS_NUM(
-      `${options.tries}`.toLowerCase() === 'infinite' ? Infinity : options.tries,
-      '-t, --tries',
-      'number',
-    );
-    options.cover = options.cover && xpath.basename(options.cover);
-    options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
-    options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
-    options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
-    options.input = PROCESS_INPUT_ARG(options.input);
-    options.concurrency = Object.fromEntries(
-      (options.concurrency || [])
-        .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
-        .map(([k, v]) => {
-          if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder', 'sources', 'feeds'].includes(k))
-            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
-          return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
-        }),
-    );
-    if (options.storefront) {
-      const data = countryData.lookup.countries({alpha2: options.storefront.toUpperCase()});
-      if (data.length) options.storefront = data[0].alpha2.toLowerCase();
-      else throw new Error('Country specification with the `--storefront` option is invalid');
-    }
-
-    if (options.coverSize) {
-      const err = new Error(
-        `Invalid \`--cover-size\` specification [${options.coverSize}]. (expected: <width>x<height> or <size> as <size>x<size>)`,
-      );
-      if (!(options.coverSize = PROCESS_IMAGE_SIZE(options.coverSize))) throw err;
-    }
-  } catch (er) {
-    stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
-    process.exit(2);
-  }
 
   Config.image = merge(Config.image, options.coverSize);
   Config.concurrency = merge(Config.concurrency, options.concurrency);
