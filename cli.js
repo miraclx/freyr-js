@@ -179,7 +179,7 @@ async function init(queries, options) {
   const initTimeStamp = Date.now();
   const stackLogger = new StackLogger({indentSize: 1});
   if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
-  if (!(Array.isArray(queries) && queries.length > 0))
+  if (!((Array.isArray(queries) && queries.length > 0) || options.input))
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid Query'), process.exit(1);
 
   try {
