@@ -112,6 +112,7 @@ class Spotify {
       ? {
           id: trackInfo.id,
           uri: trackInfo.uri,
+          link: trackInfo.external_urls.spotify,
           name: trackInfo.name,
           artists: trackInfo.artists.map(artist => artist.name),
           album: albumInfo.name,

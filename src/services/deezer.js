@@ -145,10 +145,12 @@ class Deezer {
   wrapTrackMeta(trackInfo, albumInfo = {}) {
     return {
       id: trackInfo.id,
-      uri: trackInfo.link,
+      uri: `deezer:track:${trackInfo.id}`,
+      link: trackInfo.link,
       name: trackInfo.title,
       artists: [trackInfo.artist.name],
       album: albumInfo.name,
+      album_uri: `deezer:album:${albumInfo.id}`,
       images: albumInfo.images,
       duration: trackInfo.duration * 1000,
       album_artist: albumInfo.artists[0],

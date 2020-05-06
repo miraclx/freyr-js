@@ -88,7 +88,8 @@ class AppleMusic {
   wrapTrackMeta(trackInfo, albumInfo = {}) {
     return {
       id: trackInfo.id,
-      uri: trackInfo.attributes.url,
+      uri: `apple_music:track:${trackInfo.id}`,
+      link: trackInfo.attributes.url,
       name: trackInfo.attributes.name,
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
