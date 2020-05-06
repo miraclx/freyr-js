@@ -699,7 +699,7 @@ async function init(queries, options) {
     if (!service) {
       queryLogger.write('failed\n');
       queryLogger.log(`\x1b[33m[i]\x1b[0m Invalid query`);
-      return [];
+      return;
     }
     queryLogger.write(`[${service.DESC}]\n`);
     const authLogger = queryLogger.print('[\u2022] Checking authenticated user...');
@@ -735,9 +735,12 @@ async function init(queries, options) {
       : contentType === 'artist'
       ? artistHandler
       : playlistHandler)(query, {service, queryLogger}).catch(err => {
-      queryLogger.error(`\x1b[31m[i]\x1b[0m An error occurred while processing the query${err || ''}`);
-      return Promise.reject(err);
+      queryLogger.error(
+        `\x1b[31m[i]\x1b[0m An error occurred while processing the query${err ? ` (${err.message || err})` : ''}`,
+      );
+      return Promise.resolve();
     });
+    if (!queryStats) return null;
     const source = queryStats.meta;
     const trackStats = await pFlatten(queryStats.tracks);
     queryLogger.log('[\u2022] Download Complete');
