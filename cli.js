@@ -19,6 +19,7 @@ const commander = require('commander');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
 const countryData = require('country-data');
+const {isBinaryFile} = require('isbinaryfile');
 const {spawn, spawnSync} = require('child_process');
 
 const pFlatten = require('./src/p_flatten');
@@ -157,6 +158,7 @@ function PROCESS_INPUT_ARG(input_arg) {
   const stat = fs.statSync(input_arg);
   if (stat.size > 1048576) throw new Error(`Input file [${input_arg}] is beyond the maximum 1 MiB size limit`);
   if (!stat.isFile()) throw new Error(`Input file [${input_arg}] is not a file`);
+  if (isBinaryFile(input_arg, stat.size)) throw new Error(`Input file [${input_arg}] cannot be a binary file`);
   const contents = fs
     .readFileSync(input_arg)
     .toString()
