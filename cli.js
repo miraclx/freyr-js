@@ -152,13 +152,19 @@ function CHECK_BIT_RATE_VAL(bitrate_arg) {
   return `${bitrate}k`;
 }
 
-function PROCESS_INPUT_ARG(input_arg) {
-  if (!input_arg) return [];
-  if (!fs.existsSync(input_arg)) throw new Error(`Input file [${input_arg}] is inexistent`);
+async function PROCESS_INPUT_FILE(input_arg, type, allowBinary = false) {
+  if (!fs.existsSync(input_arg)) throw new Error(`${type} file [${input_arg}] is inexistent`);
   const stat = fs.statSync(input_arg);
-  if (stat.size > 1048576) throw new Error(`Input file [${input_arg}] is beyond the maximum 1 MiB size limit`);
-  if (!stat.isFile()) throw new Error(`Input file [${input_arg}] is not a file`);
-  if (isBinaryFile(input_arg, stat.size)) throw new Error(`Input file [${input_arg}] cannot be a binary file`);
+  if (stat.size > 1048576) throw new Error(`${type} file [${input_arg}] is beyond the maximum 1 MiB size limit`);
+  if (!stat.isFile()) throw new Error(`${type} file [${input_arg}] is not a file`);
+  if (!allowBinary && (await isBinaryFile(input_arg, stat.size)))
+    throw new Error(`${type} file [${input_arg}] cannot be a binary file`);
+  return input_arg;
+}
+
+async function PROCESS_INPUT_ARG(input_arg) {
+  if (!input_arg) return [];
+  await PROCESS_INPUT_FILE(input_arg, 'Input', false);
   const contents = fs
     .readFileSync(input_arg)
     .toString()
@@ -167,6 +173,12 @@ function PROCESS_INPUT_ARG(input_arg) {
     .filter(line => !!line && /^(?!\s*#)/.test(line)) // Ignore empty lines or lines that start with comments
     .map(line => line.replace(/#.*$/, '').trim()); // Ignore comments at the end of lines
   return contents;
+}
+
+async function PROCESS_CONFIG_ARG(config_arg) {
+  const local_config = xpath.join(__dirname, 'conf.json');
+  if (!config_arg) return local_config;
+  return PROCESS_INPUT_FILE(config_arg, 'Config', false);
 }
 
 function PROCESS_IMAGE_SIZE(value) {
@@ -195,7 +207,8 @@ async function init(queries, options) {
     options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
     options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
-    options.input = PROCESS_INPUT_ARG(options.input);
+    options.input = await PROCESS_INPUT_ARG(options.input);
+    options.config = await PROCESS_CONFIG_ARG(options.config);
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
@@ -245,10 +258,9 @@ async function init(queries, options) {
     },
   };
   try {
-    const confFile = xpath.join(__dirname, 'conf.json');
-    if (fs.existsSync(confFile)) Config = merge(Config, JSON.parse(fs.readFileSync(confFile)));
+    if (fs.existsSync(options.config)) Config = merge(Config, JSON.parse(fs.readFileSync(options.config)));
     else {
-      stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] not found`);
+      stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
       process.exit(4);
     }
     const errMessage = `[key: image, value: ${JSON.stringify(Config.image)}]`;
@@ -868,7 +880,7 @@ const command = commander
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
-  .option('-o, --options <file>', 'use alternative conf file (unimplemented)')
+  .option('-o, --config <file>', 'use alternative conf file')
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-s, --storefront <COUNTRY>', 'country storefront code')
