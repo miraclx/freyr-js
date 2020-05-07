@@ -876,7 +876,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
-    'specify key-value concurrency pairs (format: <key=value>), repeat to add more options <value> implies track concurrency',
+    'specify key-value concurrency pairs (format: <key=value>), repeat to add more options. <value> implies track concurrency',
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
