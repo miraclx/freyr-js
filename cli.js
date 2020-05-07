@@ -361,7 +361,7 @@ async function init(queries, options) {
               else logger.log(opts.retryMessage(data));
             }
           })
-          .on('error', err => {
+          .once('error', err => {
             err = Object(err);
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err), '\n');
             else logger.log(opts.failureMessage(err));
