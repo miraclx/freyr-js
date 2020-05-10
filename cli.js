@@ -889,7 +889,11 @@ const command = commander
   .option('-T, --no-tree', "don't organise tracks in directory structure `[PREFIX/]<ARTIST>/<ALBUM>/<TRACK>`")
   .option('--tags', 'tag configuration specification (format: <key=value>), (reserved keys: [exclude, account]) (unimplemented)')
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
-  .option('--downloader <SERVICE>', 'specify a preferred download source (valid: [youtube, deezer]) (unimplemented)', 'youtube')
+  .option(
+    '--downloader <SERVICE>',
+    'specify a preferred download source or a comma-separated preference order (valid: [youtube, yt_music, deezer]) (unimplemented)',
+    'youtube',
+  )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-stats', "don't show the stats on completion")
