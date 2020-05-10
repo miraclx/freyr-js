@@ -7,7 +7,7 @@ const keytar = require('keytar');
 const Promise = require('bluebird');
 const youtubedl = require('youtube-dl');
 
-const YouTube = require('./youtube');
+const YouTube = require('./sources/youtube');
 const Deezer = require('./services/deezer');
 const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');

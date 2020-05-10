@@ -4,7 +4,7 @@ const util = require('util');
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
 
-const most = require('./most_polyfill');
+const most = require('../most_polyfill');
 
 function YouTubeSearchError(message, statusCode, status, body) {
   this.name = 'YouTubeSearchError';
