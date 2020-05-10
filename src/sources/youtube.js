@@ -7,6 +7,8 @@ const youtubedl = require('youtube-dl');
 
 const most = require('../most_polyfill');
 
+const _ytdlGet = util.promisify(youtubedl.getInfo);
+
 function YouTubeSearchError(message, statusCode, status, body) {
   this.name = 'YouTubeSearchError';
   this.message = message || '';
@@ -16,6 +18,14 @@ function YouTubeSearchError(message, statusCode, status, body) {
 }
 
 YouTubeSearchError.prototype = Error.prototype;
+
+function attachFeedFn(collections, generator) {
+  generator = generator || (v => v);
+  return collections.map(item => ({
+    ...item,
+    getFeeds: async () => _ytdlGet(generator(item), ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
+  }));
+}
 
 class YouTubeMusicSearch {
   gotInstance = got.extend({
@@ -173,7 +183,6 @@ class YouTubeMusicSearch {
 class YouTube {
   constructor() {
     this._search = util.promisify(ytSearch);
-    this._ytdlGet = util.promisify(youtubedl.getInfo);
   }
 
   async search(artists, trackTitle, xFilters, count = Infinity) {
@@ -198,22 +207,22 @@ class YouTube {
   }
 
   async get(artists, track, duration) {
-    return YouTube.classify(
-      (
-        await Promise.map(
-          [
-            [artists, track, ['Official Audio'], 5],
-            [artists, track, ['Audio'], 5],
-            [artists, track, ['Lyrics'], 5],
-            [artists, track, [], 5],
-          ],
-          query => Promise.resolve(this.search(...query)).reflect(),
-          {concurrency: 2},
-        )
-      ).map(ret => (ret.isFulfilled() ? ret.value() : [])),
+    const searchResults = await Promise.map(
+      [
+        [artists, track, ['Official Audio'], 5],
+        [artists, track, ['Audio'], 5],
+        [artists, track, ['Lyrics'], 5],
+        [artists, track, [], 5],
+      ],
+      query => Promise.resolve(this.search(...query)).reflect(),
+      {concurrency: 3},
+    );
+    const classified = YouTube.classify(
+      searchResults.map(ret => (ret.isFulfilled() ? ret.value() : [])),
       artists,
       duration,
     );
+    return attachFeedFn(classified, item => item.videoId);
   }
 
   static classify(stacks, artists, duration) {
