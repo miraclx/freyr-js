@@ -81,7 +81,7 @@
     "xbytes": "^1.6.0",
     "xprogress": "^0.17.1",
     "youtube-dl": "^2.3.0",
-    "yt-search": "^0.4.5"
+    "yt-search": "^1.1.2"
   },
   "devDependencies": {}
 }
