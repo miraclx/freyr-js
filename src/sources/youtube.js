@@ -3,6 +3,7 @@ const got = require('got').default;
 const util = require('util');
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
+const youtubedl = require('youtube-dl');
 
 const most = require('../most_polyfill');
 
@@ -172,6 +173,7 @@ class YouTubeMusicSearch {
 class YouTube {
   constructor() {
     this._search = util.promisify(ytSearch);
+    this._ytdlGet = util.promisify(youtubedl.getInfo);
   }
 
   async search(artists, trackTitle, xFilters, count = Infinity) {
@@ -240,6 +242,15 @@ class YouTube {
         ),
     ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : a.accuracy < b.accuracy ? 1 : 0));
     return stacks[0];
+  }
+
+  async getStreams(videoId) {
+    const data = await Promise.resolve(
+      this._ytdlGet(videoId, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
+    ).reflect();
+    return data.isFulfilled()
+      ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
+      : {err: data.reason()};
   }
 }
 

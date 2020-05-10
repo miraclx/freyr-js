@@ -1,11 +1,8 @@
 /* eslint-disable consistent-return */
-const util = require('util');
-
 const Conf = require('conf');
 const crypto = require('crypto');
 const keytar = require('keytar');
 const Promise = require('bluebird');
-const youtubedl = require('youtube-dl');
 
 const YouTube = require('./sources/youtube');
 const Deezer = require('./services/deezer');
@@ -16,7 +13,6 @@ class FreyrCore {
   constructor(ServiceConfig, AuthServer, serverOpts) {
     ServiceConfig = ServiceConfig || {};
     this.youtube = new YouTube();
-    this.ytdlGet = util.promisify(youtubedl.getInfo);
     this.engines = [
       new Deezer(ServiceConfig.deezer, AuthServer, serverOpts),
       new Spotify(ServiceConfig.spotify, AuthServer, serverOpts),
