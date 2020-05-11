@@ -1,7 +1,6 @@
 /* eslint-disable consistent-return */
 const util = require('util');
 
-const Conf = require('conf');
 const Promise = require('bluebird');
 const youtubedl = require('youtube-dl');
 
@@ -20,39 +19,6 @@ class FreyrCore {
       new Spotify(ServiceConfig.spotify, AuthServer, serverOpts),
       new AppleMusic(ServiceConfig.apple_music, AuthServer, serverOpts),
     ];
-  }
-
-  async init() {
-    await this.loadConfig();
-  }
-
-  async loadConfig() {
-    this.config = new Conf({
-      projectName: 'FreyrCLI',
-      projectSuffix: '',
-      configName: 'd3fault',
-      fileExtension: 'enc',
-      schema: {
-        services: {
-          type: 'object',
-          additionalProperties: false,
-          default: {
-            spotify: {},
-          },
-          properties: {
-            spotify: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                expiry: {type: 'integer'},
-                access_token: {type: 'string'},
-                refresh_token: {type: 'string'},
-              },
-            },
-          },
-        },
-      },
-    });
   }
 
   identifyService(content) {

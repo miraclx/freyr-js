@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle, consistent-return, camelcase */
 const fs = require('fs');
 const tmp = require('tmp');
+const Conf = require('conf');
 const open = require('open');
 const xget = require('libxget');
 const merge = require('lodash.merge');
@@ -279,12 +280,38 @@ async function init(queries, options) {
   let freyrCore;
   try {
     freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
-    await freyrCore.init();
   } catch (e) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Failed to initialize a Freyr Instance`);
     stackLogger.error(e);
     process.exit(4);
   }
+
+  const freyrCoreConfig = new Conf({
+    projectName: 'FreyrCLI',
+    projectSuffix: '',
+    configName: 'd3fault',
+    fileExtension: 'enc',
+    schema: {
+      services: {
+        type: 'object',
+        additionalProperties: false,
+        default: {
+          spotify: {},
+        },
+        properties: {
+          spotify: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              expiry: {type: 'integer'},
+              access_token: {type: 'string'},
+              refresh_token: {type: 'string'},
+            },
+          },
+        },
+      },
+    },
+  });
 
   const progressGen = prepProgressGen(options);
 
