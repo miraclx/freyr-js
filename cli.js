@@ -49,7 +49,7 @@ function ensureBinExtIfWindows(isWin, command) {
 function check_bin_is_existent(bin, path) {
   const isWin = process.platform === 'win32';
   const command = isWin ? 'where' : 'which';
-  const {status} = spawnSync(command, [bin], {env: extendPathOnEnv(path)});
+  const {status} = spawnSync(ensureBinExtIfWindows(isWin, command), [bin], {env: extendPathOnEnv(path)});
   if ([127, null].includes(status)) throw Error(`Unable to locate the command [${command}] within your PATH`);
   return status === 0;
 }
@@ -63,7 +63,9 @@ function atomicParsley(file, args, cb) {
     else return cb(err);
 
   if (typeof file === 'string')
-    spawn('AtomicParsley', [file, ...parseMeta(args), '--overWrite'], {env: extendPathOnEnv(path)}).on('close', cb);
+    spawn(ensureBinExtIfWindows(isWin, 'AtomicParsley'), [file, ...parseMeta(args), '--overWrite'], {
+      env: extendPathOnEnv(path),
+    }).on('close', cb);
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
