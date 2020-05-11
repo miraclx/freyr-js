@@ -283,7 +283,7 @@ async function init(queries, options) {
   } catch (e) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Failed to initialize a Freyr Instance`);
     stackLogger.error(e);
-    process.exit(4);
+    process.exit(6);
   }
 
   const schema = {
