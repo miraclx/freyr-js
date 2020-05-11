@@ -42,6 +42,10 @@ function extendPathOnEnv(path) {
   return {...process.env, PATH: [process.env.PATH, path].join(process.platform === 'win32' ? ';' : ':')};
 }
 
+function ensureBinExtIfWindows(isWin, command) {
+  return command.replace(/(\.exe)?$/, isWin ? '.exe' : '$1');
+}
+
 function check_bin_is_existent(bin, path) {
   const isWin = process.platform === 'win32';
   const command = isWin ? 'where' : 'which';
