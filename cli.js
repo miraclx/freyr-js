@@ -762,7 +762,7 @@ async function init(queries, options) {
     if (service.isAuthed()) authLogger.write('[authenticated]\n');
     else {
       authLogger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
-      const config = freyrCore.config.get(`services.${service.ID}`);
+      const config = freyrCoreConfig.get(`services.${service.ID}`);
       const loginLogger = queryLogger.log(`[${service.DESC} Login]`);
       service.canTryLogin(config)
         ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
@@ -773,7 +773,7 @@ async function init(queries, options) {
       queryLogger.log('[\u2717] Failed to authenticate client!');
       return;
     }
-    if (service.hasProps()) freyrCore.config.set(`services.${service.ID}`, service.getProps());
+    if (service.hasProps()) freyrCoreConfig.set(`services.${service.ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
     const queryStats = await (contentType === 'track'
