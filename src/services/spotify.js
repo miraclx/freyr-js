@@ -73,6 +73,12 @@ class Spotify {
     return true;
   }
 
+  propSchema = {
+    expiry: {type: 'integer'},
+    access_token: {type: 'string'},
+    refresh_token: {type: 'string'},
+  };
+
   getProps() {
     return {
       expiry: this.expiry,

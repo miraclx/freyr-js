@@ -286,31 +286,28 @@ async function init(queries, options) {
     process.exit(4);
   }
 
+  const schema = {
+    services: {
+      type: 'object',
+      additionalProperties: false,
+      default: {},
+      properties: {},
+    },
+  };
+  freyrCore.engines.forEach(engine => {
+    schema.services.default[engine.ID] = {};
+    schema.services.properties[engine.ID] = {
+      type: 'object',
+      additionalProperties: false,
+      properties: engine.propSchema || {},
+    };
+  });
   const freyrCoreConfig = new Conf({
     projectName: 'FreyrCLI',
     projectSuffix: '',
     configName: 'd3fault',
     fileExtension: 'enc',
-    schema: {
-      services: {
-        type: 'object',
-        additionalProperties: false,
-        default: {
-          spotify: {},
-        },
-        properties: {
-          spotify: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-              expiry: {type: 'integer'},
-              access_token: {type: 'string'},
-              refresh_token: {type: 'string'},
-            },
-          },
-        },
-      },
-    },
+    schema,
   });
 
   const progressGen = prepProgressGen(options);
