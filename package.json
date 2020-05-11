@@ -1,6 +1,6 @@
 {
   "name": "freyr",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Versatile Multi-Service Music Downloader with NodeJS",
   "main": "src/freyr.js",
   "scripts": {
