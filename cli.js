@@ -344,6 +344,7 @@ async function init(queries, options) {
       opts.successMessage,
     ].map(val => (typeof val === 'function' || val === false ? val : () => val));
     return new Promise((res, rej) => {
+      let completed = false;
       if (!Array.isArray(urlOrFragments)) {
         const feed = xget(urlOrFragments, {chunks: options.chunks, retries: options.tries, timeout: options.timeout})
           .with('progressBar', urlMeta =>
@@ -368,13 +369,14 @@ async function init(queries, options) {
             }
           })
           .once('error', err => {
+            if (completed) return;
             err = Object(err);
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err), '\n');
             else logger.log(opts.failureMessage(err));
             opts.errorHandler(err);
             rej(err);
           });
-        feed.pipe(writeStream).on('finish', () => res(writeStream.bytesWritten));
+        feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
       } else {
         const barGen = progressGen(
           urlOrFragments.reduce((total, fragment) => total + fragment.size, 0),
@@ -393,6 +395,7 @@ async function init(queries, options) {
                 if (opts.retryMessage !== false) barGen.print(opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data}));
               })
               .once('error', err => {
+                if (completed) return;
                 if (has_erred) return feed.destroy();
                 err = Object(err);
                 has_erred = true;
@@ -406,7 +409,7 @@ async function init(queries, options) {
         )
           .once('end', () => barGen.end(opts.successMessage(), '\n'))
           .pipe(writeStream)
-          .on('finish', () => res(writeStream.bytesWritten));
+          .on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
       }
     });
   }
