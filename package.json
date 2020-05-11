@@ -64,7 +64,6 @@
     "hh-mm-ss": "^1.2.0",
     "is-online": "^8.3.0",
     "isbinaryfile": "^4.0.6",
-    "keytar": "^5.5.0",
     "libxget": "^0.7.3",
     "lodash.merge": "^4.6.2",
     "merge2": "^1.3.0",

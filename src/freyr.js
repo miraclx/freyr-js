@@ -2,8 +2,6 @@
 const util = require('util');
 
 const Conf = require('conf');
-const crypto = require('crypto');
-const keytar = require('keytar');
 const Promise = require('bluebird');
 const youtubedl = require('youtube-dl');
 
@@ -25,16 +23,7 @@ class FreyrCore {
   }
 
   async init() {
-    this.isFirstRun = (await keytar.findCredentials('FreyrCLI')).length === 0;
     await this.loadConfig();
-  }
-
-  async getEncryptionKey() {
-    return (this.key =
-      this.key && this.key.length === 64
-        ? this.key
-        : (await keytar.getPassword('FreyrCLI', 'd3fault')) ||
-          (k => (keytar.setPassword('FreyrCLI', 'd3fault', k), k))(crypto.randomBytes(32).toString('hex')));
   }
 
   async loadConfig() {
@@ -43,7 +32,6 @@ class FreyrCore {
       projectSuffix: '',
       configName: 'd3fault',
       fileExtension: 'enc',
-      encryptionKey: await this.getEncryptionKey(),
       schema: {
         services: {
           type: 'object',
