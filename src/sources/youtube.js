@@ -3,8 +3,11 @@ const got = require('got').default;
 const util = require('util');
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
+const youtubedl = require('youtube-dl');
 
-const most = require('./most_polyfill');
+const most = require('../most_polyfill');
+
+const _ytdlGet = util.promisify(youtubedl.getInfo);
 
 function YouTubeSearchError(message, statusCode, status, body) {
   this.name = 'YouTubeSearchError';
@@ -15,6 +18,14 @@ function YouTubeSearchError(message, statusCode, status, body) {
 }
 
 YouTubeSearchError.prototype = Error.prototype;
+
+function attachFeedFn(collections, generator) {
+  generator = generator || (v => v);
+  return collections.map(item => ({
+    ...item,
+    getFeeds: async () => _ytdlGet(generator(item), ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
+  }));
+}
 
 class YouTubeMusicSearch {
   gotInstance = got.extend({
@@ -196,22 +207,22 @@ class YouTube {
   }
 
   async get(artists, track, duration) {
-    return YouTube.classify(
-      (
-        await Promise.map(
-          [
-            [artists, track, ['Official Audio'], 5],
-            [artists, track, ['Audio'], 5],
-            [artists, track, ['Lyrics'], 5],
-            [artists, track, [], 5],
-          ],
-          query => Promise.resolve(this.search(...query)).reflect(),
-          {concurrency: 2},
-        )
-      ).map(ret => (ret.isFulfilled() ? ret.value() : [])),
+    const searchResults = await Promise.map(
+      [
+        [artists, track, ['Official Audio'], 5],
+        [artists, track, ['Audio'], 5],
+        [artists, track, ['Lyrics'], 5],
+        [artists, track, [], 5],
+      ],
+      query => Promise.resolve(this.search(...query)).reflect(),
+      {concurrency: 3},
+    );
+    const classified = YouTube.classify(
+      searchResults.map(ret => (ret.isFulfilled() ? ret.value() : [])),
       artists,
       duration,
     );
+    return attachFeedFn(classified, item => item.videoId);
   }
 
   static classify(stacks, artists, duration) {
@@ -240,6 +251,15 @@ class YouTube {
         ),
     ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : a.accuracy < b.accuracy ? 1 : 0));
     return stacks[0];
+  }
+
+  async getStreams(videoId) {
+    const data = await Promise.resolve(
+      this._ytdlGet(videoId, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
+    ).reflect();
+    return data.isFulfilled()
+      ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
+      : {err: data.reason()};
   }
 }
 

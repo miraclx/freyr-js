@@ -2,9 +2,8 @@
 const util = require('util');
 
 const Promise = require('bluebird');
-const youtubedl = require('youtube-dl');
 
-const YouTube = require('./youtube');
+const YouTube = require('./sources/youtube');
 const Deezer = require('./services/deezer');
 const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');
@@ -13,7 +12,6 @@ class FreyrCore {
   constructor(ServiceConfig, AuthServer, serverOpts) {
     ServiceConfig = ServiceConfig || {};
     this.youtube = new YouTube();
-    this.ytdlGet = util.promisify(youtubedl.getInfo);
     this.engines = [
       new Deezer(ServiceConfig.deezer, AuthServer, serverOpts),
       new Spotify(ServiceConfig.spotify, AuthServer, serverOpts),
