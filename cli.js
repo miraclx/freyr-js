@@ -937,7 +937,7 @@ const command = commander
 
 function main(argv) {
   if (!argv.includes('-v')) {
-    const credits = `libxget v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
+    const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
     console.log(credits);
     console.log('-'.repeat(credits.length));
     if (argv.length === 2) return commander.outputHelp();
