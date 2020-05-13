@@ -8,8 +8,8 @@ const tmp = require('tmp');
 const Conf = require('conf');
 const open = require('open');
 const xget = require('libxget');
-const merge = require('lodash.merge');
 const ffmpeg = require('fluent-ffmpeg');
+const lodash = require('lodash');
 const merge2 = require('merge2');
 const mkdirp = require('mkdirp');
 const xbytes = require('xbytes');
@@ -313,8 +313,8 @@ async function init(queries, options) {
 
   const progressGen = prepProgressGen(options);
 
-  Config.image = merge(Config.image, options.coverSize);
-  Config.concurrency = merge(Config.concurrency, options.concurrency);
+  Config.image = lodash.merge(Config.image, options.coverSize);
+  Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
     options.directoryPrefix,
@@ -460,7 +460,7 @@ async function init(queries, options) {
       }).catch(err => Promise.reject({err, code: 3}));
       const rawAudio = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
       const audioBytesWritten = await downloadToStream(
-        merge(
+        lodash.merge(
           {
             writeStream: fs.createWriteStream(rawAudio.name),
             logger: trackLogger,
