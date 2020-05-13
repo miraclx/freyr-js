@@ -1,5 +1,4 @@
-/* eslint-disable max-classes-per-file */
-/* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
+/* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this, max-classes-per-file */
 const url = require('url');
 const path = require('path');
 
