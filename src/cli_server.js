@@ -9,10 +9,35 @@ const cookieParser = require('cookie-parser');
 
 function wrapHTML(opts) {
   return stringd(
-    Buffer.from(
-      'PHN0eWxlPgogIC5ib3ggewogICAgYm9yZGVyOiBub25lOwogICAgYm94LXNoYWRvdzogMHB4IDBweCA2MHB4IDEwcHggZ3JleTsKICAgIGhlaWdodDogMjAwcHg7CiAgICB3aWR0aDogNDB2aDsKICAgIHBhZGRpbmc6IDEwcHg7CiAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDk0LCA5MSwgMTIxLCAwLjgpOwogICAgYm9yZGVyLXJhZGl1czogMTRweDsKICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICB9CgogIC5jZW50ZXItdiB7CiAgICBtYXJnaW46IDA7CiAgICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgICB0b3A6IDQwJTsKICAgIGxlZnQ6IDUwJTsKICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlKC01MCUsIC01MCUpOwogIH0KPC9zdHlsZT4KCjxkaXYgY2xhc3M9ImJveCBjZW50ZXItdiBjZW50ZXItaCI+CiAgPGgxPkZyZXlyQ0xJPC9oMT4KICA8aHIgd2lkdGg9IjQ1JSIgLz4KICA8Yj46e3NlcnZpY2V9PC9iPgogIDxociB3aWR0aD0iODAlIiAvPgogIDxoMyBzdHlsZT0iY29sb3I6Ontjb2xvcn07Ij46e21zZ308L2gzPgogIFlvdSBjYW4gY2xvc2UgdGhpcyB0YWIKPC9kaXY+',
-      'base64',
-    ).toString('ascii'),
+    `<style>
+    .box {
+      border: none;
+      box-shadow: 0px 0px 60px 10px grey;
+      height: 200px;
+      width: 40vh;
+      padding: 10px;
+      background-color: rgba(94, 91, 121, 0.8);
+      border-radius: 14px;
+      text-align: center;
+    }
+  
+    .center-v {
+      margin: 0;
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+  
+  <div class="box center-v center-h">
+    <h1>FreyrCLI</h1>
+    <hr width="45%" />
+    <b>:{service}</b>
+    <hr width="80%" />
+    <h3 style="color::{color};">:{msg}</h3>
+    You can close this tab
+  </div>`,
     opts,
   );
 }
