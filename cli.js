@@ -196,6 +196,10 @@ function PROCESS_IMAGE_SIZE(value) {
   parts = parts.map(part => parseInt(part, 10));
   return {width: parts[0], height: parts[1] || parts[0]};
 }
+function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
+  if (!Array.isArray(value)) return throwEr();
+  return value.filter(Boolean).map(item => (!['youtube'].includes(item) ? throwEr(item) : item));
+}
 
 async function init(queries, options) {
   const initTimeStamp = Date.now();
@@ -238,6 +242,10 @@ async function init(queries, options) {
       );
       if (!(options.coverSize = PROCESS_IMAGE_SIZE(options.coverSize))) throw err;
     }
+
+    options.downloader = PROCESS_DOWNLOADER_ORDER((options.downloader || '').split(','), item => {
+      throw new Error(`downloader specification within the \`--downloader\` must be valid. found [${item}]`);
+    });
   } catch (er) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
     process.exit(2);
@@ -264,6 +272,9 @@ async function init(queries, options) {
       sources: 4,
       feeds: 4,
     },
+    downloader: {
+      order: ['youtube'],
+    },
   };
   try {
     if (fs.existsSync(options.config)) {
@@ -276,6 +287,10 @@ async function init(queries, options) {
     }
     const errMessage = `[key: image, value: ${JSON.stringify(Config.image)}]`;
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
+    Config.downloader.order = PROCESS_DOWNLOADER_ORDER(Config.downloader.order, item => {
+      if (item) throw new Error(`Downloader order within the config file must be valid. found [${item}]`);
+      throw new Error(`Downloader order must be an array of strings`);
+    });
   } catch (e) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted (${e})`);
     process.exit(4);
@@ -318,6 +333,7 @@ async function init(queries, options) {
 
   Config.image = lodash.merge(Config.image, options.coverSize);
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
+  Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
     options.directoryPrefix,
@@ -930,7 +946,7 @@ const command = commander
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
-    'specify a preferred download source or a `,`-separated preference order (valid: [youtube, deezer]) (unimplemented)',
+    'specify a preferred download source or a `,`-separated preference order (valid: [youtube])',
     'youtube',
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
