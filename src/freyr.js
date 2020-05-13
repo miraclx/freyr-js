@@ -3,7 +3,7 @@ const util = require('util');
 
 const Promise = require('bluebird');
 
-const YouTube = require('./sources/youtube');
+const YouTube = require('./services/youtube');
 const Deezer = require('./services/deezer');
 const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');
