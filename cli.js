@@ -266,8 +266,11 @@ async function init(queries, options) {
     },
   };
   try {
-    if (fs.existsSync(options.config)) Config = merge(Config, JSON.parse(fs.readFileSync(options.config)));
-    else {
+    if (fs.existsSync(options.config)) {
+      Config = lodash.mergeWith(Config, JSON.parse(fs.readFileSync(options.config)), (a, b, k) =>
+        k === 'order' && [a, b].every(Array.isArray) ? b.concat(a) : undefined,
+      );
+    } else {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
       process.exit(4);
     }
