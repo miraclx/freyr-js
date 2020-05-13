@@ -926,7 +926,7 @@ const command = commander
   .option('--tags', 'tag configuration specification (format: <key=value>), (reserved keys: [exclude, account]) (unimplemented)')
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
-    '--downloader <SERVICE>',
+    '-D, --downloader <SERVICE>',
     'specify a preferred download source or a `,`-separated preference order (valid: [youtube, deezer]) (unimplemented)',
     'youtube',
   )
