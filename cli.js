@@ -320,6 +320,8 @@ async function init(queries, options) {
     options.directoryPrefix,
   );
 
+  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(options.directory);
+
   if (!fs.existsSync(BASE_DIRECTORY))
     stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] isn't existent`), process.exit(3);
 
@@ -900,7 +902,7 @@ const command = commander
   .option('-b, --bitrate <N>', 'set bitrate for audio encoding\n(valid: [96, 128, 160, 192, 256, 320])', '320k')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
-  .option('-d, --directory-prefix <PREFIX>', 'save tracks to PREFIX/..', '.')
+  .option('-d, --directory <DIR>', 'save tracks to DIR/..', '.')
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
   .option(
     '--cover-size <size>',
@@ -920,7 +922,7 @@ const command = commander
   .option('-s, --storefront <COUNTRY>', 'country storefront code')
   .option('-x, --filter <SEQ>', 'filter matches [explicit] (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
-  .option('-T, --no-tree', "don't organise tracks in directory structure `[PREFIX/]<ARTIST>/<ALBUM>/<TRACK>`")
+  .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
   .option('--tags', 'tag configuration specification (format: <key=value>), (reserved keys: [exclude, account]) (unimplemented)')
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
