@@ -2,12 +2,14 @@
 /* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable no-underscore-dangle, consistent-return, camelcase */
 const fs = require('fs');
+const xpath = require('path');
+const {spawn, spawnSync} = require('child_process');
+
 const tmp = require('tmp');
 const Conf = require('conf');
 const open = require('open');
 const xget = require('libxget');
 const merge = require('lodash.merge');
-const xpath = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const merge2 = require('merge2');
 const mkdirp = require('mkdirp');
@@ -21,7 +23,6 @@ const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
 const countryData = require('country-data');
 const {isBinaryFile} = require('isbinaryfile');
-const {spawn, spawnSync} = require('child_process');
 
 const symbols = require('./src/symbols');
 const pFlatten = require('./src/p_flatten');

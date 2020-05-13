@@ -1,6 +1,7 @@
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
 const xurl = require('url');
 const path = require('path');
+
 const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 const {Client} = require('@yujinakayama/apple-music');

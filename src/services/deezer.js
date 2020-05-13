@@ -1,8 +1,9 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
-const got = require('got').default;
 const url = require('url');
 const path = require('path');
+
+const got = require('got').default;
 const NodeCache = require('node-cache');
 
 const symbols = require('../symbols');

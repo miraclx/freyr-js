@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file, no-underscore-dangle */
-const got = require('got').default;
 const util = require('util');
+
+const got = require('got').default;
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
 const youtubedl = require('youtube-dl');

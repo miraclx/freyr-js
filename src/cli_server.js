@@ -1,7 +1,8 @@
 /* eslint-disable no-underscore-dangle */
-const cors = require('cors');
 const crypto = require('crypto');
 const events = require('events');
+
+const cors = require('cors');
 const express = require('express');
 const stringd = require('stringd');
 const cookieParser = require('cookie-parser');
