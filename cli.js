@@ -335,10 +335,6 @@ async function init(queries, options) {
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
   Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
 
-  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
-    options.directoryPrefix,
-  );
-
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(options.directory);
 
   if (!fs.existsSync(BASE_DIRECTORY))
