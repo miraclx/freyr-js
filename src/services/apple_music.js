@@ -5,15 +5,23 @@ const Promise = require('bluebird');
 const NodeCache = require('node-cache');
 const {Client} = require('@yujinakayama/apple-music');
 
+const symbols = require('../symbols');
+
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
 class AppleMusic {
-  ID = 'apple_music';
+  [symbols.serviceID] = 'apple_music';
 
-  DESC = 'Apple Music';
+  [symbols.serviceDESC] = 'Apple Music';
 
   // https://www.debuggex.com/r/BcVR1cjFQmNgJn-E
-  VALID_URL = /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/;
+  [symbols.VALID_URL] = /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/;
+
+  [symbols.servicePROPS] = {
+    isQueryable: true,
+    isSearchable: false,
+    isSourceable: false,
+  };
 
   isAuthenticated = false;
 

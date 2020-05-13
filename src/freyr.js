@@ -3,6 +3,7 @@ const util = require('util');
 
 const Promise = require('bluebird');
 
+const symbols = require('./symbols');
 const YouTube = require('./services/youtube');
 const Deezer = require('./services/deezer');
 const Spotify = require('./services/spotify');
@@ -20,7 +21,7 @@ class FreyrCore {
   }
 
   identifyService(content) {
-    return this.engines.find(engine => content.match(engine.VALID_URL));
+    return this.engines.find(engine => content.match(engine[symbols.VALID_URL]));
   }
 
   async getYoutubeSource(metaInfo) {

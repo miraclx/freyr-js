@@ -23,6 +23,7 @@ const countryData = require('country-data');
 const {isBinaryFile} = require('isbinaryfile');
 const {spawn, spawnSync} = require('child_process');
 
+const symbols = require('./src/symbols');
 const pFlatten = require('./src/p_flatten');
 const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
@@ -295,8 +296,8 @@ async function init(queries, options) {
     },
   };
   freyrCore.engines.forEach(engine => {
-    schema.services.default[engine.ID] = {};
-    schema.services.properties[engine.ID] = {
+    schema.services.default[engine[symbols.serviceID]] = {};
+    schema.services.properties[engine[symbols.serviceID]] = {
       type: 'object',
       additionalProperties: false,
       properties: engine.propSchema || {},
@@ -762,8 +763,8 @@ async function init(queries, options) {
     if (service.isAuthed()) authLogger.write('[authenticated]\n');
     else {
       authLogger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
-      const config = freyrCoreConfig.get(`services.${service.ID}`);
-      const loginLogger = queryLogger.log(`[${service.DESC} Login]`);
+      const config = freyrCoreConfig.get(`services.${service[symbols.serviceID]}`);
+      const loginLogger = queryLogger.log(`[${service[symbols.serviceDESC]} Login]`);
       service.canTryLogin(config)
         ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
           (await coreAuth(loginLogger))
@@ -773,7 +774,7 @@ async function init(queries, options) {
       queryLogger.log('[\u2717] Failed to authenticate client!');
       return;
     }
-    if (service.hasProps()) freyrCoreConfig.set(`services.${service.ID}`, service.getProps());
+    if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.serviceID]}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
     const queryStats = await (contentType === 'track'

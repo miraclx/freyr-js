@@ -5,6 +5,7 @@ const url = require('url');
 const path = require('path');
 const NodeCache = require('node-cache');
 
+const symbols = require('../symbols');
 const AsyncQueue = require('../async_queue');
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
@@ -81,12 +82,18 @@ class DeezerCore {
 }
 
 class Deezer {
-  ID = 'deezer';
+  [symbols.serviceID] = 'deezer';
 
-  DESC = 'Deezer';
+  [symbols.serviceDESC] = 'Deezer';
 
   // https://www.debuggex.com/r/IuFIxSZGFJ07tOkR
-  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/;
+  [symbols.VALID_URL] = /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/;
+
+  [symbols.servicePROPS] = {
+    isQueryable: true,
+    isSearchable: false,
+    isSourceable: false,
+  };
 
   isAuthenticated = true;
 

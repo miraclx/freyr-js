@@ -4,15 +4,23 @@ const NodeCache = require('node-cache');
 const spotifyUri = require('spotify-uri');
 const SpotifyWebApi = require('spotify-web-api-node');
 
+const symbols = require('../symbols');
+
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
 class Spotify {
-  ID = 'spotify';
+  [symbols.serviceID] = 'spotify';
 
-  DESC = 'Spotify';
+  [symbols.serviceDESC] = 'Spotify';
 
   // https://www.debuggex.com/r/DgqrkwF-9XXceZ1x
-  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
+  [symbols.VALID_URL] = /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
+
+  [symbols.servicePROPS] = {
+    isQueryable: true,
+    isSearchable: false,
+    isSourceable: false,
+  };
 
   isAuthenticated = false;
 

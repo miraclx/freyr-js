@@ -6,6 +6,7 @@ const ytSearch = require('yt-search');
 const youtubedl = require('youtube-dl');
 
 const most = require('../most_polyfill');
+const symbols = require('../symbols');
 
 const _ytdlGet = util.promisify(youtubedl.getInfo);
 
@@ -181,6 +182,16 @@ class YouTubeMusicSearch {
 }
 
 class YouTube {
+  [symbols.serviceID] = 'youtube';
+
+  [symbols.serviceDESC] = 'YouTube';
+
+  [symbols.servicePROPS] = {
+    isQueryable: false,
+    isSearchable: true,
+    isSourceable: true,
+  };
+
   constructor() {
     this._search = util.promisify(ytSearch);
   }
