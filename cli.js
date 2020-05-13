@@ -925,7 +925,7 @@ const command = commander
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '--downloader <SERVICE>',
-    'specify a preferred download source or a `,`-separated preference order (valid: [youtube, yt_music, deezer]) (unimplemented)',
+    'specify a preferred download source or a `,`-separated preference order (valid: [youtube, deezer]) (unimplemented)',
     'youtube',
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
