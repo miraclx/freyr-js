@@ -12,6 +12,20 @@ const AppleMusic = require('./services/apple_music');
 class FreyrCore {
   static ENGINES = [Deezer, Spotify, AppleMusic, YouTube];
 
+  static getBitrates() {
+    return Array.from(
+      new Set(this.ENGINES.reduce((stack, engine) => stack.concat(engine[symbols.meta].BITRATES || []), [])),
+    ).sort((a, b) => (typeof a === 'string' || a > b ? 1 : -1));
+  }
+
+  static getDownloaders() {
+    return this.ENGINES.reduce((stack, engine) => {
+      const meta = engine[symbols.meta];
+      if (meta.PROPS.isSourceable) stack.push(meta.ID);
+      return stack;
+    }, []);
+  }
+
   constructor(ServiceConfig, AuthServer, serverOpts) {
     ServiceConfig = ServiceConfig || {};
     this.engines = FreyrCore.ENGINES.map(Engine => new Engine(ServiceConfig[Engine[symbols.meta].ID], AuthServer, serverOpts));
