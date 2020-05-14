@@ -641,12 +641,16 @@ async function init(queries, options) {
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
-    const audioSource = await processPromise(props.psource, trackLogger, {
-      pre: '| \u2b9e Awaiting stream sources...',
-      xerr: '[zero sources found]',
-    });
+    trackLogger.log('| \u2b9e Collating sources...');
+    const audioSource = await props.collectSources((service, sources) =>
+      processPromise(sources, trackLogger, {
+        pre: `|  \u2b9e [\u2022] ${service[symbols.meta].DESC}...`,
+        xerr: '[Unable to retrieve stream]',
+        post: '[success]',
+      }),
+    );
     if (!audioSource) return {meta, code: 1};
-    const audioFeeds = await processPromise(props.pstream, trackLogger, {
+    const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
       pre: '| \u2b9e Awaiting audiofeeds...',
       xerr: '[Unable to retrieve stream]',
     });
@@ -678,15 +682,11 @@ async function init(queries, options) {
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = fs.existsSync(outFilePath);
       const processTrack = !fileExists || options.force;
-      let psource;
-      let pstream;
-      if (processTrack) {
-        psource = sourceQueue.push(track);
-        pstream = feedQueue.push(psource);
-      }
+      let collectSources;
+      if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
       const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
-        .push({track, meta, props: {psource, pstream, fileExists, processTrack, logger}})
+        .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
         .catch(errObject => Promise.resolve({meta, code: 10, ...errObject}));
     },
