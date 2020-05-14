@@ -1,6 +1,5 @@
 /* eslint-disable consistent-return */
-const util = require('util');
-
+const {sortBy} = require('lodash');
 const Promise = require('bluebird');
 
 const symbols = require('./symbols');
@@ -31,17 +30,15 @@ class FreyrCore {
     return this.engines.find(engine => (engine[symbols.meta].PROPS.isQueryable ? content.match(engine.VALID_URL) : undefined));
   }
 
-  async getYoutubeSource(metaInfo) {
-    return this.youtube.get(metaInfo.artists, metaInfo.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''), metaInfo.duration);
+  collateSources() {
+    return this.engines.filter(engine => engine[symbols.meta].PROPS.isSourceable);
   }
 
-  async getYoutubeStream(ytInfo) {
-    const data = await Promise.resolve(
-      this.ytdlGet(ytInfo.videoId, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
-    ).reflect();
-    return data.isFulfilled()
-      ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
-      : {err: data.reason()};
+  sortSources(order) {
+    order = order ? (Array.isArray(order) ? order : [order]) : [];
+    return sortBy(this.collateSources(), source =>
+      (index => (index < 0 ? Infinity : index))(order.indexOf(source[symbols.meta].ID)),
+    );
   }
 }
 

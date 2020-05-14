@@ -342,6 +342,7 @@ async function init(queries, options) {
   Config.image = lodash.merge(Config.image, options.coverSize);
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
   Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
+  const sourceStack = freyrCore.sortSources(Config.downloader.order);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(options.directory);
 
@@ -376,13 +377,6 @@ async function init(queries, options) {
       }
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
-
-  const sourceQueue = new AsyncQueue('cli:preprocessor:sourceQueue', Config.concurrency.sources, track =>
-    freyrCore.getYoutubeSource(track),
-  );
-  const feedQueue = new AsyncQueue('cli:preprocessor:feedQueue', Config.concurrency.feeds, async psource =>
-    freyrCore.getYoutubeStream(await psource),
-  );
 
   function downloadToStream({urlOrFragments, writeStream, logger, opts}) {
     opts = {tag: '', successMessage: '', failureMessage: '', retryMessage: '', ...opts};
@@ -589,6 +583,53 @@ async function init(queries, options) {
     await embedQueue.push({track, meta, files, audioSource});
     return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
   });
+
+  const sourceHandler = new AsyncQueue(
+    'cli:preprocessor:core:sourceHandler',
+    Config.concurrency.sources,
+    async (iterator, track, selector) => {
+      const result = {service: null, sources: null};
+      if ((result.service = iterator.next().value)) {
+        result.sources = Promise.resolve(
+          result.service.get(track.artists, track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''), track.duration),
+        ).then(sources => {
+          if ([undefined, null].includes(sources)) throw new Error(`incompatible response. recieved [${sources}]`);
+          const source = (
+            selector ||
+            (results => {
+              try {
+                return results[0];
+              } catch {
+                throw new Error(`error while extracting feed from source, try defining a <selector>. recieved [${results}]`);
+              }
+            })
+          )(sources);
+          if ([undefined, null].includes(source)) throw new Error(`incompatible source response. recieved: [${source}]`);
+          if (!('getFeeds' in source)) throw new Error(`service provided no means for source to collect feeds`);
+          const feeds = source.getFeeds();
+          if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
+          return {sources, source, feeds};
+        });
+        result.results = result.sources.catch(() => {
+          return {next: sourceHandler.push(iterator, [track, selector])};
+        });
+      }
+      return result;
+    },
+  );
+
+  function buildSourceCollectorFor(track, selector) {
+    async function collect_contained(process, handler) {
+      process = await process;
+      if (!process.sources) return;
+      await handler(process.service, process.sources);
+      const results = await process.results;
+      if (results.next) return collect_contained(results.next, handler);
+      return results;
+    }
+    const process = sourceHandler.push(sourceStack.values(), [track, selector]);
+    return async handler => collect_contained(process, handler);
+  }
 
   const trackQueue = new AsyncQueue('cli:trackQueue', Config.concurrency.tracks, async ({track, meta, props}) => {
     const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`);
