@@ -90,7 +90,6 @@ class Deezer {
       isSearchable: false,
       isSourceable: false,
     },
-    BITRATES: ['FLAC'],
   };
 
   [symbols.meta] = Deezer[symbols.meta];
