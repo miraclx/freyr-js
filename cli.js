@@ -921,13 +921,13 @@ const command = commander
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
   .option(
     '--cover-size <size>',
-    'preferred cover art dimensions (format: <width>x<height> or <size> as <size>x<size>)',
+    'preferred cover art dimensions\n(format: <width>x<height> or <size> as <size>x<size>)',
     '640x640',
   )
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
-    'specify key-value concurrency pairs (format: <key=value>), repeat to add more options. <value> implies track concurrency',
+    'specify key-value concurrency pairs, repeat to add more options\n(format: <[key=]value>) (key omission implies track concurrency)',
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
@@ -938,7 +938,7 @@ const command = commander
   .option('-x, --filter <SEQ>', 'filter matches [explicit] (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
-  .option('--tags', 'tag configuration specification (format: <key=value>), (reserved keys: [exclude, account]) (unimplemented)')
+  .option('--tags', 'tag configuration specification\n(format: <key=value>) (reserved keys: [exclude, account]) (unimplemented)')
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
@@ -949,7 +949,10 @@ const command = commander
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
-  .option('--single-bar', 'show a single bar for the download, hide chunk-view\n[default when n(chunks) exceed printable space]')
+  .option(
+    '--single-bar',
+    'show a single bar for the download, hide chunk-view\n(default when number of chunks/segments exceed printable space)',
+  )
   .version(`v${packageJson.version}`, '-v, --version')
   .action(processArgs);
 
