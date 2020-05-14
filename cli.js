@@ -670,7 +670,11 @@ async function init(queries, options) {
     'cli:trackBroker',
     Config.concurrency.trackStage,
     async (track, {logger, service, isPlaylist}) => {
-      track = await track;
+      try {
+        if (!(track = await track)) throw new Error('no data recieved from track');
+      } catch (err) {
+        return Promise.resolve({code: -1, err});
+      }
       const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
       const trackName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}${
         isPlaylist || (track.compilation && track.album_artist === 'Various Artists') ? ` \u2012 ${track.artists.join(', ')}` : ''
@@ -867,7 +871,9 @@ async function init(queries, options) {
       }
       if (trackStat.code) {
         const reason =
-          trackStat.code === 1
+          trackStat.code === -1
+            ? 'Failed getting track data'
+            : trackStat.code === 1
             ? 'Zero sources found'
             : trackStat.code === 2
             ? 'Error while retrieving sources'
@@ -887,9 +893,9 @@ async function init(queries, options) {
             ? 'Unknown postprocessing error'
             : 'Unknown track processing error';
         embedLogger.error(
-          `\u2022 [\u2717] ${trackStat.meta.trackName} [${trackStat.meta.track.uri}] (failed: ${reason}${
-            trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''
-          })`,
+          `\u2022 [\u2717] ${
+            trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
+          } (failed:${reason ? ` ${reason}` : ''}${trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''})`,
         );
       } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
       else
