@@ -98,7 +98,7 @@ class YouTubeMusicSearch {
             ? 'playlists'
             : `other${layerName ? `(${layerName})` : ''}`,
           {
-            contents: layer.contents.map(content => {
+            contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
               const tags = content.flexColumns.map(obj =>
                 obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).join(''),
