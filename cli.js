@@ -199,7 +199,14 @@ function PROCESS_IMAGE_SIZE(value) {
 
 function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
   if (!Array.isArray(value)) return throwEr();
-  return value.filter(Boolean).map(item => (!['youtube'].includes(item) ? throwEr(item) : item));
+  return value.filter(Boolean).map(item =>
+    !FreyrCore.getEngineMetas()
+      .filter(meta => meta.PROPS.isSourceable)
+      .map(meta => meta.ID)
+      .includes(item)
+      ? throwEr(item)
+      : item,
+  );
 }
 
 async function init(queries, options) {
@@ -943,7 +950,9 @@ const command = commander
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
-    'specify a preferred download source or a `,`-separated preference order (valid: [youtube])',
+    `specify a preferred download source or a \`,\`-separated preference order (valid: ${FreyrCore.getEngineMetas()
+      .filter(meta => meta.PROPS.isSourceable)
+      .map(meta => meta.ID)})`,
     'youtube',
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
