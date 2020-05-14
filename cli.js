@@ -154,7 +154,7 @@ function CHECK_FLAG_IS_NUM(variable, flagref, untype) {
 
 function CHECK_BIT_RATE_VAL(bitrate_arg) {
   const bitrate = (match => (match ? match[1] : ''))((bitrate_arg || '').match(/^(\d+)(?:k(?:b(?:it)?)?(?:ps|\/s)?)?$/i));
-  const valids = [96, 128, 160, 192, 256, 320];
+  const valids = FreyrCore.getBitrates();
   if (!(bitrate && valids.includes(+bitrate)))
     throw new Error(`Invalid bitrate specification: [${bitrate_arg}]. Bitrate should be either of [${valids.join(', ')}]`);
   return `${bitrate}k`;
@@ -914,7 +914,7 @@ const command = commander
   .arguments('[query...]')
   .description(packageJson.description)
   .option('-i, --input <FILE>', 'use URIs found in the specified FILE (size limit: 1 MiB)')
-  .option('-b, --bitrate <N>', 'set bitrate for audio encoding\n(valid: [96, 128, 160, 192, 256, 320])', '320k')
+  .option('-b, --bitrate <N>', `set bitrate for audio encoding\n(valid: ${FreyrCore.getBitrates()})`, '320k')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..', '.')
