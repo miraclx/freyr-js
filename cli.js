@@ -691,7 +691,7 @@ async function init(queries, options) {
 
   async function trackHandler(query, {service, queryLogger}) {
     const logger = queryLogger.print(`Obtaining track metadata...`);
-    const track = await processPromise(service.getTrack(query, options.storefront), queryLogger);
+    const track = await processPromise(service.getTrack(query, options.storefront), queryLogger, {xerr: true});
     if (!track) return Promise.reject();
     logger.log(`\u2bc8 Title: ${track.name}`);
     logger.log(`\u2bc8 Album: ${track.album}`);
@@ -711,7 +711,7 @@ async function init(queries, options) {
   }
   async function albumHandler(query, {service, queryLogger}) {
     const logger = queryLogger.print(`Obtaining album metadata...`);
-    const album = await processPromise(service.getAlbum(query, options.storefront), queryLogger);
+    const album = await processPromise(service.getAlbum(query, options.storefront), queryLogger, {xerr: true});
     if (!album) return Promise.reject();
     logger.log(`\u2bc8 Album Name: ${album.name}`);
     logger.log(`\u2bc8 Artist: ${album.artists[0]}`);
@@ -736,7 +736,7 @@ async function init(queries, options) {
   }
   async function artistHandler(query, {service, queryLogger}) {
     const logger = queryLogger.print(`Obtaining artist metadata...`);
-    const artist = await processPromise(service.getArtist(query, options.storefront), queryLogger);
+    const artist = await processPromise(service.getArtist(query, options.storefront), queryLogger, {xerr: true});
     if (!artist) return Promise.reject();
     const artistLogger = logger.log(`\u2bc8 Artist: ${artist.name}`);
     if (artist.followers) logger.log(`\u2bc8 Followers: ${`${artist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
@@ -780,7 +780,7 @@ async function init(queries, options) {
   }
   async function playlistHandler(query, {service, queryLogger}) {
     const logger = queryLogger.print(`Obtaining playlist metadata...`);
-    const playlist = await processPromise(service.getPlaylist(query, options.storefront), queryLogger);
+    const playlist = await processPromise(service.getPlaylist(query, options.storefront), queryLogger, {xerr: true});
     if (!playlist) return Promise.reject();
     logger.log(`\u2bc8 Playlist Name: ${playlist.name}`);
     logger.log(`\u2bc8 By: ${playlist.owner_name}`);
