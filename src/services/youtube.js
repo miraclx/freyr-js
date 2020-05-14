@@ -265,7 +265,7 @@ class YouTube {
           {},
         ),
     ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : a.accuracy < b.accuracy ? 1 : 0));
-    return stacks[0];
+    return stacks;
   }
 
   async getStreams(videoId) {
