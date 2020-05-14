@@ -137,7 +137,7 @@ async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
         ? [typeof err === 'function' ? err(rex.reason()) : err, '\n']
         : [`(failed%s)\n`, (_err => (_err ? `: [${_err.message || _err}]` : ''))(rex.reason())]),
     );
-  else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr}\n`);
+  else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr !== true ? xerr : '(no data)'}\n`);
   else if (post !== false) logger.write(`${post || '[done]'}\n`);
   return rex.isFulfilled() ? rex.value() : null;
 }
