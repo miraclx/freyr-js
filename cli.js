@@ -79,9 +79,8 @@ function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalByt
         Number.isFinite(maxRetries) ? `/:{color(yellow)}${maxRetries}:{color:close(yellow)}` : ''
       }}: `,
       lastErr
-        ? `${
-            lastErr.code ? `[:{color(yellow)}${lastErr.code}:{color:close(yellow)}] ` : ''
-          }(:{color(yellow)}${lastErr}:{color:close(yellow)}) `
+        ? `${lastErr.code ? `[:{color(yellow)}${lastErr.code}:{color:close(yellow)}] ` : ''}(:{color(yellow)}${lastErr.message ||
+            lastErr}:{color:close(yellow)}) `
         : '',
       totalBytes
         ? `(:{color(cyan)}${
@@ -136,7 +135,7 @@ async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
     logger.write(
       ...(err
         ? [typeof err === 'function' ? err(rex.reason()) : err, '\n']
-        : [`(failed%s)\n`, (_err => (_err ? `: [${_err.stack || _err}]` : ''))(rex.reason())]),
+        : [`(failed%s)\n`, (_err => (_err ? `: [${_err.message || _err}]` : ''))(rex.reason())]),
     );
   else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr}\n`);
   else if (post !== false) logger.write(`${post || '[done]'}\n`);
@@ -256,8 +255,8 @@ async function init(queries, options) {
     options.downloader = PROCESS_DOWNLOADER_ORDER((options.downloader || '').split(','), item => {
       throw new Error(`downloader specification within the \`--downloader\` must be valid. found [${item}]`);
     });
-  } catch (er) {
-    stackLogger.error('\x1b[31m[i]\x1b[0m', er.message);
+  } catch (err) {
+    stackLogger.error('\x1b[31m[i]\x1b[0m', err.message || err);
     process.exit(2);
   }
 
@@ -293,23 +292,24 @@ async function init(queries, options) {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
       process.exit(4);
     }
-    const errMessage = `[key: image, value: ${JSON.stringify(Config.image)}]`;
+    const errMessage = new Error(`[key: image, value: ${JSON.stringify(Config.image)}]`);
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
     Config.downloader.order = PROCESS_DOWNLOADER_ORDER(Config.downloader.order, item => {
       if (item) throw new Error(`Downloader order within the config file must be valid. found [${item}]`);
       throw new Error(`Downloader order must be an array of strings`);
     });
-  } catch (e) {
-    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted (${e})`);
+  } catch (err) {
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
+    stackLogger.error(err.message || err);
     process.exit(4);
   }
 
   let freyrCore;
   try {
     freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
-  } catch (e) {
+  } catch (err) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Failed to initialize a Freyr Instance`);
-    stackLogger.error(e);
+    stackLogger.error(err.message || err);
     process.exit(6);
   }
 
@@ -471,7 +471,8 @@ async function init(queries, options) {
           tag: '[Retrieving album art]...',
           errorHandler: () => imageFile.removeCallback(),
           retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-          failureMessage: err => trackLogger.getText(`| [\u2717] Failed to get album art [${(err && err.code) || err}]`),
+          failureMessage: err =>
+            trackLogger.getText(`| [\u2717] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
           successMessage: trackLogger.getText(`| [\u2714] Got album art`),
         },
       }).catch(err => Promise.reject({err, code: 3}));
@@ -493,7 +494,7 @@ async function init(queries, options) {
                 urlOrFragments: feedMeta.url,
                 opts: {
                   failureMessage: err =>
-                    trackLogger.getText(`| [\u2717] Failed to get raw media stream [${(err && err.code) || err}]`),
+                    trackLogger.getText(`| [\u2717] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`),
                 },
               }
             : {
@@ -503,7 +504,9 @@ async function init(queries, options) {
                 })),
                 opts: {
                   failureMessage: err =>
-                    trackLogger.getText(`| [\u2717] Segment error while getting raw media [${(err && err.code) || err}]`),
+                    trackLogger.getText(
+                      `| [\u2717] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
+                    ),
                 },
               },
         ),
@@ -886,7 +889,7 @@ async function init(queries, options) {
             : 'Unknown track processing error';
         embedLogger.error(
           `\u2022 [\u2717] ${trackStat.meta.trackName} [${trackStat.meta.track.uri}] (failed: ${reason}${
-            trackStat.err ? ` [${trackStat.err.stack}]` : ''
+            trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''
           })`,
         );
       } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
