@@ -11,18 +11,18 @@ const symbols = require('../symbols');
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
 class AppleMusic {
-  [symbols.serviceID] = 'apple_music';
-
-  [symbols.serviceDESC] = 'Apple Music';
+  static [symbols.meta] = {
+    ID: 'apple_music',
+    DESC: 'Apple Music',
+    PROPS: {
+      isQueryable: true,
+      isSearchable: false,
+      isSourceable: false,
+    },
+  };
 
   // https://www.debuggex.com/r/BcVR1cjFQmNgJn-E
-  [symbols.VALID_URL] = /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/;
-
-  [symbols.servicePROPS] = {
-    isQueryable: true,
-    isSearchable: false,
-    isSourceable: false,
-  };
+  VALID_URL = /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/;
 
   isAuthenticated = false;
 

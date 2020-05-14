@@ -82,18 +82,19 @@ class DeezerCore {
 }
 
 class Deezer {
-  [symbols.serviceID] = 'deezer';
-
-  [symbols.serviceDESC] = 'Deezer';
+  static [symbols.meta] = {
+    ID: 'deezer',
+    DESC: 'Deezer',
+    PROPS: {
+      isQueryable: true,
+      isSearchable: false,
+      isSourceable: false,
+    },
+    BITRATES: ['FLAC'],
+  };
 
   // https://www.debuggex.com/r/IuFIxSZGFJ07tOkR
-  [symbols.VALID_URL] = /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/;
-
-  [symbols.servicePROPS] = {
-    isQueryable: true,
-    isSearchable: false,
-    isSourceable: false,
-  };
+  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/;
 
   isAuthenticated = true;
 

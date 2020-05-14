@@ -9,18 +9,18 @@ const symbols = require('../symbols');
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
 class Spotify {
-  [symbols.serviceID] = 'spotify';
-
-  [symbols.serviceDESC] = 'Spotify';
+  static [symbols.meta] = {
+    ID: 'spotify',
+    DESC: 'Spotify',
+    PROPS: {
+      isQueryable: true,
+      isSearchable: false,
+      isSourceable: false,
+    },
+  };
 
   // https://www.debuggex.com/r/DgqrkwF-9XXceZ1x
-  [symbols.VALID_URL] = /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
-
-  [symbols.servicePROPS] = {
-    isQueryable: true,
-    isSearchable: false,
-    isSourceable: false,
-  };
+  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
 
   isAuthenticated = false;
 

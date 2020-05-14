@@ -183,14 +183,15 @@ class YouTubeMusicSearch {
 }
 
 class YouTube {
-  [symbols.serviceID] = 'youtube';
-
-  [symbols.serviceDESC] = 'YouTube';
-
-  [symbols.servicePROPS] = {
-    isQueryable: false,
-    isSearchable: true,
-    isSourceable: true,
+  static [symbols.meta] = {
+    ID: 'youtube',
+    DESC: 'YouTube',
+    PROPS: {
+      isQueryable: false,
+      isSearchable: true,
+      isSourceable: true,
+    },
+    BITRATES: [96, 128, 160, 192, 256, 320],
   };
 
   constructor() {
