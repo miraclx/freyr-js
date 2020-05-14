@@ -28,7 +28,7 @@ class FreyrCore {
   }
 
   identifyService(content) {
-    return this.engines.find(engine => content.match(engine.VALID_URL));
+    return this.engines.find(engine => (engine[symbols.meta].PROPS.isQueryable ? content.match(engine.VALID_URL) : undefined));
   }
 
   async getYoutubeSource(metaInfo) {
