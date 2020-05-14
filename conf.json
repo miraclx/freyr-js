@@ -10,7 +10,7 @@
     "trackStage": 6,
     "downloader": 4,
     "encoder": 6,
-    "embedder": 10,
+    "embedder": 10
   },
   "image": {
     "width": 640,
