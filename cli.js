@@ -143,6 +143,14 @@ async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
   return rex.isFulfilled() ? rex.value() : null;
 }
 
+const VALIDS = {
+  bitrates: FreyrCore.getBitrates(),
+  downloaders: FreyrCore.getEngineMetas()
+    .filter(meta => meta.PROPS.isSourceable)
+    .map(meta => meta.ID),
+  concurrency: ['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder'],
+};
+
 function CHECK_FLAG_IS_NUM(variable, flagref, untype) {
   // eslint-disable-next-line valid-typeof
   if (typeof variable !== untype)
@@ -154,9 +162,10 @@ function CHECK_FLAG_IS_NUM(variable, flagref, untype) {
 
 function CHECK_BIT_RATE_VAL(bitrate_arg) {
   const bitrate = (match => (match ? match[1] : ''))((bitrate_arg || '').match(/^(\d+)(?:k(?:b(?:it)?)?(?:ps|\/s)?)?$/i));
-  const valids = FreyrCore.getBitrates();
-  if (!(bitrate && valids.includes(+bitrate)))
-    throw new Error(`Invalid bitrate specification: [${bitrate_arg}]. Bitrate should be either of [${valids.join(', ')}]`);
+  if (!(bitrate && VALIDS.bitrates.includes(+bitrate)))
+    throw new Error(
+      `Invalid bitrate specification: [${bitrate_arg}]. Bitrate should be either of [${VALIDS.bitrates.join(', ')}]`,
+    );
   return `${bitrate}k`;
 }
 
@@ -199,17 +208,8 @@ function PROCESS_IMAGE_SIZE(value) {
 
 function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
   if (!Array.isArray(value)) return throwEr();
-  return value.filter(Boolean).map(item =>
-    !FreyrCore.getEngineMetas()
-      .filter(meta => meta.PROPS.isSourceable)
-      .map(meta => meta.ID)
-      .includes(item)
-      ? throwEr(item)
-      : item,
-  );
+  return value.filter(Boolean).map(item => (!VALIDS.downloaders.includes(item) ? throwEr(item) : item));
 }
-
-const validConcurrencyKeys = ['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder'];
 
 async function init(queries, options) {
   const initTimeStamp = Date.now();
@@ -235,7 +235,7 @@ async function init(queries, options) {
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
-          if (!validConcurrencyKeys.includes(k))
+          if (!VALIDS.concurrency.includes(k))
             throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
           return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
         }),
@@ -958,7 +958,7 @@ const command = commander
   .arguments('[query...]')
   .description(packageJson.description)
   .option('-i, --input <FILE>', 'use URIs found in the specified FILE (size limit: 1 MiB)')
-  .option('-b, --bitrate <N>', `set bitrate for audio encoding\n(valid: ${FreyrCore.getBitrates()})`, '320k')
+  .option('-b, --bitrate <N>', `set bitrate for audio encoding\n(valid: ${VALIDS.bitrates})`, '320k')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..', '.')
@@ -971,7 +971,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
-    `specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)\n(format: <[key=]value>) (valid: ${validConcurrencyKeys})`,
+    `specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)\n(format: <[key=]value>) (valid: ${VALIDS.concurrency})`,
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
@@ -986,9 +986,7 @@ const command = commander
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
-    `specify a preferred download source or a \`,\`-separated preference order (valid: ${FreyrCore.getEngineMetas()
-      .filter(meta => meta.PROPS.isSourceable)
-      .map(meta => meta.ID)})`,
+    `specify a preferred download source or a \`,\`-separated preference order (valid: ${VALIDS.downloaders})`,
     'youtube',
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
