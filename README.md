@@ -167,7 +167,6 @@ Persistent configuration such as authentication keys and their validity period a
 
 This configuration file resides within the user config directory per-platform. e.g `$HOME/.config/FreyrCLI/d3fault.enc` for Linux.
 
-The JSON-formatted file is encrypted with a 64-character random hex that, in-turn is stored within the [Native Password Node Module](https://github.com/atom/node-keytar).
 </details>
 
 <details>
