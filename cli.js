@@ -209,6 +209,8 @@ function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
   );
 }
 
+const validConcurrencyKeys = ['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder'];
+
 async function init(queries, options) {
   const initTimeStamp = Date.now();
   const stackLogger = new StackLogger({indentSize: 1});
@@ -233,7 +235,7 @@ async function init(queries, options) {
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
-          if (!['queries', 'tracks', 'trackStage', 'downloader', 'encoder', 'embedder'].includes(k))
+          if (!validConcurrencyKeys.includes(k))
             throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
           return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
         }),
@@ -969,7 +971,7 @@ const command = commander
   .option('-C, --no-cover', 'skip saving a cover art')
   .option(
     '-z, --concurrency <SPEC>',
-    'specify key-value concurrency pairs, repeat to add more options\n(format: <[key=]value>) (key omission implies track concurrency)',
+    `specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)\n(format: <[key=]value>) (valid: ${validConcurrencyKeys})`,
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
