@@ -18,12 +18,8 @@ class FreyrCore {
     ).sort((a, b) => (typeof a === 'string' || a > b ? 1 : -1));
   }
 
-  static getDownloaders() {
-    return this.ENGINES.reduce((stack, engine) => {
-      const meta = engine[symbols.meta];
-      if (meta.PROPS.isSourceable) stack.push(meta.ID);
-      return stack;
-    }, []);
+  static getEngineMetas(ops) {
+    return this.ENGINES.map(engine => (ops || (v => v))(engine[symbols.meta]));
   }
 
   constructor(ServiceConfig, AuthServer, serverOpts) {
