@@ -274,7 +274,6 @@ async function init(queries, options) {
       queries: 1,
       tracks: 1,
       trackStage: 6,
-      requests: 4,
       downloader: 4,
       encoder: 6,
       embedder: 10,
