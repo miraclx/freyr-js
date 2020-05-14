@@ -100,15 +100,6 @@ $ nvm install v12
 
 </details>
 
-<details>
-<summary>(linux) libsecret @ latest</summary>
-
-* Debian: `sudo apt-get install libsecret-1-dev`
-* Red Hat-based: `sudo yum install libsecret-devel`
-* Arch Linux: `sudo pacman -S libsecret`
-
-</details>
-
 ### Usage
 
 ``` text
