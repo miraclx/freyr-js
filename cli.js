@@ -147,7 +147,7 @@ const VALIDS = {
   downloaders: FreyrCore.getEngineMetas()
     .filter(meta => meta.PROPS.isSourceable)
     .map(meta => meta.ID),
-  concurrency: ['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder'],
+  concurrency: ['queries', 'tracks', 'trackStage', 'downloader', 'encoder', 'embedder'],
 };
 
 function CHECK_FLAG_IS_NUM(variable, flagref, untype) {
