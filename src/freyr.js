@@ -10,14 +10,11 @@ const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');
 
 class FreyrCore {
+  static ENGINES = [Deezer, Spotify, AppleMusic, YouTube];
+
   constructor(ServiceConfig, AuthServer, serverOpts) {
     ServiceConfig = ServiceConfig || {};
-    this.youtube = new YouTube();
-    this.engines = [
-      new Deezer(ServiceConfig.deezer, AuthServer, serverOpts),
-      new Spotify(ServiceConfig.spotify, AuthServer, serverOpts),
-      new AppleMusic(ServiceConfig.apple_music, AuthServer, serverOpts),
-    ];
+    this.engines = FreyrCore.ENGINES.map(Engine => new Engine(ServiceConfig[Engine[symbols.meta].ID], AuthServer, serverOpts));
   }
 
   identifyService(content) {
