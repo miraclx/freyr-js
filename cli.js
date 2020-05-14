@@ -233,7 +233,7 @@ async function init(queries, options) {
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
-          if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder', 'sources', 'feeds'].includes(k))
+          if (!['queries', 'tracks', 'trackStage', 'downoloader', 'encoder', 'embedder'].includes(k))
             throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
           return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
         }),
@@ -277,8 +277,6 @@ async function init(queries, options) {
       downloader: 4,
       encoder: 6,
       embedder: 10,
-      sources: 4,
-      feeds: 4,
     },
     downloader: {
       order: ['youtube'],
