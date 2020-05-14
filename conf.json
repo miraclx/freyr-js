@@ -18,6 +18,11 @@
     "width": 640,
     "height": 640
   },
+  "downloader": {
+    "order": [
+      "youtube"
+    ]
+  },
   "services": {
     "spotify": {
       "clientId": "888aa4540c09464abc9ed8bbe2a5f18a",
