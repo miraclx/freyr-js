@@ -584,10 +584,8 @@ async function init(queries, options) {
     return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
   });
 
-  const sourceHandler = new AsyncQueue(
-    'cli:preprocessor:core:sourceHandler',
-    Config.concurrency.sources,
-    async (iterator, track, selector) => {
+  function buildSourceCollectorFor(track, selector) {
+    async function handleSource(iterator) {
       const result = {service: null, sources: null};
       if ((result.service = iterator.next().value)) {
         result.sources = Promise.resolve(
@@ -610,15 +608,11 @@ async function init(queries, options) {
           if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
           return {sources, source, feeds};
         });
-        result.results = result.sources.catch(() => {
-          return {next: sourceHandler.push(iterator, [track, selector])};
-        });
+        result.results = result.sources.catch(() => ({next: handleSource(iterator)}));
       }
       return result;
-    },
-  );
+    }
 
-  function buildSourceCollectorFor(track, selector) {
     async function collect_contained(process, handler) {
       process = await process;
       if (!process.sources) return;
@@ -627,7 +621,8 @@ async function init(queries, options) {
       if (results.next) return collect_contained(results.next, handler);
       return results;
     }
-    const process = sourceHandler.push(sourceStack.values(), [track, selector]);
+
+    const process = handleSource(sourceStack.values());
     return async handler => collect_contained(process, handler);
   }
 
