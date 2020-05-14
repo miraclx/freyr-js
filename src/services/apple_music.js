@@ -21,6 +21,8 @@ class AppleMusic {
     },
   };
 
+  [symbols.meta] = AppleMusic[symbols.meta];
+
   // https://www.debuggex.com/r/BcVR1cjFQmNgJn-E
   VALID_URL = /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/;
 

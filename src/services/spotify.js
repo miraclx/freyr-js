@@ -19,6 +19,8 @@ class Spotify {
     },
   };
 
+  [symbols.meta] = Spotify[symbols.meta];
+
   // https://www.debuggex.com/r/DgqrkwF-9XXceZ1x
   VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/;
 

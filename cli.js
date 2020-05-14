@@ -314,8 +314,8 @@ async function init(queries, options) {
     },
   };
   freyrCore.engines.forEach(engine => {
-    schema.services.default[engine[symbols.serviceID]] = {};
-    schema.services.properties[engine[symbols.serviceID]] = {
+    schema.services.default[engine[symbols.meta].ID] = {};
+    schema.services.properties[engine[symbols.meta].ID] = {
       type: 'object',
       additionalProperties: false,
       properties: engine.propSchema || {},
@@ -780,8 +780,8 @@ async function init(queries, options) {
     if (service.isAuthed()) authLogger.write('[authenticated]\n');
     else {
       authLogger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
-      const config = freyrCoreConfig.get(`services.${service[symbols.serviceID]}`);
-      const loginLogger = queryLogger.log(`[${service[symbols.serviceDESC]} Login]`);
+      const config = freyrCoreConfig.get(`services.${service[symbols.meta].ID}`);
+      const loginLogger = queryLogger.log(`[${service[symbols.meta].DESC} Login]`);
       service.canTryLogin(config)
         ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
           (await coreAuth(loginLogger))
@@ -791,7 +791,7 @@ async function init(queries, options) {
       queryLogger.log('[\u2717] Failed to authenticate client!');
       return;
     }
-    if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.serviceID]}`, service.getProps());
+    if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.meta].ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
     const queryStats = await (contentType === 'track'

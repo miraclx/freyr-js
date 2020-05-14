@@ -194,6 +194,8 @@ class YouTube {
     BITRATES: [96, 128, 160, 192, 256, 320],
   };
 
+  [symbols.meta] = YouTube[symbols.meta];
+
   constructor() {
     this._search = util.promisify(ytSearch);
   }
