@@ -29,6 +29,20 @@ yarn global add https://github.com/miraclx/freyr-js.git
 ### Requirements
 
 <details>
+<summary>python >= v3.2</summary>
+
+<https://www.python.org/downloads/>
+
+POSIX: _(check individual package managers)_
+
+* `*`Debian: `sudo apt-get install atomicparsley`
+* `*`ArchLinux: `sudo pacman -S python`
+* Android (termux): `apt install python`
+* _(`*: should already be preinstalled`)_
+
+</details>
+
+<details>
 <summary>nodejs >= v12.0.0</summary>
 
 <https://nodejs.org/en/download/>
