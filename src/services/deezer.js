@@ -292,8 +292,9 @@ class Deezer {
 
   async getArtistAlbums(uris) {
     const artist = await this.getArtist(uris);
-    return this.wrapPagination(() =>
-      this.core.getArtistAlbums(artist.id, {limit: Math.min(artist.nalbum, Math.max(300, artist.nalbum / 4))}),
+    return this.wrapPagination(
+      () => this.core.getArtistAlbums(artist.id, {limit: Math.min(artist.nalbum, Math.max(300, artist.nalbum / 4))}),
+      data => this.albumQueue.push(data.map(album => album.link)),
     );
   }
 
