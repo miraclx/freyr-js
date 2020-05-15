@@ -330,6 +330,49 @@ https://open.spotify.com/album/3stadz88XVpHcXnVYMHc4J
 
 Use the [`--help`](#get-cli-help) flag to see full usage documentation.
 
+#### URIs
+
+Services can be queried with short URIs containing the type and ID for the resource.
+
+<table>
+  <thead>
+    <tr>
+      <th> identifier </th>
+      <th> </th>
+      <th> type </th>
+      <th> </th>
+      <th> id </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan=4>
+        <a href="#service-support"> URI Short Tags </a>
+      </td>
+      <td rowspan=4> : </td>
+      <td> track </td>
+      <td rowspan=4> : </td>
+      <td rowspan=4> ~ </td>
+    </tr>
+    <tr>
+      <td> album </td>
+    </tr>
+    <tr>
+      <td> artist </td>
+    </tr>
+    <tr>
+      <td> playlist </td>
+    </tr>
+  </tbody>
+</table>
+
+Examples
+
+* `spotify:track:127QTOFJsJQp5LbJbu3A1y`
+* `apple_music:album:1513162098`
+* `deezer:artist:4050205`
+* `apple_music:playlist:pl.f4d106fed2bd41149aaacabb233eb5eb`
+
 ### Features
 
 * Multi-service support [See [Service Support](#service-support)]
@@ -491,12 +534,12 @@ Authentication unrequired. API is freely accessible.
 
 ## Service Support
 
-| Service | Track | Album | Artist | Playlist |
-| :-----: | :---: | :---: | :----: | :------: |
-| [Spotify](src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    |
-| [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    |
-| [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    |
-| Youtube Music |   ✗   |   ✗   |    ✗   |     ✗    |
+| Service | Track | Album | Artist | Playlist | [URI Short Tags](#uris) |
+| :-----: | :---: | :---: | :----: | :------: | :------------: |
+| [Spotify](src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    | `spotify:` |
+| [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
+| [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
+| Youtube Music |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 
 ## Development
 
