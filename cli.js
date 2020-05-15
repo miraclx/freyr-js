@@ -806,7 +806,7 @@ async function init(queries, options) {
       queryLogger.log(`\x1b[33m[i]\x1b[0m Invalid query`);
       return;
     }
-    queryLogger.write(`[${service.DESC}]\n`);
+    queryLogger.write(`[${service[symbols.meta].DESC}]\n`);
     const authLogger = queryLogger.print('[\u2022] Checking authenticated user...');
     async function coreAuth(loginLogger) {
       const authStack = service.newAuth();
