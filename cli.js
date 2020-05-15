@@ -833,77 +833,86 @@ async function init(queries, options) {
     if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.meta].ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
-    const queryStats = await (contentType === 'track'
-      ? trackHandler
-      : contentType === 'album'
-      ? albumHandler
-      : contentType === 'artist'
-      ? artistHandler
-      : playlistHandler)(query, {service, queryLogger}).catch(err => {
-      queryLogger.error(
-        `\x1b[31m[i]\x1b[0m An error occurred while processing the query${err ? ` (${err.message || err})` : ''}`,
-      );
-      return Promise.resolve();
-    });
-    if (!queryStats) return null;
-    const source = queryStats.meta;
-    const trackStats = await pFlatten(queryStats.tracks);
+    const queryStats = await pFlatten(
+      (contentType === 'track'
+        ? trackHandler
+        : contentType === 'album'
+        ? albumHandler
+        : contentType === 'artist'
+        ? artistHandler
+        : playlistHandler)(query, {service, queryLogger})
+        .then(stats => (Array.isArray(stats) ? stats : [stats]))
+        .catch(err => {
+          queryLogger.error(
+            `\x1b[31m[i]\x1b[0m An error occurred while processing the query${err ? ` (${err.message || err})` : ''}`,
+          );
+          return Promise.resolve();
+        }),
+    );
+    if (queryStats.length < 0) return null;
     queryLogger.log('[\u2022] Download Complete');
     const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
-    await Promise.mapSeries(trackStats, async trackStat => {
-      if (trackStat.postprocess) {
-        trackStat.postprocess = await trackStat.postprocess;
-        if ('code' in trackStat.postprocess) {
-          trackStat.code = trackStat.postprocess.code;
-          trackStat.err = trackStat.postprocess.err;
+
+    const allTrackStats = await Promise.mapSeries(queryStats, async queryStat => {
+      const source = queryStat.meta;
+      const trackStats = await pFlatten(queryStat.tracks);
+      await Promise.mapSeries(trackStats, async trackStat => {
+        if (trackStat.postprocess) {
+          trackStat.postprocess = await trackStat.postprocess;
+          if ('code' in trackStat.postprocess) {
+            trackStat.code = trackStat.postprocess.code;
+            trackStat.err = trackStat.postprocess.err;
+          }
         }
-      }
-      if (trackStat.code) {
-        const reason =
-          trackStat.code === -1
-            ? 'Failed getting track data'
-            : trackStat.code === 1
-            ? 'Zero sources found'
-            : trackStat.code === 2
-            ? 'Error while retrieving sources'
-            : trackStat.code === 3
-            ? 'Error downloading album art'
-            : trackStat.code === 4
-            ? 'Error downloading raw audio'
-            : trackStat.code === 5
-            ? 'Unknown Download Error'
-            : trackStat.code === 6
-            ? 'Error ensuring directory integrity'
-            : trackStat.code === 7
-            ? 'Error while encoding audio'
-            : trackStat.code === 8
-            ? 'Failed while embedding metadata'
-            : trackStat.code === 9
-            ? 'Unknown postprocessing error'
-            : 'Unknown track processing error';
-        embedLogger.error(
-          `\u2022 [\u2717] ${
-            trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
-          } (failed:${reason ? ` ${reason}` : ''}${trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''})`,
+        if (trackStat.code) {
+          const reason =
+            trackStat.code === -1
+              ? 'Failed getting track data'
+              : trackStat.code === 1
+              ? 'Zero sources found'
+              : trackStat.code === 2
+              ? 'Error while retrieving sources'
+              : trackStat.code === 3
+              ? 'Error downloading album art'
+              : trackStat.code === 4
+              ? 'Error downloading raw audio'
+              : trackStat.code === 5
+              ? 'Unknown Download Error'
+              : trackStat.code === 6
+              ? 'Error ensuring directory integrity'
+              : trackStat.code === 7
+              ? 'Error while encoding audio'
+              : trackStat.code === 8
+              ? 'Failed while embedding metadata'
+              : trackStat.code === 9
+              ? 'Unknown postprocessing error'
+              : 'Unknown track processing error';
+          embedLogger.error(
+            `\u2022 [\u2717] ${
+              trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
+            } (failed:${reason ? ` ${reason}` : ''}${trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''})`,
+          );
+        } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
+        else
+          embedLogger.log(
+            `\u2022 [\u2714] ${trackStat.meta.trackName}${
+              !!options.cover && !trackStat.postprocess.wroteImage ? ' [(i) unable to write cover art]' : ''
+            }`,
+          );
+      });
+      if (queryStat.isCollection)
+        createPlaylist(
+          trackStats,
+          queryLogger,
+          BASE_DIRECTORY,
+          `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
+          `${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
         );
-      } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
-      else
-        embedLogger.log(
-          `\u2022 [\u2714] ${trackStat.meta.trackName}${
-            !!options.cover && !trackStat.postprocess.wroteImage ? ' [(i) unable to write cover art]' : ''
-          }`,
-        );
-    });
-    if (queryStats.isCollection)
-      createPlaylist(
-        trackStats,
-        queryLogger,
-        BASE_DIRECTORY,
-        `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
-        `${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
-      );
+      return trackStats;
+    }).then(trackStats => trackStats.flat());
+
     stackLogger.log('[\u2022] Collation Complete');
-    return trackStats;
+    return allTrackStats;
   });
   const trackStats = (await pFlatten(queryQueue.push([...options.input, ...queries]))).filter(Boolean);
   if (options.playlist && typeof options.playlist === 'string')
