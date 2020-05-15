@@ -316,9 +316,19 @@ Queries can be collated to be processed at once.
 freyr query1 query2 ... queryN
 ```
 
-Or list them, line by line into a file and use the `-i, --input <FILE>` flag.
+Or batched, line by line in a file with the `-i, --input <FILE>` flag.
+Lines starting with a `#` are treated as comments and ignored. comments can also be inlined.
 
-Use the `--help` flag to see full usage documentation.
+``` text
+# Hailee Steinfeld
+https://open.spotify.com/track/5Gu0PDLN4YJeW75PpBSg9p # (track) Let Me Go
+https://open.spotify.com/track/7GCVboEDzfL3NKp1NrAgHR # (track) Wrong Direction
+
+# (album) Rina Sawayama
+https://open.spotify.com/album/3stadz88XVpHcXnVYMHc4J
+```
+
+Use the [`--help`](#get-cli-help) flag to see full usage documentation.
 
 ### Features
 
