@@ -964,7 +964,10 @@ const command = commander
   .usage('[options] [query...]')
   .arguments('[query...]')
   .description(packageJson.description)
-  .option('-i, --input <FILE>', 'use URIs found in the specified FILE (size limit: 1 MiB)')
+  .option(
+    '-i, --input <FILE>',
+    "use URIs found in the specified FILE as queries (file size limit: 1 MiB)\n(each query on a new line, use '#' for comments, whitespaces ignored)",
+  )
   .option('-b, --bitrate <N>', `set bitrate for audio encoding\n(valid: ${VALIDS.bitrates})`, '320k')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
@@ -993,7 +996,7 @@ const command = commander
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
-    `specify a preferred download source or a \`,\`-separated preference order (valid: ${VALIDS.downloaders})`,
+    `specify a preferred download source or a \`,\`-separated preference order\n(valid: ${VALIDS.downloaders})`,
     'youtube',
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
