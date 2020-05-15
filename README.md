@@ -108,23 +108,207 @@ Usage: freyr [options] [query...]
 
 [See [Service Support](#service-support)].
 
+#### Get CLI Help
+
+<details>
+<summary> <code>freyr --help</code> </summary>
+
+``` text
+freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+-------------------------------------------------------------
+Usage: freyr [options] [query...]
+
+Versatile Multi-Service Music Downloader with NodeJS
+
+Options:
+  -i, --input <FILE>          use URIs found in the specified FILE as queries (file size limit: 1 MiB)
+                              (each query on a new line, use '#' for comments, whitespaces ignored)
+  -b, --bitrate <N>           set bitrate for audio encoding
+                              (valid: 96,128,160,192,256,320) (default: "320k")
+  -n, --chunks <N>            number of concurrent chunk streams with which to download (default: 7)
+  -t, --tries <N>             set number of retries for each chunk before giving up (`infinite` for infinite) (default: 10)
+  -d, --directory <DIR>       save tracks to DIR/.. (default: ".")
+  -c, --cover <name>          custom name for the cover art (default: "cover.png")
+  --cover-size <size>         preferred cover art dimensions
+                              (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
+  -C, --no-cover              skip saving a cover art
+  -z, --concurrency <SPEC>    specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)
+                              (format: <[key=]value>) (valid: queries,tracks,trackStage,downloader,encoder,embedder)
+  -f, --force                 force overwrite of existing files
+  -o, --config <file>         use alternative conf file
+  -p, --playlist <file>       create playlist for all successfully collated tracks
+  -P, --no-playlist           skip creating a playlist file for collections
+  -s, --storefront <COUNTRY>  country storefront code
+  -x, --filter <SEQ>          filter matches [explicit] (unimplemented)
+  -g, --groups <GROUP_TYPE>   filter collections by single/album/appears_on/compilation (unimplemented)
+  -T, --no-tree               don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`
+  --tags                      tag configuration specification
+                              (format: <key=value>) (reserved keys: [exclude, account]) (unimplemented)
+  --via-tor                   tunnel downloads through the tor network (unimplemented)
+  -D, --downloader <SERVICE>  specify a preferred download source or a `,`-separated preference order
+                              (valid: youtube) (default: "youtube")
+  --cache-dir <DIR>           specify alternative cache directory (unimplemented) (default: "<tmp>")
+  --timeout <N>               network inactivity timeout (ms) (default: 10000)
+  --no-stats                  don't show the stats on completion
+  --pulsate-bar               show a pulsating bar
+  --single-bar                show a single bar for the download, hide chunk-view
+                              (default when number of chunks/segments exceed printable space)
+  -v, --version               output the version number
+  -h, --help                  output usage information
+```
+
+</details>
+
 #### Download a Spotify track
 
-``` bash
-freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01
+<details>
+<summary> <code>freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01</code> </summary>
+
+``` text
+freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+-------------------------------------------------------------
+Checking directory permissions...[done]
+[spotify:track:5FNS5Vj69AhRGJWjhrAd01]
+ [•] Identifying service...[Spotify]
+ [•] Checking authenticated user...[unauthenticated]
+ [Spotify Login]
+  [•] Logging in...[done]
+ Detected [track]
+ Obtaining track metadata...[done]
+  ⯈ Title: Slow Dance
+  ⯈ Album: Slow Dance
+  ⯈ Artist: AJ Mitchell
+  ⯈ Year: 2019
+  ⯈ Playtime: 02:58
+ [•] Collating...
+  • [01 Slow Dance]
+     | ⮞ Collating sources...
+     |  ⮞ [•] YouTube...[success]
+     | ⮞ Awaiting audiofeeds...[done]
+     | [✔] Got album art
+     | [✔] Got raw track file
+     | [•] Post Processing...
+ [•] Download Complete
+ [•] Embedding Metadata...
+  • [✔] 01 Slow Dance
+[•] Collation Complete
+========== Stats ==========
+ [•] Runtime: [59.1s]
+ [•] Total tracks: [01]
+     ⏩  Skipped: [00]
+     ✔  Passed: [01]
+     ✗  Failed: [00]
+ [•] Output directory: [.]
+ [•] Cover Art: cover.png (640x640)
+ [•] Total Output size: 7.30 MB
+ [•] Total Network Usage: 3.13 MB
+     ♫ Media: 3.03 MB
+     ▶ Album Art: 106.76 KB
+ [•] Output bitrate: 320k
+===========================
 ```
+
+</details>
 
 #### Download an Apple Music album
 
-``` bash
-freyr https://music.apple.com/us/album/stupid-love/1500499210
+<details>
+<summary> <code> freyr https://music.apple.com/us/album/stupid-love/1500499210 </code> </summary>
+
+``` text
+freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+-------------------------------------------------------------
+Checking directory permissions...[done]
+[https://music.apple.com/us/album/stupid-love/1500499210]
+ [•] Identifying service...[Apple Music]
+ [•] Checking authenticated user...[authenticated]
+ Detected [album]
+ Obtaining album metadata...[done]
+  ⯈ Album Name: Stupid Love
+  ⯈ Artist: Lady Gaga
+  ⯈ Tracks: 1
+  ⯈ Type: Album
+  ⯈ Year: 2020
+  ⯈ Genres: Pop, Music
+ [•] Collating [Stupid Love]...
+  [•] Inquiring tracks...[done]
+   • [01 Stupid Love]
+      | ⮞ Collating sources...
+      |  ⮞ [•] YouTube...[success]
+      | ⮞ Awaiting audiofeeds...[done]
+      | [✔] Got album art
+      | [✔] Got raw track file
+      | [•] Post Processing...
+ [•] Download Complete
+ [•] Embedding Metadata...
+  • [✔] 01 Stupid Love
+[•] Collation Complete
+========== Stats ==========
+ [•] Runtime: [1m 4.7s]
+ [•] Total tracks: [01]
+     ⏩  Skipped: [00]
+     ✔  Passed: [01]
+     ✗  Failed: [00]
+ [•] Output directory: [.]
+ [•] Cover Art: cover.png (640x640)
+ [•] Total Output size: 7.93 MB
+ [•] Total Network Usage: 3.30 MB
+     ♫ Media: 3.17 MB
+     ▶ Album Art: 121.02 KB
+ [•] Output bitrate: 320k
+===========================
 ```
+
+</details>
 
 #### Download a Deezer Artist
 
-``` bash
-freyr https://deezer.com/artist/1089097
+<details>
+<summary> <code> freyr https://www.deezer.com/us/artist/14808825 </code> </summary>
+
+``` text
+freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+-------------------------------------------------------------
+Checking directory permissions...[done]
+[https://www.deezer.com/us/artist/14808825]
+ [•] Identifying service...[Deezer]
+ [•] Checking authenticated user...[authenticated]
+ Detected [artist]
+ Obtaining artist metadata...[done]
+  ⯈ Artist: Mazie
+  ⯈ Followers: 2
+    > Gathering collections...[done]
+ [•] Collating...
+  (01) [no friends] (single)
+   [•] Inquiring tracks...[done]
+    • [01 no friends]
+       | ⮞ Collating sources...
+       |  ⮞ [•] YouTube...[success]
+       | ⮞ Awaiting audiofeeds...[done]
+       | [✔] Got album art
+       | [✔] Got raw track file
+       | [•] Post Processing...
+ [•] Download Complete
+ [•] Embedding Metadata...
+  • [✔] 01 no friends
+[•] Collation Complete
+========== Stats ==========
+ [•] Runtime: [56.2s]
+ [•] Total tracks: [01]
+     ⏩  Skipped: [00]
+     ✔  Passed: [01]
+     ✗  Failed: [00]
+ [•] Output directory: [.]
+ [•] Cover Art: cover.png (640x640)
+ [•] Total Output size: 4.36 MB
+ [•] Total Network Usage: 1.93 MB
+     ♫ Media: 1.82 MB
+     ▶ Album Art: 103.21 KB
+ [•] Output bitrate: 320k
+===========================
 ```
+
+</details>
 
 Queries can be collated to be processed at once.
 
