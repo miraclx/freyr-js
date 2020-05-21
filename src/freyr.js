@@ -1,6 +1,5 @@
 /* eslint-disable consistent-return */
 const {sortBy} = require('lodash');
-const Promise = require('bluebird');
 
 const symbols = require('./symbols');
 const YouTube = require('./services/youtube');
