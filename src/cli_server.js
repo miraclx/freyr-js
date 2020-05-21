@@ -73,9 +73,11 @@ class AuthServer extends events.EventEmitter {
           const state = req.query.state || null;
           const storedState = req.cookies ? req.cookies[this.stateKey] : null;
           res.clearCookie(this.stateKey);
-          if (code == null || state === null || state !== storedState)
+          if (code == null || state === null || state !== storedState) {
             res.end(wrapHTML({service: this.serviceName, color: '#d0190c', msg: 'Authentication Failed'}));
-          else res.end(wrapHTML({service: this.serviceName, color: '#1ae822;', msg: 'Successfully Authenticated'}));
+            return;
+          }
+          res.end(wrapHTML({service: this.serviceName, color: '#1ae822;', msg: 'Successfully Authenticated'}));
           server.close();
           this.emit('code', code);
         })
