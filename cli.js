@@ -955,7 +955,7 @@ async function init(queries, options) {
     stackLogger.log(` [\u2022] Total Output size: ${xbytes(finalStats.outSize)}`);
     stackLogger.log(` [\u2022] Total Network Usage: ${xbytes(finalStats.netSize)}`);
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
-    stackLogger.log(`     \u25b6 Album Art: ${xbytes(finalStats.imageSize)}`);
+    stackLogger.log(`     \u2bc8 Album Art: ${xbytes(finalStats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===========================');
   }
