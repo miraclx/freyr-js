@@ -853,7 +853,7 @@ async function init(queries, options) {
           return Promise.resolve();
         }),
     );
-    if (queryStats.length < 0) return null;
+    if (queryStats.length === 0) return null;
     await Promise.all(queryStats.map(stat => stat.tracks).flat());
     queryLogger.log('[\u2022] Download Complete');
     const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
