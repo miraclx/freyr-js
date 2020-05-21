@@ -919,7 +919,8 @@ async function init(queries, options) {
     stackLogger.log('[\u2022] Collation Complete');
     return allTrackStats;
   });
-  const trackStats = (await pFlatten(queryQueue.push([...options.input, ...queries]))).filter(Boolean);
+  const totalQueries = [...options.input, ...queries];
+  const trackStats = (await pFlatten(queryQueue.push(totalQueries))).filter(Boolean);
   if (options.playlist && typeof options.playlist === 'string')
     createPlaylist(trackStats, stackLogger, BASE_DIRECTORY, options.playlist);
   const finalStats = trackStats.reduce(
@@ -944,6 +945,7 @@ async function init(queries, options) {
   if (options.stats) {
     stackLogger.log('========== Stats ==========');
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
+    stackLogger.log(` [\u2022] Total queries: [${prePadNum(totalQueries.length, 10)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
     stackLogger.log(`     \u23e9  Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
     stackLogger.log(`     \u2714  Passed: [${prePadNum(finalStats.passed, 10)}]`);
