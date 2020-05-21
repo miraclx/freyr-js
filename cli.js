@@ -1007,6 +1007,9 @@ const command = commander
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
+  .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary (unimplemented)')
+  .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary (unimplemented)')
+  .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary (unimplemented)')
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
   .option(
