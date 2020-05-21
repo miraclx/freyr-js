@@ -797,6 +797,27 @@ async function init(queries, options) {
     };
   }
 
+  const authQueue = new AsyncQueue('cli:authQueue', 1, async (service, logger) => {
+    async function coreAuth(loginLogger) {
+      const authHandler = service.newAuth();
+      const url = await authHandler.getUrl;
+      await processPromise(open(url), loginLogger, {pre: `[\u2022] Attempting to open [ ${url} ] within browser...`});
+      await processPromise(authHandler.userToAuth(), loginLogger, {
+        pre: '[\u2022] Awaiting user authentication...',
+      });
+    }
+    if (service.isAuthed()) logger.write('[authenticated]\n');
+    else {
+      logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
+      const config = freyrCoreConfig.get(`services.${service[symbols.meta].ID}`);
+      const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`);
+      service.canTryLogin(config)
+        ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
+          (await coreAuth(loginLogger))
+        : await coreAuth(loginLogger);
+    }
+  });
+
   const queryQueue = new AsyncQueue('cli:queryQueue', Config.concurrency.queries, async query => {
     const queryLogger = stackLogger.log(`[${query}]`);
     queryLogger.print('[\u2022] Identifying service...');
@@ -807,25 +828,8 @@ async function init(queries, options) {
       return;
     }
     queryLogger.write(`[${service[symbols.meta].DESC}]\n`);
-    const authLogger = queryLogger.print('[\u2022] Checking authenticated user...');
-    async function coreAuth(loginLogger) {
-      const authStack = service.newAuth();
-      const url = await authStack.getUrl;
-      await processPromise(open(url), loginLogger, {pre: `[\u2022] Attempting to open [ ${url} ] within browser...`});
-      await processPromise(authStack.userToAuth(), loginLogger, {
-        pre: '[\u2022] Awaiting user authentication...',
-      });
-    }
-    if (service.isAuthed()) authLogger.write('[authenticated]\n');
-    else {
-      authLogger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
-      const config = freyrCoreConfig.get(`services.${service[symbols.meta].ID}`);
-      const loginLogger = queryLogger.log(`[${service[symbols.meta].DESC} Login]`);
-      service.canTryLogin(config)
-        ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
-          (await coreAuth(loginLogger))
-        : await coreAuth(loginLogger);
-    }
+    queryLogger.print('[\u2022] Checking authentication...');
+    await authQueue.push(service, queryLogger);
     if (!service.isAuthed()) {
       queryLogger.log('[\u2717] Failed to authenticate client!');
       return;
