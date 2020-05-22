@@ -12,6 +12,9 @@
     "encoder": 6,
     "embedder": 10
   },
+  "dirs": {
+    "output": "."
+  },
   "image": {
     "width": 640,
     "height": 640
