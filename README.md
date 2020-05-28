@@ -2,10 +2,20 @@
 
 > Versatile Multi-Service Music Downloader with NodeJS
 
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
+<!-- [![NPM Version][npm-image]][npm-url] -->
+<!-- [![NPM Downloads][downloads-image]][downloads-url] -->
 
-[![NPM][npm-image-url]][npm-url]
+<!-- [![NPM][npm-image-url]][npm-url] -->
+
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js)
+![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/miraclx/freyr-js)
+![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
+
+![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)
+![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)
+![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)
+![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic)
 
 ## Demo
 
