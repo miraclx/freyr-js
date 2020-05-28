@@ -43,10 +43,10 @@ yarn global add https://github.com/miraclx/freyr-js.git
 
 POSIX: _(check individual package managers)_
 
-* `*`Debian: `sudo apt-get install atomicparsley`
-* `*`ArchLinux: `sudo pacman -S python`
+* *Debian: `sudo apt-get install atomicparsley`
+* *ArchLinux: `sudo pacman -S python`
 * Android (Termux): `apt install python`
-* _(`*: should already be preinstalled`)_
+* _(`*`: should already be preinstalled)_
 
 </details>
 
