@@ -328,22 +328,36 @@ Checking directory permissions...[done]
 
 </details>
 
+#### Batch downloads
+
+##### via Arguments
+
 Queries can be collated to be processed at once.
 
 ``` bash
 freyr query1 query2 ... queryN
 ```
 
-Or batched, line by line in a file with the `-i, --input <FILE>` flag.
-Lines starting with a `#` are treated as comments and ignored. comments can also be inlined.
+##### via Batch File
+
+Queries can be batched into a file and loaded all at once with the `-i, --input <FILE>` flag.
+Queries should be on separate lines.
+
+Lines starting with a `#` are treated as comments and ignored. comments can also be inlined with everything following the `#` character ignored.
 
 ``` text
+# ./queue.txt
+
 # Hailee Steinfeld
 https://open.spotify.com/track/5Gu0PDLN4YJeW75PpBSg9p # (track) Let Me Go
 https://open.spotify.com/track/7GCVboEDzfL3NKp1NrAgHR # (track) Wrong Direction
 
 # (album) Rina Sawayama
 https://open.spotify.com/album/3stadz88XVpHcXnVYMHc4J
+```
+
+``` bash
+freyr -i ./queue.txt
 ```
 
 Use the [`--help`](#get-cli-help) flag to see full usage documentation.
