@@ -19,9 +19,7 @@
 
 ## Demo
 
-[![Ascii Demo](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup.svg)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2)
-
-(Or as [GIF](media/demo.gif))
+[![ASCII Demo](media/demo.gif)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2 "Click to view ASCII")
 
 ## Installation
 
