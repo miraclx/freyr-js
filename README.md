@@ -398,12 +398,7 @@ Services can be queried with short URIs containing the type and ID for the resou
   </tbody>
 </table>
 
-Examples
-
-* `spotify:track:127QTOFJsJQp5LbJbu3A1y`
-* `apple_music:album:1513162098`
-* `deezer:artist:4050205`
-* `apple_music:playlist:pl.f4d106fed2bd41149aaacabb233eb5eb`
+[Examples](#ssue)
 
 ### Features
 
@@ -572,6 +567,139 @@ Authentication unrequired. API is freely accessible.
 | [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
 | [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
 | Youtube Music |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
+
+<details>
+<summary id="ssue"> <strong> Short Service URI Examples </strong> </summary>
+  <table>
+    <thead>
+      <tr>
+        <th> Service </th>
+        <th> Resource Type </th>
+        <th colspan=2> URIS </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan=8> Spotify </td>
+        <td rowspan=2> track </td>
+          <td> URL </td>
+          <td> <a href="https://open.spotify.com/track/127QTOFJsJQp5LbJbu3A1y"> https://open.spotify.com/track/127QTOFJsJQp5LbJbu3A1y </a> </td>
+        </tr>
+        <tr>
+          <td> URI </td>
+          <td> <code> spotify:track:127QTOFJsJQp5LbJbu3A1y </code> </td>
+        </tr>
+        <tr>
+          <td rowspan=2> album </td>
+          <td> URL </td>
+          <td> <a href="https://open.spotify.com/album/623PL2MBg50Br5dLXC9E9e"> https://open.spotify.com/album/623PL2MBg50Br5dLXC9E9e </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> spotify:album:623PL2MBg50Br5dLXC9E9e </code> </td>
+          </tr>
+        <tr>
+          <td rowspan=2> artist </td>
+          <td> URL </td>
+          <td> <a href="https://open.spotify.com/artist/6M2wZ9GZgrQXHCFfjv46we"> https://open.spotify.com/artist/6M2wZ9GZgrQXHCFfjv46we </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> spotify:artist:6M2wZ9GZgrQXHCFfjv46we </code> </td>
+          </tr>
+        <tr>
+          <td rowspan=2> playlist </td>
+          <td> URL </td>
+          <td> <a href="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"> https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> spotify:playlist:37i9dQZF1DXcBWIGoYBM5M </code> </td>
+          </tr>
+        </tr>
+      </tr>
+      <tr>
+        <td rowspan=8> Apple Music </td>
+        <td rowspan=2> track </td>
+          <td> URL </td>
+          <td> <a href="https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685"> https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685 </a> </td>
+        </tr>
+        <tr>
+          <td> URI </td>
+          <td> <code> apple_music:track:1510821685 </code> </td>
+        </tr>
+        <tr>
+          <td rowspan=2> album </td>
+          <td> URL </td>
+          <td> <a href="https://music.apple.com/us/album/birds-of-prey-the-album/1493581254"> https://music.apple.com/us/album/birds-of-prey-the-album/1493581254 </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> apple_music:album:1493581254 </code> </td>
+          </tr>
+        <tr>
+          <td rowspan=2> artist </td>
+          <td> URL </td>
+          <td> <a href="https://music.apple.com/us/artist/412778295"> https://music.apple.com/us/artist/412778295 </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> apple_music:artist:412778295 </code> </td>
+          </tr>
+        <tr>
+          <td rowspan=2> playlist </td>
+          <td> URL </td>
+          <td> <a href="https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb"> https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> apple_music:playlist:pl.f4d106fed2bd41149aaacabb233eb5eb </code> </td>
+          </tr>
+        </tr>
+      </tr>
+      <tr>
+        <td rowspan=8> Deezer </td>
+        <td rowspan=2> track </td>
+          <td> URL </td>
+          <td> <a href="https://www.deezer.com/en/track/642674232"> https://www.deezer.com/en/track/642674232 </a> </td>
+        </tr>
+        <tr>
+          <td> URI </td>
+          <td> <code> deezer:track:642674232 </code> </td>
+        </tr>
+        <tr>
+          <td rowspan=2> album </td>
+          <td> URL </td>
+          <td> <a href="https://www.deezer.com/en/album/99687992"> https://www.deezer.com/en/album/99687992 </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> deezer:album:99687992 </code> </td>
+          </tr>
+        <tr>
+          <td rowspan=2> artist </td>
+          <td> URL </td>
+          <td> <a href="https://www.deezer.com/en/artist/5340439"> https://www.deezer.com/en/artist/5340439 </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> deezer:artist:5340439 </code> </td>
+          </tr>
+        <tr>
+          <td rowspan=2> playlist </td>
+          <td> URL </td>
+          <td> <a href="https://www.deezer.com/en/playlist/1963962142"> https://www.deezer.com/en/playlist/1963962142 </a> </td>
+        </tr>
+          <tr>
+            <td> URI </td>
+            <td> <code> deezer:playlist:1963962142 </code> </td>
+          </tr>
+        </tr>
+      </tr>
+    </tbody>
+  </table>
+
+</details>
 
 ## Development
 
