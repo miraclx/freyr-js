@@ -441,23 +441,23 @@ This file should be of `JSON` format and is to be structured as such.
 
 Defaults are in the [conf.json](conf.json) file.
 
-* `server`: &lt;object&gt; The server URL configuration same as on an individual services' callback option.
-  * `hostname`: &lt;string&gt;
-  * `port`: &lt;number&gt;
-  * `useHttps`: &lt;boolean&gt;
-* `image`: &lt;object|number|string&gt; An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
-  * `width`: &lt;number|string&gt;
-  * `height`: &lt;number|string&gt;
-* `concurrency`: &lt;object&gt;
-  * `queries`: &lt;number&gt; The number of queries to be processed concurrently.
-  * `tracks`: &lt;number&gt; The number of tracks to be actively processed in parallel.
-  * `trackStage`: &lt;number&gt; The number of tracks to concurrently preprocess before being pushed to the main trackQueue.
-  * `downloader`: &lt;number&gt; The number of tracks to be concurrently downloaded in parallel.
-  * `encoder`: &lt;number&gt; The total number of tracks to be concurrently undergo encoding.
-  * `embedder`: &lt;number&gt; The total number of tracks to be concurrently embedded in parallel.
-  * `sources`: &lt;number&gt; The number of tracks whose sources should be concurrently collated.
-  * `feeds`: &lt;number&gt; The number of tracks whose source feeds should be concurrently gotten.
-* `services`: &lt;[ServiceConfiguration](#service-configuration): object&gt;
+* `server`: \<object\> The server URL configuration same as on an individual services' callback option.
+  * `hostname`: \<string\>
+  * `port`: \<number\>
+  * `useHttps`: \<boolean\>
+* `image`: \<object|number|string\> An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
+  * `width`: \<number|string\>
+  * `height`: \<number|string\>
+* `concurrency`: \<object\>
+  * `queries`: \<number\> The number of queries to be processed concurrently.
+  * `tracks`: \<number\> The number of tracks to be actively processed in parallel.
+  * `trackStage`: \<number\> The number of tracks to concurrently preprocess before being pushed to the main trackQueue.
+  * `downloader`: \<number\> The number of tracks to be concurrently downloaded in parallel.
+  * `encoder`: \<number\> The total number of tracks to be concurrently undergo encoding.
+  * `embedder`: \<number\> The total number of tracks to be concurrently embedded in parallel.
+  * `sources`: \<number\> The number of tracks whose sources should be concurrently collated.
+  * `feeds`: \<number\> The number of tracks whose source feeds should be concurrently gotten.
+* `services`: \<[ServiceConfiguration](#service-configuration): object\>
 
 <details>
 <summary>Example JSON</summary>
@@ -497,10 +497,10 @@ The [conf.json](conf.json) file already includes some API tokens for service aut
 <details>
 <summary>Spotify</summary>
 
-* `spotify`: &lt;object&gt;
-  * `clientId`: &lt;string&gt;
-  * `clientSecret`: &lt;string&gt;
-  * `refreshToken`: &lt;string&gt;
+* `spotify`: \<object\>
+  * `clientId`: \<string\>
+  * `clientSecret`: \<string\>
+  * `refreshToken`: \<string\>
 
 Spotify requires a `clientId` and a `clientSecret` that can be gotten from their developer dashboard.
 
@@ -524,9 +524,9 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
 <details>
 <summary>Apple Music</summary>
 
-* `apple_music`: &lt;object&gt;
-  * `storefront`: &lt;string&gt;
-  * `developerToken`: &lt;string&gt;
+* `apple_music`: \<object\>
+  * `storefront`: \<string\>
+  * `developerToken`: \<string\>
 
 This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
@@ -717,7 +717,7 @@ npm run build
 
 ## License
 
-[Apache 2.0][license] © **Miraculous Owonubi** ([@miraclx][author-url]) &lt;omiraculous@gmail.com&gt;
+[Apache 2.0][license] © **Miraculous Owonubi** ([@miraclx][author-url]) \<omiraculous@gmail.com\>
 
 [npm]:  https://github.com/npm/cli "The Node Package Manager"
 [license]:  LICENSE "Apache 2.0 License"
