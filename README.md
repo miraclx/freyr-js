@@ -458,6 +458,13 @@ Defaults are in the [conf.json](conf.json) file.
   * `sources`: \<number\> The number of tracks whose sources should be concurrently collated.
   * `feeds`: \<number\> The number of tracks whose source feeds should be concurrently gotten.
 * `services`: \<[ServiceConfiguration](#service-configuration): object\>
+* `dirs`: \<object\>
+  * `output`: \<string\> Default download directory. Default: `"."`
+* `downloader`: \<object\>
+  * `order`: \<array\> Service download sources order.
+    * Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
+    * supported: `youtube`
+    * default: `[ "youtube" ]`
 
 <details>
 <summary>Example JSON</summary>
