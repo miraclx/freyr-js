@@ -37,7 +37,7 @@ POSIX: _(check individual package managers)_
 
 * `*`Debian: `sudo apt-get install atomicparsley`
 * `*`ArchLinux: `sudo pacman -S python`
-* Android (termux): `apt install python`
+* Android (Termux): `apt install python`
 * _(`*: should already be preinstalled`)_
 
 </details>
@@ -54,6 +54,8 @@ POSIX: [nvm](https://github.com/nvm-sh/nvm) recommended.
 $ nvm install v12
 ```
 
+Android (Termux): `apt install nodejs`
+
 </details>
 
 <details>
@@ -66,6 +68,7 @@ $ nvm install v12
 * Linux _(check individual package managers)_
   * Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
   * Arch Linux: `sudo pacman -S ffmpeg`
+  * Android (Termux): `apt install ffmpeg`
   * otherwise, compile from source, fetch a pre-built static binary or package at <https://ffmpeg.org/download.html>
 
 </details>
@@ -89,6 +92,7 @@ $ nvm install v12
 * POSIX: _(check individual package managers)_
   * Debian: `sudo apt-get install atomicparsley`
   * Arch Linux: `sudo pacman -S atomicparsley`
+  * Android (Termux): `apt install atomicparsley`
   * Build from source:
 
     ``` bash
