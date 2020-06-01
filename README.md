@@ -40,8 +40,8 @@ While there are no official docker images as of this moment, this project does i
 
 | Base Image OS | Average Build Network Usage | Average Disk Usage | File |
 | :-----------: | :--------: | :-------: | :---------------------------: |
-| Alpine (musl) | ~ 80 MB    | ~ 210 MB  | [`docker/Dockerfile.alpine`](docker/Dockerfile.alpine)    |
-| Arch Linux    | ~ 200 MB   | ~ 1.04 GB | [`docker/Dockerfile.archlinux`](docker/Dockerfile.alpine) |
+| Alpine (musl) | ~ 80 MB    | ~ 210 MB  | [`docker/Dockerfile.alpine`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine)    |
+| Arch Linux    | ~ 200 MB   | ~ 1.04 GB | [`docker/Dockerfile.archlinux`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.archlinux) |
 
 #### Building Dockerfiles
 
