@@ -1,6 +1,9 @@
+# ignore local package files
 node_modules/
-
-stage/
-
 package-lock.json
+
+# ignore binaries
 bins/
+
+# ignore stage for testing
+stage/
