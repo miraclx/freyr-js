@@ -58,7 +58,13 @@ To build under the `freyr:latest` tag with the default Dockerfile, run:
 
 ``` bash
 # default (alpine)
+
+# if cloned
+cd freyr-js
 docker build -t freyr:latest .
+
+# otherwise
+docker build -t freyr:latest https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine
 ```
 
 <details>
