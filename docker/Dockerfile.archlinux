@@ -14,7 +14,7 @@ RUN pacman -Sy --noconfirm \
   atomicparsley \
   which \
   time \
-  && pacman -Scc --noconfirm
+  && yes | pacman -Scc
 
 # Create freyr group. Then add root to freyr group.
 RUN groupadd -g 1000 freyr \
