@@ -7,15 +7,15 @@
 
 <!-- [![NPM][npm-image-url]][npm-url] -->
 
+[![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx)
 ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js)
 ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)
-![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/miraclx/freyr-js)
-![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
+![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)
 
+![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic)
 ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)
 ![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)
-![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)
-![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic)
+![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
 
 ## Demo
 
@@ -734,12 +734,11 @@ npm run build
 
 [Apache 2.0][license] © **Miraculous Owonubi** ([@miraclx][author-url]) \<omiraculous@gmail.com\>
 
-[npm]:  https://github.com/npm/cli "The Node Package Manager"
 [license]:  LICENSE "Apache 2.0 License"
 [author-url]: https://github.com/miraclx
 
-[npm-url]: https://npmjs.org/package/freyr
+<!-- [npm-url]: https://npmjs.org/package/freyr
 [npm-image]: https://badgen.net/npm/node/freyr
 [npm-image-url]: https://nodei.co/npm/freyr.png?stars&downloads
 [downloads-url]: https://npmjs.org/package/freyr
-[downloads-image]: https://badgen.net/npm/dm/freyr
+[downloads-image]: https://badgen.net/npm/dm/freyr -->
