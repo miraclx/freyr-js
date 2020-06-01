@@ -1,0 +1,44 @@
+FROM alpine
+LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
+  name="freyrcli" \
+  version="latest" \
+  tag="alpine"
+
+# Install dependencies and clean cache
+RUN apk add \
+  --no-cache \
+  -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  git \
+  npm \
+  nodejs \
+  python3 \
+  ffmpeg \
+  atomicparsley \
+  bash \
+  which
+
+# Create freyr group. Then add root to freyr group.
+RUN addgroup -g 1000 freyr \
+  && addgroup root freyr \
+  && mkdir /freyr \
+  && chown :freyr /freyr
+
+# Clone and install freyr
+RUN git clone -b master --depth=1 --single-branch https://github.com/miraclx/freyr-js /freyr
+RUN npm install --global --unsafe-perm /freyr
+
+# Set and mount workdir
+WORKDIR /data
+VOLUME ["/data"]
+
+# Set entrypoint
+ENTRYPOINT ["freyr", "-d", "/data"]
+
+# BUILD
+# > docker build --rm -t freyr:alpine https://gist.github.com/miraclx/d1777f44410f959e95c23d1a2f6dc127/raw/Dockerfile.alpine
+# LAUNCH (freyr)
+# > docker run -it --storage-opt size=5G freyr:alpine
+# LAUNCH (bash)
+# > docker run -it --storage-opt size=5G --entrypoint bash freyr:alpine
+# LAUNCH (freyr -> host)
+# > docker run -it -v $PWD:/data freyr:alpine -d /data https://open.spotify.com/artist/0nnYdIpahs41QiZ9MWp5Wx
