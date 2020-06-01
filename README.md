@@ -36,7 +36,7 @@ yarn global add https://github.com/miraclx/freyr-js.git
 
 ### Docker
 
-While there is no official docker image as of this moment, this project does include Dockerfiles for your convenience in the `docker/` folder.
+While there are no official docker images as of this moment, this project does include Dockerfiles for your convenience in the `docker/` folder.
 
 | Base Image OS | Average Build Network Usage | Average Disk Usage | File |
 | :-----------: | :--------: | :-------: | :---------------------------: |
