@@ -23,6 +23,8 @@
 
 ## Installation
 
+### Manually
+
 Ensure all [requirements](#requirements) are satisfied before installing.
 
 ``` bash
@@ -32,9 +34,69 @@ npm install -g git+https://github.com/miraclx/freyr-js.git
 yarn global add https://github.com/miraclx/freyr-js.git
 ```
 
+### Docker
+
+While there is no official docker image as of this moment, this project does include Dockerfiles for your convenience in the `docker/` folder.
+
+| Base Image OS | Average Build Network Usage | Average Disk Usage | File |
+| :-----------: | :--------: | :-------: | :---------------------------: |
+| Alpine (musl) | ~ 80 MB    | ~ 210 MB  | [`docker/Dockerfile.alpine`](docker/Dockerfile.alpine)    |
+| Arch Linux    | ~ 200 MB   | ~ 1.04 GB | [`docker/Dockerfile.archlinux`](docker/Dockerfile.alpine) |
+
+#### Building Dockerfiles
+
+<details>
+<summary> Structure </summary>
+
+``` bash
+docker build -t <tag> [-f <dockerfile>] <directory>
+```
+
+</details>
+
+To build under the `freyr:latest` tag with the default Dockerfile, run:
+
+``` bash
+# default (alpine)
+docker build -t freyr:latest .
+```
+
+<details>
+<summary> Building (platform-specific) </summary>
+
+``` bash
+# freyr on alpine with the `freyr:alpine` tag
+docker build -t freyr:alpine -f docker/Dockerfile.alpine .
+# freyr on archlinux with the `freyr:archlinux` tag
+docker build -t freyr:archlinux -f docker/Dockerfile.archlinux .
+```
+
+</details>
+
+#### Usage (Docker)
+
+<details>
+<summary> Structure </summary>
+
+``` bash
+docker run --rm -v $PWD:/data <tag> [options, arguments and queries...]
+```
+
+</details>
+
+Example, with the `freyr:latest` tag:
+
+``` bash
+docker run --rm -v $PWD:/data freyr:latest
+```
+
+[See [Docker Development](#docker-development)]
+
 ## Getting Started
 
 ### Requirements
+
+As an alternative to setting up freyr and its dependencies on your host system, consider the [Docker installation method](#docker) for a containerized experience.
 
 <details>
 <summary>python >= v3.2</summary>
@@ -718,7 +780,7 @@ Authentication unrequired. API is freely accessible.
 
 ## Development
 
-### Building
+### Manually Duilding
 
 Feel free to clone, use in adherance to the [license](#license) and perhaps send pull requests
 
@@ -729,6 +791,28 @@ npm install
 # hack on code
 npm run build
 ```
+
+### Docker Development
+
+While following the steps to [building the docker image](#docker) still applies, development requires jumping into a shell entrypoint as opposed to the freyr script.
+
+``` bash
+docker run -it --entrypoint bash freyr:latest
+```
+
+Optionally, you can use these interesting flags to customize the experience.
+
+* `-h freyr-dev` sets the hostname to `freyr-dev`
+* `-m 1G` sets the container memory limit
+* `-v $PWD:/data` mounts the current working directory to `/data` within the container.
+* `--cpus 2` limits the container to using 2 CPU cores
+
+The freyr source would be available in the `/freyr` directory.
+
+For more information and documentation about docker, please refer to its official website:
+
+* <https://www.docker.com/>
+* <https://docs.docker.com/>
 
 ## License
 
