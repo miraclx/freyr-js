@@ -1,24 +1,19 @@
-# FreyrJS
+<h1 align="center">
+  <a href="https://github.com/miraclx/freyr-js">
+    <img src="media/logo.gif" alt="FreyrJS - connoisseur of music">
+  </a>
+  <br> FreyrJS </br>
+</h1>
+
+<h4 align="center">
+  Versatile Multi-Service Music Downloader with NodeJS
+  
+</h4>
 
 <div align="center">
-<img src=media/logo.gif>
 
-<blockquote style="color: #6a737d;"> <p> Versatile Multi-Service Music Downloader with NodeJS </p> </blockquote>
+# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js) ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js) ![GitHub](https://img.shields.io/github/license/miraclx/freyr-js) ![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic) ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js) ![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js) ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
 
-<!-- [![NPM Version][npm-image]][npm-url] -->
-<!-- [![NPM Downloads][downloads-image]][downloads-url] -->
-
-<!-- [![NPM][npm-image-url]][npm-url] -->
-
-[![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx)
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js)
-![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)
-![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)
-
-![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic)
-![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)
-![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)
-![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
 </div>
 
 ## Demo
