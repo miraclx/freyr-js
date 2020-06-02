@@ -1,9 +1,9 @@
 # FreyrJS
 
 <div align="center">
-<img src=media/logo.gif></img>
+<img src=media/logo.gif>
 
-> Versatile Multi-Service Music Downloader with NodeJS
+<blockquote style="color: #6a737d;"> <p> Versatile Multi-Service Music Downloader with NodeJS </p> </blockquote>
 
 <!-- [![NPM Version][npm-image]][npm-url] -->
 <!-- [![NPM Downloads][downloads-image]][downloads-url] -->
@@ -805,6 +805,12 @@ npm run build
 ### Docker Development
 
 While following the steps to [building the docker image](#docker) still applies, development requires jumping into a shell entrypoint as opposed to the freyr script.
+
+``` bash
+git clone -b master --depth=1 --single-branch https://github.com/miraclx/freyr-js freyr
+cd freyr
+docker build -t freyr:latest .
+```
 
 ``` bash
 docker run -it --entrypoint bash freyr:latest
