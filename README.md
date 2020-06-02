@@ -1,5 +1,8 @@
 # FreyrJS
 
+<div align="center">
+<img src=media/logo.gif></img>
+
 > Versatile Multi-Service Music Downloader with NodeJS
 
 <!-- [![NPM Version][npm-image]][npm-url] -->
@@ -16,6 +19,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)
 ![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)
 ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
+</div>
 
 ## Demo
 
