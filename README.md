@@ -787,16 +787,17 @@ Authentication unrequired. API is freely accessible.
 
 ## Development
 
-### Manually Duilding
+### Manually Building
 
-Feel free to clone, use in adherance to the [license](#license) and perhaps send pull requests
+Feel free to clone and use in adherance to the [license](#license). Pull requests are very much welcome.
 
 ``` bash
 git clone https://github.com/miraclx/freyr-js.git
 cd freyr-js
 npm install
-# hack on code
-npm run build
+
+# don't forget to link to register the freyr command
+npm link
 ```
 
 ### Docker Development
