@@ -476,8 +476,8 @@ async function init(queries, options) {
           errorHandler: () => imageFile.removeCallback(),
           retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
           failureMessage: err =>
-            trackLogger.getText(`| [\u2717] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
-          successMessage: trackLogger.getText(`| [\u2714] Got album art`),
+            trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
+          successMessage: trackLogger.getText(`| [\u2713] Got album art`),
         },
       }).catch(err => Promise.reject({err, code: 3}));
       const rawAudio = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
@@ -490,7 +490,7 @@ async function init(queries, options) {
               tag: `[‘${meta.trackName}’]`,
               errorHandler: () => rawAudio.removeCallback(),
               retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-              successMessage: trackLogger.getText('| [\u2714] Got raw track file'),
+              successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
             },
           },
           feedMeta.protocol !== 'http_dash_segments'
@@ -498,7 +498,7 @@ async function init(queries, options) {
                 urlOrFragments: feedMeta.url,
                 opts: {
                   failureMessage: err =>
-                    trackLogger.getText(`| [\u2717] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`),
+                    trackLogger.getText(`| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`),
                 },
               }
             : {
@@ -509,7 +509,7 @@ async function init(queries, options) {
                 opts: {
                   failureMessage: err =>
                     trackLogger.getText(
-                      `| [\u2717] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
+                      `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
                     ),
                 },
               },
@@ -638,22 +638,22 @@ async function init(queries, options) {
     trackLogger.indent += 2;
     if (props.fileExists) {
       if (!props.processTrack) {
-        trackLogger.log('| [\u2717] Track exists. Skipping...');
+        trackLogger.log('| [\u2a20] Track exists. Skipping...');
         return {meta, code: 0};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
-    trackLogger.log('| \u2b9e Collating sources...');
+    trackLogger.log('| \u00bb Collating sources...');
     const audioSource = await props.collectSources((service, sources) =>
       processPromise(sources, trackLogger, {
-        pre: `|  \u2b9e [\u2022] ${service[symbols.meta].DESC}...`,
+        pre: `|  \u00bb [\u2022] ${service[symbols.meta].DESC}...`,
         xerr: '[Unable to retrieve stream]',
         post: '[success]',
       }),
     );
     if (!audioSource) return {meta, code: 1};
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
-      pre: '| \u2b9e Awaiting audiofeeds...',
+      pre: '| \u00bb Awaiting audiofeeds...',
       xerr: '[Unable to retrieve stream]',
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: audioFeeds.err, code: 2};
@@ -702,11 +702,11 @@ async function init(queries, options) {
     const logger = queryLogger.print(`Obtaining track metadata...`);
     const track = await processPromise(service.getTrack(query, options.storefront), queryLogger, {xerr: true});
     if (!track) return Promise.reject();
-    logger.log(`\u2bc8 Title: ${track.name}`);
-    logger.log(`\u2bc8 Album: ${track.album}`);
-    logger.log(`\u2bc8 Artist: ${track.album_artist}`);
-    logger.log(`\u2bc8 Year: ${new Date(track.release_date).getFullYear()}`);
-    logger.log(`\u2bc8 Playtime: ${TimeFormat.fromMs(track.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
+    logger.log(`\u27a4 Title: ${track.name}`);
+    logger.log(`\u27a4 Album: ${track.album}`);
+    logger.log(`\u27a4 Artist: ${track.album_artist}`);
+    logger.log(`\u27a4 Year: ${new Date(track.release_date).getFullYear()}`);
+    logger.log(`\u27a4 Playtime: ${TimeFormat.fromMs(track.duration, 'mm:ss').match(/(\d{2}:\d{2})(.+)?/)[1]}`);
     const collationLogger = queryLogger.log('[\u2022] Collating...');
     return {
       meta: track,
@@ -722,12 +722,12 @@ async function init(queries, options) {
     const logger = queryLogger.print(`Obtaining album metadata...`);
     const album = await processPromise(service.getAlbum(query, options.storefront), queryLogger, {xerr: true});
     if (!album) return Promise.reject();
-    logger.log(`\u2bc8 Album Name: ${album.name}`);
-    logger.log(`\u2bc8 Artist: ${album.artists[0]}`);
-    logger.log(`\u2bc8 Tracks: ${album.ntracks}`);
-    logger.log(`\u2bc8 Type: ${album.type === 'compilation' ? 'Compilation' : 'Album'}`);
-    logger.log(`\u2bc8 Year: ${new Date(album.release_date).getFullYear()}`);
-    if (album.genres.length) logger.log(`\u2bc8 Genres: ${album.genres.join(', ')}`);
+    logger.log(`\u27a4 Album Name: ${album.name}`);
+    logger.log(`\u27a4 Artist: ${album.artists[0]}`);
+    logger.log(`\u27a4 Tracks: ${album.ntracks}`);
+    logger.log(`\u27a4 Type: ${album.type === 'compilation' ? 'Compilation' : 'Album'}`);
+    logger.log(`\u27a4 Year: ${new Date(album.release_date).getFullYear()}`);
+    if (album.genres.length) logger.log(`\u27a4 Genres: ${album.genres.join(', ')}`);
     const collationLogger = queryLogger.log(`[\u2022] Collating [${album.name}]...`);
     const tracks = await processPromise(service.getAlbumTracks(album.uri), collationLogger, {
       pre: '[\u2022] Inquiring tracks...',
@@ -747,9 +747,9 @@ async function init(queries, options) {
     const logger = queryLogger.print(`Obtaining artist metadata...`);
     const artist = await processPromise(service.getArtist(query, options.storefront), queryLogger, {xerr: true});
     if (!artist) return Promise.reject();
-    const artistLogger = logger.log(`\u2bc8 Artist: ${artist.name}`);
-    if (artist.followers) logger.log(`\u2bc8 Followers: ${`${artist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
-    if (artist.genres && artist.genres.length) logger.log(`\u2bc8 Genres: ${artist.genres.join(', ')}`);
+    const artistLogger = logger.log(`\u27a4 Artist: ${artist.name}`);
+    if (artist.followers) logger.log(`\u27a4 Followers: ${`${artist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
+    if (artist.genres && artist.genres.length) logger.log(`\u27a4 Genres: ${artist.genres.join(', ')}`);
     const albumsStack = await processPromise(service.getArtistAlbums(artist.uri), artistLogger, {
       pre: ' > Gathering collections...',
     });
@@ -780,12 +780,12 @@ async function init(queries, options) {
     const logger = queryLogger.print(`Obtaining playlist metadata...`);
     const playlist = await processPromise(service.getPlaylist(query, options.storefront), queryLogger, {xerr: true});
     if (!playlist) return Promise.reject();
-    logger.log(`\u2bc8 Playlist Name: ${playlist.name}`);
-    logger.log(`\u2bc8 By: ${playlist.owner_name}`);
-    if (playlist.description) logger.log(`\u2bc8 Description: ${playlist.description}`);
-    logger.log(`\u2bc8 Type: ${playlist.type}`);
-    if (playlist.followers) logger.log(`\u2bc8 Followers: ${`${playlist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
-    logger.log(`\u2bc8 Tracks: ${playlist.ntracks}`);
+    logger.log(`\u27a4 Playlist Name: ${playlist.name}`);
+    logger.log(`\u27a4 By: ${playlist.owner_name}`);
+    if (playlist.description) logger.log(`\u27a4 Description: ${playlist.description}`);
+    logger.log(`\u27a4 Type: ${playlist.type}`);
+    if (playlist.followers) logger.log(`\u27a4 Followers: ${`${playlist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
+    logger.log(`\u27a4 Tracks: ${playlist.ntracks}`);
     const collationLogger = queryLogger.log(`[\u2022] Collating...`);
     const tracks = await processPromise(service.getPlaylistTracks(playlist.uri), collationLogger, {
       pre: '[\u2022] Inquiring tracks...',
@@ -836,7 +836,7 @@ async function init(queries, options) {
     queryLogger.print('[\u2022] Checking authentication...');
     await authQueue.push(service, queryLogger);
     if (!service.isAuthed()) {
-      queryLogger.log('[\u2717] Failed to authenticate client!');
+      queryLogger.log('[\u2715] Failed to authenticate client!');
       return;
     }
     if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.meta].ID}`, service.getProps());
@@ -898,14 +898,14 @@ async function init(queries, options) {
               ? 'Unknown postprocessing error'
               : 'Unknown track processing error';
           embedLogger.error(
-            `\u2022 [\u2717] ${
+            `\u2022 [\u2715] ${
               trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
             } (failed:${reason ? ` ${reason}` : ''}${trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''})`,
           );
-        } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u23e9] ${trackStat.meta.trackName} (skipped: [Exists])`);
+        } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u2a20] ${trackStat.meta.trackName} (skipped: [Exists])`);
         else
           embedLogger.log(
-            `\u2022 [\u2714] ${trackStat.meta.trackName}${
+            `\u2022 [\u2713] ${trackStat.meta.trackName}${
               !!options.cover && !trackStat.postprocess.wroteImage ? ' [(i) unable to write cover art]' : ''
             }`,
           );
@@ -952,15 +952,15 @@ async function init(queries, options) {
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
     stackLogger.log(` [\u2022] Total queries: [${prePadNum(totalQueries.length, 10)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
-    stackLogger.log(`     \u23e9  Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
-    stackLogger.log(`     \u2714  Passed: [${prePadNum(finalStats.passed, 10)}]`);
-    stackLogger.log(`     \u2717  Failed: [${prePadNum(finalStats.failed, 10)}]`);
+    stackLogger.log(`     \u2a20 Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
+    stackLogger.log(`     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]`);
+    stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
     stackLogger.log(` [\u2022] Cover Art: ${options.cover} (${Config.image.height}x${Config.image.width})`);
     stackLogger.log(` [\u2022] Total Output size: ${xbytes(finalStats.outSize)}`);
     stackLogger.log(` [\u2022] Total Network Usage: ${xbytes(finalStats.netSize)}`);
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
-    stackLogger.log(`     \u2bc8 Album Art: ${xbytes(finalStats.imageSize)}`);
+    stackLogger.log(`     \u27a4 Album Art: ${xbytes(finalStats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===========================');
   }
