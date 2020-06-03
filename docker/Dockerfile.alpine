@@ -35,10 +35,10 @@ VOLUME ["/data"]
 ENTRYPOINT ["freyr", "-d", "/data"]
 
 # BUILD
-# > docker build --rm -t freyr:alpine https://gist.github.com/miraclx/d1777f44410f959e95c23d1a2f6dc127/raw/Dockerfile.alpine
+# > git clone https://github.com/miraclx/freyr-js freyr
+# > docker build -t freyr:alpine -f docker/Dockerfile.alpine freyr
+
 # LAUNCH (freyr)
-# > docker run -it --storage-opt size=5G freyr:alpine
+# > docker run --rm -v $PWD:/data freyr:alpine
 # LAUNCH (bash)
-# > docker run -it --storage-opt size=5G --entrypoint bash freyr:alpine
-# LAUNCH (freyr -> host)
-# > docker run -it -v $PWD:/data freyr:alpine -d /data https://open.spotify.com/artist/0nnYdIpahs41QiZ9MWp5Wx
+# > docker run -itv $PWD:/data --entrypoint bash freyr:alpine
