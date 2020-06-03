@@ -15,7 +15,8 @@ RUN apk add \
   ffmpeg \
   atomicparsley \
   bash \
-  which
+  which \
+  && ln /usr/bin/python3 /usr/bin/python
 
 # Create freyr group. Then add root to freyr group.
 RUN addgroup -g 1000 freyr \
