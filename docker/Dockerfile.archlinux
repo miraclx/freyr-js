@@ -6,7 +6,6 @@ LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
 
 # Install dependencies and clean cache
 RUN pacman -Sy --noconfirm \
-  git \
   npm \
   nodejs \
   python \
@@ -21,8 +20,8 @@ RUN groupadd -g 1000 freyr \
   && mkdir /freyr \
   && chown :freyr /freyr
 
-# Clone and install freyr
-RUN git clone -b master --depth=1 --single-branch https://github.com/miraclx/freyr-js /freyr
+# Stage and install freyr
+COPY . /freyr
 RUN npm install --global --unsafe-perm /freyr
 
 # Set and mount workdir
