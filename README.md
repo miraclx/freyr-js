@@ -49,6 +49,7 @@ docker pull freyrcli/freyrjs
 | :-------------: | :--: |:-------- |
 | Alpine (musl) * | ![Docker Image Size (:alpine)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker) | `freyrcli/freyrjs:latest` |
 | Arch Linux      | ![Docker Image Size (:archlinux)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/archlinux?color=gray&label=%20&logo=docker) | `freyrcli/freyrjs:archlinux` |
+
 *: default
 
 #### Usage (Docker)
