@@ -37,48 +37,19 @@ yarn global add https://github.com/miraclx/freyr-js.git
 
 ### Docker
 
-While there are no official docker images as of this moment, this project does include Dockerfiles for your convenience in the `docker/` folder.
+We provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs) (automated builds from this repo).
 
-| Base Image OS | Average Build Network Usage | Average Disk Usage | File |
-| :-----------: | :--------: | :-------: | :---------------------------: |
-| Alpine (musl) | ~ 80 MB    | ~ 210 MB  | [`docker/Dockerfile.alpine`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine)    |
-| Arch Linux    | ~ 200 MB   | ~ 1.04 GB | [`docker/Dockerfile.archlinux`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.archlinux) |
-
-#### Building Dockerfiles
-
-<details>
-<summary> Structure </summary>
+Pull the image:
 
 ``` bash
-docker build -t <tag> [-f <dockerfile>] <directory>
+docker pull freyrcli/freyrjs
 ```
 
-</details>
-
-To build under the `freyr:latest` tag with the default Dockerfile, run:
-
-``` bash
-# default (alpine)
-
-# if cloned
-cd freyr-js
-docker build -t freyr:latest .
-
-# otherwise
-docker build -t freyr:latest https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine
-```
-
-<details>
-<summary> Building (platform-specific) </summary>
-
-``` bash
-# freyr on alpine with the `freyr:alpine` tag
-docker build -t freyr:alpine -f docker/Dockerfile.alpine .
-# freyr on archlinux with the `freyr:archlinux` tag
-docker build -t freyr:archlinux -f docker/Dockerfile.archlinux .
-```
-
-</details>
+| Base Image      | Size | Tag |
+| :-------------: | :--: |:-------- |
+| Alpine (musl) * | ![Docker Image Size (:alpine)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker) | `freyrcli/freyrjs:latest` |
+| Arch Linux      | ![Docker Image Size (:archlinux)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/archlinux?color=gray&label=%20&logo=docker) | `freyrcli/freyrjs:archlinux` |
+*: default
 
 #### Usage (Docker)
 
@@ -94,7 +65,13 @@ docker run --rm -v $PWD:/data <tag> [options, arguments and queries...]
 Example, with the `freyr:latest` tag:
 
 ``` bash
-docker run --rm -v $PWD:/data freyr:latest
+docker run --rm -v $pwd:/data freyr:latest
+```
+
+Alternatively, create a handy alias
+
+``` bash
+alias freyr='docker run --rm -v $PWD:/data freyr:latest'
 ```
 
 [See [Docker Development](#docker-development)]
@@ -802,26 +779,40 @@ npm link
 
 ### Docker Development
 
-While following the steps to [building the docker image](#docker) still applies, development requires jumping into a shell entrypoint as opposed to the freyr script.
+To facilitate development and experimentation through Docker, Dockerfiles are provided in the `docker/` folder for your convenience.
+
+| Base Image OS | Average Build Network Usage | Average Disk Usage | File |
+| :-----------: | :--------: | :-------: | :---------------------------: |
+| Alpine (musl) | ~ 80 MB    | ~ 210 MB  | [`docker/Dockerfile.alpine`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine)    |
+| Arch Linux    | ~ 200 MB   | ~ 1.04 GB | [`docker/Dockerfile.archlinux`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.archlinux) |
 
 ``` bash
-git clone -b master --depth=1 --single-branch https://github.com/miraclx/freyr-js freyr
+# building with default dockerfile (alpine)
+git clone https://github.com/miraclx/freyr-js.git freyr
 cd freyr
-docker build -t freyr:latest .
+docker build -t freyr-dev:latest .
+
+# alternatively, you can use any other dockerfile
+docker build -t freyr-dev:archlinux -f docker/Dockerfile.archlinux .
 ```
 
+Afterwards, you can drop into the container by explicitly defining the entrypoint
+
 ``` bash
-docker run -it --entrypoint bash freyr:latest
+docker run -it --entrypoint bash freyr-dev:latest
+
+# Alternatively, create a handy alias
+alias freyrd='docker run -it --entrypoint bash freyr-dev:latest'
 ```
 
 Optionally, you can use these interesting flags to customize the experience.
 
-* `-h freyr-dev` sets the hostname to `freyr-dev`
+* `-h freyr-dev` sets the container hostname to `freyr-dev`
 * `-m 1G` sets the container memory limit
 * `-v $PWD:/data` mounts the current working directory to `/data` within the container.
 * `--cpus 2` limits the container to using 2 CPU cores
 
-The freyr source would be available in the `/freyr` directory.
+The freyr source would be available in the `/freyr` directory within the container along with a globally registered command `freyr` for calling the script.
 
 For more information and documentation about docker, please refer to its official website:
 
