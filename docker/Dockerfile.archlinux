@@ -13,7 +13,6 @@ RUN pacman -Sy --noconfirm \
   ffmpeg \
   atomicparsley \
   which \
-  time \
   && yes | pacman -Scc
 
 # Create freyr group. Then add root to freyr group.
