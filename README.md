@@ -12,7 +12,7 @@
 
 <div align="center">
 
-# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js) ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js) ![GitHub](https://img.shields.io/github/license/miraclx/freyr-js) ![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic) ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js) ![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js) ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
+# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js) ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js) ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs) ![Docker Cloud Build Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg) ![GitHub](https://img.shields.io/github/license/miraclx/freyr-js) ![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic) ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js) ![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js) ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
 
   <sub>Built with ❤︎ by
   <a href="https://github.com/miraclx">Miraculous Owonubi</a>
