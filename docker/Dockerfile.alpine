@@ -25,7 +25,8 @@ RUN addgroup -g 1000 freyr \
 
 # Stage and install freyr
 COPY . /freyr
-RUN npm install --global --unsafe-perm /freyr
+RUN npm install --global --unsafe-perm /freyr \
+  && npm cache clean --force
 
 # Set and mount workdir
 WORKDIR /data
