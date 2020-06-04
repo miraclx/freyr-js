@@ -63,16 +63,16 @@ docker run --rm -v $PWD:/data <tag> [options, arguments and queries...]
 
 </details>
 
-Example, with the `freyr:latest` tag:
+Example, with the `freyrcli/freyrjs:latest` tag:
 
 ``` bash
-docker run --rm -v $pwd:/data freyr:latest
+docker run --rm -v $pwd:/data freyrcli/freyrjs:latest
 ```
 
 Alternatively, create a handy alias
 
 ``` bash
-alias freyr='docker run --rm -v $PWD:/data freyr:latest'
+alias freyr='docker run --rm -v $PWD:/data freyrcli/freyrjs:latest'
 ```
 
 [See [Docker Development](#docker-development)]
