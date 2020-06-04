@@ -1,4 +1,4 @@
-FROM archlinux
+FROM archlinux:20200505
 LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
   name="freyrcli" \
   version="latest" \
