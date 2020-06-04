@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/miraclx/freyr-js">
-    <img src="media/logo.gif" alt="FreyrJS - connoisseur of music">
+    <img src="https://github.com/miraclx/freyr-js/raw/master/media/logo.gif" alt="FreyrJS - connoisseur of music">
   </a>
   <br> FreyrJS </br>
 </h1>
@@ -20,7 +20,7 @@
 
 ## Demo
 
-[![ASCII Demo](media/demo.gif)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2 "Click to view ASCII")
+[![ASCII Demo](https://github.com/miraclx/freyr-js/raw/master/media/demo.gif)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2 "Click to view ASCII")
 
 ## Installation
 
