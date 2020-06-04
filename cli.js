@@ -765,7 +765,7 @@ async function init(queries, options) {
       const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
         pre: '[\u2022] Inquiring tracks...',
       });
-      if (tracks && !tracks.length) return;
+      if (!(tracks && tracks.length)) return;
       albumLogger.indent += 1;
       return {
         meta: album,
