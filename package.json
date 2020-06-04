@@ -59,6 +59,7 @@
     "cors": "^2.8.5",
     "country-data": "0.0.31",
     "express": "^4.17.1",
+    "filenamify": "^4.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "got": "^11.0.2",
     "hh-mm-ss": "^1.2.0",

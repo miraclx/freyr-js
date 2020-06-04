@@ -18,6 +18,7 @@ const cStringd = require('stringd-colors');
 const isOnline = require('is-online');
 const prettyMs = require('pretty-ms');
 const commander = require('commander');
+const filenamify = require('filenamify');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
 const countryData = require('country-data');
@@ -680,11 +681,14 @@ async function init(queries, options) {
       } catch (err) {
         return Promise.resolve({code: -1, err});
       }
-      const outFileDir = xpath.join(BASE_DIRECTORY, ...(options.tree ? [track.album_artist, track.album] : []));
+      const outFileDir = xpath.join(
+        BASE_DIRECTORY,
+        ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
+      );
       const trackName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}${
         isPlaylist || (track.compilation && track.album_artist === 'Various Artists') ? ` \u2012 ${track.artists.join(', ')}` : ''
       }`;
-      const outFileName = `${trackName}.m4a`;
+      const outFileName = `${filenamify(trackName, {replacement: '_'})}.m4a`;
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = fs.existsSync(outFilePath);
       const processTrack = !fileExists || options.force;
