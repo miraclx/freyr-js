@@ -846,7 +846,7 @@ async function init(queries, options) {
     if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.meta].ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
-    const queryStats = await pFlatten(
+    let queryStats = await pFlatten(
       (contentType === 'track'
         ? trackHandler
         : contentType === 'album'
@@ -863,7 +863,12 @@ async function init(queries, options) {
         }),
     );
     if (queryStats.length === 0) return null;
-    await Promise.all(queryStats.map(stat => stat.tracks).flat());
+    queryStats = await Promise.all(
+      queryStats
+        .filter(Boolean)
+        .map(stat => stat.tracks)
+        .flat(),
+    );
     queryLogger.log('[\u2022] Download Complete');
     const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
 
