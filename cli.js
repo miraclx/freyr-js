@@ -1033,7 +1033,7 @@ function main(argv) {
     const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
     console.log(credits);
     console.log('-'.repeat(credits.length));
-    if (argv.length === (['-d', '--directory'].some(flag => argv.includes(flag)) ? 4 : 2)) return commander.outputHelp();
+    if (argv.length === 2) return commander.outputHelp();
   }
   command.parse(argv);
 }
