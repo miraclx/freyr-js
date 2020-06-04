@@ -29,8 +29,9 @@ RUN npm install --global --unsafe-perm /freyr \
 WORKDIR /data
 VOLUME ["/data"]
 
-# Set entrypoint
+# Set entrypoint and default cmd
 ENTRYPOINT ["freyr", "-d", "/data"]
+CMD ["--help"]
 
 # BUILD
 # > git clone https://github.com/miraclx/freyr-js freyr
