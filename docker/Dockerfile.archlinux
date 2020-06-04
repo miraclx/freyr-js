@@ -4,7 +4,7 @@ LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
   version="latest" \
   tag="archlinux"
 
-# Install dependencies and clean cache
+# Install dependencies, trim unneeded large packages and clean cache
 RUN pacman -Sy --noconfirm \
   npm \
   nodejs \
@@ -12,7 +12,11 @@ RUN pacman -Sy --noconfirm \
   ffmpeg \
   atomicparsley \
   which \
-  && yes | pacman -Scc
+  && pacman -Rdds mesa --noconfirm \
+  && yes | pacman -Scc \
+  && rm -r /var/lib/pacman/* \
+  && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+ \
+  && rm /usr/lib/python3.8/config-3.8-x86_64-linux-gnu/libpython3.8.a
 
 # Create freyr group. Then add root to freyr group.
 RUN groupadd -g 1000 freyr \

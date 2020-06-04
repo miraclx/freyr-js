@@ -15,7 +15,8 @@ RUN apk add \
   atomicparsley \
   bash \
   which \
-  && ln /usr/bin/python3 /usr/bin/python
+  && ln /usr/bin/python3 /usr/bin/python \
+  && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+
 
 # Create freyr group. Then add root to freyr group.
 RUN addgroup -g 1000 freyr \
