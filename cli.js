@@ -640,22 +640,22 @@ async function init(queries, options) {
     trackLogger.indent += 2;
     if (props.fileExists) {
       if (!props.processTrack) {
-        trackLogger.log('| [\u2a20] Track exists. Skipping...');
+        trackLogger.log('| [\u00bb] Track exists. Skipping...');
         return {meta, code: 0};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
-    trackLogger.log('| \u00bb Collating sources...');
+    trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sources) =>
       processPromise(sources, trackLogger, {
-        pre: `|  \u00bb [\u2022] ${service[symbols.meta].DESC}...`,
+        pre: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
         xerr: '[Unable to retrieve stream]',
         post: '[success]',
       }),
     );
     if (!audioSource) return {meta, code: 1};
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
-      pre: '| \u00bb Awaiting audiofeeds...',
+      pre: '| \u27a4 Awaiting audiofeeds...',
       xerr: '[Unable to retrieve stream]',
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: audioFeeds.err, code: 2};
@@ -913,7 +913,7 @@ async function init(queries, options) {
               trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
             } (failed:${reason ? ` ${reason}` : ''}${trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''})`,
           );
-        } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u2a20] ${trackStat.meta.trackName} (skipped: [Exists])`);
+        } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: [Exists])`);
         else
           embedLogger.log(
             `\u2022 [\u2713] ${trackStat.meta.trackName}${
@@ -963,7 +963,7 @@ async function init(queries, options) {
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
     stackLogger.log(` [\u2022] Total queries: [${prePadNum(totalQueries.length, 10)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
-    stackLogger.log(`     \u2a20 Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
+    stackLogger.log(`     \u00bb Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
     stackLogger.log(`     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]`);
     stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
