@@ -863,12 +863,13 @@ async function init(queries, options) {
         }),
     );
     if (queryStats.length === 0) return null;
-    queryStats = await Promise.all(
-      queryStats
-        .filter(Boolean)
-        .map(stat => stat.tracks)
-        .flat(),
-    );
+    queryStats = (
+      await Promise.mapSeries(queryStats.flat(), async item => {
+        if (!item) return;
+        await Promise.all(item.tracks);
+        return item;
+      })
+    ).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
     const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
 
