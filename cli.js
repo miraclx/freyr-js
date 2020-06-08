@@ -990,7 +990,7 @@ const command = commander
     '-i, --input <FILE>',
     "use URIs found in the specified FILE as queries (file size limit: 1 MiB)\n(each query on a new line, use '#' for comments, whitespaces ignored)",
   )
-  .option('-b, --bitrate <N>', `set bitrate for audio encoding\n(valid: ${VALIDS.bitrates})`, '320k')
+  .option('-b, --bitrate <N>', `set audio quality / bitrate for audio encoding\n(valid: ${VALIDS.bitrates})`, '320k')
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..')
