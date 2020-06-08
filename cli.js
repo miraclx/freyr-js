@@ -1018,7 +1018,7 @@ program
   .option('-x, --filter <SEQ>', 'filter matches [explicit] (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
-  .option('--tags', 'tag configuration specification\n(format: <key=value>) (reserved keys: [exclude, account]) (unimplemented)')
+  .option('--tags', 'tag configuration specification (unimplemented)\n(format: <key=value>) (reserved keys: [exclude, account])')
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
