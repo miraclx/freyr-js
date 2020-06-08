@@ -984,12 +984,15 @@ function processArgs(query, args) {
 const program = commander
   .addHelpCommand(true)
   .passCommandToAction(false)
-  .storeOptionsAsProperties(true);
+  .storeOptionsAsProperties(true)
+  .name('freyr')
+  .description(packageJson.description)
+  .version(`v${packageJson.version}`, '-v, --version');
 
 program
-  .name('freyr')
+  .command('get', {isDefault: true})
   .arguments('[query...]')
-  .description(packageJson.description)
+  .description('Download music tracks from queries')
   .option(
     '-i, --input <FILE>',
     "use URIs found in the specified FILE as queries (file size limit: 1 MiB)\n(each query on a new line, use '#' for comments, whitespaces ignored)",
@@ -1040,7 +1043,6 @@ program
     '--single-bar',
     'show a single bar for the download, hide chunk-view\n(default when number of chunks/segments exceed printable space)',
   )
-  .version(`v${packageJson.version}`, '-v, --version')
   .action(processArgs);
 
 function main(argv) {
