@@ -1050,7 +1050,7 @@ function main(argv) {
     console.log('-'.repeat(credits.length));
     if (argv.length === 2) return commander.outputHelp();
   }
-  command.parse(argv);
+  program.parse(argv);
 }
 
 main(process.argv);
