@@ -1008,7 +1008,7 @@ program
     '640x640',
   )
   .option('-C, --no-cover', 'skip saving a cover art')
-  .option('-x, --format <FORMAT>', 'preferred audio output format (for export) (unimplemented)\n(valid: mp4,m4a,flac)', 'm4a')
+  .option('-x, --format <FORMAT>', 'preferred audio output format (to export) (unimplemented)\n(valid: mp3,m4a,flac)', 'm4a')
   .option(
     '-l, --filter <MATCH>',
     'filter matches off patterns (value ommision implies `true` if applicable) (unimplemented)\n(format: <key=value>)',
