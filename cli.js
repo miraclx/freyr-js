@@ -1005,6 +1005,11 @@ program
     '640x640',
   )
   .option('-C, --no-cover', 'skip saving a cover art')
+  .option('-x, --format <FORMAT>', 'preferred audio output format (for export) (unimplemented)\n(valid: mp4,m4a,flac)', 'm4a')
+  .option(
+    '-l, --filter <MATCH>',
+    'filter matches off patterns (value ommision implies `true` if applicable) (unimplemented)\n(format: <key=value>)',
+  )
   .option(
     '-z, --concurrency <SPEC>',
     `specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)\n(format: <[key=]value>) (valid: ${VALIDS.concurrency})`,
@@ -1015,7 +1020,6 @@ program
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-s, --storefront <COUNTRY>', 'country storefront code')
-  .option('-x, --filter <SEQ>', 'filter matches [explicit] (unimplemented)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
   .option('--tags', 'tag configuration specification (unimplemented)\n(format: <key=value>) (reserved keys: [exclude, account])')
