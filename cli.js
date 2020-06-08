@@ -981,9 +981,13 @@ function processArgs(query, args) {
   init(query, args).catch(err => console.error('unmanaged cli error>', err));
 }
 
-const command = commander
+const program = commander
+  .addHelpCommand(true)
+  .passCommandToAction(false)
+  .storeOptionsAsProperties(true);
+
+program
   .name('freyr')
-  .usage('[options] [query...]')
   .arguments('[query...]')
   .description(packageJson.description)
   .option(
