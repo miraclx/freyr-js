@@ -995,41 +995,69 @@ program
   .description('Download music tracks from queries')
   .option(
     '-i, --input <FILE>',
-    "use URIs found in the specified FILE as queries (file size limit: 1 MiB)\n(each query on a new line, use '#' for comments, whitespaces ignored)",
+    [
+      'use URIs found in the specified FILE as queries (file size limit: 1 MiB)',
+      "(each query on a new line, use '#' for comments, whitespaces ignored)",
+      '(example: `-i queue.txt`)',
+    ].join('\n'),
   )
-  .option('-b, --bitrate <N>', `set audio quality / bitrate for audio encoding\n(valid: ${VALIDS.bitrates})`, '320k')
+  .option(
+    '-b, --bitrate <N>',
+    ['set audio quality / bitrate for audio encoding', `(valid: ${VALIDS.bitrates})`].join('\n'),
+    '320k',
+  )
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..')
   .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
   .option(
     '--cover-size <size>',
-    'preferred cover art dimensions\n(format: <width>x<height> or <size> as <size>x<size>)',
+    ['preferred cover art dimensions', '(format: <width>x<height> or <size> as <size>x<size>)'].join('\n'),
     '640x640',
   )
   .option('-C, --no-cover', 'skip saving a cover art')
-  .option('-x, --format <FORMAT>', 'preferred audio output format (to export) (unimplemented)\n(valid: mp3,m4a,flac)', 'm4a')
+  .option(
+    '-x, --format <FORMAT>',
+    ['preferred audio output format (to export) (unimplemented)', '(valid: mp3,m4a,flac)'].join('\n'),
+    'm4a',
+  )
   .option(
     '-l, --filter <MATCH>',
-    'filter matches off patterns (value ommision implies `true` if applicable) (unimplemented)\n(format: <key=value>)',
+    [
+      'filter matches off patterns (repeatable and optionally `,`-separated) (unimplemented)',
+      '(value ommision implies `true` if applicable)',
+      '(format: <key=value>) (example: title="when we all fall asleep*",type=album)',
+    ].join('\n'),
+    (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option(
     '-z, --concurrency <SPEC>',
-    `specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)\n(format: <[key=]value>) (valid: ${VALIDS.concurrency})`,
+    [
+      'key-value concurrency pairs (repeatable and optionally `,`-separated)',
+      '(format: <[key=]value>) (key omission implies track concurrency)',
+      `(valid(key): ${VALIDS.concurrency})`,
+    ].join('\n'),
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
-  .option('-o, --config <file>', 'use alternative conf file')
+  .option('-o, --config <file>', 'specify alternative configuration file')
   .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
-  .option('-s, --storefront <COUNTRY>', 'country storefront code')
+  .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
-  .option('--tags', 'tag configuration specification (unimplemented)\n(format: <key=value>) (reserved keys: [exclude, account])')
+  .option(
+    '--tags',
+    [
+      'tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)',
+      '(format: <key=value>) (reserved keys: [exclude, account])',
+    ].join('\n'),
+    (spec, stack) => (stack || []).concat(spec.split(',')),
+  )
   .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
-    `specify a preferred download source or a \`,\`-separated preference order\n(valid: ${VALIDS.downloaders})`,
+    ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
     'youtube',
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
@@ -1041,7 +1069,10 @@ program
   .option('--pulsate-bar', 'show a pulsating bar')
   .option(
     '--single-bar',
-    'show a single bar for the download, hide chunk-view\n(default when number of chunks/segments exceed printable space)',
+    [
+      'show a single bar for the download, hide chunk-view',
+      '(default when number of chunks/segments exceed printable space)',
+    ].join('\n'),
   )
   .action(processArgs);
 
