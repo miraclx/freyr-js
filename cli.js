@@ -1080,12 +1080,13 @@ program
   .action(processArgs);
 
 function main(argv) {
-  if (!['-v', '--version', '-q', '--quiet'].some(flag=>argv.includes(flag))) {
+  const showBanner = !(['-q', '--quiet'].some(flag => argv.includes(flag)) || argv.some(arg => /^-[^-]*q/.test(arg)));
+  if (showBanner) {
     const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
     console.log(credits);
     console.log('-'.repeat(credits.length));
-    if (argv.length === 2) return commander.outputHelp();
   }
+  if (argv.length === 2) return program.outputHelp();
   program.parse(argv);
 }
 
