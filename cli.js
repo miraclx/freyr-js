@@ -987,6 +987,7 @@ const program = commander
   .storeOptionsAsProperties(true)
   .name('freyr')
   .description(packageJson.description)
+  .option('-q, --quiet', 'hide startup banner')
   .version(`v${packageJson.version}`, '-v, --version');
 
 program
@@ -1077,7 +1078,7 @@ program
   .action(processArgs);
 
 function main(argv) {
-  if (!argv.includes('-v')) {
+  if (!['-v', '--version', '-q', '--quiet'].some(flag=>argv.includes(flag))) {
     const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
     console.log(credits);
     console.log('-'.repeat(credits.length));
