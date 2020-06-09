@@ -977,10 +977,6 @@ async function init(queries, options) {
   }
 }
 
-function processArgs(query, args) {
-  init(query, args).catch(err => console.error('unmanaged cli error>', err));
-}
-
 const program = commander
   .addHelpCommand(true)
   .passCommandToAction(false)
@@ -1077,7 +1073,9 @@ program
       '(default when number of chunks/segments exceed printable space)',
     ].join('\n'),
   )
-  .action(processArgs);
+  .action((query, args) => {
+    init(query, args).catch(err => console.error('unmanaged cli error>', err));
+  });
 
 function main(argv) {
   const showBanner = !(['-q', '--quiet'].some(flag => argv.includes(flag)) || argv.some(arg => /^-[^-]*q/.test(arg)));
@@ -1086,7 +1084,7 @@ function main(argv) {
     console.log(credits);
     console.log('-'.repeat(credits.length));
   }
-  if (argv.length === 2) return program.outputHelp();
+  if (argv.length === 2 + (!showBanner ? 1 : 0)) return program.outputHelp();
   program.parse(argv);
 }
 
