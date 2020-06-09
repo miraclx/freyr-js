@@ -988,7 +988,9 @@ const program = commander
   .name('freyr')
   .description(packageJson.description)
   .option('-q, --quiet', 'hide startup banner')
-  .version(`v${packageJson.version}`, '-v, --version');
+  .version(`v${packageJson.version}`, '-v, --version')
+  .helpOption('-h, --help', 'show this help information')
+  .addHelpCommand('help [command]', 'show this help information or for any subcommand');
 
 program
   .command('get', {isDefault: true})
