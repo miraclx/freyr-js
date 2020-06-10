@@ -90,12 +90,11 @@ class Deezer {
       isSearchable: false,
       isSourceable: false,
     },
+    // https://www.debuggex.com/r/IuFIxSZGFJ07tOkR
+    VALID_URL: /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/,
   };
 
   [symbols.meta] = Deezer[symbols.meta];
-
-  // https://www.debuggex.com/r/IuFIxSZGFJ07tOkR
-  VALID_URL = /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/;
 
   isAuthenticated = true;
 
@@ -142,7 +141,7 @@ class Deezer {
   }
 
   parseURI(uri) {
-    const match = uri.match(this.VALID_URL);
+    const match = uri.match(this[symbols.meta].VALID_URL);
     if (!match) return null;
     const isURI = !!match[3];
     const parsedURL = url.parse(uri, true);

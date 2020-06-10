@@ -19,12 +19,11 @@ class AppleMusic {
       isSearchable: false,
       isSourceable: false,
     },
+    // https://www.debuggex.com/r/BcVR1cjFQmNgJn-E
+    VALID_URL: /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/,
   };
 
   [symbols.meta] = AppleMusic[symbols.meta];
-
-  // https://www.debuggex.com/r/BcVR1cjFQmNgJn-E
-  VALID_URL = /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/;
 
   isAuthenticated = false;
 
@@ -77,7 +76,7 @@ class AppleMusic {
   }
 
   parseURI(uri, storefront) {
-    const match = uri.match(this.VALID_URL);
+    const match = uri.match(this[symbols.meta].VALID_URL);
     if (!match) return null;
     const isURI = !!match[4];
     const parsedURL = xurl.parse(uri, true);
