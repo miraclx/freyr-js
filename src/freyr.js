@@ -20,25 +20,33 @@ class FreyrCore {
     return this.ENGINES.map(engine => (ops || (v => v))(engine[symbols.meta]));
   }
 
-  constructor(ServiceConfig, AuthServer, serverOpts) {
-    ServiceConfig = ServiceConfig || {};
-    this.engines = FreyrCore.ENGINES.map(Engine => new Engine(ServiceConfig[Engine[symbols.meta].ID], AuthServer, serverOpts));
+  static identifyService(content) {
+    return this.ENGINES.find(engine =>
+      engine[symbols.meta].PROPS.isQueryable ? content.match(engine[symbols.meta].VALID_URL) : undefined,
+    );
   }
 
-  identifyService(content) {
-    return this.engines.find(engine => (engine[symbols.meta].PROPS.isQueryable ? content.match(engine.VALID_URL) : undefined));
+  static collateSources() {
+    return this.ENGINES.filter(engine => engine[symbols.meta].PROPS.isSourceable);
   }
 
-  collateSources() {
-    return this.engines.filter(engine => engine[symbols.meta].PROPS.isSourceable);
-  }
-
-  sortSources(order) {
+  static sortSources(order) {
     order = order ? (Array.isArray(order) ? order : [order]) : [];
     return sortBy(this.collateSources(), source =>
       (index => (index < 0 ? Infinity : index))(order.indexOf(source[symbols.meta].ID)),
     );
   }
+
+  constructor(ServiceConfig, AuthServer, serverOpts) {
+    ServiceConfig = ServiceConfig || {};
+    this.ENGINES = FreyrCore.ENGINES.map(Engine => new Engine(ServiceConfig[Engine[symbols.meta].ID], AuthServer, serverOpts));
+  }
+
+  identifyService = FreyrCore.identifyService;
+
+  collateSources = FreyrCore.collateSources;
+
+  sortSources = FreyrCore.sortSources;
 }
 
 module.exports = FreyrCore;
