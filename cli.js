@@ -1104,6 +1104,42 @@ program
     init(query, args).catch(err => console.error('unmanaged cli error>', err));
   });
 
+program
+  .command('search')
+  .description('Search for and optionally download music interactively (unimplemented)')
+  .option('--query <PATTERN>', 'non-interactive search filter pattern to be matched')
+  .option('-n, --max <MAX>', 'return a maximum of MAX match results')
+  .option('-o, --output <FILE>', 'save search results in a batch file for later instead of autodownload')
+  .option('-p, --pretty', 'include whitespaces and commented metadata in search result output')
+  .option(
+    '-l, --filter <PATTERN>',
+    'key-value constraints that all search results must match (repeatable and optionally `,`-separated)',
+    (spec, stack) => (stack || []).concat(spec.split(',')),
+  )
+  .option('--profile <PROFILE>', 'configuration context with which to process the search and download')
+  .action((args, cmd) => {
+    throw Error('Unimplemented: [CLI:search]');
+  })
+  .on('--help', () => {
+    console.log('');
+    console.log('Info:');
+    console.log('  See `freyr help filter` for more information on constructing filter PATTERNs');
+    console.log('');
+    console.log('  Optionally, args and options provided after `--` are passed as options to the freyr download interface');
+    console.log('  Options like `--profile` share its value with the downloader');
+    console.log('');
+    console.log('Examples:');
+    console.log('  # search interactively and download afterwards with custom download flags');
+    console.log('  $ freyr search -- -d ~/Music');
+    console.log('');
+    console.log('  # search non-interactively and download afterwards');
+    console.log("  $ freyr search --query 'billie eilish @ type=album, title=*was older, duration=>3s, explicit=false'");
+    console.log('');
+    console.log('  # search interactively, save a maximum of 5 results to file and download later');
+    console.log('  $ freyr search -n 5 -o queue.txt');
+    console.log('  $ freyr -i queue.txt');
+  });
+
 const program_filter = program
   .command('filter')
   .arguments('[pattern...]')
@@ -1151,6 +1187,79 @@ const program_filter = program
     console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = >1:30<3:00, explicit = false'");
   });
 
+const config = program
+  .command('profile')
+  .description('Manage profile configuration contexts storing persistent user configs and auth keys (unimplemented)')
+  .on('--help', () => {
+    console.log('');
+    console.log('Examples:');
+    console.log('  $ freyr -q profile new test');
+    console.log('    ? Enter an encryption key: **********');
+    console.log('  /home/miraclx/.config/FreyrCLI/test.x4p');
+    console.log('');
+    console.log('  # unless unencrypted, will ask to decrypt profile');
+    console.log('  $ freyr -q --profile test deezer:playlist:1963962142');
+    console.log('    ? Enter an encryption key: **********');
+    console.log('  [...]');
+  });
+config
+  .command('new')
+  .arguments('<name>')
+  .description('create a new configuration context (unimplemented)')
+  .option('--no-pass', 'do not ask for a key to encrypt the config')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:profiles new]');
+  });
+config
+  .command('get')
+  .arguments('<name>')
+  .description('return the raw configuration content for the profile, decrypts if necessary (unimplemented)')
+  .option(
+    '-p, --pretty [SPEC]',
+    'pretty print the JSON output. (key omission implies space indentation)\n(format(SPEC): <[key=]value>) (valid(key): space,tab)',
+    'space=2',
+  )
+  .action(() => {
+    throw Error('Unimplemented: [CLI:profiles get]');
+  });
+config
+  .command('list')
+  .description('list all available profiles (unimplemented)')
+  .option('--raw', 'return raw JSON output')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:profiles list]');
+  });
+
+const urify = program
+  .command('urify')
+  .arguments('[urls...]')
+  .description('Convert service URLs to uniform freyr compatible URIs (unimplemented)')
+  .option('-i, --input <FILE>', 'get URLs from a batch file, comments with `#` are expunged')
+  .option('-o, --output <FILE>', 'write to file as opposed to stdout')
+  .option('-t, --tag', 'include original URI source as a comment above each line')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:urify]');
+  })
+  .on('--help', () => {
+    console.log('');
+    console.log('Examples:');
+    console.log('  $ freyr urify https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
+    console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
+    console.log('');
+    console.log('  $ freyr urify https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
+    console.log('  apple_music:track:1510821685');
+    console.log('');
+    console.log(
+      [
+        '  $ echo https://www.deezer.com/en/artist/5340439 \\',
+        '         https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb \\',
+        '      | freyr urify',
+      ].join('\n'),
+    );
+    console.log('  deezer:artist:5340439');
+    console.log('  apple_music:playlist:pl.f4d106fed2bd41149aaacabb233eb5eb');
+  });
+
 function main(argv) {
   const showBanner = !(['-q', '--quiet'].some(flag => argv.includes(flag)) || argv.some(arg => /^-[^-]*q/.test(arg)));
   if (showBanner) {
@@ -1159,7 +1268,11 @@ function main(argv) {
     console.log('-'.repeat(credits.length));
   }
   if (argv.length === 2 + (!showBanner ? 1 : 0)) return program.outputHelp();
-  program.parse(argv);
+  try {
+    program.parse(argv);
+  } catch (er) {
+    console.error(`\x1b[31m[!] Fatal Error\x1b[0m: ${typeof er === 'undefined' ? '[uncaught]' : er ? er.message : er}`);
+  }
 }
 
 main(process.argv);
