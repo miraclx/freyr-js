@@ -30,6 +30,7 @@ const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
 const AsyncQueue = require('./src/async_queue');
 const StackLogger = require('./src/stack_logger');
+const streamUtils = require('./src/stream_utils');
 const packageJson = require('./package.json');
 
 function parseMeta(params) {
@@ -181,14 +182,22 @@ async function PROCESS_INPUT_FILE(input_arg, type, allowBinary = false) {
 
 async function PROCESS_INPUT_ARG(input_arg) {
   if (!input_arg) return [];
-  await PROCESS_INPUT_FILE(input_arg, 'Input', false);
-  const contents = fs
-    .readFileSync(input_arg)
-    .toString()
-    .split('\n')
-    .map(line => line.trim()) // Trim whitespaces
+  const isStdin = input_arg === '-';
+  const inputSource = isStdin ? process.stdin : fs.createReadStream(await PROCESS_INPUT_FILE(input_arg, 'Input', false));
+  const lines = await streamUtils
+    .collectBuffers(inputSource.pipe(streamUtils.buildSplitter(['\n', '\r\n'])), {
+      max: 1048576, // 1 MiB size limit
+      timeout: 15000, // Timeout read op after 15 seconds
+    })
+    .catch(er => {
+      if (er.code === 1) throw new Error(`Input stream is beyond the maximum 1 MiB size limit`);
+      if (er.code === 2) throw new Error(`Input stream read timed out after 15 seconds`);
+    });
+  const contents = lines
+    .map(line => line.toString().trim()) // Trim whitespaces
     .filter(line => !!line && /^(?!\s*#)/.test(line)) // Ignore empty lines or lines that start with comments
-    .map(line => line.replace(/#.*$/, '').trim()); // Ignore comments at the end of lines
+    .map(line => line.replace(/#.*$/, '').trim()) // Ignore comments at the end of lines
+    .flatMap(line => line.split(' '));
   return contents;
 }
 
