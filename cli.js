@@ -336,7 +336,7 @@ async function init(queries, options) {
     projectName: 'FreyrCLI',
     projectSuffix: '',
     configName: 'd3fault',
-    fileExtension: 'enc',
+    fileExtension: 'x4p',
     schema,
   });
 
