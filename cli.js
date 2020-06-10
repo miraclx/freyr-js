@@ -324,7 +324,7 @@ async function init(queries, options) {
       properties: {},
     },
   };
-  freyrCore.engines.forEach(engine => {
+  freyrCore.ENGINES.forEach(engine => {
     schema.services.default[engine[symbols.meta].ID] = {};
     schema.services.properties[engine[symbols.meta].ID] = {
       type: 'object',
