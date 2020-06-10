@@ -977,6 +977,32 @@ async function init(queries, options) {
   }
 }
 
+function deescapeFilterPart(filterPart) {
+  return filterPart.replace(/{([^\s]+?)}/g, '$1');
+}
+
+function exceptEscapeFromFilterPart(str) {
+  return new RegExp(`(?=[^{])${str}(?=[^}])`, 'g');
+}
+
+function parseFilters(filterLine) {
+  return filterLine
+    ? filterLine
+        .split(exceptEscapeFromFilterPart(','))
+        .map(part =>
+          part.split(exceptEscapeFromFilterPart('=')).map(sect => deescapeFilterPart(sect.replace(/^\s*["']?|["']?\s*$/g, ''))),
+        )
+    : [];
+}
+
+function parseSearchFilter(pattern) {
+  let [query, filters] = pattern.split(exceptEscapeFromFilterPart('@')).map(str => str.trim());
+  if (!filters) [query, filters] = [filters, query];
+  filters = parseFilters(filters);
+  if (!query && (filters[0] || []).length === 1) [query] = filters.shift();
+  return {query: query ? deescapeFilterPart(query) : '*', filters: Object.fromEntries(filters)};
+}
+
 const program = commander
   .addHelpCommand(true)
   .passCommandToAction(false)
@@ -1026,6 +1052,7 @@ program
       'filter matches off patterns (repeatable and optionally `,`-separated) (unimplemented)',
       '(value ommision implies `true` if applicable)',
       '(format: <key=value>) (example: title="when we all fall asleep*",type=album)',
+      'See `freyr help filter` for more information',
     ].join('\n'),
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
@@ -1075,6 +1102,53 @@ program
   )
   .action((query, args) => {
     init(query, args).catch(err => console.error('unmanaged cli error>', err));
+  });
+
+const program_filter = program
+  .command('filter')
+  .arguments('[pattern...]')
+  .description('Process filter patterns to preview JSON representation')
+  .option('-c, --condensed', 'condense JSON output', false)
+  .action((patterns, args) => {
+    if (!patterns.length) return program_filter.outputHelp();
+    console.log(JSON.stringify(patterns.map(parseSearchFilter), null, args.condensed ? 0 : 2));
+  })
+  .on('--help', () => {
+    console.log('');
+    console.log('Format:');
+    console.log('  [query@]key1=value,key2=value');
+    console.log('');
+    console.log('  > testquery@key1=value1,key2 = some value2, key3=" some value3 "');
+    console.log('  is equivalent to');
+    console.log(`  > {
+  >   "query": "testquery",
+  >   "filters": {
+  >     "key1": "value1",
+  >     "key2": "some value2",
+  >     "key3": " some value3 "
+  >   }
+  > }`);
+    console.log('');
+    console.log('  A pattern is a query-filter pair separated by `@`');
+    console.log('  Wherever the query is absent, `*` is implied, matching all (although discouraged)');
+    console.log('  The filter is a string of key-value constraints separated by `,`');
+    console.log('  The key and value constraints themselves are separated by `=`');
+    console.log('  Filter values can also be wildcard matches');
+    console.log('  Whitespacing is optional as well as using (" or \') for strings');
+    console.log('');
+    console.log('  Use {} to escape either of these reserved delimiters');
+    console.log('  ({@} for @) ({,} for ,) ({=} for =) ({{}} for {}) ({"} for ") etc.');
+    console.log('');
+    console.log('Examples:');
+    console.log("  # match anything starting with 'Justi' and ending with 'iber'");
+    console.log("  $ freyr filter 'Justi*ber'");
+    console.log('');
+    console.log("  # filter artists matching the name 'Dua Lipa' and any album with more than 9 tracks from 'Billie Eilish'");
+    console.log('  $ freyr filter artist="Dua Lipa" \'artist = Billie Eilish, type = album, ntracks = >9\'');
+    console.log('');
+    console.log("  # filter non-explicit tracks from 'Billie Eilish' ending with 'To Die'");
+    console.log('  # whose duration is between 1:30 and 3:00 minutes');
+    console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = >1:30<3:00, explicit = false'");
   });
 
 function main(argv) {
