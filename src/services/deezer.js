@@ -141,7 +141,7 @@ class Deezer {
   }
 
   parseURI(uri) {
-    const match = uri.match(this[symbols.meta].VALID_URL);
+    const match = uri.match(Deezer[symbols.meta].VALID_URL);
     if (!match) return null;
     const isURI = !!match[3];
     const parsedURL = url.parse(uri, true);

@@ -76,7 +76,7 @@ class AppleMusic {
   }
 
   parseURI(uri, storefront) {
-    const match = uri.match(this[symbols.meta].VALID_URL);
+    const match = uri.match(AppleMusic[symbols.meta].VALID_URL);
     if (!match) return null;
     const isURI = !!match[4];
     const parsedURL = xurl.parse(uri, true);
