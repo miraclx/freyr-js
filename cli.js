@@ -1080,7 +1080,7 @@ program
     ].join('\n'),
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
-  .option('--via-tor', 'tunnel downloads through the tor network (unimplemented)')
+  .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
   .option(
     '-D, --downloader <SERVICE>',
     ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
