@@ -1230,15 +1230,28 @@ config
     throw Error('Unimplemented: [CLI:profiles list]');
   });
 
-const urify = program
+program
   .command('urify')
   .arguments('[urls...]')
-  .description('Convert service URLs to uniform freyr compatible URIs (unimplemented)')
+  .description('Convert service URLs to uniform freyr compatible URIs')
   .option('-i, --input <FILE>', 'get URLs from a batch file, comments with `#` are expunged')
   .option('-o, --output <FILE>', 'write to file as opposed to stdout')
   .option('-t, --tag', 'include original URI source as a comment above each line')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:urify]');
+  .action((uris, args) => {
+    if (args.input) uris.push(...PROCESS_INPUT_ARG(args.input));
+    if (uris.length === 0) {
+      console.error('\x1b[31m[!]\x1b[0m Please provide at least one valid URI');
+      process.exit(1);
+    }
+    const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
+    uris.forEach(uri => {
+      const service = FreyrCore.identifyService(uri);
+      if (args.tag) !service ? output.write(`# invalid: ${uri}\n`) : output.write(`# ${uri}\n`);
+      if (!service) return;
+      output.write(`${service.prototype.parseURI.call(service.prototype, uri).uri}\n`);
+    });
+    if (args.output) console.log(`Successfully written to [${args.output}]`);
+    output.end();
   })
   .on('--help', () => {
     console.log('');
