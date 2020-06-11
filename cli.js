@@ -1027,7 +1027,8 @@ const program = commander
   .storeOptionsAsProperties(true)
   .name('freyr')
   .description(packageJson.description)
-  .option('-q, --quiet', 'hide startup banner')
+  .option('--no-logo', 'hide startup logo')
+  .option('--no-header', 'hide startup header')
   .version(`v${packageJson.version}`, '-v, --version')
   .helpOption('-h, --help', 'show this help information')
   .addHelpCommand('help [command]', 'show this help information or for any subcommand');
@@ -1316,13 +1317,19 @@ program
   });
 
 function main(argv) {
-  const showBanner = !(['-q', '--quiet'].some(flag => argv.includes(flag)) || argv.some(arg => /^-[^-]*q/.test(arg)));
+  const showBanner = !argv.includes('--no-logo');
+  const showHeader = !argv.includes('--no-header');
   if (showBanner) {
+    // eslint-disable-next-line global-require
+    const banner = require('./banner'); // require banner only when needed
+    console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+  }
+  if (showHeader) {
     const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
     console.log(credits);
     console.log('-'.repeat(credits.length));
   }
-  if (argv.length === 2 + (!showBanner ? 1 : 0)) return program.outputHelp();
+  if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   try {
     program.parse(argv);
   } catch (er) {
