@@ -70,8 +70,12 @@ function collectBuffers(input, opts) {
         else c(null, result.push(v));
       },
     });
-    if (opts.timeout) setTimeout(() => self.destroy(timeoutErr), opts.timeout);
-    stream.pipeline(input, self, err => (err ? rej(err) : res(result)));
+    let timeout;
+    if (opts.timeout) timeout = setTimeout(() => self.destroy(timeoutErr), opts.timeout);
+    stream.pipeline(input, self, err => {
+      clearTimeout(timeout);
+      err ? rej(err) : res(result);
+    });
   });
 }
 
