@@ -360,7 +360,7 @@ async function init(queries, options) {
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
-    options.directory || Config.dirs.output,
+    filenamify(options.directory || Config.dirs.output, {replacement: '_'}),
   );
 
   if (!fs.existsSync(BASE_DIRECTORY))
@@ -379,7 +379,7 @@ async function init(queries, options) {
       const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
-        const playlistFile = xpath.join(directory, `${filename}.m3u8`);
+        const playlistFile = xpath.join(directory, `${filenamify(filename, {replacement: '_'})}.m3u8`);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST:${playlistTitle}\n`);
