@@ -816,7 +816,7 @@ async function init(queries, options) {
     collationLogger.indent += 1;
     return {
       meta: playlist,
-      isCollection: false,
+      isCollection: true,
       tracks: trackBroker.push(tracks, {
         logger: collationLogger,
         service,
