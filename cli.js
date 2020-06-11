@@ -1267,7 +1267,7 @@ program
         output.write(`${service.prototype.parseURI.call(service.prototype, uri).uri}\n`);
       });
     }
-    if (process.stdin.isTTY && !args.input) args.input = '-';
+    if (urls.length === 0 && process.stdin.isTTY && !args.input) args.input = '-';
     urify(urls)
       .then(async () => {
         if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
