@@ -479,7 +479,10 @@ async function init(queries, options) {
     'cli:downloadQueue',
     Config.concurrency.downloader,
     async ({track, meta, feedMeta, trackLogger}) => {
-      const imageFile = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4i'});
+      const imageFile = tmp.fileSync({
+        template: 'fr3yrcli-XXXXXX.x4i',
+        dir: options.cacheDir === '<tmp>' ? undefined : options.cacheDir,
+      });
       const imageBytesWritten = await downloadToStream({
         urlOrFragments: track.getImage(Config.image.width, Config.image.height),
         writeStream: fs.createWriteStream(imageFile.name),
@@ -493,7 +496,10 @@ async function init(queries, options) {
           successMessage: trackLogger.getText(`| [\u2713] Got album art`),
         },
       }).catch(err => Promise.reject({err, code: 3}));
-      const rawAudio = tmp.fileSync({template: 'fr3yrcli-XXXXXX.x4a'});
+      const rawAudio = tmp.fileSync({
+        template: 'fr3yrcli-XXXXXX.x4a',
+        dir: options.cacheDir === '<tmp>' ? undefined : options.cacheDir,
+      });
       const audioBytesWritten = await downloadToStream(
         lodash.merge(
           {
@@ -1098,7 +1104,7 @@ program
     ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
     'youtube',
   )
-  .option('--cache-dir <DIR>', 'specify alternative cache directory (unimplemented)', '<tmp>')
+  .option('--cache-dir <DIR>', 'specify alternative cache directory', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary (unimplemented)')
   .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary (unimplemented)')
