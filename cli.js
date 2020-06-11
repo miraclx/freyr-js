@@ -1254,7 +1254,7 @@ program
     ].join('\n'),
   )
   .option('-o, --output <FILE>', 'write to file as opposed to stdout')
-  .option('-t, --tag', 'include comments and useful info or meta for each entry')
+  .option('-t, --no-tag', 'skip comments with info or meta for each entry')
   .action((urls, args) => {
     const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
     // eslint-disable-next-line no-shadow
