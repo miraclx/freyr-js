@@ -1266,23 +1266,22 @@ program
         output.write(`${service.prototype.parseURI.call(service.prototype, uri).uri}\n`);
       });
     }
-    if (urls.length === 0 && !args.input) {
+    if (urls.length === 0 && !args.input && process.stdin.isTTY) {
       console.error('\x1b[31m[!]\x1b[0m Please provide at least one valid URI or pipe an input source');
       process.exit(1);
     }
     urify(urls)
       .then(async () => {
-        if (args.input)
-          if (!process.stdin.isTTY) await urify(await PROCESS_INPUT_ARG(args.input));
-          else {
-            console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
-            await new Promise((res, rej) =>
-              process.stdin
-                .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
-                .on('error', rej)
-                .on('close', res),
-            );
-          }
+        if (args.input && args.input !== '-') await urify(await PROCESS_INPUT_ARG(args.input));
+        else if (process.stdin.isTTY) {
+          console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
+          await new Promise((res, rej) =>
+            process.stdin
+              .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
+              .on('error', rej)
+              .on('close', res),
+          );
+        } else await urify(await PROCESS_INPUT_ARG('-'));
       })
       .then(() => {
         console.log('\x1b[32m[+]\x1b[0m Urify complete');
