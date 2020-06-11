@@ -180,10 +180,18 @@ async function PROCESS_INPUT_FILE(input_arg, type, allowBinary = false) {
   return input_arg;
 }
 
+function PARSE_INPUT_LINES(lines) {
+  return lines
+    .map(line => line.toString().trim()) // Trim whitespaces
+    .filter(line => !!line && /^(?!\s*#)/.test(line)) // Ignore empty lines or lines that start with comments
+    .map(line => line.replace(/#.*$/, '').trim()) // Ignore comments at the end of lines
+    .flatMap(line => line.split(' '));
+}
+
 async function PROCESS_INPUT_ARG(input_arg) {
   if (!input_arg) return [];
-  const isStdin = input_arg === '-';
-  const inputSource = isStdin ? process.stdin : fs.createReadStream(await PROCESS_INPUT_FILE(input_arg, 'Input', false));
+  const inputSource =
+    input_arg === '-' ? process.stdin : fs.createReadStream(await PROCESS_INPUT_FILE(input_arg, 'Input', false));
   const lines = await streamUtils
     .collectBuffers(inputSource.pipe(streamUtils.buildSplitter(['\n', '\r\n'])), {
       max: 1048576, // 1 MiB size limit
@@ -193,12 +201,7 @@ async function PROCESS_INPUT_ARG(input_arg) {
       if (er.code === 1) throw new Error(`Input stream is beyond the maximum 1 MiB size limit`);
       if (er.code === 2) throw new Error(`Input stream read timed out after 15 seconds`);
     });
-  const contents = lines
-    .map(line => line.toString().trim()) // Trim whitespaces
-    .filter(line => !!line && /^(?!\s*#)/.test(line)) // Ignore empty lines or lines that start with comments
-    .map(line => line.replace(/#.*$/, '').trim()) // Ignore comments at the end of lines
-    .flatMap(line => line.split(' '));
-  return contents;
+  return PARSE_INPUT_LINES(lines);
 }
 
 async function PROCESS_CONFIG_ARG(config_arg) {
