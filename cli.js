@@ -1246,24 +1246,50 @@ program
   .command('urify')
   .arguments('[urls...]')
   .description('Convert service URLs to uniform freyr compatible URIs')
-  .option('-i, --input <FILE>', 'get URLs from a batch file, comments with `#` are expunged')
+  .option(
+    '-i, --input <FILE>',
+    [
+      'get URLs from a batch file, comments with `#` are expunged',
+      '`-` reads from stdin, if unpiped, drops to interactive (Ctrl+D to exit)',
+    ].join('\n'),
+  )
   .option('-o, --output <FILE>', 'write to file as opposed to stdout')
-  .option('-t, --tag', 'include original URI source as a comment above each line')
-  .action((uris, args) => {
-    if (args.input) uris.push(...PROCESS_INPUT_ARG(args.input));
-    if (uris.length === 0) {
-      console.error('\x1b[31m[!]\x1b[0m Please provide at least one valid URI');
+  .option('-t, --tag', 'include comments and useful info or meta for each entry')
+  .action((urls, args) => {
+    const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
+    // eslint-disable-next-line no-shadow
+    async function urify(urls) {
+      urls.forEach(uri => {
+        const service = FreyrCore.identifyService(uri);
+        if (args.tag) !service ? output.write(`# invalid: ${uri}\n`) : output.write(`# ${uri}\n`);
+        if (!service) return;
+        output.write(`${service.prototype.parseURI.call(service.prototype, uri).uri}\n`);
+      });
+    }
+    if (urls.length === 0 && !args.input) {
+      console.error('\x1b[31m[!]\x1b[0m Please provide at least one valid URI or pipe an input source');
       process.exit(1);
     }
-    const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
-    uris.forEach(uri => {
-      const service = FreyrCore.identifyService(uri);
-      if (args.tag) !service ? output.write(`# invalid: ${uri}\n`) : output.write(`# ${uri}\n`);
-      if (!service) return;
-      output.write(`${service.prototype.parseURI.call(service.prototype, uri).uri}\n`);
-    });
-    if (args.output) console.log(`Successfully written to [${args.output}]`);
-    output.end();
+    urify(urls)
+      .then(async () => {
+        if (args.input)
+          if (!process.stdin.isTTY) await urify(await PROCESS_INPUT_ARG(args.input));
+          else {
+            console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
+            await new Promise((res, rej) =>
+              process.stdin
+                .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
+                .on('error', rej)
+                .on('close', res),
+            );
+          }
+      })
+      .then(() => {
+        console.log('\x1b[32m[+]\x1b[0m Urify complete');
+        if (args.output) console.log(`Successfully written to [${args.output}]`);
+        if (output !== process.stdout) output.end();
+      })
+      .catch(err => console.error(`\x1b[31m[!]\x1b[0m An error occurred: ${(err ? err.message : err) || err}`));
   })
   .on('--help', () => {
     console.log('');
