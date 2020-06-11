@@ -1251,6 +1251,7 @@ program
     [
       'get URLs from a batch file, comments with `#` are expunged',
       '`-` reads from stdin, if unpiped, drops to interactive (Ctrl+D to exit)',
+      'if piped, stdin has preference over FILE',
     ].join('\n'),
   )
   .option('-o, --output <FILE>', 'write to file as opposed to stdout')
@@ -1270,7 +1271,7 @@ program
     urify(urls)
       .then(async () => {
         if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
-          await urify(await PROCESS_INPUT_ARG(args.input || '-'));
+          await urify(await PROCESS_INPUT_ARG(!process.stdin.isTTY ? '-' : args.input));
         else if (process.stdin.isTTY && args.input === '-') {
           console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
           await new Promise((res, rej) =>
