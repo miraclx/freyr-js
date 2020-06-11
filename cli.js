@@ -1292,17 +1292,17 @@ program
   .on('--help', () => {
     console.log('');
     console.log('Examples:');
-    console.log('  $ freyr urify https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
+    console.log('  $ freyr -q urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
     console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
     console.log('');
-    console.log('  $ freyr urify https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
+    console.log('  $ freyr -q urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
     console.log('  apple_music:track:1510821685');
     console.log('');
     console.log(
       [
         '  $ echo https://www.deezer.com/en/artist/5340439 \\',
         '         https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb \\',
-        '      | freyr urify',
+        '      | freyr -q urify -t',
       ].join('\n'),
     );
     console.log('  deezer:artist:5340439');
