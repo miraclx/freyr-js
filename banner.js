@@ -8,3 +8,16 @@ const banner = [
 ];
 
 module.exports = banner;
+
+/*
+to record logo
+GIFSICLE_OPTS=--lossy=80 asciicast2gif -t tango -s 2 -w 28 -h 6 logo.cast logo.gif
+
+to record demo
+docker run --rm \
+  -e "GIFSICLE_OPTS=--lossy=80" \
+  -e "NODE_OPTS=--max-old-space-size=12288" \
+  -e "MAGICK_MEMORY_LIMIT=3gb" \
+  -e "MAGICK_MAP_LIMIT=3gb" \
+  -v $PWD:/data asciinema/asciicast2gif -s 2 -t tango demo.cast demo.gif
+*/
