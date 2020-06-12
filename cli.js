@@ -685,9 +685,7 @@ async function init(queries, options) {
     trackLogger.log(`| [\u2022] Post Processing...`);
     return {
       files,
-      postprocess: postProcessor
-        .push({track, meta, files, audioSource})
-        .catch(errObject => Promise.resolve({code: 9, ...errObject})),
+      postprocess: postProcessor.push({track, meta, files, audioSource}).catch(errObject => ({code: 9, ...errObject})),
     };
   });
 
@@ -698,7 +696,7 @@ async function init(queries, options) {
       try {
         if (!(track = await track)) throw new Error('no data recieved from track');
       } catch (err) {
-        return Promise.resolve({code: -1, err});
+        return {code: -1, err};
       }
       const outFileDir = xpath.join(
         BASE_DIRECTORY,
@@ -717,7 +715,7 @@ async function init(queries, options) {
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
-        .catch(errObject => Promise.resolve({meta, code: 10, ...errObject}));
+        .catch(errObject => ({meta, code: 10, ...errObject}));
     },
   );
 
@@ -874,12 +872,11 @@ async function init(queries, options) {
         ? artistHandler
         : playlistHandler)(query, {service, queryLogger})
         .then(stats => (Array.isArray(stats) ? stats : [stats]))
-        .catch(err => {
+        .catch(err =>
           queryLogger.error(
             `\x1b[31m[i]\x1b[0m An error occurred while processing the query${err ? ` (${err.message || err})` : ''}`,
-          );
-          return Promise.resolve();
-        }),
+          ),
+        ),
     );
     if (queryStats.length === 0) return null;
     queryStats = (
