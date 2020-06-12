@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const crypto = require('crypto');
 const events = require('events');
 
@@ -43,45 +42,54 @@ function wrapHTML(opts) {
 }
 
 class AuthServer extends events.EventEmitter {
+  #store = {
+    port: null,
+    hostname: null,
+    serviceName: null,
+    baseUrl: null,
+    callbackRoute: null,
+    express: null,
+  };
+
   constructor(opts) {
     super();
-    this._port = opts.port || 36346;
-    this._hostname = opts.hostname || 'localhost';
-    this.serviceName = opts.serviceName;
-    this.stateKey = 'auth_state';
-    this.base_url = `http${opts.useHttps ? 's' : ''}://${this._hostname}:${this._port}`;
-    this.callback_route = '/callback';
-    this.express_app = express()
+    this.#store.port = opts.port || 36346;
+    this.#store.hostname = opts.hostname || 'localhost';
+    this.#store.serviceName = opts.serviceName;
+    this.#store.stateKey = 'auth_state';
+    this.#store.baseUrl = `http${opts.useHttps ? 's' : ''}://${this.#store.hostname}:${this.#store.port}`;
+    this.#store.callbackRoute = '/callback';
+    this.#store.express = express()
       .use(cors())
       .use(cookieParser());
   }
 
   getRedirectURL() {
-    return `${this.base_url}${this.callback_route}`;
+    return `${this.#store.baseUrl}${this.#store.callbackRoute}`;
   }
 
   async init(gFn) {
     return new Promise(resolve => {
-      const server = this.express_app
+      const server = this.#store.express
         .get('/', (_req, res) => {
           const state = crypto.randomBytes(8).toString('hex');
-          res.cookie(this.stateKey, state);
+          res.cookie(this.#store.stateKey, state);
           res.redirect(gFn(state));
         })
-        .get(this.callback_route, (req, res) => {
+        .get(this.#store.callbackRoute, (req, res) => {
           const code = req.query.code || null;
           const state = req.query.state || null;
-          const storedState = req.cookies ? req.cookies[this.stateKey] : null;
-          res.clearCookie(this.stateKey);
+          const storedState = req.cookies ? req.cookies[this.#store.stateKey] : null;
+          res.clearCookie(this.#store.stateKey);
           if (code == null || state === null || state !== storedState) {
-            res.end(wrapHTML({service: this.serviceName, color: '#d0190c', msg: 'Authentication Failed'}));
+            res.end(wrapHTML({service: this.#store.serviceName, color: '#d0190c', msg: 'Authentication Failed'}));
             return;
           }
-          res.end(wrapHTML({service: this.serviceName, color: '#1ae822;', msg: 'Successfully Authenticated'}));
+          res.end(wrapHTML({service: this.#store.serviceName, color: '#1ae822;', msg: 'Successfully Authenticated'}));
           server.close();
           this.emit('code', code);
         })
-        .listen(this._port, this._hostname, () => resolve(this.base_url));
+        .listen(this.#store.port, this.#store.hostname, () => resolve(this.#store.baseUrl));
     });
   }
 
