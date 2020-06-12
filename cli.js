@@ -341,7 +341,7 @@ async function init(queries, options) {
     schema.services.properties[engine[symbols.meta].ID] = {
       type: 'object',
       additionalProperties: false,
-      properties: engine.propSchema || {},
+      properties: engine[symbols.meta].PROP_SCHEMA || {},
     };
   });
   const freyrCoreConfig = new Conf({

@@ -19,6 +19,11 @@ class Spotify {
     },
     // https://www.debuggex.com/r/DgqrkwF-9XXceZ1x
     VALID_URL: /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/,
+    PROP_SCHEMA: {
+      expiry: {type: 'integer'},
+      access_token: {type: 'string'},
+      refresh_token: {type: 'string'},
+    },
   };
 
   [symbols.meta] = Spotify[symbols.meta];
@@ -81,12 +86,6 @@ class Spotify {
   hasProps() {
     return true;
   }
-
-  propSchema = {
-    expiry: {type: 'integer'},
-    access_token: {type: 'string'},
-    refresh_token: {type: 'string'},
-  };
 
   getProps() {
     return {
