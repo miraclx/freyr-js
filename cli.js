@@ -676,7 +676,7 @@ async function init(queries, options) {
       pre: '| \u27a4 Awaiting audiofeeds...',
       xerr: '[Unable to retrieve stream]',
     });
-    if (!audioFeeds || audioFeeds.err) return {meta, err: audioFeeds.err, code: 2};
+    if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
     const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
     const files = await downloadQueue
