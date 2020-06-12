@@ -1,11 +1,6 @@
 /* eslint-disable func-names, prefer-spread */
 const async = require('async');
 
-const get = (store => self => {
-  if (!store.has(self)) store.set(self, {});
-  return store.get(self);
-})(new WeakMap());
-
 function insulate(items) {
   Promise.allSettled(Array.isArray(items) ? items : [items]);
   return items;
@@ -46,8 +41,8 @@ class AsyncQueue {
       throw TypeError('the <concurrency> argument, if specified must be a `number`');
     if (worker !== undefined && typeof worker !== 'function')
       throw TypeError('the <worker> argument, if specified must be a `function`');
-    get(this).name = name || 'AsyncQueue';
-    get(this).queue = async.queue(({data, args}, cb) => {
+    this.#store.name = name || 'AsyncQueue';
+    this.#store.queue = async.queue(({data, args}, cb) => {
       (async () => (worker ? worker(data, ...args) : typeof data === 'function' ? data.apply(null, args) : data))()
         .then(res => cb(null, res))
         .catch(err => {
@@ -59,7 +54,7 @@ class AsyncQueue {
               writable: false,
               enumerable: true,
             });
-          err[AsyncQueue.debugStack].push({queueName: get(this).name, sourceTask: data, sourceArgs: args});
+          err[AsyncQueue.debugStack].push({queueName: this.#store.name, sourceTask: data, sourceArgs: args});
           cb(err);
         });
     }, concurrency || 1);
@@ -110,7 +105,7 @@ class AsyncQueue {
     const promises = (Array.isArray(objects) ? objects : [[objects, meta]]).map(objectBlocks => {
       const [data, args] = Array.isArray(objectBlocks) ? objectBlocks : [objectBlocks, meta];
       return insulate(
-        get(this).queue.pushAsync({
+        this.#store.queue.pushAsync({
           data: insulate(data),
           args: insulate(args !== undefined ? (Array.isArray(args) ? args : [args]) : []),
         }),
@@ -123,21 +118,21 @@ class AsyncQueue {
    * Pause the processing of tasks until `resume()` is called.
    */
   pause() {
-    get(this).queue.pause();
+    this.#store.queue.pause();
   }
 
   /**
    * Resume task processing when the queue is paused.
    */
   resume() {
-    get(this).queue.resume();
+    this.#store.queue.resume();
   }
 
   /**
    * Return the number of tasks waiting to be processed
    */
   length() {
-    return get(this).queue.length();
+    return this.#store.queue.length();
   }
 
   /**
@@ -145,46 +140,47 @@ class AsyncQueue {
    * The queue should not be pushed back to after this method call.
    */
   abort() {
-    get(this).queue.kill();
+    this.#store.queue.kill();
   }
 
   /**
    * Return the number of tasks currently being processed.
    */
   running() {
-    return get(this).queue.running();
+    return this.#store.queue.running();
   }
 
   /**
    * Get / Set the number of active workers.
    */
   get concurrency() {
-    return get(this).queue.concurrency;
+    return this.#store.queue.concurrency;
   }
 
   set concurrency(concurrency) {
-    get(this).queue.concurrency = concurrency;
+    this.#store.queue.concurrency = concurrency;
   }
 
   /**
    * Boolean for checking if the queue is paused.
    */
   get paused() {
-    return get(this).queue.paused;
+    return this.#store.queue.paused;
   }
 
   /**
    * a boolean indicating whether or not any items have been pushed and processed by the queue.
    */
   get started() {
-    return get(this).queue.started();
+    return this.#store.queue.started();
   }
 
   /**
    * a boolean indicating whether or not items are waiting to be processed.
    */
   get idle() {
-    return get(this).queue.idle();
+    return this.#store.queue.idle();
   }
 }
+
 module.exports = AsyncQueue;
