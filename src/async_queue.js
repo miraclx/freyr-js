@@ -12,7 +12,7 @@ function insulate(items) {
 }
 
 class AsyncQueue {
-  static debugStack = (get(this).debugStack = Symbol('AsyncQueueStack'));
+  static debugStack = Symbol('AsyncQueueStack');
 
   /**
    * Creates an async queue with a defined `concurrency`.
@@ -52,14 +52,14 @@ class AsyncQueue {
         .then(res => cb(null, res))
         .catch(err => {
           err = Object(err);
-          if (!err[get(this.constructor).debugStack])
-            Object.defineProperty(err, get(this.constructor).debugStack, {
+          if (!err[AsyncQueue.debugStack])
+            Object.defineProperty(err, AsyncQueue.debugStack, {
               value: [],
               configurable: false,
               writable: false,
               enumerable: true,
             });
-          err[get(this.constructor).debugStack].push({queueName: get(this).name, sourceTask: data, sourceArgs: args});
+          err[AsyncQueue.debugStack].push({queueName: get(this).name, sourceTask: data, sourceArgs: args});
           cb(err);
         });
     }, concurrency || 1);
