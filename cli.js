@@ -360,7 +360,7 @@ async function init(queries, options) {
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
-    filenamify(options.directory || Config.dirs.output, {replacement: '_'}),
+    options.directory || Config.dirs.output,
   );
 
   if (!fs.existsSync(BASE_DIRECTORY))
