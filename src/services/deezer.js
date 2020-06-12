@@ -97,19 +97,17 @@ class Deezer {
 
   [symbols.meta] = Deezer[symbols.meta];
 
-  isAuthenticated = true;
-
-  constructor() {
-    this.core = new DeezerCore();
-    this.cache = new NodeCache();
-  }
+  #store = {
+    core: new DeezerCore(),
+    cache: new NodeCache(),
+  };
 
   hasOnceAuthed() {
     throw Error('Unimplemented: [Deezer:hasOnceAuthed()]');
   }
 
   isAuthed() {
-    return this.isAuthenticated;
+    return this.#store.isAuthenticated;
   }
 
   newAuth() {
@@ -237,8 +235,8 @@ class Deezer {
   createDataProcessor(coreFn) {
     return async uri => {
       const parsed = this.parseURI(uri);
-      if (!this.cache.has(parsed.uri)) this.cache.set(parsed.uri, await coreFn(parsed.id));
-      return this.cache.get(parsed.uri);
+      if (!this.#store.cache.has(parsed.uri)) this.#store.cache.set(parsed.uri, await coreFn(parsed.id));
+      return this.#store.cache.get(parsed.uri);
     };
   }
 
@@ -246,7 +244,7 @@ class Deezer {
     'deezer:trackQueue',
     4,
     this.createDataProcessor(async id => {
-      const track = await this.core.getTrack(id);
+      const track = await this.#store.core.getTrack(id);
       return this.wrapTrackMeta(track, await this.getAlbum(`deezer:album:${track.album.id}`));
     }),
   );
@@ -258,7 +256,7 @@ class Deezer {
   albumQueue = new AsyncQueue(
     'deezer:albumQueue',
     4,
-    this.createDataProcessor(async id => this.wrapAlbumData(await this.core.getAlbum(id))),
+    this.createDataProcessor(async id => this.wrapAlbumData(await this.#store.core.getAlbum(id))),
   );
 
   async getAlbum(uris) {
@@ -268,7 +266,7 @@ class Deezer {
   artistQueue = new AsyncQueue(
     'deezer:artistQueue',
     4,
-    this.createDataProcessor(async id => this.wrapArtistData(await this.core.getArtist(id))),
+    this.createDataProcessor(async id => this.wrapArtistData(await this.#store.core.getArtist(id))),
   );
 
   async getArtist(uris) {
@@ -278,7 +276,7 @@ class Deezer {
   playlistQueue = new AsyncQueue(
     'deezer:playlistQueue',
     4,
-    this.createDataProcessor(async id => this.wrapPlaylistData(await this.core.getPlaylist(id, {limit: 1}))),
+    this.createDataProcessor(async id => this.wrapPlaylistData(await this.#store.core.getPlaylist(id, {limit: 1}))),
   );
 
   async getPlaylist(uris) {
@@ -293,7 +291,7 @@ class Deezer {
   async getArtistAlbums(uris) {
     const artist = await this.getArtist(uris);
     return this.wrapPagination(
-      () => this.core.getArtistAlbums(artist.id, {limit: Math.min(artist.nalbum, Math.max(300, artist.nalbum / 4))}),
+      () => this.#store.core.getArtistAlbums(artist.id, {limit: Math.min(artist.nalbum, Math.max(300, artist.nalbum / 4))}),
       data => this.albumQueue.push(data.map(album => album.link)),
     );
   }
@@ -301,7 +299,8 @@ class Deezer {
   async getPlaylistTracks(uri) {
     const playlist = await this.getPlaylist(uri);
     return this.wrapPagination(
-      () => this.core.getPlaylistTracks(playlist.id, {limit: Math.min(playlist.ntracks, Math.max(300, playlist.ntracks / 4))}),
+      () =>
+        this.#store.core.getPlaylistTracks(playlist.id, {limit: Math.min(playlist.ntracks, Math.max(300, playlist.ntracks / 4))}),
       data => this.trackQueue.push(data.map(track => track.link)),
     );
   }

@@ -28,59 +28,65 @@ class Spotify {
 
   [symbols.meta] = Spotify[symbols.meta];
 
-  isAuthenticated = false;
+  #store = {
+    core: null,
+    AuthServer: null,
+    serverOpts: null,
+    cache: new NodeCache(),
+    expiry: null,
+    isAuthenticated: null,
+  };
 
   constructor(config, authServer, serverOpts) {
     if (!config) throw new Error(`[Spotify] Please define a configuration object`);
     if (typeof config !== 'object') throw new Error(`[Spotify] Please define a configuration as an object`);
     if (!config.clientId) throw new Error(`[Spotify] Please define [clientId] as a property within the configuration`);
     if (!config.clientSecret) throw new Error(`[Spotify] Please define [clientSecret] as a property within the configuration`);
-    [this.AuthServer, this.serverOpts] = [authServer, serverOpts];
-    this.core = new SpotifyWebApi({
+    [this.#store.AuthServer, this.#store.serverOpts] = [authServer, serverOpts];
+    this.#store.core = new SpotifyWebApi({
       clientId: config.clientId,
       clientSecret: config.clientSecret,
       refreshToken: config.refreshToken,
     });
-    this.cache = new NodeCache();
   }
 
   hasOnceAuthed() {
-    return this.isAuthenticated;
+    return this.#store.isAuthenticated;
   }
 
   accessTokenIsValid() {
-    return Date.now() < this.expiry;
+    return Date.now() < this.#store.expiry;
   }
 
   isAuthed() {
-    return this.isAuthenticated && this.accessTokenIsValid();
+    return this.#store.isAuthenticated && this.accessTokenIsValid();
   }
 
   newAuth() {
-    const server = new this.AuthServer({...this.serverOpts, serviceName: 'Spotify'});
-    this.core.setRedirectURI(server.getRedirectURL());
+    const server = new this.#store.AuthServer({...this.#store.serverOpts, serviceName: 'Spotify'});
+    this.#store.core.setRedirectURI(server.getRedirectURL());
     const scope = ['user-read-private', 'user-read-email'];
     const authCode = Promise.resolve(server.getCode());
     return {
-      getUrl: server.init(state => this.core.createAuthorizeURL(scope, state)),
+      getUrl: server.init(state => this.#store.core.createAuthorizeURL(scope, state)),
       userToAuth: async () => {
         const code = await authCode;
-        const data = await this.core.authorizationCodeGrant(code);
+        const data = await this.#store.core.authorizationCodeGrant(code);
         this.setExpiry(data.body.expires_in);
-        this.core.setRefreshToken(data.body.refresh_token);
-        this.core.setAccessToken(data.body.access_token);
-        this.isAuthenticated = true;
-        return {refresh_token: data.body.refresh_token, expiry: this.expiry};
+        this.#store.core.setRefreshToken(data.body.refresh_token);
+        this.#store.core.setAccessToken(data.body.access_token);
+        this.#store.isAuthenticated = true;
+        return {refresh_token: data.body.refresh_token, expiry: this.#store.expiry};
       },
     };
   }
 
   setExpiry(expiry) {
-    this.expiry = Date.now() + expiry * 1000;
+    this.#store.expiry = Date.now() + expiry * 1000;
   }
 
   canTryLogin(config) {
-    return !!(this.core.getRefreshToken() || config.refresh_token);
+    return !!(this.#store.core.getRefreshToken() || config.refresh_token);
   }
 
   hasProps() {
@@ -89,22 +95,22 @@ class Spotify {
 
   getProps() {
     return {
-      expiry: this.expiry,
-      access_token: this.core.getAccessToken(),
-      refresh_token: this.core.getRefreshToken(),
+      expiry: this.#store.expiry,
+      access_token: this.#store.core.getAccessToken(),
+      refresh_token: this.#store.core.getRefreshToken(),
     };
   }
 
   async login(config) {
-    if (config.refresh_token) this.core.setRefreshToken(config.refresh_token);
+    if (config.refresh_token) this.#store.core.setRefreshToken(config.refresh_token);
     this.setExpiry(config.expires_in);
-    if (this.accessTokenIsValid()) this.core.setAccessToken(config.access_token);
+    if (this.accessTokenIsValid()) this.#store.core.setAccessToken(config.access_token);
     else {
-      const data = await this.core.refreshAccessToken();
-      this.core.setAccessToken(data.body.access_token);
+      const data = await this.#store.core.refreshAccessToken();
+      this.#store.core.setAccessToken(data.body.access_token);
       this.setExpiry(data.body.expires_in);
     }
-    return (this.isAuthenticated = true);
+    return (this.#store.isAuthenticated = true);
   }
 
   validateType(uri) {
@@ -233,7 +239,7 @@ class Spotify {
 
   async getTrack(uris, country) {
     return this.processData(uris, 50, async ids => {
-      const {tracks} = (await this.core.getTracks(ids, {market: country})).body;
+      const {tracks} = (await this.#store.core.getTracks(ids, {market: country})).body;
       await this.getAlbum(
         tracks.map(track => track.album.uri),
         country,
@@ -244,7 +250,7 @@ class Spotify {
 
   async getAlbum(uris, country) {
     return this.processData(uris, 20, async ids =>
-      Promise.mapSeries((await this.core.getAlbums(ids, {market: country})).body.albums, async album =>
+      Promise.mapSeries((await this.#store.core.getAlbums(ids, {market: country})).body.albums, async album =>
         this.wrapAlbumData(album),
       ),
     );
@@ -256,7 +262,7 @@ class Spotify {
 
   async getArtist(uris) {
     return this.processData(uris, 50, async ids =>
-      Promise.mapSeries((await this.core.getArtists(ids)).body.artists, async artist => this.wrapArtistData(artist)),
+      Promise.mapSeries((await this.#store.core.getArtists(ids)).body.artists, async artist => this.wrapArtistData(artist)),
     );
   }
 
@@ -264,7 +270,7 @@ class Spotify {
     const parsedURI = this.parseURI(uri);
     uri = spotifyUri.formatURI(parsedURI);
     if (!this.cache.has(uri))
-      this.cache.set(uri, this.wrapPlaylistData((await this.core.getPlaylist(parsedURI.id, {market: country})).body));
+      this.cache.set(uri, this.wrapPlaylistData((await this.#store.core.getPlaylist(parsedURI.id, {market: country})).body));
     return this.cache.get(uri);
   }
 
@@ -285,7 +291,7 @@ class Spotify {
           (
             await this._gatherCompletely(
               (offset, limit) =>
-                this.core.getArtistAlbums(id, {offset, limit, country, include_groups: 'album,single,compilation'}),
+                this.#store.core.getArtistAlbums(id, {offset, limit, country, include_groups: 'album,single,compilation'}),
               {offset: 0, limit: 50, sel: 'items'},
             )
           ).map(album => album.uri),
@@ -296,11 +302,11 @@ class Spotify {
   }
 
   async checkIsActivelyListening() {
-    return (await this.core.getMyCurrentPlaybackState()).statusCode !== '204';
+    return (await this.#store.core.getMyCurrentPlaybackState()).statusCode !== '204';
   }
 
   async getActiveTrack() {
-    return this.core.getMyCurrentPlayingTrack();
+    return this.#store.core.getMyCurrentPlayingTrack();
   }
 
   async _gatherCompletely(fn, {offset, limit, sel} = {}) {
