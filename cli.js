@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable no-underscore-dangle, consistent-return, camelcase, prefer-promise-reject-errors */
+/* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 const fs = require('fs');
 const xpath = require('path');
 const {spawn, spawnSync} = require('child_process');
