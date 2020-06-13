@@ -9,6 +9,11 @@ function insulate(items) {
 class AsyncQueue {
   static debugStack = Symbol('AsyncQueueStack');
 
+  #store = {
+    name: null,
+    queue: null,
+  };
+
   /**
    * Creates an async queue with a defined `concurrency`.
    * Tasks added to the `queue` are processed in parallel (up to the `concurrency` limit).
