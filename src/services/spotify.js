@@ -216,7 +216,7 @@ class Spotify {
     uris = (wasArr ? uris : [uris]).map(uri => {
       const parsedURI = this.parseURI(uri);
       uri = spotifyUri.formatURI(parsedURI);
-      return [parsedURI.id, this.cache.get(uri)];
+      return [parsedURI.id, this.#store.cache.get(uri)];
     });
     const ids = uris.filter(([, value]) => !value).map(([id]) => id);
     uris = Object.fromEntries(uris);
@@ -231,7 +231,7 @@ class Spotify {
         )
       )
         .flat(1)
-        .forEach(item => (!item ? null : (this.cache.set(item.uri, item), (uris[item.id] = item))));
+        .forEach(item => (!item ? null : (this.#store.cache.set(item.uri, item), (uris[item.id] = item))));
 
     const ret = Object.values(uris);
     return !wasArr ? ret[0] : ret;
@@ -269,9 +269,12 @@ class Spotify {
   async getPlaylist(uri, country) {
     const parsedURI = this.parseURI(uri);
     uri = spotifyUri.formatURI(parsedURI);
-    if (!this.cache.has(uri))
-      this.cache.set(uri, this.wrapPlaylistData((await this.#store.core.getPlaylist(parsedURI.id, {market: country})).body));
-    return this.cache.get(uri);
+    if (!this.#store.cache.has(uri))
+      this.#store.cache.set(
+        uri,
+        this.wrapPlaylistData((await this.#store.core.getPlaylist(parsedURI.id, {market: country})).body),
+      );
+    return this.#store.cache.get(uri);
   }
 
   async getPlaylistTracks(uri, country) {
@@ -284,8 +287,8 @@ class Spotify {
   async getArtistAlbums(uri, country) {
     const {id} = this.parseURI(uri);
     uri = `spotify:artist_albums:${id}`;
-    if (!this.cache.has(uri))
-      this.cache.set(
+    if (!this.#store.cache.has(uri))
+      this.#store.cache.set(
         uri,
         await this.getAlbum(
           (
@@ -298,7 +301,7 @@ class Spotify {
           country,
         ),
       );
-    return this.cache.get(uri);
+    return this.#store.cache.get(uri);
   }
 
   async checkIsActivelyListening() {
