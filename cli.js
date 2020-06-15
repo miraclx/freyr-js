@@ -308,7 +308,7 @@ async function init(queries, options) {
       );
     } else {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
-      process.exit(4);
+      process.exit(3);
     }
     const errMessage = new Error(`[key: image, value: ${JSON.stringify(Config.image)}]`);
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
@@ -319,7 +319,7 @@ async function init(queries, options) {
   } catch (err) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
     stackLogger.error(err.message || err);
-    process.exit(4);
+    process.exit(3);
   }
 
   Config.image = lodash.merge(Config.image, options.coverSize);
@@ -328,14 +328,14 @@ async function init(queries, options) {
   Config.opts = lodash.mergeWith(Config.opts, {netCheck: options.netCheck, browser: options.browser}, (a, b) => b && a);
 
   if (Config.opts.netCheck && !(await isOnline()))
-    stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
+    stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(4);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
     options.directory || Config.dirs.output,
   );
 
   if (!fs.existsSync(BASE_DIRECTORY))
-    stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] isn't existent`), process.exit(3);
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] isn't existent`), process.exit(5);
 
   if (
     (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.F_OK), stackLogger, {
@@ -343,7 +343,7 @@ async function init(queries, options) {
       post: '[done]',
     })) === null
   )
-    process.exit(3);
+    process.exit(5);
 
   let freyrCore;
   try {

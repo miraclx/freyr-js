@@ -616,9 +616,9 @@ Authentication unrequired. API is freely accessible.
 * 0: OK
 * 1: Invalid query
 * 2: Invalid flag value
-* 3: Error with working directory
-* 4: Invalid / Inexistent configuration file
-* 5: Network error
+* 3: Invalid / Inexistent configuration file
+* 4: Network error
+* 5: Error with working directory
 * 6: Failed to initialize a freyr instance
 
 ## Service Support
