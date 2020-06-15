@@ -226,7 +226,6 @@ function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
 async function init(queries, options) {
   const initTimeStamp = Date.now();
   const stackLogger = new StackLogger({indentSize: 1});
-  if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
   if (!((Array.isArray(queries) && queries.length > 0) || options.input))
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid query'), process.exit(1);
 
@@ -319,6 +318,27 @@ async function init(queries, options) {
     process.exit(4);
   }
 
+  Config.image = lodash.merge(Config.image, options.coverSize);
+  Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
+  Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
+
+  if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
+
+  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
+    options.directory || Config.dirs.output,
+  );
+
+  if (!fs.existsSync(BASE_DIRECTORY))
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] isn't existent`), process.exit(3);
+
+  if (
+    (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.F_OK), stackLogger, {
+      pre: 'Checking directory permissions...',
+      post: '[done]',
+    })) === null
+  )
+    process.exit(3);
+
   let freyrCore;
   try {
     freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
@@ -352,27 +372,9 @@ async function init(queries, options) {
     schema,
   });
 
-  const progressGen = prepProgressGen(options);
-
-  Config.image = lodash.merge(Config.image, options.coverSize);
-  Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
-  Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
 
-  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
-    options.directory || Config.dirs.output,
-  );
-
-  if (!fs.existsSync(BASE_DIRECTORY))
-    stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] isn't existent`), process.exit(3);
-
-  if (
-    (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.F_OK), stackLogger, {
-      pre: 'Checking directory permissions...',
-      post: '[done]',
-    })) === null
-  )
-    process.exit(3);
+  const progressGen = prepProgressGen(options);
 
   function createPlaylist(stats, logger, directory, filename, playlistTitle) {
     if (options.playlist) {
