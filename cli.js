@@ -278,6 +278,10 @@ async function init(queries, options) {
       port: 36346,
       useHttps: false,
     },
+    opts: {
+      netCheck: true,
+      browser: true,
+    },
     dirs: {
       output: '.',
     },
@@ -321,8 +325,10 @@ async function init(queries, options) {
   Config.image = lodash.merge(Config.image, options.coverSize);
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
   Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
+  Config.opts = lodash.mergeWith(Config.opts, {netCheck: options.netCheck, browser: options.browser}, (a, b) => b && a);
 
-  if (!(await isOnline())) stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
+  if (Config.opts.netCheck && !(await isOnline()))
+    stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(5);
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
     options.directory || Config.dirs.output,
@@ -827,6 +833,7 @@ async function init(queries, options) {
 
   const authQueue = new AsyncQueue('cli:authQueue', 1, async (service, logger) => {
     async function coreAuth(loginLogger) {
+      if (!Config.opts.browser) return;
       const authHandler = service.newAuth();
       const url = await authHandler.getUrl;
       await processPromise(open(url), loginLogger, {pre: `[\u2022] Attempting to open [ ${url} ] within browser...`});
@@ -1106,6 +1113,8 @@ program
   )
   .option('--cache-dir <DIR>', 'specify alternative cache directory', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
+  .option('--no-browser', 'disable browser authentication')
+  .option('--no-net-check', 'disable internet connection check')
   .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary (unimplemented)')
   .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary (unimplemented)')
   .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary (unimplemented)')

@@ -12,6 +12,10 @@
     "encoder": 6,
     "embedder": 10
   },
+  "opts": {
+    "netCheck": true,
+    "browser": true
+  },
   "dirs": {
     "output": "."
   },
