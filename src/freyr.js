@@ -2,13 +2,13 @@
 const {sortBy} = require('lodash');
 
 const symbols = require('./symbols');
-const YouTube = require('./services/youtube');
+const {YouTube, YouTubeMusic} = require('./services/youtube');
 const Deezer = require('./services/deezer');
 const Spotify = require('./services/spotify');
 const AppleMusic = require('./services/apple_music');
 
 class FreyrCore {
-  static ENGINES = [Deezer, Spotify, AppleMusic, YouTube];
+  static ENGINES = [Deezer, Spotify, AppleMusic, YouTube, YouTubeMusic];
 
   static getBitrates() {
     return Array.from(

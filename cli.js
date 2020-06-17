@@ -298,7 +298,7 @@ async function init(queries, options) {
       embedder: 10,
     },
     downloader: {
-      order: ['youtube'],
+      order: ['yt_music', 'youtube'],
     },
   };
   try {

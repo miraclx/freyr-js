@@ -313,4 +313,4 @@ class YouTube {
   }
 }
 
-module.exports = YouTube;
+module.exports = {YouTube, YouTubeMusic};

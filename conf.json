@@ -25,6 +25,7 @@
   },
   "downloader": {
     "order": [
+      "yt_music",
       "youtube"
     ]
   },
