@@ -1152,7 +1152,7 @@ program
 program
   .command('search')
   .description('Search for and optionally download music interactively (unimplemented)')
-  .option('--query <PATTERN>', 'non-interactive search filter pattern to be matched')
+  .option('-q, --query <PATTERN>', 'non-interactive search filter pattern to be matched')
   .option('-n, --max <MAX>', 'return a maximum of MAX match results')
   .option('-o, --output <FILE>', 'save search results in a batch file for later instead of autodownload')
   .option('-p, --pretty', 'include whitespaces and commented metadata in search result output')
