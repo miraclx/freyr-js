@@ -675,17 +675,17 @@ async function init(queries, options) {
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
     trackLogger.log('| \u27a4 Collating sources...');
-    const audioSource = await props.collectSources((service, sources) =>
-      processPromise(sources, trackLogger, {
+    const audioSource = await props.collectSources((service, sourcesPromise) =>
+      processPromise(sourcesPromise, trackLogger, {
         pre: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
-        xerr: '[Unable to retrieve stream]',
-        post: '[success]',
+        xerr: '[Unable to gather sources]',
+        post: ({sources}) => `[success, found ${sources.length} sources]`,
       }),
     );
     if (!audioSource) return {meta, code: 1};
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
       pre: '| \u27a4 Awaiting audiofeeds...',
-      xerr: '[Unable to retrieve stream]',
+      xerr: '[Unable to collect source feeds]',
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
