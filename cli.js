@@ -573,14 +573,17 @@ async function init(queries, options) {
           ['CD', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-          [meta.service.DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
+          [meta.service[symbols.meta].DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
           ...track.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
         ],
         apID: 'cli@freyr.git',
         compilation: track.compilation,
         copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text,
         purchaseDate: 'timestamp',
-        comment: `URI: ${track.uri}\nYouTube Stream ID: ${audioSource.videoId}`,
+        comment: [
+          `${meta.service[symbols.meta].DESC} URI: ${track.uri}`,
+          `${audioSource.service[symbols.meta].DESC} Stream ID: ${audioSource.source.videoId}`,
+        ].join('\n'),
       })
         .finally(() => files.image.file.removeCallback())
         .catch(err => Promise.reject({err, code: 8}));
@@ -641,7 +644,7 @@ async function init(queries, options) {
           const feeds = source.getFeeds();
           feeds.catch(() => {}); // diffuse the promise, in case of an asynchronous rejection
           if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
-          return {sources, source, feeds};
+          return {sources, source, feeds, service: result.service};
         });
         result.results = result.sources.catch(() => ({next: handleSource(iterator)}));
       }
