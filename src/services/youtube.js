@@ -29,7 +29,20 @@ function attachFeedFn(collections, generator) {
   }));
 }
 
-class YouTubeMusicSearch {
+class YouTubeMusic {
+  static [symbols.meta] = {
+    ID: 'yt_music',
+    DESC: 'YouTube Music',
+    PROPS: {
+      isQueryable: false,
+      isSearchable: true,
+      isSourceable: true,
+    },
+    BITRATES: [96, 128, 160, 192, 256, 320],
+  };
+
+  [symbols.meta] = YouTubeMusic[symbols.meta];
+
   gotInstance = got.extend({
     headers: {
       'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
@@ -57,8 +70,9 @@ class YouTubeMusicSearch {
 
   async _search(queryObject, params, tag) {
     if (typeof queryObject !== 'object') throw new Error('<queryObject> must be an object');
-    if (params && typeof queryObject !== 'object') throw new Error('<params>, if defined must be an object');
+    if (params && typeof params !== 'object') throw new Error('<params>, if defined must be an object');
     const response = await this.request('https://music.youtube.com/youtubei/v1/search', {
+      timeout: 10000,
       method: 'post',
       searchParams: {alt: 'json', key: await this.getApiKey(), ...params},
       responseType: 'json',
@@ -177,8 +191,39 @@ class YouTubeMusicSearch {
     );
   }
 
-  async search(query) {
-    return this._search({query});
+  async search(artists, track, duration) {
+    const results = await this._search({query: artists.concat(track).join(' ')});
+    const validSections = [
+      ...results.top.contents, // top recommended songs
+      ...results.songs.contents, // song section
+      ...results.videos.contents, // videos section
+    ];
+    const classified = YouTubeMusic.classify(validSections, duration);
+    return attachFeedFn(classified, item => item.videoId);
+  }
+
+  static classify(stacks, duration) {
+    function calculateAccuracyFor(item) {
+      // get weighted delta from expected duration
+      const durationDelta =
+        100 - (Math.abs(duration - item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000) / duration) * 100;
+      // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
+      return (
+        durationDelta + (res => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * res)(100 - durationDelta)
+      );
+    }
+    return Object.values(
+      stacks.reduce((final, item) => {
+        // prune duplicates
+        if (!(item.link.videoId in final))
+          final[item.link.videoId] = {
+            ...item,
+            videoId: item.link.videoId,
+            accuracy: calculateAccuracyFor(item),
+          };
+        return final;
+      }, {}),
+    ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
   }
 }
 
