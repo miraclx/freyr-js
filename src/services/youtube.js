@@ -196,11 +196,9 @@ class YouTube {
 
   [symbols.meta] = YouTube[symbols.meta];
 
-  constructor() {
-    this._search = util.promisify(ytSearch);
-  }
+  _search = util.promisify(ytSearch);
 
-  async search(artists, trackTitle, xFilters, count = Infinity) {
+  async _get(artists, trackTitle, xFilters, count = Infinity) {
     return (
       await this._search({
         query: artists
@@ -221,7 +219,7 @@ class YouTube {
       .slice(0, count);
   }
 
-  async get(artists, track, duration) {
+  async search(artists, track, duration) {
     const searchResults = await Promise.map(
       [
         [artists, track, ['Official Audio'], 5],
@@ -267,14 +265,6 @@ class YouTube {
     ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : a.accuracy < b.accuracy ? 1 : 0));
     return stacks;
   }
-
-  async getStreams(videoId) {
-    const data = await Promise.resolve(
-      this._ytdlGet(videoId, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
-    ).reflect();
-    return data.isFulfilled()
-      ? {id: data.value().id, formats: data.value().formats.filter(format => format.acodec !== 'none')}
-      : {err: data.reason()};
   }
 }
 
