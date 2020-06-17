@@ -293,23 +293,16 @@ class YouTube {
             : 0),
       );
     }
-    stacks = Object.values(
-      stacks
-        .flat()
-        .reverse()
-        .reduce(
-          (o, v) => ({
-            ...o,
-            [v.videoId]: {
-              ...v,
-              accuracy: bumpWith(v, ((duration - Math.abs(duration - v.seconds * 1000)) / duration) * 100),
-            },
-          }),
-          {},
-        ),
+    return Object.values(
+      stacks.reduce((final, item) => {
+        if (!(item.videoId in final))
+          final[item.videoId] = {
+            ...item,
+            accuracy: bumpWith(item, ((duration - Math.abs(duration - item.seconds * 1000)) / duration) * 100),
+          };
+        return final;
+      }, {}),
     ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : a.accuracy < b.accuracy ? 1 : 0));
-    return stacks;
-  }
   }
 }
 
