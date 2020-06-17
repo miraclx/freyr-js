@@ -1135,6 +1135,21 @@ program
   });
 
 program
+  .command('serve')
+  .arguments('[port]')
+  .description('Launch freyr server on an HTTP interface (unimplemented)', {
+    port: 'specify alternative port [default: 3797]',
+  })
+  .option('-b, --bind <ADDRESS>', 'address to bind to')
+  .option('-d, --directory <DIR>', 'working directory')
+  .option('-c, --config <FILE>', 'configuration file')
+  .option('-t, --tmp <DIR>', 'temporary directory for unprocessed artifacts', '<tmp>')
+  .option('-a, --archive <WHEN>', 'when to pack file(s) in an archive (valid: auto,always,never))', 'auto')
+  .option('-z, --compression [algorithm]', 'compression algorithm to use (valid: gzip,lz4)', 'gzip')
+  .option('-Z, --no-compression', 'disable compression altogether')
+  .option('--no-cache', 'disable file caching');
+
+program
   .command('search')
   .description('Search for and optionally download music interactively (unimplemented)')
   .option('--query <PATTERN>', 'non-interactive search filter pattern to be matched')
