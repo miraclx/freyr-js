@@ -21,6 +21,23 @@ function YouTubeSearchError(message, statusCode, status, body) {
 
 YouTubeSearchError.prototype = Error.prototype;
 
+/**
+ * @typedef {(
+ *   {
+ *     title: string,
+ *     type: "Song" | "Video",
+ *     artists: string,
+ *     album: string,
+ *     duration: string,
+ *     duration_ms: number,
+ *     videoId: string,
+ *     playlistId: string,
+ *     accuracy: number,
+ *     getFeeds: () => Promise<youtubedl.Info>,
+ *   }[]
+ * )} YouTubeSearchResult
+ */
+
 function genAsyncGetFeedsFn(url) {
   return async () => _ytdlGet(url, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']);
 }
@@ -192,7 +209,28 @@ class YouTubeMusic {
     );
   }
 
+  /**
+   * Search the YouTube Music service for matches
+   * @param {string|string[]} [artists] An artist or list of artists
+   * @param {string} [track] Track name
+   * @param {number} [duration] Duration in milliseconds
+   *
+   * If `track` is a number, it becomes duration, leaving `track` undefined.
+   * If `artists` is a string and `track` is undefined, it becomes `track`, leaving artists empty.
+   * If `artists` is non-array but `track` is defined, artists becomes an item in the artists array.
+   *
+   * @returns {YouTubeSearchResult} YouTubeMusicSearchResults
+   */
   async search(artists, track, duration) {
+    if (typeof track === 'number') [track, duration] = [, track];
+    if (!Array.isArray(artists))
+      if (track && artists) artists = [artists];
+      else [artists, track] = [[], artists || track];
+    if (typeof track !== 'string') throw new Error('<track> must be a valid string');
+    if (artists.some(artist => typeof artist !== 'string'))
+      throw new Error('<artist>, if defined must be a valid array of strings');
+    if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
+
     const results = await this._search({query: artists.concat(track).join(' ')});
     const validSections = [
       ...results.top.contents, // top recommended songs
@@ -267,7 +305,27 @@ class YouTube {
     });
   }
 
+  /**
+   * Search YouTube service for matches
+   * @param {string|string[]} [artists] An artist or list of artists
+   * @param {string} [track] Track name
+   * @param {number} [duration] Duration in milliseconds
+   *
+   * If `track` is a number, it becomes duration, leaving `track` undefined.
+   * If `artists` is a string and `track` is undefined, it becomes `track`, leaving artists empty.
+   * If `artists` is non-array but `track` is defined, artists becomes an item in the artists array.
+   *
+   * @returns {YouTubeSearchResult} YouTubeSearchResults
+   */
   async search(artists, track, duration) {
+    if (typeof track === 'number') [track, duration] = [, track];
+    if (!Array.isArray(artists))
+      if (track && artists) artists = [artists];
+      else [artists, track] = [[], artists || track];
+    if (typeof track !== 'string') throw new Error('<track> must be a valid string');
+    if (artists.some(artist => typeof artist !== 'string'))
+      throw new Error('<artist>, if defined must be a valid array of strings');
+    if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
     const searchResults = await Promise.map(
       [
         [artists, track, ['Official Audio'], 5],
