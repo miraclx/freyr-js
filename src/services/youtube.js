@@ -275,11 +275,11 @@ class YouTube {
         [artists, track, ['Lyrics'], 5],
         [artists, track, [], 5],
       ],
-      query => Promise.resolve(this.search(...query)).reflect(),
+      query => Promise.resolve(this._get(...query)).reflect(),
       {concurrency: 3},
     );
     const classified = YouTube.classify(
-      searchResults.map(ret => (ret.isFulfilled() ? ret.value() : [])),
+      searchResults.flatMap(ret => (ret.isFulfilled() ? ret.value() : [])),
       artists,
       duration,
     );
