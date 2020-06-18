@@ -251,22 +251,20 @@ class YouTube {
   async _get(artists, trackTitle, xFilters, count = Infinity) {
     return (
       await this._search({
-        query: artists
-          .concat(trackTitle)
-          .concat(xFilters)
-          .join(' '),
+        query: [...artists, trackTitle, ...xFilters].join(' '),
         pageStart: 1,
         pageEnd: 2,
       })
-    ).videos
-      .filter(
-        video =>
-          most(artists, keyWord => video.title.toLowerCase().includes(keyWord.toLowerCase())) &&
-          video.title.toLowerCase().includes(trackTitle.toLowerCase()),
+    ).videos.reduce((all, item) => {
+      if (
+        all.length < count &&
+        most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
+        item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
+        !/\d+D/i.test(item.title)
       )
-      .filter(video => !/\d+D/i.test(video.title))
-      .map(v => Object.assign(v, {xFilters}))
-      .slice(0, count);
+        all.push({...item, xFilters});
+      return all;
+    });
   }
 
   async search(artists, track, duration) {
