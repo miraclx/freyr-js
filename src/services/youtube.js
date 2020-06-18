@@ -83,6 +83,12 @@ class YouTubeMusic {
   }
 
   async _search(queryObject, params, tag) {
+    /**
+     * VideoID Types?
+     * OMV: Official Music Video
+     * ATV:
+     * UGC: User-generated content
+     */
     if (typeof queryObject !== 'object') throw new Error('<queryObject> must be an object');
     if (params && typeof params !== 'object') throw new Error('<params>, if defined must be an object');
     const response = await this.request('https://music.youtube.com/youtubei/v1/search', {
