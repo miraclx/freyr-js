@@ -199,32 +199,36 @@ class YouTubeMusic {
       ...results.songs.contents, // song section
       ...results.videos.contents, // videos section
     ];
-    const classified = YouTubeMusic.classify(validSections, duration);
-    return attachFeedFn(classified, item => item.videoId);
-  }
-
-  static classify(stacks, duration) {
     function calculateAccuracyFor(item) {
       // get weighted delta from expected duration
-      const durationDelta =
-        100 - (Math.abs(duration - item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000) / duration) * 100;
+      const durationDelta = 100 - (Math.abs(duration - item.duration_ms) / duration) * 100;
       // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
-      return (
-        durationDelta + (res => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * res)(100 - durationDelta)
-      );
+      const accuracy =
+        durationDelta + (res => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * res)(100 - durationDelta);
+      return accuracy;
     }
-    return Object.values(
-      stacks.reduce((final, item) => {
+    const classified = Object.values(
+      validSections.reduce((final, item) => {
         // prune duplicates
-        if (!(item.link.videoId in final))
+        if (!(item.link.videoId in final)) {
           final[item.link.videoId] = {
-            ...item,
+            title: item.title,
+            type: item.type,
+            artists: item.artists,
+            album: item.album,
+            duration: item.duration,
+            duration_ms: item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000,
             videoId: item.link.videoId,
-            accuracy: calculateAccuracyFor(item),
+            playlistId: item.link.playlistId,
+            getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
+          final[item.link.videoId].accuracy = calculateAccuracyFor(final[item.link.videoId]);
+        }
         return final;
       }, {}),
+      // sort descending by accuracy
     ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
+    return classified;
   }
 }
 
