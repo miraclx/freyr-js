@@ -43,11 +43,6 @@ function genAsyncGetFeedsFn(url) {
   return async () => _ytdlGet(url, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']);
 }
 
-function attachFeedFn(collections, generator) {
-  generator = generator || (v => v);
-  return collections.map(item => ({...item, getFeeds: genAsyncGetFeedsFn(generator(item))}));
-}
-
 class YouTubeMusic {
   static [symbols.meta] = {
     ID: 'yt_music',
@@ -239,11 +234,12 @@ class YouTubeMusic {
       ...results.videos.contents, // videos section
     ];
     function calculateAccuracyFor(item) {
+      let accuracy = 0;
       // get weighted delta from expected duration
-      const durationDelta = 100 - (Math.abs(duration - item.duration_ms) / duration) * 100;
+      accuracy += 100 - (Math.abs(duration - item.duration_ms) / duration) * 100;
       // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
-      const accuracy =
-        durationDelta + (res => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * res)(100 - durationDelta);
+      accuracy += (cur => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * cur)(100 - accuracy);
+      // TODO: CALCULATE ACCURACY BY AUTHOR
       return accuracy;
     }
     const classified = Object.values(
