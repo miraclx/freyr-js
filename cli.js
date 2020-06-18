@@ -1077,7 +1077,7 @@ program
   .option(
     '-D, --downloader <SERVICE>',
     ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
-    'youtube',
+    'yt_music',
   )
   .option(
     '-l, --filter <MATCH>',
