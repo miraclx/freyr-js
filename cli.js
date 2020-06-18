@@ -1075,6 +1075,11 @@ program
     'm4a',
   )
   .option(
+    '-D, --downloader <SERVICE>',
+    ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
+    'youtube',
+  )
+  .option(
     '-l, --filter <MATCH>',
     [
       'filter matches off patterns (repeatable and optionally `,`-separated) (unimplemented)',
@@ -1109,11 +1114,6 @@ program
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
-  .option(
-    '-D, --downloader <SERVICE>',
-    ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
-    'youtube',
-  )
   .option('--cache-dir <DIR>', 'specify alternative cache directory', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-browser', 'disable browser authentication')
