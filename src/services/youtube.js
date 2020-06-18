@@ -8,6 +8,7 @@ const youtubedl = require('youtube-dl');
 
 const most = require('../most_polyfill');
 const symbols = require('../symbols');
+const AsyncQueue = require('../async_queue');
 
 const _ytdlGet = util.promisify(youtubedl.getInfo);
 
@@ -286,8 +287,8 @@ class YouTube {
 
   _search = util.promisify(ytSearch);
 
-  async _get(artists, trackTitle, xFilters, count = Infinity) {
-    return (
+  searchQueue = new AsyncQueue('YouTube:netSearchQueue', 3, async (artists, trackTitle, xFilters, count = Infinity) =>
+    (
       await this._search({
         query: [...artists, trackTitle, ...xFilters].join(' '),
         pageStart: 1,
@@ -302,8 +303,8 @@ class YouTube {
       )
         all.push({...item, xFilters});
       return all;
-    });
-  }
+    }),
+  );
 
   /**
    * Search YouTube service for matches
@@ -326,44 +327,49 @@ class YouTube {
     if (artists.some(artist => typeof artist !== 'string'))
       throw new Error('<artist>, if defined must be a valid array of strings');
     if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
-    const searchResults = await Promise.map(
-      [
-        [artists, track, ['Official Audio'], 5],
-        [artists, track, ['Audio'], 5],
-        [artists, track, ['Lyrics'], 5],
-        [artists, track, [], 5],
-      ],
-      query => Promise.resolve(this._get(...query)).reflect(),
-      {concurrency: 3},
-    );
-    const classified = YouTube.classify(
-      searchResults.flatMap(ret => (ret.isFulfilled() ? ret.value() : [])),
-      artists,
-      duration,
-    );
-    return attachFeedFn(classified, item => item.videoId);
-  }
 
-  static classify(stacks, artists, duration) {
-    const highestViews = Math.max(...stacks.map(video => video.views));
-    function bumpWith(video, accuracy) {
-      return (x => x + (video.views === highestViews ? (60 / 100) * (100 - accuracy) : 0))(
-        accuracy +
-          (most(artists, artist => video.author.name.toLowerCase().includes(artist.toLowerCase()))
-            ? (60 / 100) * (100 - accuracy)
-            : 0),
+    const searchResults = await Promise.all(
+      (
+        await this.searchQueue.push([
+          [artists, [track, ['Official Audio'], 5]],
+          [artists, [track, ['Audio'], 5]],
+          [artists, [track, ['Lyrics'], 5]],
+          [artists, [track, [], 5]],
+        ])
+      ).map(result => Promise.resolve(result).reflect()),
+    ).flatMap(ret => (ret.isFulfilled() ? ret.value() : []));
+    const highestViews = Math.max(...searchResults.map(video => video.views));
+    function calculateAccuracyFor(item) {
+      let accuracy = 0;
+      // get weighted delta from expected duration
+      accuracy += 100 - (Math.abs(duration - item.duration_ms) / duration) * 100;
+      // bump accuracy by max of 80% on the basis of highest views
+      accuracy += (cur => cur + (80 / 100) * ((item.views / highestViews) * 100))(100 - accuracy);
+      // bump accuracy by 60% if video author matches track author
+      accuracy += (cur =>
+        cur + (most(artists, artist => item.author.name.toLowerCase().includes(artist.toLowerCase())) ? (60 / 100) * cur : 0))(
+        100 - accuracy,
       );
+      return accuracy;
     }
-    return Object.values(
-      stacks.reduce((final, item) => {
+    const classified = Object.values(
+      searchResults.reduce((final, item) => {
         if (!(item.videoId in final))
           final[item.videoId] = {
-            ...item,
-            accuracy: bumpWith(item, ((duration - Math.abs(duration - item.seconds * 1000)) / duration) * 100),
+            title: item.title,
+            type: item.type,
+            author: item.author,
+            // album: item.album,
+            duration: item.album.timestamp,
+            duration_ms: item.duration.seconds * 1000,
+            videoId: item.videoId,
+            accuracy: calculateAccuracyFor(item),
+            getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
         return final;
       }, {}),
-    ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : a.accuracy < b.accuracy ? 1 : 0));
+    ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
+    return classified;
   }
 }
 
