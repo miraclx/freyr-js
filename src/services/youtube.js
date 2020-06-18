@@ -21,12 +21,13 @@ function YouTubeSearchError(message, statusCode, status, body) {
 
 YouTubeSearchError.prototype = Error.prototype;
 
+function genAsyncGetFeedsFn(url) {
+  return async () => _ytdlGet(url, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']);
+}
+
 function attachFeedFn(collections, generator) {
   generator = generator || (v => v);
-  return collections.map(item => ({
-    ...item,
-    getFeeds: async () => _ytdlGet(generator(item), ['--socket-timeout=20', '--retries=20', '--no-cache-dir']),
-  }));
+  return collections.map(item => ({...item, getFeeds: genAsyncGetFeedsFn(generator(item))}));
 }
 
 class YouTubeMusic {
