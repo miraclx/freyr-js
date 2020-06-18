@@ -249,12 +249,11 @@ class YouTubeMusic {
           final[item.link.videoId] = {
             title: item.title,
             type: item.type,
-            artists: item.artists,
+            author: item.artists,
             album: item.album,
             duration: item.duration,
             duration_ms: item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000,
             videoId: item.link.videoId,
-            playlistId: item.link.playlistId,
             getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
           final[item.link.videoId].accuracy = calculateAccuracyFor(final[item.link.videoId]);
