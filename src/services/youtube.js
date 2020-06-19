@@ -235,9 +235,9 @@ class YouTubeMusic {
 
     const results = await this._search({query: artists.concat(track).join(' ')});
     const validSections = [
-      ...results.top.contents, // top recommended songs
-      ...results.songs.contents, // song section
-      ...results.videos.contents, // videos section
+      ...((results.top || {}).contents || []), // top recommended songs
+      ...((results.songs || {}).contents || []), // song section
+      ...((results.videos || {}).contents || []), // videos section
     ];
     function calculateAccuracyFor(item) {
       let accuracy = 0;
