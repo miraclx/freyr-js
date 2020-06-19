@@ -130,6 +130,77 @@ function prepProgressGen(options) {
   };
 }
 
+/**
+ * Concise promise handler for ensuring proper core method dispatches and logging
+ *
+ * **Handlers**:
+ *  * `onInit`: printed before the promise is awaited
+ *  * `onErr`: printed if the promise was rejected
+ *  * `noVal`: printed if a successfully resolved promise returned a null-ish value
+ *  * `arrIsEmpty`: printed if a successfully resolved promise returned an empty array or if an array contains only null-ish values
+ *  * `onPass`: printed only if the promise successfully fulfilled with a proper value
+ *
+ * In the event that any handler is `true`, its default printer would be used
+ * Except in the case of `onInit` and `onPass` whose default printer would be called even if a handler isn't specified
+ *
+ * If a handler's value is a function, its return value would only be printed if it is an array.
+ * Otherwise, `processPromise` assumes that you took care of the printing.
+ * @param {() => Promise<any>|Promise<any>} promise Promise to be awaited on
+ * @param {StackLogger} logger Logger to be used
+ * @param {{
+ *   onInit: string | boolean | (() => any[] | boolean);
+ *   onErr: string | boolean | (() => any[] | boolean);
+ *   noVal: string | boolean | (() => any[] | boolean);
+ *   arrIsEmpty: string | boolean | (() => any[] | boolean);
+ *   onPass: string | boolean | (() => any[] | boolean);
+ * }} messageHandlers State logging handlers
+ */
+async function processPromise_new(promise, logger, messageHandlers) {
+  /**
+   * TODO: Add retry functionality
+   * ? Checking...(failed)
+   * ?  [2/4] Retrying...(failed)
+   * ?  [3/4] Retrying...(failed)
+   * ?  [4/4] Retrying...(done)
+   */
+  if (!messageHandlers) messageHandlers = {};
+  function handleResultOf(value, msg, defaultHandler) {
+    if (msg === true) msg = defaultHandler;
+    if (typeof msg === 'function') {
+      value = msg(value, logger);
+      if (Array.isArray(value)) logger.write(...value);
+    } else logger.write(`${msg}\n`);
+  }
+
+  // formerly .pre
+  if (messageHandlers.onInit !== false) handleResultOf(null, messageHandlers.onInit, () => logger.print(messageHandlers.onInit));
+  const result = await Promise.resolve(typeof promise === 'function' ? promise() : promise).reflect();
+  if (result.isRejected()) {
+    // formerly .err
+    if (messageHandlers.onErr !== false)
+      handleResultOf(result.reason(), messageHandlers.onErr, reason => [
+        '(failed%s)',
+        reason ? `: [${reason.message || reason}]` : '',
+        '\n',
+      ]);
+    return null;
+  }
+  const value = result.value();
+
+  // formerly .xerr
+  if (messageHandlers.noVal && (!value || value.err)) handleResultOf(value, messageHandlers.noVal, () => ['(no data)', '\n']);
+  // formerly .aerr
+  else if (
+    messageHandlers.arrIsEmpty &&
+    Array.isArray(value) &&
+    (value.length === 0 || value.every(item => [undefined, null].some(item)))
+  )
+    handleResultOf(value, messageHandlers.arrIsEmpty, () => ['(array contains no data)', '\n']);
+  // formerly .post
+  else if (messageHandlers.onPass !== false) handleResultOf(value, messageHandlers.onPass, () => ['[done]', '\n']);
+  return value;
+}
+
 async function processPromise(px, logger, {pre, post, err, xerr, aerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
