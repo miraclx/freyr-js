@@ -57,32 +57,41 @@ class YouTubeMusic {
 
   [symbols.meta] = YouTubeMusic[symbols.meta];
 
-  gotInstance = got.extend({
-    headers: {
-      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
-    },
-  });
+  #store = {
+    gotInstance: got.extend({
+      headers: {
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+      },
+    }),
+    apiKey: null,
+  };
 
-  apiKey = null;
-
-  async request(url, opts) {
-    const response = await this.gotInstance(url, opts).catch(err =>
-      Promise.reject(
-        new YouTubeSearchError(err.message, err.response && err.response.statusCode, err.code, err.response && err.response.body),
-      ),
-    );
+  #request = async function request(url, opts) {
+    const response = await this.#store
+      .gotInstance(url, opts)
+      .catch(err =>
+        Promise.reject(
+          new YouTubeSearchError(
+            err.message,
+            err.response && err.response.statusCode,
+            err.code,
+            err.response && err.response.body,
+          ),
+        ),
+      );
     return response.body;
-  }
+  };
 
-  async getApiKey(force = false) {
-    if (this.apiKey && !force) return this.apiKey;
-    const body = await this.request('https://music.youtube.com/', {method: 'get'});
+  #getApiKey = async function getApiKey(force = false) {
+    if (this.#store.apiKey && !force) return this.#store.apiKey;
+    const body = await this.#request('https://music.youtube.com/', {method: 'get'});
     let match;
-    if ((match = (body || '').match(/(?="INNERTUBE_API_KEY":"(.+?)")/))) return ([, this.apiKey] = match), this.apiKey;
+    if ((match = (body || '').match(/(?="INNERTUBE_API_KEY":"(.+?)")/)))
+      return ([, this.#store.apiKey] = match), this.#store.apiKey;
     throw new YouTubeSearchError('Failed to extract `INNERTUBE_API_KEY`');
-  }
+  };
 
-  async _search(queryObject, params, tag) {
+  #search = async function search(queryObject, params, tag) {
     /**
      * VideoID Types?
      * OMV: Official Music Video
@@ -91,10 +100,10 @@ class YouTubeMusic {
      */
     if (typeof queryObject !== 'object') throw new Error('<queryObject> must be an object');
     if (params && typeof params !== 'object') throw new Error('<params>, if defined must be an object');
-    const response = await this.request('https://music.youtube.com/youtubei/v1/search', {
+    const response = await this.#request('https://music.youtube.com/youtubei/v1/search', {
       timeout: 10000,
       method: 'post',
-      searchParams: {alt: 'json', key: await this.getApiKey(), ...params},
+      searchParams: {alt: 'json', key: await this.#getApiKey(), ...params},
       responseType: 'json',
       json: {
         context: {
@@ -190,7 +199,7 @@ class YouTubeMusic {
                     : async () => {
                         const continuationObject = layer.continuations[0].nextContinuationData;
                         return (
-                          await this._search(
+                          await this.#search(
                             {},
                             {
                               icit: continuationObject.clickTrackingParams,
@@ -203,13 +212,13 @@ class YouTubeMusic {
                   expand: !layer.bottomEndpoint
                     ? undefined
                     : async () =>
-                        (await this._search(layer.bottomEndpoint.searchEndpoint, {}, tag || layerName.slice(0, -1))).other,
+                        (await this.#search(layer.bottomEndpoint.searchEndpoint, {}, tag || layerName.slice(0, -1))).other,
                 }),
           },
         ];
       }),
     );
-  }
+  };
 
   /**
    * Search the YouTube Music service for matches
@@ -233,7 +242,7 @@ class YouTubeMusic {
       throw new Error('<artist>, if defined must be a valid array of strings');
     if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
 
-    const results = await this._search({query: artists.concat(track).join(' ')});
+    const results = await this.#search({query: artists.concat(track).join(' ')});
     const validSections = [
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
@@ -286,26 +295,27 @@ class YouTube {
 
   [symbols.meta] = YouTube[symbols.meta];
 
-  _search = util.promisify(ytSearch);
-
-  searchQueue = new AsyncQueue('YouTube:netSearchQueue', 3, async (artists, trackTitle, xFilters, count = Infinity) =>
-    (
-      await this._search({
-        query: [...artists, trackTitle, ...xFilters].join(' '),
-        pageStart: 1,
-        pageEnd: 2,
-      })
-    ).videos.reduce((all, item) => {
-      if (
-        all.length < count &&
-        most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
-        item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
-        !/\d+D/i.test(item.title)
-      )
-        all.push({...item, xFilters});
-      return all;
-    }),
-  );
+  #store = {
+    search: util.promisify(ytSearch),
+    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 3, async (artists, trackTitle, xFilters, count = Infinity) =>
+      (
+        await this.#store.search({
+          query: [...artists, trackTitle, ...xFilters].join(' '),
+          pageStart: 1,
+          pageEnd: 2,
+        })
+      ).videos.reduce((all, item) => {
+        if (
+          all.length < count &&
+          most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
+          item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
+          !/\d+D/i.test(item.title)
+        )
+          all.push({...item, xFilters});
+        return all;
+      }),
+    ),
+  };
 
   /**
    * Search YouTube service for matches
@@ -332,7 +342,7 @@ class YouTube {
     const searchResults = (
       await Promise.all(
         (
-          await this.searchQueue.push([
+          await this.#store.searchQueue.push([
             [artists, [track, ['Official Audio'], 5]],
             [artists, [track, ['Audio'], 5]],
             [artists, [track, ['Lyrics'], 5]],
