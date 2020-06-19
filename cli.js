@@ -1121,7 +1121,14 @@ const program = commander
   .option('--no-header', 'hide startup header')
   .version(`v${packageJson.version}`, '-v, --version')
   .helpOption('-h, --help', 'show this help information')
-  .addHelpCommand('help [command]', 'show this help information or for any subcommand');
+  .addHelpCommand('help [command]', 'show this help information or for any subcommand')
+  .on('--help', () => {
+    console.log('Info:');
+    console.log('  The `get` subcommand is implicit and default');
+    console.log('   $ freyr spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
+    console.log('     # is equivalent to');
+    console.log('   $ freyr get spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
+  });
 
 program
   .command('get', {isDefault: true})
