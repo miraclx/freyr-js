@@ -361,7 +361,7 @@ class YouTube {
             type: item.type,
             author: item.author,
             // album: item.album,
-            duration: item.album.timestamp,
+            duration: item.duration.timestamp,
             duration_ms: item.duration.seconds * 1000,
             videoId: item.videoId,
             accuracy: calculateAccuracyFor(item),
