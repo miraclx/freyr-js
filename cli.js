@@ -130,7 +130,7 @@ function prepProgressGen(options) {
   };
 }
 
-async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
+async function processPromise(px, logger, {pre, post, err, xerr, aerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
   if (rex.isRejected() && err !== false)
@@ -140,6 +140,12 @@ async function processPromise(px, logger, {pre, post, err, xerr} = {}) {
         : [`(failed%s)\n`, (_err => (_err ? `: [${_err.message || _err}]` : ''))(rex.reason())]),
     );
   else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr !== true ? xerr : '(no data)'}\n`);
+  else if (
+    aerr &&
+    Array.isArray(rex.value()) &&
+    (rex.value().length === 0 || rex.value().every(item => [undefined, null].some(item)))
+  )
+    logger.write(`${aerr !== true ? aerr : '(array contains no data)'}\n`);
   else if (post !== false) {
     const isFn = typeof post === 'function';
     if (isFn) post = post(rex.value(), logger);
