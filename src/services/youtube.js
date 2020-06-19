@@ -251,7 +251,7 @@ class YouTubeMusic {
     const classified = Object.values(
       validSections.reduce((final, item) => {
         // prune duplicates
-        if (!(item.link.videoId in final)) {
+        if (item && item.link.videoId && !(item.link.videoId in final)) {
           final[item.link.videoId] = {
             title: item.title,
             type: item.type,
@@ -357,7 +357,7 @@ class YouTube {
     }
     const classified = Object.values(
       searchResults.reduce((final, item) => {
-        if (!(item.videoId in final))
+        if (item.videoId && !(item.videoId in final))
           final[item.videoId] = {
             title: item.title,
             type: item.type,
