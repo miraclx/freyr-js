@@ -180,7 +180,7 @@ async function processPromise_new(promise, logger, messageHandlers) {
     if (messageHandlers.onErr !== false)
       handleResultOf(result.reason(), messageHandlers.onErr, reason => [
         '(failed%s)',
-        reason ? `: [${reason.message || reason}]` : '',
+        reason ? `: [${reason['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || reason}]` : '',
         '\n',
       ]);
     return null;
@@ -208,7 +208,10 @@ async function processPromise(px, logger, {pre, post, err, xerr, aerr} = {}) {
     logger.write(
       ...(err
         ? [typeof err === 'function' ? err(rex.reason()) : err, '\n']
-        : [`(failed%s)\n`, (_err => (_err ? `: [${_err.message || _err}]` : ''))(rex.reason())]),
+        : [
+            `(failed%s)\n`,
+            (_err => (_err ? `: [${_err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || _err}]` : ''))(rex.reason()),
+          ]),
     );
   else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr !== true ? xerr : '(no data)'}\n`);
   else if (
