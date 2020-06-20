@@ -1221,9 +1221,7 @@ program
       '(default when number of chunks/segments exceed printable space)',
     ].join('\n'),
   )
-  .action((query, args) => {
-    init(query, args).catch(err => console.error('unmanaged cli error>', err));
-  });
+  .action(init);
 
 program
   .command('serve')
@@ -1447,11 +1445,9 @@ function main(argv) {
     console.log('-'.repeat(credits.length));
   }
   if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
-  try {
-    program.parse(argv);
-  } catch (er) {
+  (async () => program.parseAsync(argv))().catch(er => {
     console.error(`\x1b[31m[!] Fatal Error\x1b[0m: ${typeof er === 'undefined' ? '[uncaught]' : er ? er.message : er}`);
-  }
+  });
 }
 
 main(process.argv);
