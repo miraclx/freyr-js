@@ -763,7 +763,7 @@ async function init(queries, options) {
       processPromise(sourcesPromise, trackLogger, {
         pre: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
         xerr: '[Unable to gather sources]',
-        post: ({sources}) => `[success, found ${sources.length} sources]`,
+        post: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]`,
       }),
     );
     if (!audioSource) return {meta, code: 1};
