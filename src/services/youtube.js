@@ -355,12 +355,12 @@ class YouTube {
     function calculateAccuracyFor(item) {
       let accuracy = 0;
       // get weighted delta from expected duration
-      accuracy += 100 - (Math.abs(duration - item.duration_ms) / duration) * 100;
+      accuracy += 100 - (Math.abs(duration - item.duration.seconds * 1000) / duration) * 100;
       // bump accuracy by max of 80% on the basis of highest views
-      accuracy += (cur => cur + (80 / 100) * ((item.views / highestViews) * 100))(100 - accuracy);
+      accuracy += (cur => cur * (80 / 100) * (item.views / highestViews))(100 - accuracy);
       // bump accuracy by 60% if video author matches track author
       accuracy += (cur =>
-        cur + (most(artists, artist => item.author.name.toLowerCase().includes(artist.toLowerCase())) ? (60 / 100) * cur : 0))(
+        most(artists, artist => item.author.name.toLowerCase().includes(artist.toLowerCase())) ? (60 / 100) * cur : 0)(
         100 - accuracy,
       );
       return accuracy;
