@@ -269,7 +269,7 @@ class YouTubeMusic {
             duration: item.duration,
             duration_ms: item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000,
             videoId: item.link.videoId,
-            getFeeds: genAsyncGetFeedsFn(item.videoId),
+            getFeeds: genAsyncGetFeedsFn(item.link.videoId),
           };
           final[item.link.videoId].accuracy = calculateAccuracyFor(final[item.link.videoId]);
         }
