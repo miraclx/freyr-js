@@ -371,7 +371,7 @@ class YouTube {
           final[item.videoId] = {
             title: item.title,
             type: item.type,
-            author: item.author,
+            author: item.author.name,
             // album: item.album,
             duration: item.duration.timestamp,
             duration_ms: item.duration.seconds * 1000,
