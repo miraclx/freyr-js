@@ -314,7 +314,7 @@ class YouTube {
         )
           all.push({...item, xFilters});
         return all;
-      }),
+      }, []),
     ),
   };
 
