@@ -305,16 +305,21 @@ class YouTube {
           pageStart: 1,
           pageEnd: 2,
         })
-      ).videos.reduce((all, item) => {
-        if (
-          all.length < count &&
-          most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
-          item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
-          !/\d+D/i.test(item.title)
-        )
-          all.push({...item, xFilters});
-        return all;
-      }, []),
+      ).videos.reduce(
+        (final, item) => {
+          if (
+            final.results.length < count &&
+            most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
+            item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
+            !/\d+D/i.test(item.title) // ignore 8d, 16d, etc videos, not original audio
+          ) {
+            final.highestViews = Math.max(final.highestViews, item.views);
+            final.results.push(item);
+          }
+          return final;
+        },
+        {xFilters, highestViews: 0, results: []},
+      ),
     ),
   };
 
@@ -354,8 +359,8 @@ class YouTube {
       const err = searchResults[searchResults.length - 1].reason();
       throw new YouTubeSearchError(err.message, null, err.code);
     }
-    searchResults = searchResults.flatMap(ret => (ret.isFulfilled() ? ret.value() : []));
-    const highestViews = Math.max(...searchResults.map(video => video.views));
+    searchResults = searchResults.map(ret => (ret.isFulfilled() ? ret.value() : {}));
+    const highestViews = Math.max(...searchResults.map(sources => sources.highestViews));
     function calculateAccuracyFor(item) {
       let accuracy = 0;
       // get weighted delta from expected duration
@@ -369,8 +374,10 @@ class YouTube {
       );
       return accuracy;
     }
-    const classified = Object.values(
-      searchResults.reduce((final, item) => {
+    const final = {};
+    searchResults.forEach(source =>
+      source.results.forEach(item => {
+        // prune duplicates
         if (item && 'videoId' in item && !(item.videoId in final))
           final[item.videoId] = {
             title: item.title,
@@ -379,13 +386,13 @@ class YouTube {
             duration: item.duration.timestamp,
             duration_ms: item.duration.seconds * 1000,
             videoId: item.videoId,
+            xFilters: source.xFilters,
             accuracy: calculateAccuracyFor(item),
             getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
-        return final;
-      }, {}),
-    ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
-    return classified;
+      }),
+    );
+    return Object.values(final).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
   }
 }
 
