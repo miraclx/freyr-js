@@ -249,7 +249,7 @@ class YouTubeMusic {
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
       ...((results.videos || {}).contents || []), // videos section
-    ];
+    ].filter(item => item.title.toLowerCase().includes(track.toLowerCase()));
     function calculateAccuracyFor(item) {
       let accuracy = 0;
       // get weighted delta from expected duration
