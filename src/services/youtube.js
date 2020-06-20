@@ -348,10 +348,10 @@ class YouTube {
     let searchResults = await Promise.all(
       (
         await this.#store.searchQueue.push([
-          [artists, [track, ['Official Audio'], 5]],
-          [artists, [track, ['Audio'], 5]],
-          [artists, [track, ['Lyrics'], 5]],
-          [artists, [track, [], 5]],
+          [artists, [track, ['Official Audio']]],
+          [artists, [track, ['Audio']]],
+          [artists, [track, ['Lyrics']]],
+          [artists, [track, []]],
         ])
       ).map(result => Promise.resolve(result).reflect()),
     );
