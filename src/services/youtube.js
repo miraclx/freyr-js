@@ -144,7 +144,9 @@ class YouTubeMusic {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
               const tags = content.flexColumns.map(obj =>
-                obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).join(''),
+                obj.musicResponsiveListItemFlexColumnRenderer.text
+                  ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).join('')
+                  : undefined,
               );
               const type = tag || tags.splice(1, 1)[0];
               return type === 'Song'
