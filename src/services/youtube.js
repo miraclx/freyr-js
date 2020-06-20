@@ -340,18 +340,21 @@ class YouTube {
       throw new Error('<artist>, if defined must be a valid array of strings');
     if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
 
-    const searchResults = (
-      await Promise.all(
-        (
-          await this.#store.searchQueue.push([
-            [artists, [track, ['Official Audio'], 5]],
-            [artists, [track, ['Audio'], 5]],
-            [artists, [track, ['Lyrics'], 5]],
-            [artists, [track, [], 5]],
-          ])
-        ).map(result => Promise.resolve(result).reflect()),
-      )
-    ).flatMap(ret => (ret.isFulfilled() ? ret.value() : []));
+    let searchResults = await Promise.all(
+      (
+        await this.#store.searchQueue.push([
+          [artists, [track, ['Official Audio'], 5]],
+          [artists, [track, ['Audio'], 5]],
+          [artists, [track, ['Lyrics'], 5]],
+          [artists, [track, [], 5]],
+        ])
+      ).map(result => Promise.resolve(result).reflect()),
+    );
+    if (searchResults.every(result => result.isRejected())) {
+      const err = searchResults[searchResults.length - 1].reason();
+      throw new YouTubeSearchError(err.message, null, err.code);
+    }
+    searchResults = searchResults.flatMap(ret => (ret.isFulfilled() ? ret.value() : []));
     const highestViews = Math.max(...searchResults.map(video => video.views));
     function calculateAccuracyFor(item) {
       let accuracy = 0;
