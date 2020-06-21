@@ -706,8 +706,8 @@ async function init(queries, options) {
   });
 
   function buildSourceCollectorFor(track, selector) {
-    async function handleSource(iterator) {
-      const result = {service: null, sources: null};
+    async function handleSource(iterator, lastErr) {
+      const result = {service: null, sources: null, lastErr};
       if ((result.service = iterator.next().value)) {
         result.sources = Promise.resolve(
           result.service.search(track.artists, track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''), track.duration),
@@ -732,14 +732,14 @@ async function init(queries, options) {
           if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
           return {sources, source, feeds, service: result.service};
         });
-        result.results = result.sources.catch(() => ({next: handleSource(iterator)}));
+        result.results = result.sources.catch(err => ({next: handleSource(iterator, err)}));
       }
       return result;
     }
 
     async function collect_contained(process, handler) {
       process = await process;
-      if (!process.sources) return;
+      if (!process.sources) return {err: process.lastErr};
       await handler(process.service, process.sources);
       const results = await process.results;
       if (results.next) return collect_contained(results.next, handler);
@@ -768,7 +768,7 @@ async function init(queries, options) {
         post: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]`,
       }),
     );
-    if (!audioSource) return {meta, code: 1};
+    if ('err' in audioSource) return {meta, code: 1, err: audioSource.err}; // zero sources found
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
       pre: '| \u27a4 Awaiting audiofeeds...',
       xerr: '[Unable to collect source feeds]',
