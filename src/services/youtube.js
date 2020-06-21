@@ -249,7 +249,12 @@ class YouTubeMusic {
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
       ...((results.videos || {}).contents || []), // videos section
-    ].filter(item => item.title.toLowerCase().includes(track.toLowerCase()));
+    ].filter(
+      item =>
+        item &&
+        'title' in item &&
+        (item.title.toLowerCase().includes(track.toLowerCase()) || track.toLowerCase().includes(item.title.toLowerCase())),
+    );
     function calculateAccuracyFor(item) {
       let accuracy = 0;
       // get weighted delta from expected duration
@@ -309,8 +314,11 @@ class YouTube {
         (final, item) => {
           if (
             artists.length === 0 ||
-            (most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
-              item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
+            (item &&
+              'title' in item &&
+              most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
+              (item.title.toLowerCase().includes(trackTitle.toLowerCase()) ||
+                trackTitle.toLowerCase().includes(item.title.toLowerCase())) &&
               !/\d+D/i.test(item.title)) // ignore 8d, 16d, etc videos, not original audio
           ) {
             final.highestViews = Math.max(final.highestViews, item.views);
