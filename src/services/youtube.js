@@ -298,7 +298,7 @@ class YouTube {
 
   #store = {
     search: util.promisify(ytSearch),
-    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 3, async (artists, trackTitle, xFilters) =>
+    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 4, async (artists, trackTitle, xFilters) =>
       (
         await this.#store.search({
           query: [...artists, trackTitle, ...xFilters].join(' '),
