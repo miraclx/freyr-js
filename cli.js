@@ -712,7 +712,9 @@ async function init(queries, options) {
         result.sources = Promise.resolve(
           result.service.search(track.artists, track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''), track.duration),
         ).then(sources => {
-          if ([undefined, null].includes(sources)) throw new Error(`incompatible response. recieved [${sources}]`);
+          if ([undefined, null].includes(sources)) throw new Error(`incompatible source response. recieved [${sources}]`);
+          // arrays returned from service source calls should have at least one item
+          if (Array.isArray(sources) && sources.length === 0) throw new Error('Zero sources found');
           const source = (
             selector ||
             (results => {
