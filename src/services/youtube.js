@@ -298,7 +298,7 @@ class YouTube {
 
   #store = {
     search: util.promisify(ytSearch),
-    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 3, async (artists, trackTitle, xFilters, count = Infinity) =>
+    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 3, async (artists, trackTitle, xFilters) =>
       (
         await this.#store.search({
           query: [...artists, trackTitle, ...xFilters].join(' '),
@@ -308,7 +308,6 @@ class YouTube {
       ).videos.reduce(
         (final, item) => {
           if (
-            final.results.length < count &&
             most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
             item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
             !/\d+D/i.test(item.title) // ignore 8d, 16d, etc videos, not original audio
