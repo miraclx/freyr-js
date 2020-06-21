@@ -797,10 +797,13 @@ async function init(queries, options) {
         BASE_DIRECTORY,
         ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
       );
-      const trackName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}${
-        isPlaylist || (track.compilation && track.album_artist === 'Various Artists') ? ` \u2012 ${track.artists.join(', ')}` : ''
-      }`;
-      const outFileName = `${filenamify(trackName, {replacement: '_'})}.m4a`;
+      const trackBaseName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
+      const trackName = trackBaseName.concat(
+        isPlaylist || (track.compilation && track.album_artist === 'Various Artists')
+          ? ` \u2012 ${track.artists.join(', ')}`
+          : '',
+      );
+      const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.m4a`;
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = fs.existsSync(outFilePath);
       const processTrack = !fileExists || options.force;
