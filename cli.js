@@ -725,7 +725,7 @@ async function init(queries, options) {
               }
             })
           )(sources);
-          if ([undefined, null].includes(source)) throw new Error(`incompatible source response. recieved: [${source}]`);
+          if ([undefined, null].includes(source)) throw new Error(`incompatible response item. recieved: [${source}]`);
           if (!('getFeeds' in source)) throw new Error(`service provided no means for source to collect feeds`);
           const feeds = source.getFeeds();
           Promise.resolve(feeds).catch(() => {}); // diffuse feeds result, in case of an asynchronous promise rejection
