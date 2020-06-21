@@ -253,7 +253,7 @@ class YouTubeMusic {
     function calculateAccuracyFor(item) {
       let accuracy = 0;
       // get weighted delta from expected duration
-      accuracy += 100 - (duration ? Math.abs(duration - item.duration_ms) / duration : 1) * 100;
+      accuracy += 100 - (duration ? Math.abs(duration - item.duration_ms) / duration : 0.5) * 100;
       // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
       accuracy += (cur => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * cur)(100 - accuracy);
       // TODO: CALCULATE ACCURACY BY AUTHOR
@@ -363,7 +363,7 @@ class YouTube {
     function calculateAccuracyFor(item) {
       let accuracy = 0;
       // get weighted delta from expected duration
-      accuracy += 100 - (duration ? Math.abs(duration - item.duration.seconds * 1000) / duration : 1) * 100;
+      accuracy += 100 - (duration ? Math.abs(duration - item.duration.seconds * 1000) / duration : 0.5) * 100;
       // bump accuracy by max of 80% on the basis of highest views
       accuracy += (cur => cur * (80 / 100) * (item.views / highestViews))(100 - accuracy);
       // bump accuracy by 60% if video author matches track author
