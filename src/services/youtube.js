@@ -375,23 +375,24 @@ class YouTube {
       return accuracy;
     }
     const final = {};
-    searchResults.forEach(source =>
-      source.results.forEach(item => {
-        // prune duplicates
-        if (item && 'videoId' in item && !(item.videoId in final))
-          final[item.videoId] = {
-            title: item.title,
-            type: item.type,
-            author: item.author.name,
-            duration: item.duration.timestamp,
-            duration_ms: item.duration.seconds * 1000,
-            videoId: item.videoId,
-            xFilters: source.xFilters,
-            accuracy: calculateAccuracyFor(item),
-            getFeeds: genAsyncGetFeedsFn(item.videoId),
-          };
-      }),
-    );
+    searchResults.forEach(source => {
+      if (Array.isArray(source.results))
+        source.results.forEach(item => {
+          // prune duplicates
+          if (item && 'videoId' in item && !(item.videoId in final))
+            final[item.videoId] = {
+              title: item.title,
+              type: item.type,
+              author: item.author.name,
+              duration: item.duration.timestamp,
+              duration_ms: item.duration.seconds * 1000,
+              videoId: item.videoId,
+              xFilters: source.xFilters,
+              accuracy: calculateAccuracyFor(item),
+              getFeeds: genAsyncGetFeedsFn(item.videoId),
+            };
+        });
+    });
     return Object.values(final).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
   }
 }
