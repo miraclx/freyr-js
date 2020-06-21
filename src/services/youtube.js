@@ -308,9 +308,10 @@ class YouTube {
       ).videos.reduce(
         (final, item) => {
           if (
-            most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
-            item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
-            !/\d+D/i.test(item.title) // ignore 8d, 16d, etc videos, not original audio
+            artists.length === 0 ||
+            (most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
+              item.title.toLowerCase().includes(trackTitle.toLowerCase()) &&
+              !/\d+D/i.test(item.title)) // ignore 8d, 16d, etc videos, not original audio
           ) {
             final.highestViews = Math.max(final.highestViews, item.views);
             final.results.push(item);
