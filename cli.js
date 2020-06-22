@@ -471,7 +471,10 @@ async function init(queries, options) {
       const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
-        const playlistFile = xpath.join(BASE_DIRECTORY, `${filenamify(filename, {replacement: '_'})}.m3u8`);
+        const playlistFile = xpath.join(
+          options.playlistDir || BASE_DIRECTORY,
+          `${filenamify(filename, {replacement: '_'})}.m3u8`,
+        );
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
