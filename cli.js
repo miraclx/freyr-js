@@ -5,6 +5,7 @@ const xpath = require('path');
 const {spawn, spawnSync} = require('child_process');
 
 const tmp = require('tmp');
+const xurl = require('url');
 const Conf = require('conf');
 const open = require('open');
 const xget = require('libxget');
@@ -484,7 +485,9 @@ async function init(queries, options) {
               '',
               `#URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
-              `${xpath.relative(BASE_DIRECTORY, outFilePath)}`,
+              `${(xurl.format(xurl.parse(options.playlistNamespace)).concat('/') || '').concat(
+                xpath.relative(BASE_DIRECTORY, outFilePath),
+              )}`,
               '',
             ].join('\n'),
           ),
