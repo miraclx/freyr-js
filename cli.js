@@ -1162,9 +1162,9 @@ program
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..')
-  .option('-c, --cover <name>', 'custom name for the cover art', 'cover.png')
+  .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
   .option(
-    '--cover-size <size>',
+    '--cover-size <SIZE>',
     ['preferred cover art dimensions', '(format: <width>x<height> or <size> as <size>x<size>)'].join('\n'),
     '640x640',
   )
@@ -1199,8 +1199,8 @@ program
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('-f, --force', 'force overwrite of existing files')
-  .option('-o, --config <file>', 'specify alternative configuration file')
-  .option('-p, --playlist <file>', 'create playlist for all successfully collated tracks')
+  .option('-o, --config <FILE>', 'specify alternative configuration file')
+  .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
