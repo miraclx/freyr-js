@@ -1006,9 +1006,9 @@ async function init(queries, options) {
             trackStat.code === -1
               ? 'Failed getting track data'
               : trackStat.code === 1
-              ? 'Zero sources found'
+              ? 'Failed collecting sources'
               : trackStat.code === 2
-              ? 'Error while retrieving sources'
+              ? 'Error while collecting sources feeds'
               : trackStat.code === 3
               ? 'Error downloading album art'
               : trackStat.code === 4
