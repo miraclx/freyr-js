@@ -1202,6 +1202,15 @@ program
   .option('-o, --config <FILE>', 'specify alternative configuration file')
   .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
+  .option('--playlist-dir <DIR>', 'directory to save playlist file to, if any, (default: tracks base directory)')
+  .option(
+    '--playlist-namespace <SPEC>',
+    [
+      'namespace to prefix on each track entry, relative to tracks base directory',
+      'useful for, but not limited to custom (file:// or http://) entries',
+      '(example, you can prefix with a HTTP domain path: `http://webpage.com/music`)',
+    ].join('\n'),
+  )
   .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
