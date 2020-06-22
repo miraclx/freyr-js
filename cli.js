@@ -466,18 +466,18 @@ async function init(queries, options) {
 
   const progressGen = prepProgressGen(options);
 
-  function createPlaylist(stats, logger, directory, filename, playlistTitle) {
+  function createPlaylist(stats, logger, filename, playlistTitle) {
     if (options.playlist !== false) {
       const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
-        const playlistFile = xpath.join(directory, `${filenamify(filename, {replacement: '_'})}.m3u8`);
+        const playlistFile = xpath.join(BASE_DIRECTORY, `${filenamify(filename, {replacement: '_'})}.m3u8`);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST:${playlistTitle}\n`);
         validStats.forEach(({meta: {track: {name, artists, duration}, outFilePath}}) =>
           plStream.write(
-            `\n#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}\n${xpath.relative(directory, outFilePath)}\n`,
+            `\n#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}\n${xpath.relative(BASE_DIRECTORY, outFilePath)}\n`,
           ),
         );
         plStream.close();
@@ -1041,7 +1041,6 @@ async function init(queries, options) {
         createPlaylist(
           trackStats,
           queryLogger,
-          BASE_DIRECTORY,
           `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
           `${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
         );
@@ -1053,8 +1052,7 @@ async function init(queries, options) {
   });
   const totalQueries = [...options.input, ...queries];
   const trackStats = (await pFlatten(queryQueue.push(totalQueries))).filter(Boolean);
-  if (options.playlist && typeof options.playlist === 'string')
-    createPlaylist(trackStats, stackLogger, BASE_DIRECTORY, options.playlist);
+  if (options.playlist && typeof options.playlist === 'string') createPlaylist(trackStats, stackLogger, options.playlist);
   const finalStats = trackStats.reduce(
     (total, current) => {
       if (current.postprocess && current.postprocess.finalSize) {
