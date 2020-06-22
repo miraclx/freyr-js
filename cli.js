@@ -467,7 +467,7 @@ async function init(queries, options) {
   const progressGen = prepProgressGen(options);
 
   function createPlaylist(stats, logger, directory, filename, playlistTitle) {
-    if (options.playlist) {
+    if (options.playlist !== false) {
       const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
