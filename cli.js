@@ -474,10 +474,16 @@ async function init(queries, options) {
         const playlistFile = xpath.join(BASE_DIRECTORY, `${filenamify(filename, {replacement: '_'})}.m3u8`);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
-        if (playlistTitle) plStream.write(`#PLAYLIST:${playlistTitle}\n`);
-        validStats.forEach(({meta: {track: {name, artists, duration}, outFilePath}}) =>
+        if (playlistTitle) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
+        validStats.forEach(({meta: {track: {uri, name, artists, duration}, outFilePath}}) =>
           plStream.write(
-            `\n#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}\n${xpath.relative(BASE_DIRECTORY, outFilePath)}\n`,
+            [
+              '',
+              `#URI: ${uri}`,
+              `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
+              `${xpath.relative(BASE_DIRECTORY, outFilePath)}`,
+              '',
+            ].join('\n'),
           ),
         );
         plStream.close();
