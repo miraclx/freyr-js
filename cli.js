@@ -479,14 +479,16 @@ async function init(queries, options) {
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
-        validStats.forEach(({meta: {track: {uri, name, artists, duration}, outFilePath}}) =>
+        validStats.forEach(({meta: {track: {uri, name, artists, duration}, service, outFilePath}}) =>
           plStream.write(
             [
               '',
-              `#URI: ${uri}`,
+              `#${service[symbols.meta].DESC} URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
-              `${(xurl.format(xurl.parse(options.playlistNamespace)).concat('/') || '').concat(
-                xpath.relative(BASE_DIRECTORY, outFilePath),
+              `${escape(
+                (options.playlistNamespace ? xurl.format(xurl.parse(options.playlistNamespace)).concat('/') : '').concat(
+                  xpath.relative(BASE_DIRECTORY, outFilePath),
+                ),
               )}`,
               '',
             ].join('\n'),
