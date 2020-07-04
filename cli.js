@@ -1260,7 +1260,7 @@ program
   });
 
 program
-  .command('serve')
+  .command('serve', {hidden: true})
   .arguments('[port]')
   .description('Launch freyr server on an HTTP interface (unimplemented)', {
     port: 'specify alternative port [default: 3797]',
@@ -1278,7 +1278,7 @@ program
   });
 
 program
-  .command('search')
+  .command('search', {hidden: true})
   .description('Search for and optionally download music interactively (unimplemented)')
   .option('-q, --query <PATTERN>', 'non-interactive search filter pattern to be matched')
   .option('-n, --max <MAX>', 'return a maximum of MAX match results')
@@ -1361,7 +1361,7 @@ const program_filter = program
   });
 
 const config = program
-  .command('profile')
+  .command('profile', {hidden: true})
   .description('Manage profile configuration contexts storing persistent user configs and auth keys (unimplemented)')
   .on('--help', () => {
     console.log('');
