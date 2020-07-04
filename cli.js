@@ -1396,7 +1396,34 @@ config
     throw Error('Unimplemented: [CLI:profiles get]');
   });
 config
+  .command('remove')
+  .alias('rm')
+  .arguments('<name>')
+  .description('deletes the profile context, decrypts if necessary (unimplemented)')
+  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:profiles reset]');
+  });
+config
+  .command('reset')
+  .alias('rs')
+  .arguments('<name>')
+  .description('resets the profile context, decrypts if necessary (unimplemented)')
+  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:profiles reset]');
+  });
+config
+  .command('unset')
+  .alias('un')
+  .arguments('<name> <field>')
+  .description('unsets a field within the profile context, decrypts if necessary (unimplemented)')
+  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:profiles unset]');
+  });
   .command('list')
+  .alias('ls')
   .description('list all available profiles (unimplemented)')
   .option('--raw', 'return raw JSON output')
   .action(() => {
