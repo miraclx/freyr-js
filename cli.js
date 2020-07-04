@@ -487,7 +487,9 @@ async function init(queries, options) {
               `#${service[symbols.meta].DESC} URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
               `${(options.playlistNamespace ? xurl.format(xurl.parse(options.playlistNamespace)).concat('/') : '').concat(
-                xpath.relative(BASE_DIRECTORY, outFilePath).replace(/#/g, '%23'),
+                (entry => (options.playlistNoescape ? entry : entry.replace(/#/g, '%23')))(
+                  xpath.relative(BASE_DIRECTORY, outFilePath),
+                ),
               )}`,
               '',
             ].join('\n'),
@@ -1212,6 +1214,7 @@ program
   .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('--playlist-dir <DIR>', 'directory to save playlist file to, if any, (default: tracks base directory)')
+  .option('--playlist-noescape', 'do not escape invalid characters within playlist entries')
   .option(
     '--playlist-namespace <SPEC>',
     [
