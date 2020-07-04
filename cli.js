@@ -423,7 +423,7 @@ async function init(queries, options) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] doesn't exist`), process.exit(5);
 
   if (
-    (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.F_OK), stackLogger, {
+    (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.W_OK), stackLogger, {
       pre: 'Checking directory permissions...',
       post: '[done]',
     })) === null
