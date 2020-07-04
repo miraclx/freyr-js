@@ -476,7 +476,7 @@ async function init(queries, options) {
           options.playlistDir || BASE_DIRECTORY,
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
-        const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
+        const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: options.playlistAppend ? 'a' : 'w'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
         if (header) plStream.write(`#${header}\n`);
@@ -1214,6 +1214,7 @@ program
   .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('--playlist-dir <DIR>', 'directory to save playlist file to, if any, (default: tracks base directory)')
+  .option('--playlist-append', 'whether or not to append to the playlist file, if any exists')
   .option('--playlist-noescape', 'do not escape invalid characters within playlist entries')
   .option(
     '--playlist-namespace <SPEC>',
