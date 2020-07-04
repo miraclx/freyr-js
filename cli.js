@@ -467,7 +467,7 @@ async function init(queries, options) {
 
   const progressGen = prepProgressGen(options);
 
-  function createPlaylist(stats, logger, filename, playlistTitle) {
+  function createPlaylist(header, stats, logger, filename, playlistTitle) {
     if (options.playlist !== false) {
       const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
@@ -479,6 +479,7 @@ async function init(queries, options) {
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
+        if (header) plStream.write(`#${header}\n`);
         validStats.forEach(({meta: {track: {uri, name, artists, duration}, service, outFilePath}}) =>
           plStream.write(
             [
@@ -1053,6 +1054,7 @@ async function init(queries, options) {
       });
       if (queryStat.isCollection)
         createPlaylist(
+          `Collection URI: ${source.uri}`,
           trackStats,
           queryLogger,
           `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
@@ -1066,7 +1068,7 @@ async function init(queries, options) {
   });
   const totalQueries = [...options.input, ...queries];
   const trackStats = (await pFlatten(queryQueue.push(totalQueries))).filter(Boolean);
-  if (options.playlist && typeof options.playlist === 'string') createPlaylist(trackStats, stackLogger, options.playlist);
+  if (options.playlist && typeof options.playlist === 'string') createPlaylist(null, trackStats, stackLogger, options.playlist);
   const finalStats = trackStats.reduce(
     (total, current) => {
       if (current.postprocess && current.postprocess.finalSize) {
