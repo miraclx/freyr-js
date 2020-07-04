@@ -486,10 +486,8 @@ async function init(queries, options) {
               '',
               `#${service[symbols.meta].DESC} URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
-              `${escape(
-                (options.playlistNamespace ? xurl.format(xurl.parse(options.playlistNamespace)).concat('/') : '').concat(
-                  xpath.relative(BASE_DIRECTORY, outFilePath),
-                ),
+              `${(options.playlistNamespace ? xurl.format(xurl.parse(options.playlistNamespace)).concat('/') : '').concat(
+                xpath.relative(BASE_DIRECTORY, outFilePath).replace(/#/g, '%23'),
               )}`,
               '',
             ].join('\n'),
