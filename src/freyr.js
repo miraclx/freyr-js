@@ -37,6 +37,12 @@ class FreyrCore {
     );
   }
 
+  static urify(url) {
+    const service = this.identifyService(url);
+    if (!service) return null;
+    return service.prototype.parseURI.call(service.prototype, url).uri;
+  }
+
   constructor(ServiceConfig, AuthServer, serverOpts) {
     ServiceConfig = ServiceConfig || {};
     this.ENGINES = FreyrCore.ENGINES.map(Engine => new Engine(ServiceConfig[Engine[symbols.meta].ID], AuthServer, serverOpts));

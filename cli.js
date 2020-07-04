@@ -1408,11 +1408,11 @@ program
     const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
     // eslint-disable-next-line no-shadow
     async function urify(urls) {
-      urls.forEach(uri => {
-        const service = FreyrCore.identifyService(uri);
-        if (args.tag) !service ? output.write(`# invalid: ${uri}\n`) : output.write(`# ${uri}\n`);
-        if (!service) return;
-        output.write(`${service.prototype.parseURI.call(service.prototype, uri).uri}\n`);
+      urls.forEach(url => {
+        const uri = FreyrCore.urify(url);
+        if (args.tag) !uri ? output.write(`# invalid: ${url}\n`) : output.write(`# ${url}\n`);
+        if (!uri) return;
+        output.write(`${uri}\n`);
       });
     }
     if (urls.length === 0 && process.stdin.isTTY && !args.input) args.input = '-';
