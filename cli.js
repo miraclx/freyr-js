@@ -1472,7 +1472,11 @@ function main(argv) {
   }
   if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   (async () => program.parseAsync(argv))().catch(er => {
-    console.error(`\x1b[31m[!] Fatal Error\x1b[0m: ${typeof er === 'undefined' ? '[uncaught]' : er ? er.message : er}`);
+    console.error(
+      `\x1b[31m[!] Fatal Error\x1b[0m: ${
+        typeof er === 'undefined' ? '[uncaught]' : er ? er['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] : er
+      }`,
+    );
   });
 }
 
