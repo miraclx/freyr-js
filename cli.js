@@ -1145,6 +1145,7 @@ const program = commander
   .helpOption('-h, --help', 'show this help information')
   .addHelpCommand('help [command]', 'show this help information or for any subcommand')
   .on('--help', () => {
+    console.log('');
     console.log('Info:');
     console.log('  The `get` subcommand is implicit and default');
     console.log('   $ freyr spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
