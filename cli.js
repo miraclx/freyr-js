@@ -370,6 +370,14 @@ async function init(queries, options) {
     dirs: {
       output: '.',
     },
+    playlist: {
+      always: false, // always create playlists for queries
+      append: true, // append to end of file for regular queries
+      escape: true, // whether or not to escape invalid characters
+      forceAppend: false, // whether or not to forcefully append collections as well
+      dir: null, // directory to write playlist to
+      namespace: null, // namespace to prefix playlist entries with
+    },
     image: {
       width: 640,
       height: 640,
@@ -467,27 +475,30 @@ async function init(queries, options) {
 
   const progressGen = prepProgressGen(options);
 
-  function createPlaylist(header, stats, logger, filename, playlistTitle) {
+  function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
       const validStats = stats.filter(stat => !stat.code);
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
         const playlistFile = xpath.join(
-          options.playlistDir || BASE_DIRECTORY,
+          options.playlistDir || Config.playlist.dir || BASE_DIRECTORY,
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
-        const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: options.playlistAppend ? 'a' : 'w'});
+        const isNew = !fs.existsSync(playlistFile) || !(options.playlistAppend || shouldAppend);
+        const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
         plStream.write('#EXTM3U\n');
-        if (playlistTitle) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
+        if (playlistTitle && isNew) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
         if (header) plStream.write(`#${header}\n`);
+        let namespace = options.playlistNamespace || Config.playlist.namespace;
+        namespace = namespace ? xurl.format(xurl.parse(namespace)).concat('/') : '';
         validStats.forEach(({meta: {track: {uri, name, artists, duration}, service, outFilePath}}) =>
           plStream.write(
             [
               '',
               `#${service[symbols.meta].DESC} URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
-              `${(options.playlistNamespace ? xurl.format(xurl.parse(options.playlistNamespace)).concat('/') : '').concat(
-                (entry => (options.playlistNoescape ? entry : entry.replace(/#/g, '%23')))(
+              `${namespace.concat(
+                (entry => (options.playlistNoescape || !Config.playlist.escape ? entry : entry.replace(/#/g, '%23')))(
                   xpath.relative(BASE_DIRECTORY, outFilePath),
                 ),
               )}`,
@@ -1059,6 +1070,7 @@ async function init(queries, options) {
           queryLogger,
           `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
           `${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
+          Config.playlist.forceAppend,
         );
       return trackStats;
     }).then(trackStats => trackStats.flat());
@@ -1068,7 +1080,8 @@ async function init(queries, options) {
   });
   const totalQueries = [...options.input, ...queries];
   const trackStats = (await pFlatten(queryQueue.push(totalQueries))).filter(Boolean);
-  if (options.playlist && typeof options.playlist === 'string') createPlaylist(null, trackStats, stackLogger, options.playlist);
+  if ((options.playlist && typeof options.playlist === 'string') || Config.playlist.always)
+    createPlaylist(null, trackStats, stackLogger, options.playlist, Config.playlist.append);
   const finalStats = trackStats.reduce(
     (total, current) => {
       if (current.postprocess && current.postprocess.finalSize) {

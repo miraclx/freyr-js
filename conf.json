@@ -19,6 +19,14 @@
   "dirs": {
     "output": "."
   },
+  "playlist": {
+    "always": false,
+    "append": true,
+    "escape": true,
+    "forceAppend": false,
+    "dir": "",
+    "namespace": ""
+  },
   "image": {
     "width": 640,
     "height": 640
