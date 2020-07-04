@@ -1378,7 +1378,8 @@ const config = program
 config
   .command('new')
   .arguments('<name>')
-  .description('create a new configuration context (unimplemented)')
+  .description('create a new profile context (unimplemented)')
+  .option('-k, --pass <KEY>', 'encrypted password for the new profile')
   .option('--no-pass', 'do not ask for a key to encrypt the config')
   .action(() => {
     throw Error('Unimplemented: [CLI:profiles new]');
@@ -1387,6 +1388,7 @@ config
   .command('get')
   .arguments('<name>')
   .description('return the raw configuration content for the profile, decrypts if necessary (unimplemented)')
+  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
   .option(
     '-p, --pretty [SPEC]',
     'pretty print the JSON output. (key omission implies space indentation)\n(format(SPEC): <[key=]value>) (valid(key): space,tab)',
