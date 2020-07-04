@@ -1272,7 +1272,10 @@ program
   .option('-a, --archive <WHEN>', 'when to pack file(s) in an archive (valid: auto,always,never))', 'auto')
   .option('-z, --compression [algorithm]', 'compression algorithm to use (valid: gzip,lz4)', 'gzip')
   .option('-Z, --no-compression', 'disable compression altogether')
-  .option('--no-cache', 'disable file caching');
+  .option('--no-cache', 'disable file caching')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:serve]');
+  });
 
 program
   .command('search')
