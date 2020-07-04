@@ -1277,6 +1277,23 @@ program
     throw Error('Unimplemented: [CLI:serve]');
   });
 
+const program_context = program
+  .command('context', {hidden: true})
+  .description('Create and manage music contexts (unimplemented)')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:context]');
+  });
+
+program_context
+  .command('new')
+  .arguments('<name>')
+  .description('create a new music context (unimplemented)')
+  .option('-k, --pass <KEY>', 'encrypted password for the context, if any')
+  .option('--no-pass', 'do not ask for a key to encrypt the context')
+  .action(() => {
+    throw Error('Unimplemented: [CLI:context new]');
+  });
+
 program
   .command('search', {hidden: true})
   .description('Search for and optionally download music interactively (unimplemented)')
