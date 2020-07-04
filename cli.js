@@ -1250,7 +1250,14 @@ program
       '(default when number of chunks/segments exceed printable space)',
     ].join('\n'),
   )
-  .action(init);
+  .action(init)
+  .on('--help', () => {
+    console.log('');
+    console.log('Info:');
+    console.log('  When downloading playlists, tracks are downloaded individually');
+    console.log('  into their respective folders. However, a m3u8 playlist file is generated');
+    console.log('  in the base directory with the name of the playlist that lists the tracks');
+  });
 
 program
   .command('serve')
