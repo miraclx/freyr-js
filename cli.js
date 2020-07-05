@@ -682,6 +682,7 @@ async function init(queries, options) {
         composer: track.composers,
         stik: 'Normal',
         genre: (track.genres || [])[0],
+        gapless: 'false',
         rDNSatom: [
           ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
