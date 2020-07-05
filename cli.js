@@ -674,9 +674,12 @@ async function init(queries, options) {
         encodingTool: 'fr3yrcl1',
         tracknum: `${track.track_number}/${track.total_tracks}`,
         encodedBy: 'd3vc0dr',
-        advisory: track.explicit ? 'explicit' : 'clean',
+        advisory: ['explicit', 'clean'].includes(track.explicit)
+          ? track.explicit
+          : track.explicit === true
+          ? 'explicit'
+          : 'Inoffensive',
         composer: track.composers,
-        Rating: track.explicit ? 'Explicit Content' : 'Inoffensive',
         stik: 'Normal',
         genre: (track.genres || [])[0],
         rDNSatom: [
