@@ -687,7 +687,9 @@ async function init(queries, options) {
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
           [meta.service[symbols.meta].DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
-          ...track.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
+          [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
+          // com.apple.iTunes domain can only have one name, why?
+          // ...track.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
         ],
         apID: 'cli@freyr.git',
         compilation: track.compilation,
