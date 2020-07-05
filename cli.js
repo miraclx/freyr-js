@@ -664,39 +664,39 @@ async function init(queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       return Promise.promisify(atomicParsley)(meta.outFilePath, {
-        title: track.name,
-        artist: track.artists[0],
-        albumArtist: track.album_artist,
-        album: track.album,
-        disk: `${track.disc_number}/${track.disc_number}`,
-        artwork: files.image.file.name,
-        year: new Date(track.release_date).toISOString().split('T')[0],
-        encodingTool: 'fr3yrcl1',
-        tracknum: `${track.track_number}/${track.total_tracks}`,
-        encodedBy: 'd3vc0dr',
-        advisory: ['explicit', 'clean'].includes(track.explicit)
-          ? track.explicit
-          : track.explicit === true
-          ? 'explicit'
-          : 'Inoffensive',
-        composer: track.composers,
-        stik: 'Normal',
-        genre: (track.genres || [])[0],
-        gapless: 'false',
+        title: track.name, // ©nam
+        artist: track.artists[0], // ©ART
+        composer: track.composers, // ©wrt
+        album: track.album, // ©alb
+        genre: (track.genres || [])[0], // ©gen | gnre
+        tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
+        disk: `${track.disc_number}/${track.disc_number}`, // disk
+        year: new Date(track.release_date).toISOString().split('T')[0], // ©day
+        compilation: track.compilation, // ©cpil
+        gapless: 'false', // pgap
         rDNSatom: [
+          // ----
           ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
           [meta.service[symbols.meta].DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
           [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
-          // com.apple.iTunes domain can only have one name, why?
-          // ...track.artists.map(artist => [artist, 'name=ARTISTS', 'domain=com.apple.iTunes']),
         ],
-        apID: 'cli@freyr.git',
-        compilation: track.compilation,
-        copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text,
-        purchaseDate: 'timestamp',
+        advisory: ['explicit', 'clean'].includes(track.explicit) // rtng
+          ? track.explicit
+          : track.explicit === true
+          ? 'explicit'
+          : 'Inoffensive',
+        stik: 'Normal', // stik
+        albumArtist: track.album_artist, // aART
+        purchaseDate: 'timestamp', // purd
+        apID: 'cli@freyr.git', // apID
+        copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
+        encodingTool: 'fr3yrcl1', // ©too
+        encodedBy: 'd3vc0dr', // ©enc
+        artwork: files.image.file.name, // covr
         comment: [
+          // ©cmt
           `${meta.service[symbols.meta].DESC} URI: ${track.uri}`,
           `${audioSource.service[symbols.meta].DESC} Stream ID: ${audioSource.source.videoId}`,
         ].join('\n'),
