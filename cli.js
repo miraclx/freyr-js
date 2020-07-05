@@ -680,10 +680,12 @@ async function init(queries, options) {
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
           [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-          [meta.service[symbols.meta].DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
-          [track.uri, 'name=SOURCEURI', 'domain=com.apple.iTunes'],
-          [audioSource.service[symbols.meta].DESC, 'name=PROVIDER', 'domain=com.apple.iTunes'],
-          [audioSource.source.videoId, 'name=PROVIDERURI', 'domain=com.apple.iTunes'],
+          [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
+          [
+            `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
+            'name=PROVIDER',
+            'domain=com.apple.iTunes',
+          ],
         ],
         advisory: ['explicit', 'clean'].includes(track.explicit) // rtng
           ? track.explicit
