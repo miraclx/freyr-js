@@ -688,7 +688,11 @@ async function init(queries, options) {
           ? 'explicit'
           : 'Inoffensive',
         stik: 'Normal', // stik
+        // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
+        // sfID: 0, // ~~~~: store front ID
+        // cnID: 0, // cnID: catalog ID
         albumArtist: track.album_artist, // aART
+        // ownr? <owner>
         purchaseDate: 'timestamp', // purd
         apID: 'cli@freyr.git', // apID
         copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
@@ -700,6 +704,12 @@ async function init(queries, options) {
           `${meta.service[symbols.meta].DESC} URI: ${track.uri}`,
           `${audioSource.service[symbols.meta].DESC} Stream ID: ${audioSource.source.videoId}`,
         ].join('\n'),
+        // sortOrder: [
+        //   ['name', 'NAME'], // sonm
+        //   ['album', 'NAME'], // soal
+        //   ['artist', 'NAME'], // soar
+        //   ['albumartist', 'NAME'], // soaa
+        // ],
       })
         .finally(() => files.image.file.removeCallback())
         .catch(err => Promise.reject({err, code: 8}));
