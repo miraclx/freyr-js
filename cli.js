@@ -673,7 +673,7 @@ async function init(queries, options) {
         disk: `${track.disc_number}/${track.disc_number}`, // disk
         year: new Date(track.release_date).toISOString().split('T')[0], // ©day
         compilation: track.compilation, // ©cpil
-        gapless: 'false', // pgap
+        gapless: options.gapless, // pgap
         rDNSatom: [
           // ----
           ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
@@ -1238,6 +1238,7 @@ program
     ].join('\n'),
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
+  .option('--gapless', 'set the gapless playback flag for all tracks')
   .option('-f, --force', 'force overwrite of existing files')
   .option('-o, --config <FILE>', 'specify alternative configuration file')
   .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
