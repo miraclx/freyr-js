@@ -683,7 +683,7 @@ async function init(queries, options) {
         stik: 'Normal',
         genre: (track.genres || [])[0],
         rDNSatom: [
-          ['CD', 'name=MEDIA', 'domain=com.apple.iTunes'],
+          ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
           [meta.service[symbols.meta].DESC, 'name=SOURCE', 'domain=com.apple.iTunes'],
