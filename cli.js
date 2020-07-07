@@ -795,7 +795,7 @@ async function init(queries, options) {
   }
 
   const trackQueue = new AsyncQueue('cli:trackQueue', Config.concurrency.tracks, async ({track, meta, props}) => {
-    const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`).tick(2);
+    const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`).tick(3);
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
