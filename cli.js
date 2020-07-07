@@ -999,6 +999,7 @@ async function init(queries, options) {
     const isAuthenticated = !!(await processPromise(authQueue.push(service, queryLogger), queryLogger, {
       onInit: '[\u2022] Checking authentication...',
       noVal: '[\u2715] Failed to authenticate client!\n',
+      onPass: false,
     }));
     if (!isAuthenticated) return;
     if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.meta].ID}`, service.getProps());
