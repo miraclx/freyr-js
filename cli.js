@@ -205,33 +205,6 @@ async function processPromise(promise, logger, messageHandlers) {
   return value;
 }
 
-async function processPromise_old(px, logger, {pre, post, err, xerr, aerr} = {}) {
-  if (pre) logger.print(pre);
-  const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
-  if (rex.isRejected() && err !== false)
-    logger.write(
-      ...(err
-        ? [typeof err === 'function' ? err(rex.reason()) : err, '\n']
-        : [
-            `(failed%s)\n`,
-            (_err => (_err ? `: [${_err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || _err}]` : ''))(rex.reason()),
-          ]),
-    );
-  else if (xerr && (!rex.value() || rex.value().err)) logger.write(`${xerr !== true ? xerr : '(no data)'}\n`);
-  else if (
-    aerr &&
-    Array.isArray(rex.value()) &&
-    (rex.value().length === 0 || rex.value().every(item => [undefined, null].some(item)))
-  )
-    logger.write(`${aerr !== true ? aerr : '(array contains no data)'}\n`);
-  else if (post !== false) {
-    const isFn = typeof post === 'function';
-    if (isFn) post = post(rex.value(), logger);
-    if (!isFn || post !== true) logger.write(`${post || '[done]'}\n`);
-  }
-  return rex.isFulfilled() ? rex.value() : null;
-}
-
 const VALIDS = {
   bitrates: FreyrCore.getBitrates(),
   downloaders: FreyrCore.getEngineMetas()
