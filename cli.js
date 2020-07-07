@@ -808,7 +808,7 @@ async function init(queries, options) {
       processPromise(sourcesPromise, trackLogger, {
         onInit: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
         arrIsEmpty: '[Unable to gather sources]',
-        onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]`,
+        onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]\n`,
       }),
     );
     if ('err' in audioSource) return {meta, code: 1, err: audioSource.err}; // zero sources found
