@@ -156,7 +156,7 @@ function prepProgressGen(options) {
  *   onPass: string | boolean | (() => any[] | boolean);
  * }} messageHandlers State logging handlers
  */
-async function processPromise_new(promise, logger, messageHandlers) {
+async function processPromise(promise, logger, messageHandlers) {
   /**
    * TODO: Add retry functionality
    * ? Checking...(failed)
@@ -165,16 +165,19 @@ async function processPromise_new(promise, logger, messageHandlers) {
    * ?  [4/4] Retrying...(done)
    */
   if (!messageHandlers) messageHandlers = {};
+  const isNdef = v => [undefined, null].includes(v);
   function handleResultOf(value, msg, defaultHandler) {
-    if (msg === true) msg = defaultHandler;
+    if (msg === true || isNdef(msg)) msg = defaultHandler;
+    if (isNdef(msg)) return;
     if (typeof msg === 'function') {
       value = msg(value, logger);
       if (Array.isArray(value)) logger.write(...value);
-    } else logger.write(`${msg}\n`);
+      else if (typeof value === 'string') logger.write(value);
+    } else logger.print(msg);
   }
 
   // formerly .pre
-  if (messageHandlers.onInit !== false) handleResultOf(null, messageHandlers.onInit, () => logger.print(messageHandlers.onInit));
+  if (messageHandlers.onInit !== false) handleResultOf(null, messageHandlers.onInit);
   const result = await Promise.resolve(typeof promise === 'function' ? promise() : promise).reflect();
   if (result.isRejected()) {
     // formerly .err
@@ -202,7 +205,7 @@ async function processPromise_new(promise, logger, messageHandlers) {
   return value;
 }
 
-async function processPromise(px, logger, {pre, post, err, xerr, aerr} = {}) {
+async function processPromise_old(px, logger, {pre, post, err, xerr, aerr} = {}) {
   if (pre) logger.print(pre);
   const rex = await Promise.resolve(typeof px === 'function' ? px() : px).reflect();
   if (rex.isRejected() && err !== false)
@@ -310,7 +313,7 @@ function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
 
 async function init(queries, options) {
   const initTimeStamp = Date.now();
-  const stackLogger = new StackLogger({indentSize: 1});
+  const stackLogger = new StackLogger({indentSize: 1, autoTick: false});
   if (!((Array.isArray(queries) && queries.length > 0) || options.input))
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid query'), process.exit(1);
 
@@ -432,8 +435,7 @@ async function init(queries, options) {
 
   if (
     (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.W_OK), stackLogger, {
-      pre: 'Checking directory permissions...',
-      post: '[done]',
+      onInit: 'Checking directory permissions...',
     })) === null
   )
     process.exit(5);
@@ -531,7 +533,7 @@ async function init(queries, options) {
               urlMeta.size,
               urlMeta.chunkStack.map(chunk => chunk.size),
               {tag: opts.tag(urlMeta)},
-              logger.indent,
+              logger.indentation(),
               false,
             ),
           )
@@ -561,7 +563,7 @@ async function init(queries, options) {
           urlOrFragments.reduce((total, fragment) => total + fragment.size, 0),
           urlOrFragments.map(fragment => fragment.size),
           {tag: opts.tag()},
-          logger.indent,
+          logger.indentation(),
           true,
         );
 
@@ -793,8 +795,7 @@ async function init(queries, options) {
   }
 
   const trackQueue = new AsyncQueue('cli:trackQueue', Config.concurrency.tracks, async ({track, meta, props}) => {
-    const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`);
-    trackLogger.indent += 2;
+    const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`).tick(2);
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
@@ -805,15 +806,15 @@ async function init(queries, options) {
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
-        pre: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
-        xerr: '[Unable to gather sources]',
-        post: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]`,
+        onInit: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
+        arrIsEmpty: '[Unable to gather sources]',
+        onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]`,
       }),
     );
     if ('err' in audioSource) return {meta, code: 1, err: audioSource.err}; // zero sources found
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
-      pre: '| \u27a4 Awaiting audiofeeds...',
-      xerr: '[Unable to collect source feeds]',
+      onInit: '| \u27a4 Awaiting audiofeeds...',
+      noVal: '[Unable to collect source feeds]',
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
@@ -862,8 +863,8 @@ async function init(queries, options) {
   );
 
   async function trackHandler(query, {service, queryLogger}) {
-    const logger = queryLogger.print(`Obtaining track metadata...`);
-    const track = await processPromise(service.getTrack(query, options.storefront), queryLogger, {xerr: true});
+    const logger = queryLogger.print(`Obtaining track metadata...`).tick();
+    const track = await processPromise(service.getTrack(query, options.storefront), logger, {noVal: true});
     if (!track) return Promise.reject();
     logger.log(`\u27a4 Title: ${track.name}`);
     logger.log(`\u27a4 Album: ${track.album}`);
@@ -882,8 +883,8 @@ async function init(queries, options) {
     };
   }
   async function albumHandler(query, {service, queryLogger}) {
-    const logger = queryLogger.print(`Obtaining album metadata...`);
-    const album = await processPromise(service.getAlbum(query, options.storefront), queryLogger, {xerr: true});
+    const logger = queryLogger.print(`Obtaining album metadata...`).tick();
+    const album = await processPromise(service.getAlbum(query, options.storefront), logger, {noVal: true});
     if (!album) return Promise.reject();
     logger.log(`\u27a4 Album Name: ${album.name}`);
     logger.log(`\u27a4 Artist: ${album.artists[0]}`);
@@ -891,47 +892,47 @@ async function init(queries, options) {
     logger.log(`\u27a4 Type: ${album.type === 'compilation' ? 'Compilation' : 'Album'}`);
     logger.log(`\u27a4 Year: ${new Date(album.release_date).getFullYear()}`);
     if (album.genres.length) logger.log(`\u27a4 Genres: ${album.genres.join(', ')}`);
-    const collationLogger = queryLogger.log(`[\u2022] Collating [${album.name}]...`);
+    const collationLogger = queryLogger.log(`[\u2022] Collating [${album.name}]...`).tick();
     const tracks = await processPromise(service.getAlbumTracks(album.uri), collationLogger, {
-      pre: '[\u2022] Inquiring tracks...',
+      onInit: '[\u2022] Inquiring tracks...',
     });
-    collationLogger.indent += 1;
     return {
       meta: album,
       isCollection: album.type === 'collection',
       tracks: trackBroker.push(tracks, {
-        logger: collationLogger,
+        logger: collationLogger.tick(),
         service,
         isPlaylist: false,
       }),
     };
   }
   async function artistHandler(query, {service, queryLogger}) {
-    const logger = queryLogger.print(`Obtaining artist metadata...`);
-    const artist = await processPromise(service.getArtist(query, options.storefront), queryLogger, {xerr: true});
+    const logger = queryLogger.print(`Obtaining artist metadata...`).tick();
+    const artist = await processPromise(service.getArtist(query, options.storefront), logger, {noVal: true});
     if (!artist) return Promise.reject();
-    const artistLogger = logger.log(`\u27a4 Artist: ${artist.name}`);
+    logger.log(`\u27a4 Artist: ${artist.name}`);
     if (artist.followers) logger.log(`\u27a4 Followers: ${`${artist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
     if (artist.genres && artist.genres.length) logger.log(`\u27a4 Genres: ${artist.genres.join(', ')}`);
-    const albumsStack = await processPromise(service.getArtistAlbums(artist.uri), artistLogger, {
-      pre: ' > Gathering collections...',
+    const albumsStack = await processPromise(service.getArtistAlbums(artist.uri), logger, {
+      onInit: '> Gathering collections...',
     });
     if (!albumsStack) return;
-    const collationLogger = queryLogger.log(`[\u2022] Collating...`);
+    const collationLogger = queryLogger.log(`[\u2022] Collating...`).tick();
     return Promise.mapSeries(albumsStack, async ({uri}, index) => {
       const album = await service.getAlbum(uri);
-      const albumLogger = collationLogger.log(`(${prePadNum(index + 1, albumsStack.length)}) [${album.name}] (${album.type})`);
+      const albumLogger = collationLogger
+        .log(`(${prePadNum(index + 1, albumsStack.length)}) [${album.name}] (${album.type})`)
+        .tick();
       const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
-        pre: '[\u2022] Inquiring tracks...',
+        onInit: '[\u2022] Inquiring tracks...',
       });
       if (!(tracks && tracks.length)) return;
-      albumLogger.indent += 1;
       return {
         meta: album,
         isCollection: album.type === 'collection',
         tracks: await Promise.all(
           trackBroker.push(tracks, {
-            logger: albumLogger,
+            logger: albumLogger.tick(),
             service,
             isPlaylist: false,
           }),
@@ -940,8 +941,8 @@ async function init(queries, options) {
     });
   }
   async function playlistHandler(query, {service, queryLogger}) {
-    const logger = queryLogger.print(`Obtaining playlist metadata...`);
-    const playlist = await processPromise(service.getPlaylist(query, options.storefront), queryLogger, {xerr: true});
+    const logger = queryLogger.print(`Obtaining playlist metadata...`).tick();
+    const playlist = await processPromise(service.getPlaylist(query, options.storefront), logger, {noVal: true});
     if (!playlist) return Promise.reject();
     logger.log(`\u27a4 Playlist Name: ${playlist.name}`);
     logger.log(`\u27a4 By: ${playlist.owner_name}`);
@@ -949,16 +950,15 @@ async function init(queries, options) {
     logger.log(`\u27a4 Type: ${playlist.type}`);
     if (playlist.followers) logger.log(`\u27a4 Followers: ${`${playlist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
     logger.log(`\u27a4 Tracks: ${playlist.ntracks}`);
-    const collationLogger = queryLogger.log(`[\u2022] Collating...`);
+    const collationLogger = queryLogger.log(`[\u2022] Collating...`).tick();
     const tracks = await processPromise(service.getPlaylistTracks(playlist.uri), collationLogger, {
-      pre: '[\u2022] Inquiring tracks...',
+      onInit: '[\u2022] Inquiring tracks...',
     });
-    collationLogger.indent += 1;
     return {
       meta: playlist,
       isCollection: true,
       tracks: trackBroker.push(tracks, {
-        logger: collationLogger,
+        logger: collationLogger.tick(),
         service,
         isPlaylist: true,
       }),
@@ -970,39 +970,37 @@ async function init(queries, options) {
       if (!Config.opts.browser) return;
       const authHandler = service.newAuth();
       const url = await authHandler.getUrl;
-      await processPromise(open(url), loginLogger, {pre: `[\u2022] Attempting to open [ ${url} ] within browser...`});
+      await processPromise(open(url), loginLogger, {onInit: `[\u2022] Attempting to open [ ${url} ] within browser...`});
       await processPromise(authHandler.userToAuth(), loginLogger, {
-        pre: '[\u2022] Awaiting user authentication...',
+        onInit: '[\u2022] Awaiting user authentication...',
       });
     }
     if (service.isAuthed()) logger.write('[authenticated]\n');
     else {
       logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
       const config = freyrCoreConfig.get(`services.${service[symbols.meta].ID}`);
-      const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`);
+      const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`).tick();
       service.canTryLogin(config)
-        ? (await processPromise(service.login(config), loginLogger, {pre: '[\u2022] Logging in...'})) ||
+        ? (await processPromise(service.login(config), loginLogger, {onInit: '[\u2022] Logging in...'})) ||
           (await coreAuth(loginLogger))
         : await coreAuth(loginLogger);
     }
+    return service.isAuthed();
   });
 
   const queryQueue = new AsyncQueue('cli:queryQueue', Config.concurrency.queries, async query => {
-    const queryLogger = stackLogger.log(`[${query}]`);
-    queryLogger.print('[\u2022] Identifying service...');
-    const service = freyrCore.identifyService(query);
-    if (!service) {
-      queryLogger.write('failed\n');
-      queryLogger.log(`\x1b[33m[i]\x1b[0m Invalid query`);
-      return;
-    }
-    queryLogger.write(`[${service[symbols.meta].DESC}]\n`);
-    queryLogger.print('[\u2022] Checking authentication...');
-    await authQueue.push(service, queryLogger);
-    if (!service.isAuthed()) {
-      queryLogger.log('[\u2715] Failed to authenticate client!');
-      return;
-    }
+    const queryLogger = stackLogger.log(`[${query}]`).tick();
+    const service = await processPromise(freyrCore.identifyService(query), queryLogger, {
+      onInit: '[\u2022] Identifying service...',
+      noVal: '(failed: \x1b[33mInvalid Query\x1b[0m)\n',
+      onPass: engine => `[${engine[symbols.meta].DESC}]\n`,
+    });
+    if (!service) return;
+    const isAuthenticated = !!(await processPromise(authQueue.push(service, queryLogger), queryLogger, {
+      onInit: '[\u2022] Checking authentication...',
+      noVal: '[\u2715] Failed to authenticate client!\n',
+    }));
+    if (!isAuthenticated) return;
     if (service.hasProps()) freyrCoreConfig.set(`services.${service[symbols.meta].ID}`, service.getProps());
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
@@ -1030,7 +1028,7 @@ async function init(queries, options) {
       })
     ).filter(Boolean);
     queryLogger.log('[\u2022] Download Complete');
-    const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...');
+    const embedLogger = queryLogger.log('[\u2022] Embedding Metadata...').tick();
 
     const allTrackStats = await Promise.mapSeries(queryStats, async queryStat => {
       const source = queryStat.meta;
