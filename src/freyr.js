@@ -37,10 +37,10 @@ class FreyrCore {
     );
   }
 
-  static urify(url) {
+  static parseURI(url) {
     const service = this.identifyService(url);
     if (!service) return null;
-    return service.prototype.parseURI.call(service.prototype, url).uri;
+    return service.prototype.parseURI.call(service.prototype, url);
   }
 
   constructor(ServiceConfig, AuthServer, serverOpts) {
