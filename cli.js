@@ -1506,6 +1506,7 @@ program
   .command('urify')
   .arguments('[urls...]')
   .description('Convert service URLs to uniform freyr compatible URIs')
+  .option('-u, --url', 'unify output in service-specific URL representations')
   .option(
     '-i, --input <FILE>',
     [
@@ -1521,7 +1522,8 @@ program
     // eslint-disable-next-line no-shadow
     async function urify(urls) {
       urls.forEach(url => {
-        const uri = FreyrCore.urify(url);
+        const parsed = FreyrCore.parseURI(url);
+        const uri = parsed && parsed[args.url ? 'url' : 'uri'];
         if (args.tag) !uri ? output.write(`# invalid: ${url}\n`) : output.write(`# ${url}\n`);
         if (!uri) return;
         output.write(`${uri}\n`);
