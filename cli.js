@@ -397,6 +397,14 @@ async function init(queries, options) {
   Config.image = lodash.merge(Config.image, options.coverSize);
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
   Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
+  Config.dirs = lodash.mergeWith(
+    Config.dirs,
+    {
+      output: options.directory,
+      cache: options.cacheDir,
+    },
+    (a, b) => b && a,
+  );
   Config.opts = lodash.mergeWith(
     Config.opts,
     {
@@ -410,9 +418,7 @@ async function init(queries, options) {
   if (Config.opts.netCheck && !(await isOnline()))
     stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(4);
 
-  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(
-    options.directory || Config.dirs.output,
-  );
+  const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(Config.dirs.output);
 
   if (!fs.existsSync(BASE_DIRECTORY))
     stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] doesn't exist`), process.exit(5);
@@ -612,7 +618,7 @@ async function init(queries, options) {
     async ({track, meta, feedMeta, trackLogger}) => {
       const imageFile = tmp.fileSync({
         template: 'fr3yrcli-XXXXXX.x4i',
-        dir: options.cacheDir === '<tmp>' ? undefined : options.cacheDir,
+        dir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
       });
       const imageBytesWritten = await downloadToStream({
         urlOrFragments: track.getImage(Config.image.width, Config.image.height),
@@ -629,7 +635,7 @@ async function init(queries, options) {
       }).catch(err => Promise.reject({err, code: 3}));
       const rawAudio = tmp.fileSync({
         template: 'fr3yrcli-XXXXXX.x4a',
-        dir: options.cacheDir === '<tmp>' ? undefined : options.cacheDir,
+        dir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
       });
       const audioBytesWritten = await downloadToStream(
         lodash.merge(
@@ -861,13 +867,17 @@ async function init(queries, options) {
           ? ` \u2012 ${track.artists.join(', ')}`
           : '',
       );
+      const fingerprint = crypto
+        .createHash('md5')
+        .update(track.uri)
+        .digest('hex');
       const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.m4a`;
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = fs.existsSync(outFilePath);
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
-      const meta = {trackName, outFileDir, outFilePath, track, service};
+      const meta = {fingerprint, trackName, outFileDir, outFilePath, track, service};
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
@@ -1280,7 +1290,7 @@ program
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
   .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
-  .option('--cache-dir <DIR>', 'specify alternative cache directory', '<tmp>')
+  .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-auth', 'skip authentication procedure')
   .option('--no-browser', 'disable auto-launching of user browser')

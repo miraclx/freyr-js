@@ -18,7 +18,8 @@
     "autoOpenBrowser": true
   },
   "dirs": {
-    "output": "."
+    "output": ".",
+    "cache": "<tmp>"
   },
   "playlist": {
     "always": false,

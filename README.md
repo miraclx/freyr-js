@@ -512,6 +512,7 @@ Defaults are in the [conf.json](conf.json) file.
   * `autoOpenBrowser`: \<boolean\> Whether or not to automatically open user browser.
 * `dirs`: \<object\>
   * `output`: \<string\> Default download directory. Default: `"."`
+  * `cache`: \<string\> Default temp download directory. Default: `"<tmp>"`
 * `playlist`: \<object\>
   * `always`: \<boolean\> Always create playlists for collections and non-collections alike.
   * `append`: \<boolean\> Append non-collection tracks onto the playlist file.
