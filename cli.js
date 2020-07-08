@@ -1407,7 +1407,7 @@ const program_filter = program
     console.log('  ({@} for @) ({,} for ,) ({=} for =) ({{}} for {}) ({"} for ") etc.');
     console.log('');
     console.log('Examples:');
-    console.log("  # match anything starting with 'Justi' and ending with 'iber'");
+    console.log("  # match anything starting with 'Justi' and ending with 'ber'");
     console.log("  $ freyr filter 'Justi*ber'");
     console.log('');
     console.log("  # filter artists matching the name 'Dua Lipa' and any album with more than 9 tracks from 'Billie Eilish'");
