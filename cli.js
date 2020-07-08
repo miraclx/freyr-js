@@ -59,18 +59,20 @@ function check_bin_is_existent(bin, path) {
   return status === 0;
 }
 
-function atomicParsley(file, args, cb, binaryPath) {
-  const isWin = process.platform === 'win32';
-  const path = xpath.relative(__dirname, xpath.join('./bins', isWin ? 'windows' : 'posix'));
-  if (!binaryPath) {
-    const err = new Error('Unable to find an executable AtomicParsley binary. Please install.');
-    if (!check_bin_is_existent('AtomicParsley', path))
-      if (typeof file === 'boolean') throw err;
-      else return cb(err);
-    binaryPath = ensureBinExtIfWindows(isWin, 'AtomicParsley');
-  }
+function wrapCliInterface(binaryName, binaryPath) {
+  return (file, args, cb) => {
+    const isWin = process.platform === 'win32';
+    const path = xpath.relative(__dirname, xpath.join('./bins', isWin ? 'windows' : 'posix'));
+    if (!binaryPath) {
+      const err = new Error(`Unable to find an executable ${binaryName} binary. Please install.`);
+      if (!check_bin_is_existent(binaryName, path))
+        if (typeof file === 'boolean') throw err;
+        else return cb(err);
+      binaryPath = ensureBinExtIfWindows(isWin, binaryName);
+    }
 
-  if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
+    if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
+  };
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -446,6 +448,8 @@ async function init(queries, options) {
   });
 
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
+
+  const atomicParsley = wrapCliInterface('AtomicParsley', options.atomicParsley);
 
   try {
     if (options.ffmpeg) {
