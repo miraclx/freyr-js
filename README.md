@@ -508,7 +508,8 @@ Defaults are in the [conf.json](conf.json) file.
   * `embedder`: \<number\> The total number of tracks to be concurrently embedded in parallel.
 * `opts`: \<object\>
   * `netCheck`: \<boolean\> Whether or not to check network access at program start.
-  * `browser`: \<boolean\> Whether or not to process authentication by opening user browser.
+  * `attemptAuth`: \<boolean\> Whether or not to process authentication.
+  * `autoOpenBrowser`: \<boolean\> Whether or not to automatically open user browser.
 * `dirs`: \<object\>
   * `output`: \<string\> Default download directory. Default: `"."`
 * `playlist`: \<object\>
