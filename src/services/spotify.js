@@ -239,7 +239,7 @@ class Spotify {
 
   async getTrack(uris, country) {
     return this.processData(uris, 50, async ids => {
-      const {tracks} = (await this.#store.core.getTracks(ids, {market: country})).body;
+      const tracks = (await this.#store.core.getTracks(ids, {market: country})).body.tracks.filter(Boolean);
       await this.getAlbum(
         tracks.map(track => track.album.uri),
         country,
