@@ -70,10 +70,7 @@ function atomicParsley(file, args, cb, binaryPath) {
     binaryPath = ensureBinExtIfWindows(isWin, 'AtomicParsley');
   }
 
-  if (typeof file === 'string')
-    spawn(binaryPath, [file, ...parseMeta(args), '--overWrite'], {
-      env: extendPathOnEnv(path),
-    }).on('close', cb);
+  if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -662,6 +659,8 @@ async function init(queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       return Promise.promisify(atomicParsley)(meta.outFilePath, {
+        overWrite: '', // overwrite the file
+
         title: track.name, // ©nam
         artist: track.artists[0], // ©ART
         composer: track.composers, // ©wrt
