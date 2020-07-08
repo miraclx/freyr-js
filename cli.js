@@ -291,7 +291,6 @@ async function init(queries, options) {
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid query'), process.exit(1);
 
   try {
-    atomicParsley(true);
     options.tries = CHECK_FLAG_IS_NUM(
       `${options.tries}`.toLowerCase() === 'infinite' ? Infinity : options.tries,
       '-t, --tries',
@@ -447,6 +446,27 @@ async function init(queries, options) {
   });
 
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
+
+  try {
+    if (options.ffmpeg) {
+      if (!fs.existsSync(options.ffmpeg)) throw new Error(`\x1b[31mffmpeg\x1b[0m: Binary not found [${options.ffmpeg}]`);
+      if (!(await isBinaryFile(options.ffmpeg)))
+        stackLogger.warn('\x1b[33mffmpeg\x1b[0m: Detected non-binary file, trying anyways...');
+    }
+
+    if (options.atomicParsley) {
+      if (!fs.existsSync(options.atomicParsley))
+        throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
+      if (!(await isBinaryFile(options.atomicParsley)))
+        stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
+    } else atomicParsley(true);
+
+    if (options.youtubeDl && !fs.existsSync(options.youtubeDl))
+      throw new Error(`\x1b[31myoutube-dl\x1b[0m: Script not found [${options.youtubeDl}]`);
+  } catch (err) {
+    stackLogger.error(err.message);
+    process.exit(7);
+  }
 
   const progressGen = prepProgressGen(options);
 
