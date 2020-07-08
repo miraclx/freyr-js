@@ -6,8 +6,7 @@
 </h1>
 
 <h4 align="center">
-  Versatile Multi-Service Music Downloader with NodeJS
-  
+  A versatile, service-agnostic music downloader and manager
 </h4>
 
 <div align="center">

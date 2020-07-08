@@ -1,7 +1,7 @@
 {
   "name": "freyr",
   "version": "0.7.0",
-  "description": "Versatile Multi-Service Music Downloader with NodeJS",
+  "description": "A versatile, service-agnostic music downloader and manager",
   "main": "src/freyr.js",
   "scripts": {
     "push": "git push github master"
