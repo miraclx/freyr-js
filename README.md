@@ -628,6 +628,7 @@ Authentication unrequired. API is freely accessible.
 * 4: Network error
 * 5: Error with working directory
 * 6: Failed to initialize a freyr instance
+* 7: An error occurred checking dependency paths
 
 ## Service Support
 
