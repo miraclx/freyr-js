@@ -1295,9 +1295,9 @@ program
     console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
     console.log('');
     console.log('Info:');
-    console.log('  When downloading playlists, tracks are downloaded individually');
-    console.log('  into their respective folders. However, a m3u8 playlist file is generated');
-    console.log('  in the base directory with the name of the playlist that lists the tracks');
+    console.log('  When downloading playlists, the tracks are downloaded individually into');
+    console.log('  their respective folders. However, a m3u8 playlist file is generated in');
+    console.log('  the base directory with the name of the playlist that lists the tracks');
   });
 
 program
