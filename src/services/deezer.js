@@ -107,7 +107,7 @@ class Deezer {
   }
 
   isAuthed() {
-    return this.#store.isAuthenticated;
+    return true;
   }
 
   newAuth() {
