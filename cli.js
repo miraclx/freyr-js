@@ -59,16 +59,19 @@ function check_bin_is_existent(bin, path) {
   return status === 0;
 }
 
-function atomicParsley(file, args, cb) {
-  const err = new Error('Unable to find an executable AtomicParsley binary. Please install.');
+function atomicParsley(file, args, cb, binaryPath) {
   const isWin = process.platform === 'win32';
   const path = xpath.relative(__dirname, xpath.join('./bins', isWin ? 'windows' : 'posix'));
-  if (!check_bin_is_existent('AtomicParsley', path))
-    if (typeof file === 'boolean') throw err;
-    else return cb(err);
+  if (!binaryPath) {
+    const err = new Error('Unable to find an executable AtomicParsley binary. Please install.');
+    if (!check_bin_is_existent('AtomicParsley', path))
+      if (typeof file === 'boolean') throw err;
+      else return cb(err);
+    binaryPath = ensureBinExtIfWindows(isWin, 'AtomicParsley');
+  }
 
   if (typeof file === 'string')
-    spawn(ensureBinExtIfWindows(isWin, 'AtomicParsley'), [file, ...parseMeta(args), '--overWrite'], {
+    spawn(binaryPath, [file, ...parseMeta(args), '--overWrite'], {
       env: extendPathOnEnv(path),
     }).on('close', cb);
 }
