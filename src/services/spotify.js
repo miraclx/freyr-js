@@ -90,7 +90,7 @@ class Spotify {
   }
 
   hasProps() {
-    return true;
+    return this.#store.isAuthenticated;
   }
 
   getProps() {
