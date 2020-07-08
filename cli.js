@@ -617,8 +617,9 @@ async function init(queries, options) {
     Config.concurrency.downloader,
     async ({track, meta, feedMeta, trackLogger}) => {
       const imageFile = tmp.fileSync({
-        template: 'fr3yrcli-XXXXXX.x4i',
+        name: `freyrcli-${meta.fingerprint}.x4i`,
         dir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+        keep: true,
       });
       const imageBytesWritten = await downloadToStream({
         urlOrFragments: track.getImage(Config.image.width, Config.image.height),
@@ -634,8 +635,9 @@ async function init(queries, options) {
         },
       }).catch(err => Promise.reject({err, code: 3}));
       const rawAudio = tmp.fileSync({
-        template: 'fr3yrcli-XXXXXX.x4a',
+        name: `freyrcli-${meta.fingerprint}.x4a`,
         dir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+        keep: true,
       });
       const audioBytesWritten = await downloadToStream(
         lodash.merge(
