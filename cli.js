@@ -414,6 +414,18 @@ async function init(queries, options) {
     },
     (a, b) => b && a,
   );
+  Config.playlist = lodash.mergeWith(
+    Config.playlist,
+    {
+      always: options.playlist,
+      append: options.playlistAppend,
+      escape: !options.playlistNoescape,
+      forceAppend: options.playlistForceAppend,
+      dir: options.playlistDir,
+      namespace: options.playlistNamespace,
+    },
+    (a, b) => (b !== undefined ? b && a : a),
+  );
 
   if (Config.opts.netCheck && !(await isOnline()))
     stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(4);
@@ -500,7 +512,7 @@ async function init(queries, options) {
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
         const playlistFile = xpath.join(
-          options.playlistDir || Config.playlist.dir || BASE_DIRECTORY,
+          Config.playlist.dir || BASE_DIRECTORY,
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
         const isNew = !fs.existsSync(playlistFile) || !(options.playlistAppend || shouldAppend);
@@ -508,7 +520,7 @@ async function init(queries, options) {
         plStream.write('#EXTM3U\n');
         if (playlistTitle && isNew) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
         if (header) plStream.write(`#${header}\n`);
-        let namespace = options.playlistNamespace || Config.playlist.namespace;
+        let {namespace} = Config.playlist;
         namespace = namespace ? xurl.format(xurl.parse(namespace)).concat('/') : '';
         validStats.forEach(({meta: {track: {uri, name, artists, duration}, service, outFilePath}}) =>
           plStream.write(
@@ -517,7 +529,7 @@ async function init(queries, options) {
               `#${service[symbols.meta].DESC} URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
               `${namespace.concat(
-                (entry => (options.playlistNoescape || !Config.playlist.escape ? entry : entry.replace(/#/g, '%23')))(
+                (entry => (!Config.playlist.escape ? entry : entry.replace(/#/g, '%23')))(
                   xpath.relative(BASE_DIRECTORY, outFilePath),
                 ),
               )}`,
@@ -1296,6 +1308,7 @@ program
       '(example, you can prefix with a HTTP domain path: `http://webpage.com/music`)',
     ].join('\n'),
   )
+  .option('--playlist-force-append', 'force append collection tracks to the playlist file')
   .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
   .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
