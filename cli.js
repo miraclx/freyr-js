@@ -19,6 +19,7 @@ const cStringd = require('stringd-colors');
 const isOnline = require('is-online');
 const prettyMs = require('pretty-ms');
 const commander = require('commander');
+const youtubedl = require('youtube-dl');
 const filenamify = require('filenamify');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
@@ -456,6 +457,7 @@ async function init(queries, options) {
       if (!fs.existsSync(options.ffmpeg)) throw new Error(`\x1b[31mffmpeg\x1b[0m: Binary not found [${options.ffmpeg}]`);
       if (!(await isBinaryFile(options.ffmpeg)))
         stackLogger.warn('\x1b[33mffmpeg\x1b[0m: Detected non-binary file, trying anyways...');
+      ffmpeg.setFfmpegPath(options.ffmpeg);
     }
 
     if (options.atomicParsley) {
@@ -465,8 +467,11 @@ async function init(queries, options) {
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
     } else atomicParsley(true);
 
-    if (options.youtubeDl && !fs.existsSync(options.youtubeDl))
-      throw new Error(`\x1b[31myoutube-dl\x1b[0m: Script not found [${options.youtubeDl}]`);
+    if (options.youtubeDl) {
+      if (!fs.existsSync(options.youtubeDl))
+        throw new Error(`\x1b[31myoutube-dl\x1b[0m: Script not found [${options.youtubeDl}]`);
+      youtubedl.setYtdlBinary(options.youtubeDl);
+    }
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
@@ -1268,9 +1273,9 @@ program
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-browser', 'disable browser authentication')
   .option('--no-net-check', 'disable internet connection check')
-  .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary (unimplemented)')
-  .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary (unimplemented)')
-  .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary (unimplemented)')
+  .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
+  .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary')
+  .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
   .option(
