@@ -150,6 +150,7 @@ class Spotify {
           genres: albumInfo.genres,
           label: albumInfo.label,
           copyrights: albumInfo.copyrights,
+          composers: null,
           compilation: albumInfo.type === 'compilation',
           getImage: albumInfo.getImage,
         }
