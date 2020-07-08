@@ -34,7 +34,7 @@ class Spotify {
     serverOpts: null,
     cache: new NodeCache(),
     expiry: null,
-    isAuthenticated: null,
+    isAuthenticated: false,
   };
 
   constructor(config, authServer, serverOpts) {
