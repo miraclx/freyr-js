@@ -78,7 +78,7 @@
     "stringd-colors": "^1.9.0",
     "tmp": "^0.1.0",
     "tough-cookie": "^4.0.0",
-    "xbytes": "^1.6.1",
+    "xbytes": "^1.6.2",
     "xprogress": "^0.17.2",
     "youtube-dl": "^2.3.0",
     "yt-search": "^1.1.2"
