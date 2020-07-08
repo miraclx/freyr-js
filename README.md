@@ -509,8 +509,6 @@ Defaults are in the [conf.json](conf.json) file.
   * `downloader`: \<number\> The number of tracks to be concurrently downloaded in parallel.
   * `encoder`: \<number\> The total number of tracks to be concurrently undergo encoding.
   * `embedder`: \<number\> The total number of tracks to be concurrently embedded in parallel.
-  * `sources`: \<number\> The number of tracks whose sources should be concurrently collated.
-  * `feeds`: \<number\> The number of tracks whose source feeds should be concurrently gotten.
 * `services`: \<[ServiceConfiguration](#service-configuration): object\>
 * `dirs`: \<object\>
   * `output`: \<string\> Default download directory. Default: `"."`
