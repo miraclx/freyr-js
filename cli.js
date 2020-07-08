@@ -532,7 +532,7 @@ async function init(queries, options) {
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
 
-  function downloadToStream({urlOrFragments, writeStream, logger, opts}) {
+  function downloadToStream({urlOrFragments, outputFile, logger, opts}) {
     opts = {tag: '', successMessage: '', failureMessage: '', retryMessage: '', ...opts};
     [opts.tag, opts.errorHandler, opts.retryMessage, opts.failureMessage, opts.successMessage] = [
       opts.tag,
@@ -544,7 +544,7 @@ async function init(queries, options) {
     return new Promise((res, rej) => {
       let completed = false;
       if (!Array.isArray(urlOrFragments)) {
-        const feed = xget(urlOrFragments, {chunks: options.chunks, retries: options.tries, timeout: options.timeout})
+        const feed = xget(urlOrFragments, {auto: false, chunks: options.chunks, retries: options.tries, timeout: options.timeout})
           .with('progressBar', urlMeta =>
             progressGen(
               urlMeta.size,
@@ -574,7 +574,17 @@ async function init(queries, options) {
             opts.errorHandler(err);
             rej(err);
           });
-        feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
+        feed.setHeadHandler(({acceptsRanges}) => {
+          let [offset, writeStream] = [];
+          if (acceptsRanges && fs.existsSync(outputFile)) {
+            ({size: offset} = fs.statSync(outputFile));
+            opts.resumeHandler(offset);
+            writeStream = fs.createWriteStream(outputFile, {flags: 'a'});
+          } else writeStream = fs.createWriteStream(outputFile, {flags: 'w'});
+          feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
+          return offset;
+        });
+        feed.start();
       } else {
         const barGen = progressGen(
           urlOrFragments.reduce((total, fragment) => total + fragment.size, 0),
@@ -585,6 +595,7 @@ async function init(queries, options) {
         );
 
         let has_erred = false;
+        const writeStream = fs.createWriteStream(outputFile);
 
         merge2(
           ...urlOrFragments.map((frag, i) => {
@@ -608,6 +619,8 @@ async function init(queries, options) {
           .once('end', () => barGen.end(opts.successMessage(), '\n'))
           .pipe(writeStream)
           .on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
+        // TODO: support resumption of segmented resources
+        // TODO: retry fragments?
       }
     });
   }
@@ -623,12 +636,13 @@ async function init(queries, options) {
       });
       const imageBytesWritten = await downloadToStream({
         urlOrFragments: track.getImage(Config.image.width, Config.image.height),
-        writeStream: fs.createWriteStream(imageFile.name),
+        writeStream: imageFile.name,
         logger: trackLogger,
         opts: {
           tag: '[Retrieving album art]...',
-          errorHandler: () => imageFile.removeCallback(),
+          // errorHandler: () => imageFile.removeCallback(),
           retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+          resumeHandler: offset => trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
           failureMessage: err =>
             trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
           successMessage: trackLogger.getText(`| [\u2713] Got album art`),
@@ -642,12 +656,14 @@ async function init(queries, options) {
       const audioBytesWritten = await downloadToStream(
         lodash.merge(
           {
-            writeStream: fs.createWriteStream(rawAudio.name),
+            writeStream: rawAudio.name,
             logger: trackLogger,
             opts: {
               tag: `[‘${meta.trackName}’]`,
               errorHandler: () => rawAudio.removeCallback(),
               retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+              resumeHandler: offset =>
+                trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
               successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
             },
           },
