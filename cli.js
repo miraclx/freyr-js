@@ -1504,7 +1504,7 @@ program
   )
   .option('-o, --output <FILE>', 'write to file as opposed to stdout')
   .option('-t, --no-tag', 'skip comments with info or meta for each entry')
-  .action((urls, args) => {
+  .action(async (urls, args) => {
     const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
     // eslint-disable-next-line no-shadow
     async function urify(urls) {
@@ -1516,7 +1516,7 @@ program
       });
     }
     if (urls.length === 0 && process.stdin.isTTY && !args.input) args.input = '-';
-    urify(urls)
+    await urify(urls)
       .then(async () => {
         if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
           await urify(await PROCESS_INPUT_ARG(!process.stdin.isTTY ? '-' : args.input));
@@ -1534,8 +1534,7 @@ program
         console.log('\x1b[32m[+]\x1b[0m Urify complete');
         if (args.output) console.log(`Successfully written to [${args.output}]`);
         if (output !== process.stdout) output.end();
-      })
-      .catch(err => console.error(`\x1b[31m[!]\x1b[0m An error occurred: ${(err ? err.message : err) || err}`));
+      });
   })
   .on('--help', () => {
     console.log('');
