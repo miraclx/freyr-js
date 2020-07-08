@@ -343,7 +343,8 @@ async function init(queries, options) {
     },
     opts: {
       netCheck: true,
-      browser: true,
+      attemptAuth: true,
+      autoOpenBrowser: true,
     },
     dirs: {
       output: '.',
@@ -396,7 +397,15 @@ async function init(queries, options) {
   Config.image = lodash.merge(Config.image, options.coverSize);
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
   Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
-  Config.opts = lodash.mergeWith(Config.opts, {netCheck: options.netCheck, browser: options.browser}, (a, b) => b && a);
+  Config.opts = lodash.mergeWith(
+    Config.opts,
+    {
+      netCheck: options.netCheck,
+      attemptAuth: options.authentication,
+      autoOpenBrowser: options.browser,
+    },
+    (a, b) => b && a,
+  );
 
   if (Config.opts.netCheck && !(await isOnline()))
     stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(4);
@@ -971,10 +980,12 @@ async function init(queries, options) {
 
   const authQueue = new AsyncQueue('cli:authQueue', 1, async (service, logger) => {
     async function coreAuth(loginLogger) {
-      if (!Config.opts.browser) return;
+      if (!Config.opts.attemptAuth) return;
       const authHandler = service.newAuth();
       const url = await authHandler.getUrl;
-      await processPromise(open(url), loginLogger, {onInit: `[\u2022] Attempting to open [ ${url} ] within browser...`});
+      if (Config.opts.autoOpenBrowser)
+        await processPromise(open(url), loginLogger, {onInit: `[\u2022] Attempting to open [ ${url} ] within browser...`});
+      else loginLogger.log(`[\u2022] Open [ ${url} ] in a browser to proceed with authentication`);
       await processPromise(authHandler.userToAuth(), loginLogger, {
         onInit: '[\u2022] Awaiting user authentication...',
       });
@@ -1271,8 +1282,9 @@ program
   .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
   .option('--cache-dir <DIR>', 'specify alternative cache directory', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
-  .option('--no-browser', 'disable browser authentication')
+  .option('--no-browser', 'disable auto-launching of user browser')
   .option('--no-net-check', 'disable internet connection check')
+  .option('--no-authentication', 'skip authentication procedure')
   .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
   .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary')
   .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')

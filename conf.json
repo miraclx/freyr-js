@@ -14,7 +14,8 @@
   },
   "opts": {
     "netCheck": true,
-    "browser": true
+    "attemptAuth": true,
+    "autoOpenBrowser": true
   },
   "dirs": {
     "output": "."
