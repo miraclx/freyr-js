@@ -1288,6 +1288,12 @@ program
   .action(init)
   .on('--help', () => {
     console.log('');
+    console.log('Environment Variables:');
+    console.log('  SHOW_DEBUG_STACK             show extended debug information');
+    console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
+    console.log('  YOUTUBE_DL_PATH              custom youtube-dl path, alternatively use `--youtube-dl`');
+    console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
+    console.log('');
     console.log('Info:');
     console.log('  When downloading playlists, tracks are downloaded individually');
     console.log('  into their respective folders. However, a m3u8 playlist file is generated');
