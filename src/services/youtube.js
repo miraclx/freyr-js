@@ -143,6 +143,13 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
+              const watchEndpoint =
+                'watchEndpoint' in content.doubleTapCommand
+                  ? content.doubleTapCommand.watchEndpoint
+                  : 'watchPlaylistEndpoint' in content.doubleTapCommand
+                  ? content.doubleTapCommand.watchPlaylistEndpoint
+                  : null;
+              if (!watchEndpoint) return {};
               const tags = content.flexColumns.map(obj =>
                 obj.musicResponsiveListItemFlexColumnRenderer.text
                   ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).join('')
@@ -156,7 +163,7 @@ class YouTubeMusic {
                     artists: tags[1],
                     album: tags[2],
                     duration: tags[3],
-                    link: content.doubleTapCommand.watchEndpoint,
+                    link: watchEndpoint,
                   }
                 : type === 'Video'
                 ? {
@@ -165,7 +172,7 @@ class YouTubeMusic {
                     artists: tags[1],
                     views: tags[2],
                     duration: tags[3],
-                    link: content.doubleTapCommand.watchEndpoint,
+                    link: watchEndpoint,
                   }
                 : type === 'Album'
                 ? {
@@ -174,14 +181,14 @@ class YouTubeMusic {
                     album_type: type === 'Single' ? 'Album' : type,
                     artists: tags[1],
                     year: tags[2],
-                    link: content.doubleTapCommand.watchPlaylistEndpoint,
+                    link: watchEndpoint,
                   }
                 : type === 'Artist'
                 ? {
                     name: tags[0],
                     type,
                     subscribers: tags[1],
-                    link: content.doubleTapCommand.watchPlaylistEndpoint,
+                    link: watchEndpoint,
                   }
                 : type === 'Playlist'
                 ? {
@@ -189,7 +196,7 @@ class YouTubeMusic {
                     type,
                     author: tags[1],
                     nb_songs: tags[2],
-                    link: content.doubleTapCommand.watchPlaylistEndpoint,
+                    link: watchEndpoint,
                   }
                 : {};
             }),
