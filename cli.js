@@ -401,7 +401,7 @@ async function init(queries, options) {
     Config.opts,
     {
       netCheck: options.netCheck,
-      attemptAuth: options.authentication,
+      attemptAuth: options.auth,
       autoOpenBrowser: options.browser,
     },
     (a, b) => b && a,
@@ -1282,9 +1282,9 @@ program
   .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
   .option('--cache-dir <DIR>', 'specify alternative cache directory', '<tmp>')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
+  .option('--no-auth', 'skip authentication procedure')
   .option('--no-browser', 'disable auto-launching of user browser')
   .option('--no-net-check', 'disable internet connection check')
-  .option('--no-authentication', 'skip authentication procedure')
   .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
   .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary')
   .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
