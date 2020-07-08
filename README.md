@@ -499,9 +499,6 @@ Defaults are in the [conf.json](conf.json) file.
   * `hostname`: \<string\>
   * `port`: \<number\>
   * `useHttps`: \<boolean\>
-* `image`: \<object|number|string\> An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
-  * `width`: \<number|string\>
-  * `height`: \<number|string\>
 * `concurrency`: \<object\>
   * `queries`: \<number\> The number of queries to be processed concurrently.
   * `tracks`: \<number\> The number of tracks to be actively processed in parallel.
@@ -509,14 +506,27 @@ Defaults are in the [conf.json](conf.json) file.
   * `downloader`: \<number\> The number of tracks to be concurrently downloaded in parallel.
   * `encoder`: \<number\> The total number of tracks to be concurrently undergo encoding.
   * `embedder`: \<number\> The total number of tracks to be concurrently embedded in parallel.
-* `services`: \<[ServiceConfiguration](#service-configuration): object\>
+* `opts`: \<object\>
+  * `netCheck`: \<boolean\> Whether or not to check network access at program start.
+  * `browser`: \<boolean\> Whether or not to process authentication by opening user browser.
 * `dirs`: \<object\>
   * `output`: \<string\> Default download directory. Default: `"."`
+* `playlist`: \<object\>
+  * `always`: \<boolean\> Always create playlists for collections and non-collections alike.
+  * `append`: \<boolean\> Append non-collection tracks onto the playlist file.
+  * `escape`: \<boolean\> Escape `#` characters within playlist entries paths.
+  * `forceAppend`: \<boolean\> Force append collection tracks.
+  * `dir`: \<string\> Default playlist save directory.
+  * `namespace`: \<string\> Prefix namespace to prepend to track paths.
+* `image`: \<object|number|string\> An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
+  * `width`: \<number|string\>
+  * `height`: \<number|string\>
 * `downloader`: \<object\>
   * `order`: \<array\> Service download sources order.
     * Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
-    * supported: `youtube`
-    * default: `[ "youtube" ]`
+    * supported: `youtube`, `yt_music`
+    * default: `[ "yt_music", "youtube" ]`
+* `services`: \<[ServiceConfiguration](#service-configuration): object\>
 
 <details>
 <summary>Example JSON</summary>
