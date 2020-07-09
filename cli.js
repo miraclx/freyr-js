@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 const fs = require('fs');
+const xurl = require('url');
 const xpath = require('path');
 const crypto = require('crypto');
 const {spawn, spawnSync} = require('child_process');
 
 const tmp = require('tmp');
-const xurl = require('url');
 const Conf = require('conf');
 const open = require('open');
 const xget = require('libxget');
@@ -1296,6 +1296,7 @@ program
       'key-value concurrency pairs (repeatable and optionally `,`-separated)',
       '(format: <[key=]value>) (key omission implies track concurrency)',
       `(valid(key): ${VALIDS.concurrency})`,
+      '(example: `queries=2,downloader=4` processes 2 CLI queries, downloads at most 4 tracks concurrently)',
     ].join('\n'),
     (spec, stack) => (stack || []).concat(spec.split(',')),
   )
