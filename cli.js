@@ -724,7 +724,7 @@ async function init(queries, options) {
         artist: track.artists[0], // ©ART
         composer: track.composers, // ©wrt
         album: track.album, // ©alb
-        genre: (track.genres || [])[0].concat(' '), // ©gen | gnre
+        genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
         tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
         disk: `${track.disc_number}/${track.disc_number}`, // disk
         year: new Date(track.release_date).toISOString().split('T')[0], // ©day
