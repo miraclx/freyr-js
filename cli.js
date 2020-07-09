@@ -652,7 +652,7 @@ async function init(queries, options) {
       });
       const imageBytesWritten = await downloadToStream({
         urlOrFragments: track.getImage(Config.image.width, Config.image.height),
-        writeStream: imageFile.name,
+        outputFile: imageFile.name,
         logger: trackLogger,
         opts: {
           tag: '[Retrieving album art]...',
@@ -673,7 +673,7 @@ async function init(queries, options) {
       const audioBytesWritten = await downloadToStream(
         lodash.merge(
           {
-            writeStream: rawAudio.name,
+            outputFile: rawAudio.name,
             logger: trackLogger,
             opts: {
               tag: `[‘${meta.trackName}’]`,
