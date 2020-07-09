@@ -570,20 +570,20 @@ async function init(queries, options) {
           .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.next))
           .on('end', () => {
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.successMessage(), '\n');
-            else logger.log(opts.successMessage());
+            else logger.write(opts.successMessage(), '\n');
           })
           .on('retry', data => {
             if (opts.retryMessage !== false) {
               if (feed.store.has('progressBar'))
                 data.store.get('progressBar').print(opts.retryMessage({ref: data.index + 1, ...data}));
-              else logger.log(opts.retryMessage(data));
+              else logger.write(opts.retryMessage(data), '\n');
             }
           })
           .once('error', err => {
             if (completed) return;
             err = Object(err);
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err), '\n');
-            else logger.log(opts.failureMessage(err));
+            else logger.write(opts.failureMessage(err), '\n');
             opts.errorHandler(err);
             rej(err);
           });
