@@ -28,6 +28,7 @@ const countryData = require('country-data');
 const {isBinaryFile} = require('isbinaryfile');
 
 const symbols = require('./src/symbols');
+const fileMgr = require('./src/file_mgr');
 const pFlatten = require('./src/p_flatten');
 const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
@@ -642,9 +643,11 @@ async function init(queries, options) {
     'cli:downloadQueue',
     Config.concurrency.downloader,
     async ({track, meta, feedMeta, trackLogger}) => {
-      const imageFile = tmp.fileSync({
-        name: `freyrcli-${meta.fingerprint}.x4i`,
-        dir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+      const baseCacheDir = 'fr3yrcach3';
+      const imageFile = await fileMgr({
+        filename: `freyrcli-${meta.fingerprint}.x4i`,
+        tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+        dirname: baseCacheDir,
         keep: true,
       });
       const imageBytesWritten = await downloadToStream({
@@ -661,9 +664,10 @@ async function init(queries, options) {
           successMessage: trackLogger.getText(`| [\u2713] Got album art`),
         },
       }).catch(err => Promise.reject({err, code: 3}));
-      const rawAudio = tmp.fileSync({
-        name: `freyrcli-${meta.fingerprint}.x4a`,
-        dir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+      const rawAudio = await fileMgr({
+        filename: `freyrcli-${meta.fingerprint}.x4a`,
+        tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+        dirname: baseCacheDir,
         keep: true,
       });
       const audioBytesWritten = await downloadToStream(
@@ -673,7 +677,6 @@ async function init(queries, options) {
             logger: trackLogger,
             opts: {
               tag: `[‘${meta.trackName}’]`,
-              errorHandler: () => rawAudio.removeCallback(),
               retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
               resumeHandler: offset =>
                 trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
@@ -684,6 +687,7 @@ async function init(queries, options) {
             ? {
                 urlOrFragments: feedMeta.url,
                 opts: {
+                  errorHandler: () => rawAudio.removeCallback(),
                   failureMessage: err =>
                     trackLogger.getText(`| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`),
                 },
