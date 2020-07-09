@@ -1124,7 +1124,9 @@ async function init(queries, options) {
           embedLogger.error(
             `\u2022 [\u2715] ${
               trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
-            } (failed:${reason ? ` ${reason}` : ''}${trackStat.err ? ` [${trackStat.err.message || trackStat.err}]` : ''})`,
+            } (failed:${reason ? ` ${reason}` : ''}${
+              trackStat.err ? ` [${trackStat.err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || trackStat.err}]` : ''
+            })`,
           );
         } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: [Exists])`);
         else
