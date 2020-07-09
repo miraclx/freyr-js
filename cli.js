@@ -592,7 +592,7 @@ async function init(queries, options) {
           let [offset, writeStream] = [];
           if (acceptsRanges && fs.existsSync(outputFile)) {
             ({size: offset} = fs.statSync(outputFile));
-            opts.resumeHandler(offset);
+            if (offset) opts.resumeHandler(offset);
             writeStream = fs.createWriteStream(outputFile, {flags: 'a'});
           } else writeStream = fs.createWriteStream(outputFile, {flags: 'w'});
           feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
