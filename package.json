@@ -65,7 +65,7 @@
     "hh-mm-ss": "^1.2.0",
     "is-online": "^8.3.0",
     "isbinaryfile": "^4.0.6",
-    "libxget": "^0.8.0-1",
+    "libxget": "^0.8.1",
     "lodash": "^4.17.15",
     "merge2": "^1.3.0",
     "mkdirp": "^1.0.4",
