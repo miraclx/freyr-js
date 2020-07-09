@@ -1543,6 +1543,7 @@ config
   .action(() => {
     throw Error('Unimplemented: [CLI:profiles unset]');
   });
+config
   .command('list')
   .alias('ls')
   .description('list all available profiles (unimplemented)')
