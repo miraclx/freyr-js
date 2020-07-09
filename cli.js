@@ -2,6 +2,7 @@
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 const fs = require('fs');
 const xpath = require('path');
+const crypto = require('crypto');
 const {spawn, spawnSync} = require('child_process');
 
 const tmp = require('tmp');
