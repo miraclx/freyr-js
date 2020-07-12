@@ -520,7 +520,7 @@ async function init(queries, options) {
         const isNew = !fs.existsSync(playlistFile) || !(options.playlistAppend || shouldAppend);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
         plStream.write('#EXTM3U\n');
-        if (playlistTitle && isNew) plStream.write(`#PLAYLIST: ${playlistTitle}\n`);
+        if (playlistTitle && isNew) plStream.write(`${playlistTitle.replace(/^/gm, '# ')}\n`);
         if (header) plStream.write(`#${header}\n`);
         let {namespace} = Config.playlist;
         namespace = namespace ? xurl.format(xurl.parse(namespace)).concat('/') : '';
@@ -1146,7 +1146,7 @@ async function init(queries, options) {
           trackStats,
           queryLogger,
           `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
-          `${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
+          `Playlist: ${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''} (${source.uri})`,
           Config.playlist.forceAppend,
         );
       return trackStats;
@@ -1158,7 +1158,14 @@ async function init(queries, options) {
   const totalQueries = [...options.input, ...queries];
   const trackStats = (await pFlatten(queryQueue.push(totalQueries))).filter(Boolean);
   if ((options.playlist && typeof options.playlist === 'string') || Config.playlist.always)
-    createPlaylist(null, trackStats, stackLogger, options.playlist, Config.playlist.append);
+    createPlaylist(
+      null,
+      trackStats,
+      stackLogger,
+      options.playlist,
+      `Queries:\n${totalQueries.join('\n')}`,
+      Config.playlist.append,
+    );
   const finalStats = trackStats.reduce(
     (total, current) => {
       if (current.postprocess && current.postprocess.finalSize) {
