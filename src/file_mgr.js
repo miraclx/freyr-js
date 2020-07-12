@@ -18,9 +18,10 @@ function garbageCollector() {
   process.removeListener('exit', garbageCollector);
 }
 
-const hookedUpListeners = false;
+let hookedUpListeners = false;
 function hookupListeners() {
   if (!hookedUpListeners) {
+    hookedUpListeners = true;
     process.addListener('exit', garbageCollector);
   }
 }
