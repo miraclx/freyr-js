@@ -38,8 +38,8 @@ const streamUtils = require('./src/stream_utils');
 const packageJson = require('./package.json');
 
 function parseMeta(params) {
-  return Object.entries(params)
-    .filter(([, value]) => value !== undefined)
+  return Object.entries(params || {})
+    .filter(([, value]) => ![undefined, null].includes(value))
     .map(([key, value]) =>
       Array.isArray(value) ? value.map(tx => (tx ? [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])] : '')) : [`--${key}`, value],
     )
