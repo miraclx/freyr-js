@@ -306,7 +306,7 @@ async function init(queries, options) {
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = await PROCESS_INPUT_ARG(options.input);
     options.config = await PROCESS_CONFIG_ARG(options.config);
-    if (options.memCache !== false) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
+    if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
