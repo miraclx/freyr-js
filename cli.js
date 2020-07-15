@@ -529,7 +529,7 @@ async function init(queries, options) {
               `#${service[symbols.meta].DESC} URI: ${uri}`,
               `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
               `${namespace.concat(
-                (entry => (!Config.playlist.escape ? entry : entry.replace(/#/g, '%23')))(
+                (entry => (!Config.playlist.escape ? entry : encodeURI(entry).replace(/#/g, '%23')))(
                   xpath.relative(BASE_DIRECTORY, outFilePath),
                 ),
               )}`,
