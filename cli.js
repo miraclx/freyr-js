@@ -518,7 +518,7 @@ async function init(queries, options) {
         const isNew = !fs.existsSync(playlistFile) || !(!options.playlistNoappend || shouldAppend);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
         plStream.write('#EXTM3U\n');
-        if (playlistTitle && isNew) plStream.write(`${playlistTitle.replace(/^/gm, '# ')}\n`);
+        if (playlistTitle && isNew) plStream.write(`#${playlistTitle.replace(/\n/gm, '\n# ')}\n`);
         if (header) plStream.write(`#${header}\n`);
         let {namespace} = Config.playlist;
         namespace = namespace ? xurl.format(xurl.parse(namespace)).concat('/') : '';
