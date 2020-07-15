@@ -6,7 +6,6 @@ const xpath = require('path');
 const crypto = require('crypto');
 const {spawn, spawnSync} = require('child_process');
 
-const tmp = require('tmp');
 const Conf = require('conf');
 const open = require('open');
 const xget = require('libxget');
