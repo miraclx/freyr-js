@@ -524,6 +524,8 @@ Defaults are in the [conf.json](conf.json) file.
   * `width`: \<number|string\>
   * `height`: \<number|string\>
 * `downloader`: \<object\>
+  * `memCache`: \<boolean\> Whether or not to use in-memory caching for download chunks.
+  * `cacheSize`: \<number\> Maximum size of bytes to be cached per download.
   * `order`: \<array\> Service download sources order.
     * Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
     * supported: `youtube`, `yt_music`
