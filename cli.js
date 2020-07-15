@@ -418,14 +418,14 @@ async function init(queries, options) {
   Config.playlist = lodash.mergeWith(
     Config.playlist,
     {
-      always: options.playlist,
-      append: options.playlistAppend,
+      always: !!options.playlist,
+      append: !options.playlistNoappend,
       escape: !options.playlistNoescape,
       forceAppend: options.playlistForceAppend,
       dir: options.playlistDir,
       namespace: options.playlistNamespace,
     },
-    (a, b) => (b !== undefined ? b && a : a),
+    (a, b) => (b !== undefined ? b : a),
   );
 
   if (Config.opts.netCheck && !(await isOnline()))
@@ -516,7 +516,7 @@ async function init(queries, options) {
           Config.playlist.dir || BASE_DIRECTORY,
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
-        const isNew = !fs.existsSync(playlistFile) || !(options.playlistAppend || shouldAppend);
+        const isNew = !fs.existsSync(playlistFile) || !(!options.playlistNoappend || shouldAppend);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
         plStream.write('#EXTM3U\n');
         if (playlistTitle && isNew) plStream.write(`${playlistTitle.replace(/^/gm, '# ')}\n`);
@@ -1312,7 +1312,7 @@ program
   .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
   .option('-P, --no-playlist', 'skip creating a playlist file for collections')
   .option('--playlist-dir <DIR>', 'directory to save playlist file to, if any, (default: tracks base directory)')
-  .option('--playlist-append', 'whether or not to append to the playlist file, if any exists')
+  .option('--playlist-noappend', 'do not append to the playlist file, if any exists')
   .option('--playlist-noescape', 'do not escape invalid characters within playlist entries')
   .option(
     '--playlist-namespace <SPEC>',
