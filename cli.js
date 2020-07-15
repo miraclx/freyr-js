@@ -967,7 +967,7 @@ async function init(queries, options) {
     });
     return {
       meta: album,
-      isCollection: album.type === 'collection',
+      isCollection: album.type === 'compilation',
       tracks: trackBroker.push(tracks, {
         logger: collationLogger.tick(),
         service,
