@@ -397,35 +397,29 @@ async function init(queries, options) {
 
   Config.image = lodash.merge(Config.image, options.coverSize);
   Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
-  Config.downloader.order = Array.from(new Set(options.downloader.concat(Config.downloader.order)));
-  Config.dirs = lodash.mergeWith(
-    Config.dirs,
+  Config.dirs = lodash.merge(Config.dirs, {
+    output: options.directory,
+    cache: options.cacheDir,
+  });
+  Config.opts = lodash.merge(Config.opts, {
+    netCheck: options.netCheck,
+    attemptAuth: options.auth,
+    autoOpenBrowser: options.browser,
+  });
+  Config.playlist = lodash.merge(Config.playlist, {
+    always: !!options.playlist,
+    append: !options.playlistNoappend,
+    escape: !options.playlistNoescape,
+    forceAppend: options.playlistForceAppend,
+    dir: options.playlistDir,
+    namespace: options.playlistNamespace,
+  });
+  Config.downloader = lodash.mergeWith(
+    Config.downloader,
     {
-      output: options.directory,
-      cache: options.cacheDir,
+      order: options.downloader,
     },
-    (a, b) => b && a,
-  );
-  Config.opts = lodash.mergeWith(
-    Config.opts,
-    {
-      netCheck: options.netCheck,
-      attemptAuth: options.auth,
-      autoOpenBrowser: options.browser,
-    },
-    (a, b) => b && a,
-  );
-  Config.playlist = lodash.mergeWith(
-    Config.playlist,
-    {
-      always: !!options.playlist,
-      append: !options.playlistNoappend,
-      escape: !options.playlistNoescape,
-      forceAppend: options.playlistForceAppend,
-      dir: options.playlistDir,
-      namespace: options.playlistNamespace,
-    },
-    (a, b) => (b !== undefined ? b : a),
+    (a, b, k) => (k === 'order' ? Array.from(new Set(b.concat(a))) : b !== undefined ? b : undefined),
   );
 
   if (Config.opts.netCheck && !(await isOnline()))
