@@ -1157,7 +1157,7 @@ async function init(queries, options) {
           trackStats,
           queryLogger,
           `${source.name}${source.owner_name ? `-${source.owner_name}` : ''}`,
-          `Playlist: ${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''} (${source.uri})`,
+          `Playlist: ${source.name}${source.owner_name ? ` by ${source.owner_name}` : ''}`,
           Config.playlist.forceAppend,
         );
       return trackStats;
