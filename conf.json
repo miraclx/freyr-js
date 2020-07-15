@@ -34,6 +34,8 @@
     "height": 640
   },
   "downloader": {
+    "memCache": true,
+    "cacheSize": 209715200,
     "order": [
       "yt_music",
       "youtube"

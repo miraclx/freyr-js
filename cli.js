@@ -306,6 +306,7 @@ async function init(queries, options) {
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = await PROCESS_INPUT_ARG(options.input);
     options.config = await PROCESS_CONFIG_ARG(options.config);
+    if (options.memCache !== false) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
@@ -371,6 +372,8 @@ async function init(queries, options) {
       embedder: 10,
     },
     downloader: {
+      memCache: true,
+      cacheSize: 209715200,
       order: ['yt_music', 'youtube'],
     },
   };
@@ -417,6 +420,8 @@ async function init(queries, options) {
   Config.downloader = lodash.mergeWith(
     Config.downloader,
     {
+      memCache: !!options.memCache,
+      cacheSize: options.memCache,
       order: options.downloader,
     },
     (a, b, k) => (k === 'order' ? Array.from(new Set(b.concat(a))) : b !== undefined ? b : undefined),
@@ -551,7 +556,14 @@ async function init(queries, options) {
     return new Promise((res, rej) => {
       let completed = false;
       if (!Array.isArray(urlOrFragments)) {
-        const feed = xget(urlOrFragments, {auto: false, chunks: options.chunks, retries: options.tries, timeout: options.timeout})
+        const feed = xget(urlOrFragments, {
+          auto: false,
+          cache: Config.downloader.memCache,
+          chunks: options.chunks,
+          retries: options.tries,
+          timeout: options.timeout,
+          cacheSize: Config.downloader.cacheSize,
+        })
           .with('progressBar', urlMeta =>
             progressGen(
               urlMeta.size,
@@ -606,7 +618,13 @@ async function init(queries, options) {
 
         merge2(
           ...urlOrFragments.map((frag, i) => {
-            const feed = xget(frag.url, {chunks: 1, retries: options.tries, timeout: options.timeout})
+            const feed = xget(frag.url, {
+              cache: Config.downloader.memCache,
+              chunks: 1,
+              retries: options.tries,
+              timeout: options.timeout,
+              cacheSize: Config.downloader.cacheSize,
+            })
               .on('retry', data => {
                 if (opts.retryMessage !== false) barGen.print(opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data}));
               })
@@ -1330,6 +1348,8 @@ program
   )
   .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
   .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
+  .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
+  .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-auth', 'skip authentication procedure')
   .option('--no-browser', 'disable auto-launching of user browser')
