@@ -143,12 +143,13 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              const watchEndpoint =
-                'watchEndpoint' in content.doubleTapCommand
+              const watchEndpoint = content.doubleTapCommand
+                ? 'watchEndpoint' in content.doubleTapCommand
                   ? content.doubleTapCommand.watchEndpoint
                   : 'watchPlaylistEndpoint' in content.doubleTapCommand
                   ? content.doubleTapCommand.watchPlaylistEndpoint
-                  : null;
+                  : null
+                : null;
               if (!watchEndpoint) return {};
               const tags = content.flexColumns.map(obj =>
                 obj.musicResponsiveListItemFlexColumnRenderer.text
