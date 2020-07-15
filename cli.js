@@ -590,9 +590,9 @@ async function init(queries, options) {
           });
         feed.setHeadHandler(({acceptsRanges}) => {
           let [offset, writeStream] = [];
-          if (acceptsRanges && fs.existsSync(outputFile)) {
-            ({size: offset} = fs.statSync(outputFile));
-            if (offset) opts.resumeHandler(offset);
+          if (acceptsRanges && fs.existsSync(outputFile)) ({size: offset} = fs.statSync(outputFile));
+          if (offset) {
+            opts.resumeHandler(offset);
             writeStream = fs.createWriteStream(outputFile, {flags: 'a'});
           } else writeStream = fs.createWriteStream(outputFile, {flags: 'w'});
           feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
