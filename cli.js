@@ -884,6 +884,10 @@ async function init(queries, options) {
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
     const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
+    meta.fingerprint = crypto
+      .createHash('md5')
+      .update(`${audioSource.source.videoId}`)
+      .digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
       .catch(errObject => Promise.reject({meta, code: 5, ...(errObject.code ? errObject : {err: errObject})}));
@@ -913,17 +917,13 @@ async function init(queries, options) {
           ? ` \u2012 ${track.artists.join(', ')}`
           : '',
       );
-      const fingerprint = crypto
-        .createHash('md5')
-        .update(track.uri)
-        .digest('hex');
       const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.m4a`;
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = fs.existsSync(outFilePath);
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
-      const meta = {fingerprint, trackName, outFileDir, outFilePath, track, service};
+      const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
