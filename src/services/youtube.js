@@ -4,6 +4,7 @@ const util = require('util');
 const got = require('got').default;
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
+const {StripChar} = require('stripchar');
 const youtubedl = require('youtube-dl');
 
 const most = require('../most_polyfill');
@@ -253,6 +254,7 @@ class YouTubeMusic {
     if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
 
     const results = await this.#search({query: artists.concat(track).join(' ')});
+    const strippedTitle = StripChar.RSspecChar(track).toLowerCase();
     const validSections = [
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
@@ -261,7 +263,13 @@ class YouTubeMusic {
       item =>
         item &&
         'title' in item &&
-        (item.title.toLowerCase().includes(track.toLowerCase()) || track.toLowerCase().includes(item.title.toLowerCase())),
+        most(
+          StripChar.RSspecChar(item.title)
+            .replace(/\s{2,}/g, ' ')
+            .toLowerCase()
+            .split(' '),
+          text => strippedTitle.includes(text),
+        ),
     );
     function calculateAccuracyFor(item) {
       let accuracy = 0;
@@ -311,7 +319,7 @@ class YouTube {
 
   #store = {
     search: util.promisify(ytSearch),
-    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 4, async (artists, trackTitle, xFilters) =>
+    searchQueue: new AsyncQueue('YouTube:netSearchQueue', 4, async (artists, trackTitle, strippedTitle, xFilters) =>
       (
         await this.#store.search({
           query: [...artists, trackTitle, ...xFilters].join(' '),
@@ -325,8 +333,13 @@ class YouTube {
             (item &&
               'title' in item &&
               most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
-              (item.title.toLowerCase().includes(trackTitle.toLowerCase()) ||
-                trackTitle.toLowerCase().includes(item.title.toLowerCase())) &&
+              most(
+                StripChar.RSspecChar(item.title)
+                  .replace(/\s{2,}/g, ' ')
+                  .toLowerCase()
+                  .split(' '),
+                text => strippedTitle.includes(text),
+              ) &&
               !/\d+D/i.test(item.title)) // ignore 8d, 16d, etc videos, not original audio
           ) {
             final.highestViews = Math.max(final.highestViews, item.views);
@@ -361,13 +374,14 @@ class YouTube {
       throw new Error('<artist>, if defined must be a valid array of strings');
     if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
 
+    const strippedTitle = StripChar.RSspecChar(track).toLowerCase();
     let searchResults = await Promise.all(
       (
         await this.#store.searchQueue.push([
-          [artists, [track, ['Official Audio']]],
-          [artists, [track, ['Audio']]],
-          [artists, [track, ['Lyrics']]],
-          [artists, [track, []]],
+          [artists, [track, strippedTitle, ['Official Audio']]],
+          [artists, [track, strippedTitle, ['Audio']]],
+          [artists, [track, strippedTitle, ['Lyrics']]],
+          [artists, [track, strippedTitle, []]],
         ])
       ).map(result => Promise.resolve(result).reflect()),
     );
