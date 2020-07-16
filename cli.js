@@ -295,9 +295,9 @@ async function init(queries, options) {
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid query'), process.exit(1);
 
   try {
-    options.tries = CHECK_FLAG_IS_NUM(
-      `${options.tries}`.toLowerCase() === 'infinite' ? Infinity : options.tries,
-      '-t, --tries',
+    options.retries = CHECK_FLAG_IS_NUM(
+      `${options.retries}`.toLowerCase() === 'infinite' ? Infinity : options.retries,
+      '-r, --retries',
       'number',
     );
     options.cover = options.cover && xpath.basename(options.cover);
@@ -560,7 +560,7 @@ async function init(queries, options) {
           auto: false,
           cache: Config.downloader.memCache,
           chunks: options.chunks,
-          retries: options.tries,
+          retries: options.retries,
           timeout: options.timeout,
           cacheSize: Config.downloader.cacheSize,
         })
@@ -621,7 +621,7 @@ async function init(queries, options) {
             const feed = xget(frag.url, {
               cache: Config.downloader.memCache,
               chunks: 1,
-              retries: options.tries,
+              retries: options.retries,
               timeout: options.timeout,
               cacheSize: Config.downloader.cacheSize,
             })
@@ -1279,7 +1279,7 @@ program
     '320k',
   )
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
-  .option('-t, --tries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
+  .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..')
   .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
   .option(
