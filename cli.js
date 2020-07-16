@@ -300,6 +300,11 @@ async function init(queries, options) {
       '-r, --retries',
       'number',
     );
+    options.metaRetries = CHECK_FLAG_IS_NUM(
+      `${options.metaRetries}`.toLowerCase() === 'infinite' ? Infinity : options.metaRetries,
+      '-t, --meta-tries',
+      'number',
+    );
     options.cover = options.cover && xpath.basename(options.cover);
     options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
     options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
@@ -836,7 +841,7 @@ async function init(queries, options) {
           )(sources);
           if ([undefined, null].includes(source)) throw new Error(`incompatible response item. recieved: [${source}]`);
           if (!('getFeeds' in source)) throw new Error(`service provided no means for source to collect feeds`);
-          const feeds = source.getFeeds();
+          const feeds = source.getFeeds(options.metaRetries);
           Promise.resolve(feeds).catch(() => {}); // diffuse feeds result, in case of an asynchronous promise rejection
           if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
           return {sources, source, feeds, service: result.service};
@@ -1280,6 +1285,7 @@ program
   )
   .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
   .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
+  .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
   .option('-d, --directory <DIR>', 'save tracks to DIR/..')
   .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
   .option(
