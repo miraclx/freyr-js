@@ -520,11 +520,14 @@ async function init(queries, options) {
           Config.playlist.dir || BASE_DIRECTORY,
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
-        const isNew = !fs.existsSync(playlistFile) || !(!options.playlistNoappend || shouldAppend);
+        const isNew =
+          !(fs.existsSync(playlistFile) && fs.statSync(playlistFile).size) || !(!options.playlistNoappend || shouldAppend);
         const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
-        plStream.write('#EXTM3U\n');
-        if (playlistTitle && isNew) plStream.write(`#${playlistTitle.replace(/\n/gm, '\n# ')}\n`);
-        if (header) plStream.write(`#${header}\n`);
+        if (isNew) {
+          plStream.write('#EXTM3U\n');
+          if (playlistTitle) plStream.write(`#${playlistTitle.replace(/\n/gm, '\n# ')}\n`);
+          if (header) plStream.write(`#${header}\n`);
+        }
         let {namespace} = Config.playlist;
         namespace = namespace ? xurl.format(xurl.parse(namespace)).concat('/') : '';
         validStats.forEach(({meta: {track: {uri, name, artists, duration}, service, outFilePath}}) =>
