@@ -894,7 +894,7 @@ async function init(queries, options) {
     const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
     meta.fingerprint = crypto
       .createHash('md5')
-      .update(`${audioSource.source.videoId}`)
+      .update(`${audioSource.source.videoId} ${feedMeta.format_id}`)
       .digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
