@@ -33,8 +33,9 @@ const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
 const AsyncQueue = require('./src/async_queue');
 const StackLogger = require('./src/stack_logger');
-const streamUtils = require('./src/stream_utils');
 const packageJson = require('./package.json');
+const streamUtils = require('./src/stream_utils');
+const parseSearchFilter = require('./src/filter_parser');
 
 function parseMeta(params) {
   return Object.entries(params || {})
@@ -1221,32 +1222,6 @@ async function init(queries, options) {
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===========================');
   }
-}
-
-function deescapeFilterPart(filterPart) {
-  return filterPart.replace(/{([^\s]+?)}/g, '$1');
-}
-
-function exceptEscapeFromFilterPart(str) {
-  return new RegExp(`(?=[^{])${str}(?=[^}])`, 'g');
-}
-
-function parseFilters(filterLine) {
-  return filterLine
-    ? filterLine
-        .split(exceptEscapeFromFilterPart(','))
-        .map(part =>
-          part.split(exceptEscapeFromFilterPart('=')).map(sect => deescapeFilterPart(sect.replace(/^\s*["']?|["']?\s*$/g, ''))),
-        )
-    : [];
-}
-
-function parseSearchFilter(pattern) {
-  let [query, filters] = pattern.split(exceptEscapeFromFilterPart('@')).map(str => str.trim());
-  if (!filters) [query, filters] = [filters, query];
-  filters = parseFilters(filters);
-  if (!query && (filters[0] || []).length === 1) [query] = filters.shift();
-  return {query: query ? deescapeFilterPart(query) : '*', filters: Object.fromEntries(filters)};
 }
 
 const program = commander
