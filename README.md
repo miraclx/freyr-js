@@ -176,6 +176,7 @@ Android (Termux): `apt install nodejs`
 
 ``` text
 Usage: freyr [options] [query...]
+Usage: freyr [options] [subcommand]
 ```
 
 [See [Service Support](#service-support)].
@@ -183,50 +184,94 @@ Usage: freyr [options] [query...]
 #### Get CLI Help
 
 <details>
-<summary> <code>freyr --help</code> </summary>
+<summary> <code>freyr get --help</code> </summary>
 
 ``` text
-freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
--------------------------------------------------------------
-Usage: freyr [options] [query...]
+    ____
+   / __/_______  __  _______
+  / /_/ ___/ _ \/ / / / ___/
+ / __/ /  /  __/ /_/ / /
+/_/ /_/   \___/\__, /_/
+              /____/ v0.1.0
 
-Versatile Multi-Service Music Downloader with NodeJS
+freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+-------------------------------------------------------------
+Usage: freyr get [options] [query...]
+
+Download music tracks from queries
 
 Options:
-  -i, --input <FILE>          use URIs found in the specified FILE as queries (file size limit: 1 MiB)
-                              (each query on a new line, use '#' for comments, whitespaces ignored)
-  -b, --bitrate <N>           set bitrate for audio encoding
-                              (valid: 96,128,160,192,256,320) (default: "320k")
-  -n, --chunks <N>            number of concurrent chunk streams with which to download (default: 7)
-  -t, --tries <N>             set number of retries for each chunk before giving up (`infinite` for infinite) (default: 10)
-  -d, --directory <DIR>       save tracks to DIR/.. (default: ".")
-  -c, --cover <name>          custom name for the cover art (default: "cover.png")
-  --cover-size <size>         preferred cover art dimensions
-                              (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
-  -C, --no-cover              skip saving a cover art
-  -z, --concurrency <SPEC>    specify key-value concurrency pairs, repeat to add more options (key omission implies track concurrency)
-                              (format: <[key=]value>) (valid: queries,tracks,trackStage,downloader,encoder,embedder)
-  -f, --force                 force overwrite of existing files
-  -o, --config <file>         use alternative conf file
-  -p, --playlist <file>       create playlist for all successfully collated tracks
-  -P, --no-playlist           skip creating a playlist file for collections
-  -s, --storefront <COUNTRY>  country storefront code
-  -x, --filter <SEQ>          filter matches [explicit] (unimplemented)
-  -g, --groups <GROUP_TYPE>   filter collections by single/album/appears_on/compilation (unimplemented)
-  -T, --no-tree               don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`
-  --tags                      tag configuration specification
-                              (format: <key=value>) (reserved keys: [exclude, account]) (unimplemented)
-  --via-tor                   tunnel downloads through the tor network (unimplemented)
-  -D, --downloader <SERVICE>  specify a preferred download source or a `,`-separated preference order
-                              (valid: youtube) (default: "youtube")
-  --cache-dir <DIR>           specify alternative cache directory (unimplemented) (default: "<tmp>")
-  --timeout <N>               network inactivity timeout (ms) (default: 10000)
-  --no-stats                  don't show the stats on completion
-  --pulsate-bar               show a pulsating bar
-  --single-bar                show a single bar for the download, hide chunk-view
-                              (default when number of chunks/segments exceed printable space)
-  -v, --version               output the version number
-  -h, --help                  output usage information
+  -i, --input <FILE>           use URIs found in the specified FILE as queries (file size limit: 1 MiB)
+                               (each query on a new line, use '#' for comments, whitespaces ignored)
+                               (example: `-i queue.txt`)
+  -b, --bitrate <N>            set audio quality / bitrate for audio encoding
+                               (valid: 96,128,160,192,256,320) (default: "320k")
+  -n, --chunks <N>             number of concurrent chunk streams with which to download (default: 7)
+  -r, --retries <N>            set number of retries for each chunk before giving up
+                               (`infinite` for infinite) (default: 10)
+  -t, --meta-retries <N>       set number of retries for collating track feeds (`infinite` for infinite) (default: 5)
+  -d, --directory <DIR>        save tracks to DIR/..
+  -c, --cover <NAME>           custom name for the cover art (default: "cover.png")
+  --cover-size <SIZE>          preferred cover art dimensions
+                               (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
+  -C, --no-cover               skip saving a cover art
+  -x, --format <FORMAT>        preferred audio output format (to export) (unimplemented)
+                               (valid: mp3,m4a,flac) (default: "m4a")
+  -D, --downloader <SERVICE>   specify a preferred download source or a `,`-separated preference order
+                               (valid: youtube,yt_music) (default: "yt_music")
+  -l, --filter <MATCH>         filter matches off patterns (repeatable and optionally `,`-separated) (unimplemented)
+                               (value ommision implies `true` if applicable)
+                               (format: <key=value>) (example: title="when we all fall asleep*",type=album)
+                               See `freyr help filter` for more information
+  -z, --concurrency <SPEC>     key-value concurrency pairs (repeatable and optionally `,`-separated)
+                               (format: <[key=]value>) (key omission implies track concurrency)
+                               (valid(key): queries,tracks,trackStage,downloader,encoder,embedder)
+                               (example: `queries=2,downloader=4` processes 2 CLI queries,
+                               downloads at most 4 tracks concurrently)
+  --gapless                    set the gapless playback flag for all tracks
+  -f, --force                  force overwrite of existing files
+  -o, --config <FILE>          specify alternative configuration file
+  -p, --playlist <FILENAME>    create playlist for all successfully collated tracks
+  -P, --no-playlist            skip creating a playlist file for collections
+  --playlist-dir <DIR>         directory to save playlist file to, if any, (default: tracks base directory)
+  --playlist-noappend          do not append to the playlist file, if any exists
+  --playlist-noescape          do not escape invalid characters within playlist entries
+  --playlist-namespace <SPEC>  namespace to prefix on each track entry, relative to tracks base directory
+                               useful for, but not limited to custom (file:// or http://) entries
+                               (example, you can prefix with a HTTP domain path: `http://webpage.com/music`)
+  --playlist-force-append      force append collection tracks to the playlist file
+  -s, --storefront <COUNTRY>   country storefront code (example: us,uk,ru)
+  -g, --groups <GROUP_TYPE>    filter collections by single/album/appears_on/compilation (unimplemented)
+  -T, --no-tree                don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`
+  --tags                       tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)
+                               (format: <key=value>) (reserved keys: [exclude, account])
+  --via-tor                    tunnel network traffic through the tor network (unimplemented)
+  --cache-dir <DIR>            specify alternative cache directory, `<tmp>` for tempdir
+  -m, --mem-cache <SIZE>       max size of bytes to be cached in-memory for each download chunk
+  --no-mem-cache               disable in-memory chunk caching (restricts to sequential download)
+  --timeout <N>                network inactivity timeout (ms) (default: 10000)
+  --no-auth                    skip authentication procedure
+  --no-browser                 disable auto-launching of user browser
+  --no-net-check               disable internet connection check
+  --ffmpeg <PATH>              explicit path to the ffmpeg binary
+  --youtube-dl <PATH>          explicit path to the youtube-dl binary
+  --atomic-parsley <PATH>      explicit path to the atomic-parsley binary
+  --no-stats                   don't show the stats on completion
+  --pulsate-bar                show a pulsating bar
+  --single-bar                 show a single bar for the download, hide chunk-view
+                               (default when number of chunks/segments exceed printable space)
+  -h, --help                   show this help information
+
+Environment Variables:
+  SHOW_DEBUG_STACK             show extended debug information
+  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`
+  YOUTUBE_DL_PATH              custom youtube-dl path, alternatively use `--youtube-dl`
+  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
+
+Info:
+  When downloading playlists, the tracks are downloaded individually into
+  their respective folders. However, a m3u8 playlist file is generated in
+  the base directory with the name of the playlist that lists the tracks
 ```
 
 </details>
@@ -237,45 +282,53 @@ Options:
 <summary> <code>freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01</code> </summary>
 
 ``` text
-freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+    ____
+   / __/_______  __  _______
+  / /_/ ___/ _ \/ / / / ___/
+ / __/ /  /  __/ /_/ / /
+/_/ /_/   \___/\__, /_/
+              /____/ v0.1.0
+
+freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [spotify:track:5FNS5Vj69AhRGJWjhrAd01]
  [•] Identifying service...[Spotify]
- [•] Checking authenticated user...[unauthenticated]
+ [•] Checking authentication...[unauthenticated]
  [Spotify Login]
   [•] Logging in...[done]
  Detected [track]
  Obtaining track metadata...[done]
-  ⯈ Title: Slow Dance
-  ⯈ Album: Slow Dance
-  ⯈ Artist: AJ Mitchell
-  ⯈ Year: 2019
-  ⯈ Playtime: 02:58
+  ➤ Title: Slow Dance
+  ➤ Album: Slow Dance
+  ➤ Artist: AJ Mitchell
+  ➤ Year: 2019
+  ➤ Playtime: 02:58
  [•] Collating...
-  • [01 Slow Dance]
-     | ⮞ Collating sources...
-     |  ⮞ [•] YouTube...[success]
-     | ⮞ Awaiting audiofeeds...[done]
-     | [✔] Got album art
-     | [✔] Got raw track file
-     | [•] Post Processing...
+ • [01 Slow Dance]
+    | ➤ Collating sources...
+    |  ➤ [•] YouTube Music...[success, found 1 source]
+    | ➤ Awaiting audiofeeds...[done]
+    | [✓] Got album art
+    | [✓] Got raw track file
+    | [•] Post Processing...
  [•] Download Complete
  [•] Embedding Metadata...
-  • [✔] 01 Slow Dance
+  • [✓] 01 Slow Dance
 [•] Collation Complete
 ========== Stats ==========
- [•] Runtime: [59.1s]
+ [•] Runtime: [31.7s]
+ [•] Total queries: [01]
  [•] Total tracks: [01]
-     ⏩  Skipped: [00]
-     ✔  Passed: [01]
-     ✗  Failed: [00]
+     » Skipped: [00]
+     ✓ Passed:  [01]
+     ✕ Failed:  [00]
  [•] Output directory: [.]
  [•] Cover Art: cover.png (640x640)
  [•] Total Output size: 7.30 MB
- [•] Total Network Usage: 3.13 MB
-     ♫ Media: 3.03 MB
-     ▶ Album Art: 106.76 KB
+ [•] Total Network Usage: 3.12 MB
+     ♫ Media: 3.02 MB
+     ➤ Album Art: 106.76 KB
  [•] Output bitrate: 320k
 ===========================
 ```
@@ -285,48 +338,80 @@ Checking directory permissions...[done]
 #### Download an Apple Music album
 
 <details>
-<summary> <code> freyr https://music.apple.com/us/album/stupid-love/1500499210 </code> </summary>
+<summary> <code> freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443 </code> </summary>
 
 ``` text
-freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+    ____
+   / __/_______  __  _______
+  / /_/ ___/ _ \/ / / / ___/
+ / __/ /  /  __/ /_/ / /
+/_/ /_/   \___/\__, /_/
+              /____/ v0.1.0
+
+freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
-[https://music.apple.com/us/album/stupid-love/1500499210]
+[https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443]
  [•] Identifying service...[Apple Music]
- [•] Checking authenticated user...[authenticated]
+ [•] Checking authentication...[authenticated]
  Detected [album]
  Obtaining album metadata...[done]
-  ⯈ Album Name: Stupid Love
-  ⯈ Artist: Lady Gaga
-  ⯈ Tracks: 1
-  ⯈ Type: Album
-  ⯈ Year: 2020
-  ⯈ Genres: Pop, Music
- [•] Collating [Stupid Love]...
+  ➤ Album Name: I'm Sorry, I'm Not Sorry
+  ➤ Artist: Sody
+  ➤ Tracks: 4
+  ➤ Type: Album
+  ➤ Year: 2020
+  ➤ Genres: Singer/Songwriter, Music
+ [•] Collating [I'm Sorry, I'm Not Sorry]...
   [•] Inquiring tracks...[done]
-   • [01 Stupid Love]
-      | ⮞ Collating sources...
-      |  ⮞ [•] YouTube...[success]
-      | ⮞ Awaiting audiofeeds...[done]
-      | [✔] Got album art
-      | [✔] Got raw track file
+   • [01 What We Had]
+      | ➤ Collating sources...
+      |  ➤ [•] YouTube Music...[success, found 4 sources]
+      | ➤ Awaiting audiofeeds...[done]
+      | [✓] Got album art
+      | [✓] Got raw track file
+      | [•] Post Processing...
+   • [02 Reason To Stay]
+      | ➤ Collating sources...
+      |  ➤ [•] YouTube Music...[success, found 6 sources]
+      | ➤ Awaiting audiofeeds...[done]
+      | [✓] Got album art
+      | [✓] Got raw track file
+      | [•] Post Processing...
+   • [03 Nothing Ever Changes]
+      | ➤ Collating sources...
+      |  ➤ [•] YouTube Music...[success, found 4 sources]
+      | ➤ Awaiting audiofeeds...[done]
+      | [✓] Got album art
+      | [✓] Got raw track file
+      | [•] Post Processing...
+   • [04 Love's a Waste]
+      | ➤ Collating sources...
+      |  ➤ [•] YouTube Music...[success, found 4 sources]
+      | ➤ Awaiting audiofeeds...[done]
+      | [✓] Got album art
+      | [✓] Got raw track file
       | [•] Post Processing...
  [•] Download Complete
  [•] Embedding Metadata...
-  • [✔] 01 Stupid Love
+  • [✓] 01 What We Had
+  • [✓] 02 Reason To Stay
+  • [✓] 03 Nothing Ever Changes
+  • [✓] 04 Love's a Waste
 [•] Collation Complete
 ========== Stats ==========
- [•] Runtime: [1m 4.7s]
- [•] Total tracks: [01]
-     ⏩  Skipped: [00]
-     ✔  Passed: [01]
-     ✗  Failed: [00]
+ [•] Runtime: [2m 2.3s]
+ [•] Total queries: [01]
+ [•] Total tracks: [04]
+     » Skipped: [00]
+     ✓ Passed:  [04]
+     ✕ Failed:  [00]
  [•] Output directory: [.]
  [•] Cover Art: cover.png (640x640)
- [•] Total Output size: 7.93 MB
- [•] Total Network Usage: 3.30 MB
-     ♫ Media: 3.17 MB
-     ▶ Album Art: 121.02 KB
+ [•] Total Output size: 29.79 MB
+ [•] Total Network Usage: 13.35 MB
+     ♫ Media: 12.73 MB
+     ➤ Album Art: 619.43 KB
  [•] Output bitrate: 320k
 ===========================
 ```
@@ -339,43 +424,61 @@ Checking directory permissions...[done]
 <summary> <code> freyr https://www.deezer.com/us/artist/14808825 </code> </summary>
 
 ``` text
-freyr v0.7.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+    ____
+   / __/_______  __  _______
+  / /_/ ___/ _ \/ / / / ___/
+ / __/ /  /  __/ /_/ / /
+/_/ /_/   \___/\__, /_/
+              /____/ v0.1.0
+
+freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [https://www.deezer.com/us/artist/14808825]
  [•] Identifying service...[Deezer]
- [•] Checking authenticated user...[authenticated]
+ [•] Checking authentication...[authenticated]
  Detected [artist]
  Obtaining artist metadata...[done]
-  ⯈ Artist: Mazie
-  ⯈ Followers: 2
-    > Gathering collections...[done]
+  ➤ Artist: Mazie
+  ➤ Followers: 6
+  > Gathering collections...[done]
  [•] Collating...
-  (01) [no friends] (single)
+  (01) [i think i wanna be alone] (single)
+   [•] Inquiring tracks...[done]
+    • [01 i think i wanna be alone]
+       | ➤ Collating sources...
+       |  ➤ [•] YouTube Music...[success, found 2 sources]
+       | ➤ Awaiting audiofeeds...[done]
+       | [✓] Got album art
+       | [✓] Got raw track file
+       | [•] Post Processing...
+  (02) [no friends] (single)
    [•] Inquiring tracks...[done]
     • [01 no friends]
-       | ⮞ Collating sources...
-       |  ⮞ [•] YouTube...[success]
-       | ⮞ Awaiting audiofeeds...[done]
-       | [✔] Got album art
-       | [✔] Got raw track file
+       | ➤ Collating sources...
+       |  ➤ [•] YouTube Music...[success, found 4 sources]
+       | ➤ Awaiting audiofeeds...[done]
+       | [✓] Got album art
+       | [✓] Got raw track file
        | [•] Post Processing...
  [•] Download Complete
  [•] Embedding Metadata...
-  • [✔] 01 no friends
+  • [✓] 01 i think i wanna be alone
+  • [✓] 01 no friends
 [•] Collation Complete
 ========== Stats ==========
- [•] Runtime: [56.2s]
- [•] Total tracks: [01]
-     ⏩  Skipped: [00]
-     ✔  Passed: [01]
-     ✗  Failed: [00]
+ [•] Runtime: [54.6s]
+ [•] Total queries: [01]
+ [•] Total tracks: [02]
+     » Skipped: [00]
+     ✓ Passed:  [02]
+     ✕ Failed:  [00]
  [•] Output directory: [.]
  [•] Cover Art: cover.png (640x640)
- [•] Total Output size: 4.36 MB
- [•] Total Network Usage: 1.93 MB
-     ♫ Media: 1.82 MB
-     ▶ Album Art: 103.21 KB
+ [•] Total Output size: 8.47 MB
+ [•] Total Network Usage: 3.66 MB
+     ♫ Media: 3.50 MB
+     ➤ Album Art: 157.16 KB
  [•] Output bitrate: 320k
 ===========================
 ```
