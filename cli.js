@@ -777,7 +777,7 @@ async function init(queries, options) {
         purchaseDate: 'timestamp', // purd
         apID: 'cli@freyr.git', // apID
         copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
-        encodingTool: 'fr3yrcl1', // ©too
+        encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
         encodedBy: 'd3vc0dr', // ©enc
         artwork: files.image.file.name, // covr
         // sortOrder: [
