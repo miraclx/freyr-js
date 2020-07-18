@@ -171,7 +171,7 @@ class Deezer {
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,
       composers: trackInfo.contributors.map(composer => composer.name).join(', '),
-      compilation: albumInfo.type === 'compilation',
+      compilation: albumInfo.record_type === 'compile',
       getImage: albumInfo.getImage,
     };
   }
