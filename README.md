@@ -241,7 +241,6 @@ Options:
                                (example, you can prefix with a HTTP domain path: `http://webpage.com/music`)
   --playlist-force-append      force append collection tracks to the playlist file
   -s, --storefront <COUNTRY>   country storefront code (example: us,uk,ru)
-  -g, --groups <GROUP_TYPE>    filter collections by single/album/appears_on/compilation (unimplemented)
   -T, --no-tree                don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`
   --tags                       tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)
                                (format: <key=value>) (reserved keys: [exclude, account])

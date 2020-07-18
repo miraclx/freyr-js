@@ -1320,7 +1320,6 @@ program
   )
   .option('--playlist-force-append', 'force append collection tracks to the playlist file')
   .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
-  .option('-g, --groups <GROUP_TYPE>', 'filter collections by single/album/appears_on/compilation (unimplemented)')
   .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
   .option(
     '--tags',
