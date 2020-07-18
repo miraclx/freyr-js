@@ -426,7 +426,7 @@ async function init(queries, options) {
   Config.downloader = lodash.mergeWith(
     Config.downloader,
     {
-      memCache: !!options.memCache,
+      memCache: options.memCache !== undefined ? !!options.memCache : undefined,
       cacheSize: options.memCache,
       order: options.downloader,
     },
