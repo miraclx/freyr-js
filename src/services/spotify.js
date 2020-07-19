@@ -145,7 +145,7 @@ class Spotify {
           total_tracks: albumInfo.ntracks,
           release_date: albumInfo.release_date,
           disc_number: trackInfo.disc_number,
-          explicit: trackInfo.explicit,
+          contentRating: trackInfo.explicit === true ? 'explicit' : 'clean',
           isrc: (trackInfo.external_ids || {}).isrc,
           genres: albumInfo.genres,
           label: albumInfo.label,

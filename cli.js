@@ -763,9 +763,9 @@ async function init(queries, options) {
             'domain=com.apple.iTunes',
           ],
         ],
-        advisory: ['explicit', 'clean'].includes(track.explicit) // rtng
-          ? track.explicit
-          : track.explicit === true
+        advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+          ? track.contentRating
+          : track.contentRating === true
           ? 'explicit'
           : 'Inoffensive',
         stik: 'Normal', // stik

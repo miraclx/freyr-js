@@ -123,7 +123,7 @@ class AppleMusic {
           .map(([val, size]) => val.toString().padStart(size, '0'))
           .join('-'))(trackInfo.attributes.releaseDate),
       disc_number: trackInfo.attributes.discNumber,
-      explicit: trackInfo.attributes.contentRating === 'explicit',
+      contentRating: trackInfo.attributes.contentRating,
       isrc: trackInfo.attributes.isrc,
       genres: trackInfo.attributes.genreNames,
       label: albumInfo.label,

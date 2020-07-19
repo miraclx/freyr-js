@@ -165,7 +165,7 @@ class Deezer {
       total_tracks: albumInfo.ntracks,
       release_date: new Date(trackInfo.release_date),
       disc_number: trackInfo.disk_number,
-      explicit: !!trackInfo.explicit_lyrics,
+      contentRating: !!trackInfo.explicit_lyrics,
       isrc: trackInfo.isrc,
       genres: albumInfo.genres,
       label: albumInfo.label,
