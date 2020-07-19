@@ -2,22 +2,28 @@ function deescapeFilterPart(filterPart) {
   return filterPart.replace(/{([^\s]+?)}/g, '$1');
 }
 
-function exceptEscapeFromFilterPart(str) {
-  return new RegExp(`(?=[^{])${str}(?=[^}])`, 'g');
+function exceptEscapeFromFilterPart(str, noGlob) {
+  return new RegExp(`(?=[^{])${str}(?=[^}])`, !noGlob ? 'g' : '');
+}
+
+function dissociate(str, sep) {
+  let match;
+  return (match = str.match(exceptEscapeFromFilterPart(sep, true)))
+    ? [str.slice(0, match.index), str.slice(match.index + 1)]
+    : [str];
 }
 
 function parseFilters(filterLine) {
   return filterLine
     ? filterLine
         .split(exceptEscapeFromFilterPart(','))
-        .map(part =>
-          part.split(exceptEscapeFromFilterPart('=')).map(sect => deescapeFilterPart(sect.replace(/^\s*["']?|["']?\s*$/g, ''))),
-        )
+        .map(part => dissociate(part, '=').map(sect => deescapeFilterPart(sect.replace(/^\s*["']?|["']?\s*$/g, ''))))
     : [];
 }
 
 function parseSearchFilter(pattern) {
-  let [query, filters] = pattern.split(exceptEscapeFromFilterPart('@')).map(str => str.trim());
+  // let [query, filters] = pattern.split(exceptEscapeFromFilterPart('@')).map(str => str.trim());
+  let [query, filters] = dissociate(pattern, '@').map(str => str.trim());
   if (!filters) [query, filters] = [filters, query];
   filters = parseFilters(filters);
   if (!query && (filters[0] || []).length === 1) [query] = filters.shift();
