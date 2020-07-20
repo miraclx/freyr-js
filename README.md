@@ -749,6 +749,10 @@ Authentication unrequired. API is freely accessible.
 
 ### FilterRules
 
+Filter rules each to be matched against the tracks involved in any operation.
+
+Used as values to the `-l, --filter` flag or as key-value pairs in the `filters` array of the [configuration file](#project-specific-configuration).
+
 | key            | glob-matching |   description   | examples |
 | -------------- | :-----------: | --------------- | -------- |
 | `id`           |      yes      | ID              | `id=1497949287` |
