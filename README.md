@@ -585,7 +585,7 @@ Services can be queried with short URIs containing the type and ID for the resou
 
 Persistent configuration such as authentication keys and their validity period are stored within a session specific configuration file.
 
-This configuration file resides within the user config directory per-platform. e.g `$HOME/.config/FreyrCLI/d3fault.enc` for Linux.
+This configuration file resides within the user config directory per-platform. e.g `$HOME/.config/FreyrCLI/d3fault.x4p` for Linux.
 
 </details>
 
