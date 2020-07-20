@@ -341,9 +341,8 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
 ];
 
 function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
-  const rules = (arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []);
   // use different rules to indicate "OR", not "AND"
-  const wrappedHandler = (trackObject = {}, uncontain = false) => {
+  const coreHandler = (rules, trackObject = {}, uncontain = false) => {
     try {
       rules.forEach(ruleObject =>
         Object.entries(ruleObject).forEach(([rule, value]) => {
@@ -368,7 +367,15 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
       return {status: false, reason};
     }
   };
-  return (...args) => wrappedHandler(...args);
+  const rules = (arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []);
+  const wrappedHandler = (trackObject = {}, uncontain = false) => coreHandler(rules, trackObject, uncontain);
+  const handler = (...args) => wrappedHandler(...args);
+  handler.extend = _rules => {
+    coreHandler(_rules, {}, true);
+    rules.push(..._rules);
+    return handler;
+  };
+  return handler;
 }
 
 async function init(queries, options) {
