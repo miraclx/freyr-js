@@ -371,6 +371,7 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
   const wrappedHandler = (trackObject = {}, uncontain = false) => coreHandler(rules, trackObject, uncontain);
   const handler = (...args) => wrappedHandler(...args);
   handler.extend = _rules => {
+    if (!Array.isArray(_rules)) throw new TypeError('Filter rules must be a valid array');
     coreHandler(_rules, {}, true);
     rules.push(..._rules);
     return handler;
