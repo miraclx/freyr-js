@@ -354,7 +354,7 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
                 if (!(rule in object)) return;
                 return minimatch(`${object[rule]}`, spec, {nocase: !props.filterCase});
               })
-            )(value, trackObject, props);
+            )(`${value}`, trackObject, props);
             if (status !== undefined && !status) throw new Error(`Expected \`${value}\``);
           } catch (reason) {
             throw new Error(`<${rule}>, ${reason.message}`);
@@ -459,6 +459,7 @@ async function init(queries, options) {
       width: 640,
       height: 640,
     },
+    filters: [],
     concurrency: {
       queries: 1,
       tracks: 1,
@@ -488,6 +489,7 @@ async function init(queries, options) {
       if (item) throw new Error(`Downloader order within the config file must be valid. found [${item}]`);
       throw new Error(`Downloader order must be an array of strings`);
     });
+    options.filter.extend(Config.filters);
   } catch (err) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
     stackLogger.error(err.message || err);

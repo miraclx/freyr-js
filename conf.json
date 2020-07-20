@@ -17,6 +17,7 @@
     "attemptAuth": true,
     "autoOpenBrowser": true
   },
+  "filters": [],
   "dirs": {
     "output": ".",
     "cache": "<tmp>"
