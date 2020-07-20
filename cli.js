@@ -491,7 +491,7 @@ async function init(queries, options) {
     });
     options.filter.extend(Config.filters);
   } catch (err) {
-    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [conf.json] wrongly formatted`);
+    stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${options.config}] wrongly formatted`);
     stackLogger.error(err.message || err);
     process.exit(3);
   }
