@@ -883,6 +883,7 @@ async function init(queries, options) {
       return new Promise((res, rej) =>
         ffmpeg()
           .addInput(files.audio.file.name)
+          .audioCodec('aac')
           .audioBitrate(options.bitrate)
           .audioFrequency(44100)
           .noVideo()
