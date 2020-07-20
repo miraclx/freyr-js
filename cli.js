@@ -598,7 +598,7 @@ async function init(queries, options) {
 
   function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
-      const validStats = stats.filter(stat => !stat.code);
+      const validStats = stats.filter(stat => (stat.code === 0 ? stat.complete : !stat.code));
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
         const playlistFile = xpath.join(
@@ -957,7 +957,7 @@ async function init(queries, options) {
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, code: 0, skip_reason: new Error('Exists')};
+        return {meta, code: 0, skip_reason: new Error('Exists'), complete: true};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
@@ -965,7 +965,7 @@ async function init(queries, options) {
     const filterStat = options.filter(track, false);
     if (!filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
-      return {meta, code: 0, skip_reason: new Error(`Filtered out: ${filterStat.reason.message}`)};
+      return {meta, code: 0, skip_reason: new Error(`Filtered out: ${filterStat.reason.message}`), complete: false};
     }
 
     trackLogger.log('| \u27a4 Collating sources...');
