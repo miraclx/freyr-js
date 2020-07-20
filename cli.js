@@ -318,10 +318,9 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
       return parsed.check(object.track_number);
     },
     duration(spec, object) {
-      // use specialized range parser
-      // TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss')
+      const parsed = parseRange.time(spec, true);
       if (!('duration' in object)) return;
-      return spec === object.duration;
+      return parsed.check(object.duration);
     },
     year(spec, object) {
       const parsed = parseRange.num(spec, true);
