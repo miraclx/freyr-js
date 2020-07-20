@@ -612,6 +612,7 @@ Defaults are in the [conf.json](conf.json) file.
   * `netCheck`: \<boolean\> Whether or not to check network access at program start.
   * `attemptAuth`: \<boolean\> Whether or not to process authentication.
   * `autoOpenBrowser`: \<boolean\> Whether or not to automatically open user browser.
+* `filters`: \<[FilterRules](#filterrules)[]\> Filter rules each track must match to be downloaded.
 * `dirs`: \<object\>
   * `output`: \<string\> Default download directory. Default: `"."`
   * `cache`: \<string\> Default temp download directory. Default: `"<tmp>"`
@@ -633,6 +634,26 @@ Defaults are in the [conf.json](conf.json) file.
     * supported: `youtube`, `yt_music`
     * default: `[ "yt_music", "youtube" ]`
 * `services`: \<[ServiceConfiguration](#service-configuration): object\>
+
+#### FilterRules
+
+| key            | glob-matching |   description   | examples |
+| -------------- | :-----------: | --------------- | -------- |
+| `id`           |      yes      | ID              | `id=1497949287` |
+| `uri`          |      yes      | URI             | `uri="spotify:+(track|album):*"` |
+| `title`        |      yes      | Track title     | `title="all*good girls*hell"` |
+| `album`        |      yes      | Track album     | `album="when we*fall*do we go*"` |
+| `artist`       |      yes      | Match an artist | `artist="Billie*"` |   |
+| `trackn`       |       no      | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
+| `type`         |       no      | `album` \| `compilation` | `type=compilation` |
+| `duration`     |       no      | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
+| `explicit`     |       no      | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
+| `album_artist` |      yes      | Album artist | `album_artist="Billie Eilish"` |
+| `isrc`         |      yes      | Track ISRC   | `isrc=USUM71900766` |
+| `label`        |      yes      | Record label | `label="*Interscope*"` |
+| `year`         |       no      | Release year | `year=2019`, `year=2018..2020` |
+| `diskn`        |       no      | Disk number  | `diskn=1` |
+| `ntracks`      |       no      | Number of tracks in the album | `ntracks=10..=14` |
 
 <details>
 <summary>Example JSON</summary>
