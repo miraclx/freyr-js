@@ -565,6 +565,29 @@ Services can be queried with short URIs containing the type and ID for the resou
   </tbody>
 </table>
 
+Use the `urify` subcommand to parse betweeen URIs and its equivalent URL representation, and vice-versa.
+Creating freyr-compatible queue output.
+
+<details>
+<summary> <code> freyr urify https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B --no-header --no-logo --no-tag </code> </summary>
+
+``` text
+spotify:album:2D23kwwoy2JpZVuJwzE42B
+[+] Urify complete
+```
+
+</details>
+
+<details>
+<summary> <code> freyr urify -i queue_of_urls.txt -o queue_of_uris.txt --no-header --no-logo </code> </summary>
+
+``` text
+[+] Urify complete
+Successfully written to [queue_of_uris.txt]
+```
+
+</details>
+
 [Examples](#ssue)
 
 ### Features
