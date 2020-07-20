@@ -175,13 +175,23 @@ Android (Termux): `apt install nodejs`
 ### Usage
 
 ``` text
-Usage: freyr [options] [query...]
 Usage: freyr [options] [subcommand]
 ```
 
 [See [Service Support](#service-support)].
 
+#### Show freyr help and list subcommands
+
+`freyr --help`
+
 #### Get CLI Help
+
+*The `get` subcommand is implicit and default.
+
+``` text
+Usage: freyr [options] get [options] [query...]
+Usage: freyr [options] [query...]
+```
 
 <details>
 <summary> <code>freyr get --help</code> </summary>
