@@ -219,10 +219,11 @@ Options:
                                (valid: mp3,m4a,flac) (default: "m4a")
   -D, --downloader <SERVICE>   specify a preferred download source or a `,`-separated preference order
                                (valid: youtube,yt_music) (default: "yt_music")
-  -l, --filter <MATCH>         filter matches off patterns (repeatable and optionally `,`-separated) (unimplemented)
+  -l, --filter <MATCH>         filter matches off patterns (repeatable and optionally `,`-separated)
                                (value ommision implies `true` if applicable)
                                (format: <key=value>) (example: title="when we all fall asleep*",type=album)
                                See `freyr help filter` for more information
+  -L, --filter-case            enable case sensitivity for glob matches on the filters
   -z, --concurrency <SPEC>     key-value concurrency pairs (repeatable and optionally `,`-separated)
                                (format: <[key=]value>) (key omission implies track concurrency)
                                (valid(key): queries,tracks,trackStage,downloader,encoder,embedder)
