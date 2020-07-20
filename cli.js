@@ -19,6 +19,7 @@ const cStringd = require('stringd-colors');
 const isOnline = require('is-online');
 const prettyMs = require('pretty-ms');
 const commander = require('commander');
+const minimatch = require('minimatch');
 const youtubedl = require('youtube-dl');
 const filenamify = require('filenamify');
 const TimeFormat = require('hh-mm-ss');
@@ -32,6 +33,7 @@ const pFlatten = require('./src/p_flatten');
 const FreyrCore = require('./src/freyr');
 const AuthServer = require('./src/cli_server');
 const AsyncQueue = require('./src/async_queue');
+const parseRange = require('./src/parse_range');
 const StackLogger = require('./src/stack_logger');
 const packageJson = require('./package.json');
 const streamUtils = require('./src/stream_utils');
@@ -289,6 +291,87 @@ function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
   return value.filter(Boolean).map(item => (!VALIDS.downloaders.includes(item) ? throwEr(item) : item));
 }
 
+const [RULE_DEFAULTS, RULE_HANDLERS] = [
+  ['id', 'uri', 'album', 'album_artist', 'isrc', 'label'],
+  {
+    title(spec, object, props) {
+      if (!('name' in object)) return;
+      return minimatch(object.name, spec, {nocase: !props.filterCase});
+    },
+    type(spec, object) {
+      if (spec && !['album', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
+      if (!('compilation' in object)) return;
+      return spec === 'compilation' ? object.compilation : !object.compilation;
+    },
+    artist(spec, object, props) {
+      if (!('artists' in object)) return;
+      return object.artists.some(artist => minimatch(artist, spec, {nocase: !props.filterCase}));
+    },
+    ntracks(spec, object) {
+      const parsed = parseRange.num(spec, true);
+      if (!('total_tracks' in object)) return;
+      return parsed.check(object.total_tracks);
+    },
+    trackn(spec, object) {
+      const parsed = parseRange.num(spec, true);
+      if (!('track_number' in object)) return;
+      return parsed.check(object.track_number);
+    },
+    duration(spec, object) {
+      // use specialized range parser
+      // TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss')
+      if (!('duration' in object)) return;
+      return spec === object.duration;
+    },
+    year(spec, object) {
+      const parsed = parseRange.num(spec, true);
+      if (!('release_date' in object)) return;
+      return parsed.check(new Date(object.release_date).getFullYear());
+    },
+    diskn(spec, object) {
+      const parsed = parseRange.num(spec, true);
+      if (!('track_number' in object)) return;
+      return parsed.check(object.disc_number);
+    },
+    explicit(spec, object) {
+      if (spec && !['true', 'false', 'inoffensive'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
+      if (!('contentRating' in object)) return;
+      return object.contentRating === (spec === 'true' ? 'explicit' : spec === 'false' ? 'clean' : undefined);
+    },
+  },
+];
+
+function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
+  const rules = (arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []);
+  // use different rules to indicate "OR", not "AND"
+  const wrappedHandler = (trackObject = {}, uncontain = false) => {
+    try {
+      rules.forEach(ruleObject =>
+        Object.entries(ruleObject).forEach(([rule, value]) => {
+          if (!(rule in RULE_HANDLERS || RULE_DEFAULTS.includes(rule))) throw new Error(`Invalid filter rule: [${rule}]`);
+          try {
+            const status = (
+              RULE_HANDLERS[rule] ||
+              ((spec, object) => {
+                if (!(rule in object)) return;
+                return minimatch(`${object[rule]}`, spec, {nocase: !props.filterCase});
+              })
+            )(value, trackObject, props);
+            if (status !== undefined && !status) throw new Error(`Expected \`${value}\``);
+          } catch (reason) {
+            throw new Error(`<${rule}>, ${reason.message}`);
+          }
+        }),
+      );
+      return {status: true, reason: null};
+    } catch (reason) {
+      if (uncontain) throw new Error(`Filter rule: ${reason.message}`);
+      return {status: false, reason};
+    }
+  };
+  return (...args) => wrappedHandler(...args);
+}
+
 async function init(queries, options) {
   const initTimeStamp = Date.now();
   const stackLogger = new StackLogger({indentSize: 1, autoTick: false});
@@ -313,6 +396,7 @@ async function init(queries, options) {
     options.input = await PROCESS_INPUT_ARG(options.input);
     options.config = await PROCESS_CONFIG_ARG(options.config);
     if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
+    (options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase}))({}, true);
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
@@ -873,10 +957,17 @@ async function init(queries, options) {
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, code: 0};
+        return {meta, code: 0, skip_reason: new Error('Exists')};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
+
+    const filterStat = options.filter(track, false);
+    if (!filterStat.status) {
+      trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
+      return {meta, code: 0, skip_reason: new Error(`Filtered out: ${filterStat.reason.message}`)};
+    }
+
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
@@ -1152,7 +1243,8 @@ async function init(queries, options) {
               trackStat.err ? ` [${trackStat.err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || trackStat.err}]` : ''
             })`,
           );
-        } else if (trackStat.code === 0) embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: [Exists])`);
+        } else if (trackStat.code === 0)
+          embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: [${trackStat.skip_reason}])`);
         else
           embedLogger.log(
             `\u2022 [\u2713] ${trackStat.meta.trackName}${
@@ -1285,13 +1377,14 @@ program
   .option(
     '-l, --filter <MATCH>',
     [
-      'filter matches off patterns (repeatable and optionally `,`-separated) (unimplemented)',
+      'filter matches off patterns (repeatable and optionally `,`-separated)',
       '(value ommision implies `true` if applicable)',
       '(format: <key=value>) (example: title="when we all fall asleep*",type=album)',
       'See `freyr help filter` for more information',
     ].join('\n'),
-    (spec, stack) => (stack || []).concat(spec.split(',')),
+    (spec, stack) => (stack || []).concat(spec),
   )
+  .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters')
   .option(
     '-z, --concurrency <SPEC>',
     [
@@ -1409,8 +1502,9 @@ program
   .option(
     '-l, --filter <PATTERN>',
     'key-value constraints that all search results must match (repeatable and optionally `,`-separated)',
-    (spec, stack) => (stack || []).concat(spec.split(',')),
+    (spec, stack) => (stack || []).concat(spec),
   )
+  .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters (unimplemented)')
   .option('--profile <PROFILE>', 'configuration context with which to process the search and download')
   .action((args, cmd) => {
     throw Error('Unimplemented: [CLI:search]');
@@ -1428,7 +1522,7 @@ program
     console.log('  $ freyr search -- -d ~/Music');
     console.log('');
     console.log('  # search non-interactively and download afterwards');
-    console.log("  $ freyr search --query 'billie eilish @ type=album, title=*was older, duration=>3s, explicit=false'");
+    console.log("  $ freyr search --query 'billie eilish @ type=album, title=*was older, duration=3s.., explicit=false'");
     console.log('');
     console.log('  # search interactively, save a maximum of 5 results to file and download later');
     console.log('  $ freyr search -n 5 -o queue.txt');
@@ -1474,12 +1568,12 @@ const program_filter = program
     console.log("  # match anything starting with 'Justi' and ending with 'ber'");
     console.log("  $ freyr filter 'Justi*ber'");
     console.log('');
-    console.log("  # filter artists matching the name 'Dua Lipa' and any album with more than 9 tracks from 'Billie Eilish'");
-    console.log('  $ freyr filter artist="Dua Lipa" \'artist = Billie Eilish, type = album, ntracks = >9\'');
+    console.log("  # filter artists matching the name 'Dua Lipa' and any album with 9 or more tracks from 'Billie Eilish'");
+    console.log('  $ freyr filter artist="Dua Lipa" \'artist = Billie Eilish, type = album, ntracks = 9..\'');
     console.log('');
     console.log("  # filter non-explicit tracks from 'Billie Eilish' ending with 'To Die'");
     console.log('  # whose duration is between 1:30 and 3:00 minutes');
-    console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = >1:30<3:00, explicit = false'");
+    console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = 1:30..3:00, explicit = false'");
   });
 
 const config = program
