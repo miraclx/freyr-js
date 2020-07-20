@@ -646,30 +646,10 @@ Defaults are in the [conf.json](conf.json) file.
     * default: `[ "yt_music", "youtube" ]`
 * `services`: \<[ServiceConfiguration](#service-configuration): object\>
 
-#### FilterRules
-
-| key            | glob-matching |   description   | examples |
-| -------------- | :-----------: | --------------- | -------- |
-| `id`           |      yes      | ID              | `id=1497949287` |
-| `uri`          |      yes      | URI             | `uri="spotify:+(track|album):*"` |
-| `title`        |      yes      | Track title     | `title="all*good girls*hell"` |
-| `album`        |      yes      | Track album     | `album="when we*fall*do we go*"` |
-| `artist`       |      yes      | Match an artist | `artist="Billie*"` |   |
-| `trackn`       |       no      | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
-| `type`         |       no      | `album` \| `compilation` | `type=compilation` |
-| `duration`     |       no      | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
-| `explicit`     |       no      | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
-| `album_artist` |      yes      | Album artist | `album_artist="Billie Eilish"` |
-| `isrc`         |      yes      | Track ISRC   | `isrc=USUM71900766` |
-| `label`        |      yes      | Record label | `label="*Interscope*"` |
-| `year`         |       no      | Release year | `year=2019`, `year=2018..2020` |
-| `diskn`        |       no      | Disk number  | `diskn=1` |
-| `ntracks`      |       no      | Number of tracks in the album | `ntracks=10..=14` |
-
 <details>
 <summary>Example JSON</summary>
 
-```json
+``` json
 {
   "server": {
     "hostname": "localhost",
@@ -766,6 +746,48 @@ Authentication unrequired. API is freely accessible.
 * 5: Error with working directory
 * 6: Failed to initialize a freyr instance
 * 7: An error occurred checking dependency paths
+
+### FilterRules
+
+| key            | glob-matching |   description   | examples |
+| -------------- | :-----------: | --------------- | -------- |
+| `id`           |      yes      | ID              | `id=1497949287` |
+| `uri`          |      yes      | URI             | `uri="spotify:+(track|album):*"` |
+| `title`        |      yes      | Track title     | `title="all*good girls*hell"` |
+| `album`        |      yes      | Track album     | `album="when we*fall*do we go*"` |
+| `artist`       |      yes      | Match an artist | `artist="Billie*"` |   |
+| `trackn`       |       no      | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
+| `type`         |       no      | `album` \| `compilation` | `type=compilation` |
+| `duration`     |       no      | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
+| `explicit`     |       no      | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
+| `album_artist` |      yes      | Album artist | `album_artist="Billie Eilish"` |
+| `isrc`         |      yes      | Track ISRC   | `isrc=USUM71900766` |
+| `label`        |      yes      | Record label | `label="*Interscope*"` |
+| `year`         |       no      | Release year | `year=2019`, `year=2018..2020` |
+| `diskn`        |       no      | Disk number  | `diskn=1` |
+| `ntracks`      |       no      | Number of tracks in the album | `ntracks=10..=14` |
+
+#### Previewing filter representation
+
+To preview filter rules specification, use the `filter` subcommand.
+
+<details>
+<summary> <code> freyr filter title="all*good girls*hell",artist="*eilish",trackn="4..=5" --no-header --no-logo </code> </summary>
+
+``` text
+[
+  {
+    "query": "*",
+    "filters": {
+      "title": "all*good girls*hell",
+      "artist": "*eilish",
+      "trackn": "4..=5"
+    }
+  }
+]
+```
+
+</details>
 
 ## Service Support
 
