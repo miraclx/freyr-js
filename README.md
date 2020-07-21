@@ -175,6 +175,7 @@ Android (Termux): `apt install nodejs`
 ### Usage
 
 ``` text
+Usage: freyr [options] [query...]
 Usage: freyr [options] [subcommand]
 ```
 
