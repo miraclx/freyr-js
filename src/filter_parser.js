@@ -22,7 +22,6 @@ function parseFilters(filterLine) {
 }
 
 function parseSearchFilter(pattern) {
-  // let [query, filters] = pattern.split(exceptEscapeFromFilterPart('@')).map(str => str.trim());
   let [query, filters] = dissociate(pattern, '@').map(str => str.trim());
   if (!filters) [query, filters] = [filters, query];
   filters = parseFilters(filters);
