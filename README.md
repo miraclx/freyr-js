@@ -776,23 +776,46 @@ Filter rules each to be matched against the tracks involved in any operation.
 
 Used as values to the `-l, --filter` flag or as key-value pairs in the `filters` array of the [configuration file](#project-specific-configuration).
 
-| key            | glob-matching |   description   | examples |
+| key            |     syntax    |   description   | examples |
 | -------------- | :-----------: | --------------- | -------- |
-| `id`           |      yes      | ID              | `id=1497949287` |
-| `uri`          |      yes      | URI             | `uri="spotify:+(track|album):*"` |
-| `title`        |      yes      | Track title     | `title="all*good girls*hell"` |
-| `album`        |      yes      | Track album     | `album="when we*fall*do we go*"` |
-| `artist`       |      yes      | Match an artist | `artist="Billie*"` |   |
-| `trackn`       |       no      | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
-| `type`         |       no      | `album` \| `compilation` | `type=compilation` |
-| `duration`     |       no      | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
-| `explicit`     |       no      | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
-| `album_artist` |      yes      | Album artist | `album_artist="Billie Eilish"` |
-| `isrc`         |      yes      | Track ISRC   | `isrc=USUM71900766` |
-| `label`        |      yes      | Record label | `label="*Interscope*"` |
-| `year`         |       no      | Release year | `year=2019`, `year=2018..2020` |
-| `diskn`        |       no      | Disk number  | `diskn=1` |
-| `ntracks`      |       no      | Number of tracks in the album | `ntracks=10..=14` |
+| `id`           |      glob     | Resource ID     | `id=1497949287`, `id=*149` |
+| `uri`          |      glob     | Resource URI    | `uri="*:+(track|album):*"` |
+| `title`        |      glob     | Track title     | `title="all*good girls*hell"` |
+| `album`        |      glob     | Track album     | `album="when we*fall*do we go*"` |
+| `artist`       |      glob     | Match an artist | `artist="Billie*"` |   |
+| `trackn`       | [Numeric Range](#ranges) | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
+| `type`         |     Static    | `album` \| `compilation` | `type=compilation` |
+| `duration`     |  [Timed Range](#timed-ranges)  | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
+| `explicit`     |     Static    | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
+| `album_artist` |      glob     | Album artist | `album_artist="Billie Eilish"` |
+| `isrc`         |      glob     | Track ISRC   | `isrc=USUM71900766` |
+| `label`        |      glob     | Record label | `label="*Interscope*"` |
+| `year`         | [Numeric Range](#ranges) | Release year | `year=2019`, `year=2018..2020` |
+| `diskn`        | [Numeric Range](#ranges) | Disk number  | `diskn=1` |
+| `ntracks`      | [Numeric Range](#ranges) | Number of tracks in the album | `ntracks=10..=14` |
+
+#### Ranges
+
+Syntax: `[a][..][[=]b]`
+
+| Spec    | Match            | Representation |
+| ------- | ---------------- | -------------- |
+| `..`    | `-∞ ... ∞`       | `x`            |
+| `3..7`  | `3, 4, 5, 6`     | `7 > x ≥ 3`    |
+| `3..=7` | `3, 4, 5, 6, 7`  | `7 ≥ x ≥ 3`    |
+| `..3`   | `-∞ ... 0, 1, 2` | `3 > x`        |
+| `..=3`  | `-∞ ... 1, 2, 3` | `3 ≥ x`        |
+| `5..`   | `5, 6, 7 ... ∞`  | `x ≥ 5`        |
+
+#### Timed Ranges
+
+Examples: `duration=60s..=3:40`
+
+| Metric  | Values                   |
+| ------- | ------------------------ |
+| Seconds | `30`, `30s`, `00:30`     |
+| Minutes | `120`, `120s`, `02:00`   |
+| Hours   | `5400`, `5400s`, `01:30` |
 
 #### Previewing filter representation
 
