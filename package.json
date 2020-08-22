@@ -15,7 +15,8 @@
   "files": [
     "src",
     "typings",
-    "conf.json"
+    "conf.json",
+    "banner.js"
   ],
   "directories": {
     "lib": "src"
