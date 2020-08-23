@@ -89,7 +89,7 @@ As an alternative to setting up freyr and its dependencies on your host system, 
 
 POSIX: _(check individual package managers)_
 
-* *Debian: `sudo apt-get install atomicparsley`
+* *Debian: `sudo apt-get install python3.6`
 * *ArchLinux: `sudo pacman -S python`
 * Android (Termux): `apt install python`
 * _(`*`: should already be preinstalled)_
