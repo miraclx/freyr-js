@@ -138,10 +138,12 @@ Android (Termux): `apt install nodejs`
 <details>
 <summary>AtomicParsley >= 0.9.6</summary>
 
+<https://github.com/wez/atomicparsley/releases/latest/>
+
 * Windows:
   * Chocolatey: <https://chocolatey.org/packages/atomicparsley>
   * Manually:
-    * Download: <https://bitbucket.org/jonhedgerows/atomicparsley/downloads/AtomicParsley-0.9.6-hg109.9183fff907bf.zip>
+    * Download archive from the repo releases
     * unzip and place the `AtomicParsley.exe` in your `PATH` or the `bins/windows` folder. Create the folders if unexistent.
 * POSIX: _(check individual package managers)_
   * Debian: `sudo apt-get install atomicparsley`
@@ -151,23 +153,19 @@ Android (Termux): `apt install nodejs`
 
     ``` bash
     # download the tarball
-    $ curl https://bitbucket.org/wez/atomicparsley/get/0.9.6.tar.gz -o wez-atomicparsley-da2f6e4fc120.tar.gz
+    $ curl https://github.com/wez/atomicparsley/archive/20200701.154658.b0d6223.tar.gz -o atomicparsley-20200701.154658.b0d6223.tar.gz
 
     # gunzip and untar
-    $ tar -xzvf wez-atomicparsley-da2f6e4fc120.tar.gz
+    $ tar -xzvf atomicparsley-20200701.154658.b0d6223.tar.gz
 
     # build
-    $ cd wez-atomicparsley-da2f6e4fc120
-    $ ./autogen.sh
-    $ ./configure
-    $ make
+    $ cd atomicparsley-20200701.154658.b0d6223
+    $ cmake .
+    $ cmake --build . --config Release
 
     # To install locally (project only)
     $ mkdir -p $PROJECT_DIR/bins/posix # ensure directory exists
     $ cp ./AtomicParsley $PROJECT_DIR/bins/posix
-
-    # To install globally
-    $ sudo make install
     ```
 
 </details>
