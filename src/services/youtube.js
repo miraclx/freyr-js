@@ -41,10 +41,7 @@ YouTubeSearchError.prototype = Error.prototype;
  */
 
 function genAsyncGetFeedsFn(url) {
-  const loadFeeds = async retries =>
-    _ytdlGet(url, ['--socket-timeout=20', '--retries=20', '--no-cache-dir']).catch(err =>
-      (retries -= 1) > 0 ? loadFeeds(retries) : Promise.reject(err),
-    );
+  const loadFeeds = async () => _ytdlGet(url, ['--socket-timeout=20', '--no-cache-dir']);
   return loadFeeds;
 }
 

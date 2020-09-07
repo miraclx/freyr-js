@@ -939,7 +939,10 @@ async function init(queries, options) {
           )(sources);
           if ([undefined, null].includes(source)) throw new Error(`incompatible response item. recieved: [${source}]`);
           if (!('getFeeds' in source)) throw new Error(`service provided no means for source to collect feeds`);
-          const feeds = source.getFeeds(options.metaRetries);
+          let feedTries = 1;
+          const getFeeds = () =>
+            source.getFeeds().catch(err => ((feedTries += 1) <= options.metaRetries ? getFeeds() : Promise.reject(err)));
+          const feeds = getFeeds();
           Promise.resolve(feeds).catch(() => {}); // diffuse feeds result, in case of an asynchronous promise rejection
           if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
           return {sources, source, feeds, service: result.service};
