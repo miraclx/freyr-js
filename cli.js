@@ -1077,6 +1077,8 @@ async function init(queries, options) {
     const tracks = await processPromise(service.getAlbumTracks(album.uri), collationLogger, {
       onInit: '[\u2022] Inquiring tracks...',
     });
+    if (!tracks) throw new Error('Failed to collect album tracks');
+    if (!tracks.length) return;
     return {
       meta: album,
       isCollection: album.type === 'compilation',
@@ -1135,6 +1137,8 @@ async function init(queries, options) {
     const tracks = await processPromise(service.getPlaylistTracks(playlist.uri), collationLogger, {
       onInit: '[\u2022] Inquiring tracks...',
     });
+    if (!tracks) throw new Error('Failed to collect playlist tracks');
+    if (!tracks.length) return;
     return {
       meta: playlist,
       isCollection: true,
