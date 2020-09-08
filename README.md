@@ -991,7 +991,7 @@ git clone https://github.com/miraclx/freyr-js.git
 cd freyr-js
 npm install
 
-# don't forget to link to register the freyr command
+# don't forget to register the freyr command
 npm link
 ```
 
