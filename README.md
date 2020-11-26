@@ -57,7 +57,7 @@ docker pull freyrcli/freyrjs
 <summary> Structure </summary>
 
 ``` bash
-docker run --rm -v $PWD:/data <tag> [options, arguments and queries...]
+docker run -it --rm -v $PWD:/data <tag> [options, arguments and queries...]
 ```
 
 </details>
@@ -65,13 +65,13 @@ docker run --rm -v $PWD:/data <tag> [options, arguments and queries...]
 Example, with the `freyrcli/freyrjs:latest` tag:
 
 ``` bash
-docker run --rm -v $PWD:/data freyrcli/freyrjs:latest
+docker run -it --rm -v $PWD:/data freyrcli/freyrjs:latest
 ```
 
 Alternatively, create a handy alias
 
 ``` bash
-alias freyr='docker run --rm -v $PWD:/data freyrcli/freyrjs:latest'
+alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs:latest'
 ```
 
 [See [Docker Development](#docker-development)]
