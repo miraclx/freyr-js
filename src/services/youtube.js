@@ -23,6 +23,36 @@ function YouTubeSearchError(message, statusCode, status, body) {
 
 YouTubeSearchError.prototype = Error.prototype;
 
+var walk = function() {
+	var current, obj, propName, val, _i, _len;
+
+	obj = arguments[0], propName = arguments[1];
+
+	if (obj === null) {
+		return null;
+	}
+	else if (Array.isArray(obj)) {
+		// need to walk all entries
+		for (_i = 0, _len = obj.length; _i < _len; _i++) {
+			var result = walk(obj[_i], propName);
+			if (result != null) return result;
+		}
+	}
+	else if (typeof obj === 'object') {
+		for (const key in obj) {
+			if (key == propName) return obj[propName];
+			if (obj[key] === null) continue;
+
+			if (typeof obj[key] === 'object') {
+				var result = walk(obj[key], propName);
+				if (result != null) return result;
+			}
+		}
+	}
+
+	return null;
+}
+
 /**
  * @typedef {(
  *   {
@@ -122,6 +152,7 @@ class YouTubeMusic {
         referer: 'https://music.youtube.com/search',
       },
     });
+
     const shelf = !('continuationContents' in response)
       ? response.contents.sectionListRenderer.contents.map(section => section.musicShelfRenderer || section)
       : [response.continuationContents.musicShelfContinuation || response.continuationContents.sectionListContinuation];
@@ -145,19 +176,17 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              const watchEndpoint = content.doubleTapCommand
-                ? 'watchEndpoint' in content.doubleTapCommand
-                  ? content.doubleTapCommand.watchEndpoint
-                  : 'watchPlaylistEndpoint' in content.doubleTapCommand
-                  ? content.doubleTapCommand.watchPlaylistEndpoint
-                  : null
-                : null;
+              var watchEndpoint = walk(content, 'watchEndpoint');
+              if (!watchEndpoint) {
+                watchEndpoint = walk(content, 'watchPlaylistEndpoint');
+              }
               if (!watchEndpoint) return {};
               const tags = content.flexColumns.map(obj =>
                 obj.musicResponsiveListItemFlexColumnRenderer.text
-                  ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).join('')
+                  ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).filter(text => text !== ' • ')
                   : undefined,
-              );
+              ).flat();
+
               const type = tag || tags.splice(1, 1)[0];
               return type === 'Song'
                 ? {
