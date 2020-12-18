@@ -845,7 +845,7 @@ To preview filter rules specification, use the `filter` subcommand.
 | [Spotify](src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    | `spotify:` |
 | [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
 | [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
-| Youtube Music |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
+| Youtube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 
 <details>
 <summary id="ssue"> <strong> Short Service URI Examples </strong> </summary>
