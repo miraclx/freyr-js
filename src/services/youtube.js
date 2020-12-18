@@ -23,34 +23,20 @@ function YouTubeSearchError(message, statusCode, status, body) {
 
 YouTubeSearchError.prototype = Error.prototype;
 
-var walk = function() {
-	var current, obj, propName, val, _i, _len;
-
-	obj = arguments[0], propName = arguments[1];
-
-	if (obj === null) {
-		return null;
-	}
-	else if (Array.isArray(obj)) {
-		// need to walk all entries
-		for (_i = 0, _len = obj.length; _i < _len; _i++) {
-			var result = walk(obj[_i], propName);
-			if (result != null) return result;
-		}
-	}
-	else if (typeof obj === 'object') {
-		for (const key in obj) {
-			if (key == propName) return obj[propName];
-			if (obj[key] === null) continue;
-
-			if (typeof obj[key] === 'object') {
-				var result = walk(obj[key], propName);
-				if (result != null) return result;
-			}
-		}
-	}
-
-	return null;
+function walk(object, key) {
+  if (Array.isArray(object)) {
+    for (let obj of object) {
+      let result = walk(obj, key);
+      if (result != null) return result;
+    }
+  } else if (typeof object == "object") {
+    if (key in object && object[key] != null) return object[key];
+    for (const value of Object.values(object)) {
+      let result = walk(value, key);
+      if (result != null) return result;
+    }
+  }
+  return null;
 }
 
 /**
