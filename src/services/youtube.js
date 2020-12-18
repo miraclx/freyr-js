@@ -162,11 +162,9 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              var watchEndpoint = walk(content, 'watchEndpoint');
-              if (!watchEndpoint) {
-                watchEndpoint = walk(content, 'watchPlaylistEndpoint');
-              }
-              if (!watchEndpoint) return {};
+              const videoId = walk(content, 'videoId');
+              if (!videoId) return {};
+              const watchEndpoint = {videoId};
               const tags = content.flexColumns.map(obj =>
                 obj.musicResponsiveListItemFlexColumnRenderer.text
                   ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).filter(text => text !== ' • ')
