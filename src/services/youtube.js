@@ -150,11 +150,15 @@ class YouTubeMusic {
               const videoId = walk(content, 'videoId');
               if (!videoId) return {};
               const watchEndpoint = {videoId};
-              const tags = content.flexColumns.map(obj =>
-                obj.musicResponsiveListItemFlexColumnRenderer.text
-                  ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).filter(text => text !== ' • ')
-                  : undefined,
-              ).flat();
+              const tags = content.flexColumns
+                .map(obj =>
+                  obj.musicResponsiveListItemFlexColumnRenderer.text
+                    ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs
+                        .map(side => side.text)
+                        .filter(text => text !== ' • ')
+                    : undefined,
+                )
+                .flat();
 
               const type = tag || tags.splice(1, 1)[0];
               return type === 'Song'
