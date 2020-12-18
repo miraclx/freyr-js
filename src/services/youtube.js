@@ -23,6 +23,22 @@ function YouTubeSearchError(message, statusCode, status, body) {
 
 YouTubeSearchError.prototype = Error.prototype;
 
+function walk(object, key) {
+  if (Array.isArray(object)) {
+    for (let obj of object) {
+      let result = walk(obj, key);
+      if (result != null) return result;
+    }
+  } else if (typeof object == "object") {
+    if (key in object && object[key] != null) return object[key];
+    for (const value of Object.values(object)) {
+      let result = walk(value, key);
+      if (result != null) return result;
+    }
+  }
+  return null;
+}
+
 /**
  * @typedef {(
  *   {
@@ -122,6 +138,7 @@ class YouTubeMusic {
         referer: 'https://music.youtube.com/search',
       },
     });
+
     const shelf = !('continuationContents' in response)
       ? response.contents.sectionListRenderer.contents.map(section => section.musicShelfRenderer || section)
       : [response.continuationContents.musicShelfContinuation || response.continuationContents.sectionListContinuation];
@@ -145,19 +162,15 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              const watchEndpoint = content.doubleTapCommand
-                ? 'watchEndpoint' in content.doubleTapCommand
-                  ? content.doubleTapCommand.watchEndpoint
-                  : 'watchPlaylistEndpoint' in content.doubleTapCommand
-                  ? content.doubleTapCommand.watchPlaylistEndpoint
-                  : null
-                : null;
-              if (!watchEndpoint) return {};
+              const videoId = walk(content, 'videoId');
+              if (!videoId) return {};
+              const watchEndpoint = {videoId};
               const tags = content.flexColumns.map(obj =>
                 obj.musicResponsiveListItemFlexColumnRenderer.text
-                  ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).join('')
+                  ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs.map(side => side.text).filter(text => text !== ' • ')
                   : undefined,
-              );
+              ).flat();
+
               const type = tag || tags.splice(1, 1)[0];
               return type === 'Song'
                 ? {
