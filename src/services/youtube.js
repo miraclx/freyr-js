@@ -327,17 +327,21 @@ class YouTube {
         })
       ).videos.reduce(
         (final, item) => {
+          const _title = StripChar.RSspecChar(item.title)
+            .replace(/\s{2,}/g, ' ')
+            .toLowerCase()
+            .split(' ');
           if (
             artists.length === 0 ||
             (item &&
               'title' in item &&
               most(artists, keyWord => item.title.toLowerCase().includes(keyWord.toLowerCase())) &&
               most(
-                StripChar.RSspecChar(item.title)
-                  .replace(/\s{2,}/g, ' ')
-                  .toLowerCase()
-                  .split(' '),
-                text => strippedTitle.includes(text),
+                strippedTitle
+                  .split(' ')
+                  .filter(Boolean)
+                  .map(part => part.trim()),
+                text => _title.includes(text),
               ) &&
               !/\d+D/i.test(item.title)) // ignore 8d, 16d, etc videos, not original audio
           ) {
