@@ -281,11 +281,12 @@ class Spotify {
   async getPlaylistTracks(uri, country) {
     const {id} = this.parseURI(uri);
     return this.getTrack(
-      (await this._gatherCompletely(
-        (offset, limit) =>
-          this.#store.core.getPlaylistTracks(id, {offset: offset, limit, market: country}),
-        {offset: 0, limit: 50, sel: 'items', filt: item => item.track ? item.track.name : false}
-      )).map(item => item.track.uri),
+      (
+        await this._gatherCompletely(
+          (offset, limit) => this.#store.core.getPlaylistTracks(id, {offset, limit, market: country}),
+          {offset: 0, limit: 50, sel: 'items', filt: item => (item.track ? item.track.name : false)},
+        )
+      ).map(item => item.track.uri),
       country,
     );
   }
