@@ -284,7 +284,7 @@ class Spotify {
       (
         await this._gatherCompletely(
           (offset, limit) => this.#store.core.getPlaylistTracks(id, {offset, limit, market: country}),
-          {offset: 0, limit: 50, sel: 'items', filt: item => (item.track ? item.track.name : false)},
+          {offset: 0, limit: 50, sel: 'items', filt: item => !!(item.track && item.track.name)},
         )
       ).map(item => item.track.uri),
       country,
