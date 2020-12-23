@@ -284,9 +284,11 @@ class Spotify {
       (
         await this._gatherCompletely(
           (offset, limit) => this.#store.core.getPlaylistTracks(id, {offset, limit, market: country}),
-          {offset: 0, limit: 50, sel: 'items', filt: item => !!(item.track && item.track.name)},
+          {offset: 0, limit: 50, sel: 'items'},
         )
-      ).map(item => item.track.uri),
+      )
+        .filter(item => !!(item.track && item.track.name))
+        .map(item => item.track.uri),
       country,
     );
   }
@@ -302,9 +304,11 @@ class Spotify {
             await this._gatherCompletely(
               (offset, limit) =>
                 this.#store.core.getArtistAlbums(id, {offset, limit, country, include_groups: 'album,single,compilation'}),
-              {offset: 0, limit: 50, sel: 'items', filt: item => item.name},
+              {offset: 0, limit: 50, sel: 'items'},
             )
-          ).map(album => album.uri),
+          )
+            .filter(item => item.name)
+            .map(album => album.uri),
           country,
         ),
       );
@@ -319,10 +323,10 @@ class Spotify {
     return this.#store.core.getMyCurrentPlayingTrack();
   }
 
-  async _gatherCompletely(fn, {offset, limit, sel, filt} = {}) {
+  async _gatherCompletely(fn, {offset, limit, sel} = {}) {
     const {body} = await fn(offset, limit);
-    if (body.next) body[sel].push(await this._gatherCompletely(fn, {offset: offset + body.limit, limit, sel, filt}));
-    return body[sel].flat().filter(filt);
+    if (body.next) body[sel].push(await this._gatherCompletely(fn, {offset: offset + body.limit, limit, sel}));
+    return body[sel].flat();
   }
 }
 
