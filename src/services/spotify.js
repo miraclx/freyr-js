@@ -325,8 +325,8 @@ class Spotify {
 
   async _gatherCompletely(fn, {offset, limit, sel} = {}) {
     const {body} = await fn(offset, limit);
-    if (body.next) body[sel].push(await this._gatherCompletely(fn, {offset: offset + body.limit, limit, sel}));
-    return body[sel].flat();
+    if (body.next) body[sel].push(...(await this._gatherCompletely(fn, {offset: offset + body.limit, limit, sel})));
+    return body[sel];
   }
 }
 
