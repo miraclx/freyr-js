@@ -851,20 +851,20 @@ To preview filter rules specification, use the `filter` subcommand.
 
 |      Meta      | Spotify | Apple Music | Deezer |
 | :------------: | :-----: | :---------: | :----: |
-| `Title`        |   `✔`   |     `✔`     |   `✔`  |
-| `Artist`       |   `✔`   |     `✔`     |   `✔`  |
-| `Composer`     |   `✗`   |     `✔`     |   `✔`  |
-| `Album`        |   `✔`   |     `✔`     |   `✔`  |
-| `Genre`        |   `✗`   |     `✔`     |   `✔`  |
-| `Track Number` |   `✔`   |     `✔`     |   `✔`  |
-| `Disk Number`  |   `✔`   |     `✔`     |   `✔`  |
-| `Release Date` |   `✔`   |     `✔`     |   `✔`  |
-| `Rating`       |   `✔`   |     `✔`     |   `✔`  |
-| `Album Artist` |   `✔`   |     `✔`     |   `✔`  |
-| `ISRC`         |   `✔`   |     `✔`     |   `✔`  |
-| `Label`        |   `✔`   |     `✔`     |   `✔`  |
-| `Copyright`    |   `✔`   |     `✔`     |   `✗`  |
-| `Cover Art`    |   `✔`   |     `✔`     |   `✔`  |
+| `Title`        |   ✔   |     ✔     |   ✔  |
+| `Artist`       |   ✔   |     ✔     |   ✔  |
+| `Composer`     |   ✗   |     ✔     |   ✔  |
+| `Album`        |   ✔   |     ✔     |   ✔  |
+| `Genre`        |   ✗   |     ✔     |   ✔  |
+| `Track Number` |   ✔   |     ✔     |   ✔  |
+| `Disk Number`  |   ✔   |     ✔     |   ✔  |
+| `Release Date` |   ✔   |     ✔     |   ✔  |
+| `Rating`       |   ✔   |     ✔     |   ✔  |
+| `Album Artist` |   ✔   |     ✔     |   ✔  |
+| `ISRC`         |   ✔   |     ✔     |   ✔  |
+| `Label`        |   ✔   |     ✔     |   ✔  |
+| `Copyright`    |   ✔   |     ✔     |   ✗  |
+| `Cover Art`    |   ✔   |     ✔     |   ✔  |
 
 <details>
 <summary id="ssue"> <strong> Short Service URI Examples </strong> </summary>
