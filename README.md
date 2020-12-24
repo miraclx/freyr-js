@@ -847,7 +847,7 @@ To preview filter rules specification, use the `filter` subcommand.
 | [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
 | Youtube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 
-## Metadata Availability
+### Metadata Availability
 
 |      Meta      | Spotify | Apple Music | Deezer |
 | :------------: | :-----: | :---------: | :----: |
