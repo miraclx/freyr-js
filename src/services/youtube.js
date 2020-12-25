@@ -95,7 +95,12 @@ class YouTubeMusic {
   };
 
   #YTM_PATHS = {
+    PLAY_BUTTON: ['overlay', 'musicItemThumbnailOverlayRenderer', 'content', 'musicPlayButtonRenderer'],
+    NAVIGATION_BROWSE_ID: ['navigationEndpoint', 'browseEndpoint', 'browseId'],
     NAVIGATION_VIDEO_ID: ['navigationEndpoint', 'watchEndpoint', 'videoId'],
+    NAVIGATION_PLAYLIST_ID: ['navigationEndpoint', 'watchEndpoint', 'playlistId'],
+    SECTION_LIST: ['sectionListRenderer', 'contents'],
+    TITLE_TEXT: ['title', 'runs', 0, 'text'],
   };
 
   #search = async function search(queryObject, params, tag) {
