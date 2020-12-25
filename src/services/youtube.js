@@ -45,9 +45,7 @@ function genAsyncGetFeedsFn(url) {
   const loadFeeds = async () => _ytdlGet(url, ['--socket-timeout=20', '--no-cache-dir']);
   return loadFeeds;
 }
-const YTM_PATHS = {
-  NAVIGATION_VIDEO_ID: ['navigationEndpoint', 'watchEndpoint', 'videoId'],
-};
+
 class YouTubeMusic {
   static [symbols.meta] = {
     ID: 'yt_music',
@@ -96,6 +94,10 @@ class YouTubeMusic {
     throw new YouTubeSearchError('Failed to extract `INNERTUBE_API_KEY`');
   };
 
+  #YTM_PATHS = {
+    NAVIGATION_VIDEO_ID: ['navigationEndpoint', 'watchEndpoint', 'videoId'],
+  };
+
   #search = async function search(queryObject, params, tag) {
     /**
      * VideoID Types?
@@ -125,6 +127,8 @@ class YouTubeMusic {
         referer: 'https://music.youtube.com/search',
       },
     });
+
+    const YTM_PATHS = this.#YTM_PATHS;
 
     const shelf = !('continuationContents' in response)
       ? response.contents.sectionListRenderer.contents.map(section => section.musicShelfRenderer || section)
