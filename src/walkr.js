@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 
 function walk(object, ...keys) {
-  return keys.reduce((base, key) => {
+  return keys.flat().reduce((base, key) => {
     if (Array.isArray(base) && typeof key !== 'number') {
       for (const obj of base) {
         const result = walk(obj, key);
