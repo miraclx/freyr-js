@@ -1,17 +1,21 @@
-function walk(object, key) {
-  if (Array.isArray(object)) {
-    for (const obj of object) {
-      const result = walk(obj, key);
-      if (result != null) return result;
+/* eslint-disable no-restricted-syntax */
+
+function walk(object, ...keys) {
+  return keys.reduce((base, key) => {
+    if (Array.isArray(base)) {
+      for (const obj of base) {
+        const result = walk(obj, key);
+        if (result != null) return result;
+      }
+    } else if (typeof base === 'object') {
+      if (key in base && base[key] != null) return base[key];
+      for (const value of Object.values(base)) {
+        const result = walk(value, key);
+        if (result != null) return result;
+      }
     }
-  } else if (typeof object === 'object') {
-    if (key in object && object[key] != null) return object[key];
-    for (const value of Object.values(object)) {
-      const result = walk(value, key);
-      if (result != null) return result;
-    }
-  }
-  return null;
+    return null;
+  }, object);
 }
 
 module.exports = walk;
