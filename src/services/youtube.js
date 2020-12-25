@@ -136,11 +136,15 @@ class YouTubeMusic {
     const YTM_PATHS = this.#YTM_PATHS;
 
     const shelf = !('continuationContents' in response)
-      ? response.contents.sectionListRenderer.contents.map(section => section.musicShelfRenderer || section)
-      : [response.continuationContents.musicShelfContinuation || response.continuationContents.sectionListContinuation];
+      ? walk(response, YTM_PATHS.SECTION_LIST).map(section => section.musicShelfRenderer || section)
+      : [
+          walk(response, 'continuationContents', 'musicShelfContinuation') ||
+            walk(response, 'continuationContents', 'sectionListContinuation'),
+        ];
+
     return Object.fromEntries(
       shelf.map(layer => {
-        const layerName = layer.title && layer.title.runs[0].text;
+        const layerName = walk(layer, YTM_PATHS.TITLE_TEXT);
         return [
           layerName === 'Top result'
             ? 'top'
