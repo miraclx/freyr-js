@@ -162,63 +162,74 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              const videoId = walk(content, YTM_PATHS.NAVIGATION_VIDEO_ID);
-              if (!videoId) return {};
-              const watchEndpoint = {videoId};
-              const tags = content.flexColumns
-                .map(obj =>
-                  obj.musicResponsiveListItemFlexColumnRenderer.text
-                    ? obj.musicResponsiveListItemFlexColumnRenderer.text.runs
-                        .map(side => side.text)
-                        .filter(text => text !== ' • ')
-                    : undefined,
-                )
-                .flat();
 
-              const type = tag || tags.splice(1, 1)[0];
-              return type === 'Song'
-                ? {
-                    title: tags[0],
-                    type,
-                    artists: tags[1],
-                    album: tags[2],
-                    duration: tags[3],
-                    link: watchEndpoint,
-                  }
-                : type === 'Video'
-                ? {
-                    title: tags[0],
-                    type,
-                    artists: tags[1],
-                    views: tags[2],
-                    duration: tags[3],
-                    link: watchEndpoint,
-                  }
-                : type === 'Album'
-                ? {
-                    name: tags[0],
-                    type,
-                    album_type: type === 'Single' ? 'Album' : type,
-                    artists: tags[1],
-                    year: tags[2],
-                    link: watchEndpoint,
-                  }
-                : type === 'Artist'
-                ? {
-                    name: tags[0],
-                    type,
-                    subscribers: tags[1],
-                    link: watchEndpoint,
-                  }
-                : type === 'Playlist'
-                ? {
-                    name: tags[0],
-                    type,
-                    author: tags[1],
-                    nb_songs: tags[2],
-                    link: watchEndpoint,
-                  }
-                : {};
+              function getItemRuns(item, index) {
+                return walk(item, 'flexColumns', index, 'musicResponsiveListItemFlexColumnRenderer', 'text', 'runs');
+              }
+
+              function getItemText(item, index, run_index = 0) {
+                return getItemRuns(item, index)[run_index].text;
+              }
+
+              const result = {};
+
+              let type = getItemText(content, 1).toLowerCase();
+              if (type === 'single') type = 'album';
+
+              if (['song', 'video', 'album', 'artist', 'playlist'].includes(type)) result.type = type;
+
+              const runs = getItemRuns(content, 1).filter(item => item.text !== ' • ');
+              const navigable = runs
+                .filter(item => 'navigationEndpoint' in item)
+                .map(item => ({name: item.text, id: walk(item, YTM_PATHS.NAVIGATION_BROWSE_ID)}));
+
+              if (['song', 'video', 'album', 'playlist'].includes(type)) {
+                result.title = getItemText(content, 0);
+              }
+
+              if (['song', 'video', 'album', 'playlist'].includes(type)) {
+                [result.artists, result.album] = navigable.reduce(
+                  ([artists, album], item) => {
+                    if (item.id.startsWith('UC')) artists.push(item);
+                    else album = item;
+                    return [artists, album];
+                  },
+                  [[], null],
+                );
+              }
+
+              if (['song', 'video'].includes(type))
+                result.videoId = walk(content, YTM_PATHS.PLAY_BUTTON, 'playNavigationEndpoint', 'watchEndpoint', 'videoId');
+
+              if (
+                ['artist', 'album', 'playlist'].includes(type) &&
+                !(result.browseId = walk(content, YTM_PATHS.NAVIGATION_BROWSE_ID))
+              ) {
+                return {};
+              }
+
+              if (type === 'song') {
+                result.duration = runs[runs.length - 1].text;
+              } else if (type === 'video') {
+                delete result.album;
+                [result.views, result.duration] = runs.slice(-2).map(item => item.text);
+                [result.views] = result.views.split(' ');
+              } else if (type === 'album') {
+                result.type = runs[0].text.toLowerCase();
+                delete result.album;
+                result.title = getItemText(content, 0);
+                result.year = runs[runs.length - 1].text;
+              } else if (type === 'artist') {
+                result.artist = getItemText(content, 0);
+                [result.subscribers] = runs[runs.length - 1].text.split(' ');
+              } else if (type === 'playlist') {
+                result.author = result.artists;
+                delete result.artists;
+                delete result.album;
+                result.itemCount = parseInt(runs[runs.length - 1].text.split(' ')[0], 10);
+              }
+
+              return result;
             }),
             ...(layerName === 'Top result'
               ? null
@@ -294,24 +305,24 @@ class YouTubeMusic {
       // get weighted delta from expected duration
       accuracy += 100 - (duration ? Math.abs(duration - item.duration_ms) / duration : 0.5) * 100;
       // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
-      accuracy += (cur => ((item.type === 'Song' ? 80 : item.type === 'Video' ? 70 : 10) / 100) * cur)(100 - accuracy);
+      accuracy += (cur => ((item.type === 'song' ? 80 : item.type === 'video' ? 70 : 10) / 100) * cur)(100 - accuracy);
       // TODO: CALCULATE ACCURACY BY AUTHOR
       return accuracy;
     }
     const classified = Object.values(
       validSections.reduce((final, item) => {
         // prune duplicates
-        if (item && 'link' in item && 'videoId' in item.link && !(item.link.videoId in final)) {
-          final[item.link.videoId] = {
+        if (item && 'videoId' in item && !(item.videoId in final)) {
+          final[item.videoId] = {
             title: item.title,
             type: item.type,
             author: item.artists,
             duration: item.duration,
             duration_ms: item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000,
-            videoId: item.link.videoId,
-            getFeeds: genAsyncGetFeedsFn(item.link.videoId),
+            videoId: item.videoId,
+            getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
-          final[item.link.videoId].accuracy = calculateAccuracyFor(final[item.link.videoId]);
+          final[item.videoId].accuracy = calculateAccuracyFor(final[item.videoId]);
         }
         return final;
       }, {}),
