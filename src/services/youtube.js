@@ -45,7 +45,9 @@ function genAsyncGetFeedsFn(url) {
   const loadFeeds = async () => _ytdlGet(url, ['--socket-timeout=20', '--no-cache-dir']);
   return loadFeeds;
 }
-
+const YTM_PATHS = {
+  NAVIGATION_VIDEO_ID: ['navigationEndpoint', 'watchEndpoint', 'videoId'],
+};
 class YouTubeMusic {
   static [symbols.meta] = {
     ID: 'yt_music',
@@ -147,7 +149,7 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              const videoId = walk(content, 'playNavigationEndpoint', 'watchEndpoint', 'videoId');
+              const videoId = walk(content, YTM_PATHS.NAVIGATION_VIDEO_ID);
               if (!videoId) return {};
               const watchEndpoint = {videoId};
               const tags = content.flexColumns
