@@ -147,7 +147,7 @@ class YouTubeMusic {
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
-              const videoId = walk(content, 'videoId');
+              const videoId = walk(content, 'playNavigationEndpoint', 'watchEndpoint', 'videoId');
               if (!videoId) return {};
               const watchEndpoint = {videoId};
               const tags = content.flexColumns
