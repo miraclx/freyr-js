@@ -17,10 +17,18 @@ def youtube_lookup(url):
     video = pafy.new(url)
     return {"best": video.getbestaudio().itag, "all": [source._info for source in video.audiostreams]}
 
+
+def ytmusic_search(query):
+    from ytmusicapi import YTMusic
+    ytmusic = YTMusic()
+    return ytmusic.search(query)
+
+
 handlers = {
     "add": add,
     "factorial": factorial,
-    "youtube:lookup": youtube_lookup
+    "youtube:lookup": youtube_lookup,
+    "ytmusic:search": ytmusic_search
 }
 
 

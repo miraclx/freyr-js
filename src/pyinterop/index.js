@@ -93,6 +93,8 @@ async function main() {
 
   console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
 
+  console.log(await core.exec('ytmusic:search', 'Billie Eilish Therefore I Am'));
+
   core.close();
 }
 
