@@ -81,15 +81,15 @@ class PythonInterop {
 async function main() {
   const core = new PythonInterop();
 
-  const c = core.exec('add', 1, 2, 3);
-  const d = core.exec('add', 1, 2, 4);
-  console.log('c', await c);
-  console.log('d', await d);
+  const a = core.exec('add', 1, 2, 3);
+  const b = core.exec('add', 1, 2, 4);
+  console.log('1 + 2 + 3 =', await a);
+  console.log('1 + 2 + 4 =', await b);
 
-  const a = core.exec('factorial', 10000);
-  const b = core.exec('factorial', 10000);
-  console.log(BigInt(await a));
-  console.log(BigInt(await b));
+  const c = core.exec('factorial', 100);
+  const d = core.exec('factorial', 100);
+  console.log('100!', BigInt(await c));
+  console.log('100!', BigInt(await d));
 
   core.close();
 }
