@@ -13,9 +13,9 @@ def factorial(val):
 
 
 def youtube_lookup(url):
-    import pafy
-    video = pafy.new(url)
-    return {"best": video.getbestaudio().itag, "all": [source._info for source in video.audiostreams]}
+    from youtube_dl import YoutubeDL
+    with YoutubeDL({"quiet": True}) as ydl:
+        return ydl.extract_info(url, download=False)
 
 
 def ytmusic_search(query):
