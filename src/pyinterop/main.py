@@ -30,7 +30,7 @@ def init_app(exit_secret):
                 raise KeyError(
                     f"Invalid query endpoint [{inputPayload['path']}]")
             handler = handlers[inputPayload["path"]]
-            response["payload"] = handler(*inputPayload["data"])
+            response["payload"] = json.dumps(handler(*inputPayload["data"]))
         except:
             exc = sys.exc_info()
             response["error"] = {"type": exc[0].__name__, "message": str(
