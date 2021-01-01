@@ -12,9 +12,15 @@ def factorial(val):
     return str(math.factorial(val))
 
 
+def youtube_lookup(url):
+    import pafy
+    video = pafy.new(url)
+    return {"best": video.getbestaudio().itag, "all": [source._info for source in video.audiostreams]}
+
 handlers = {
     "add": add,
     "factorial": factorial,
+    "youtube:lookup": youtube_lookup
 }
 
 

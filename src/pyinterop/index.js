@@ -91,6 +91,8 @@ async function main() {
   console.log('100!', BigInt(await c));
   console.log('100!', BigInt(await d));
 
+  console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
+
   core.close();
 }
 
