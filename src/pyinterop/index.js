@@ -50,7 +50,7 @@ class PythonInterop {
             ].join('\n');
             return err;
           })(data.error),
-      payload,
+      JSON.parse(payload),
     );
   };
 
