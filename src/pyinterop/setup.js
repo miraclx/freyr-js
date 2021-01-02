@@ -162,24 +162,22 @@ function main() {
     console.log('freyr_setup_interop (c) 2020 Miraculous Owonubi');
     console.log('Setup inter-operational python dependencies for freyr-js');
     console.log();
-    console.log('Usage: node setup.js [-l] [module]');
+    console.log('Usage: node setup.js [-l] [module...]');
     console.log();
     console.log(' Options');
     console.log('   -l, --list   print list of installable modules');
     console.log('   -h, --help   show help information');
-    console.log('   module       optional name of module to install');
+    console.log('   module       optional name of module(s) to install');
     console.log();
     console.log(' Without any arguments, this sets up all installable modules');
     return;
   }
 
-  const preferredModule = args[0];
-
   const pkgEntries = Object.entries(interoperPackages);
-  const pkgs = Object.fromEntries(pkgEntries.filter(([name]) => !preferredModule || name === preferredModule));
+  const pkgs = Object.fromEntries(pkgEntries.filter(([name]) => !args.length || args.includes(name)));
 
   if (shouldList) {
-    pkgEntries.forEach(([name]) => console.log(`${name}${name in pkgs ? ' (*)' : ''}`));
+    pkgEntries.forEach(([name]) => console.log(`${name}${args.length && name in pkgs ? ' (*)' : ''}`));
     return;
   }
 
