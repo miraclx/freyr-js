@@ -4,13 +4,11 @@ const path = require('path');
 const crypto = require('crypto');
 const {promisify} = require('util');
 
-const $mv = require('mv');
 const xget = require('libxget');
 const axios = require('axios');
 const unzipper = require('unzipper');
 const xprogress = require('xprogress');
 
-const mv = promisify($mv);
 const mkdir = promisify(fs.mkdir);
 const rmdir = promisify(fs.rmdir);
 const exists = promisify(fs.exists);
