@@ -124,7 +124,7 @@ async function main() {
     // eslint-disable-next-line no-restricted-syntax
     for await (const entry of zip) {
       const {path: file, type} = entry;
-      if (['.py', '.json'].includes(path.extname(file)) && type !== 'Directory') {
+      if (type !== 'Directory') {
         const pathStruct = file.split(path.sep).slice(1);
         if (pathStruct[0] === 'ytmusicapi') {
           const outPath = path.join(STAGEDIR, ...pathStruct);
