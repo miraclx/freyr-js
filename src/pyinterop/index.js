@@ -38,7 +38,7 @@ class PythonInterop {
   }
 
   #dataHandler = function dataHandler(data) {
-    const {qID, payload} = data;
+    const {qID, payload} = {payload: null, ...data};
     this.#core.record.get(qID)(
       !data.error
         ? null
