@@ -88,8 +88,8 @@ async function main() {
 
   const c = core.exec('factorial', 100);
   const d = core.exec('factorial', 100);
-  console.log('100!', BigInt(await c));
-  console.log('100!', BigInt(await d));
+  console.log('100! =', BigInt(await c));
+  console.log('100! =', BigInt(await d));
 
   console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
 
