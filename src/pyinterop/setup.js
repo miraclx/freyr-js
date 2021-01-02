@@ -41,7 +41,7 @@ function dl(fileName, url) {
   const feed = xget(url, {timeout: 5000})
     .with('progressBar', urlMeta => genProgressBar(fileName, urlMeta))
     .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
-    .on('end', () => feed.store.get('progressBar').end(`Successfully Downloaded ${fileName}\n`))
+    .on('end', () => feed.store.get('progressBar').end(`\x1b[36m[\u2713]\x1b[0m Successfully Downloaded ${fileName}\n`))
     .on('retry', data => {
       const msg = ` \x1b[33m(i)\x1b[0m [${data.meta ? 'meta' : data.index}]{${data.retryCount}/${data.maxRetries}} [${
         data.lastErr.code
