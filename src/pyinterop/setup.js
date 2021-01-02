@@ -130,7 +130,7 @@ async function init(pkgs) {
   await $do('Cleaning up', () => rmdir(BASEDIR, {recursive: true}));
 }
 
-main({
+const interoperPackages = {
   youtube_dl: {
     url: 'https://yt-dl.org/downloads/latest/youtube-dl',
     skip: 22, // skip first 22 bytes: env hashbang
@@ -147,4 +147,14 @@ main({
     module: 'ytmusicapi',
     rootEntries: 1, // root entries to remove when unzipping
   },
-}).catch(err => console.log('An error occurred\n', err));
+};
+
+function main() {
+  const preferredModule = process.argv.slice(2)[0];
+
+  init(
+    Object.fromEntries(Object.entries(interoperPackages).filter(([name]) => !preferredModule || name === preferredModule)),
+  ).catch(err => console.log('An error occurred\n', err));
+}
+
+main();
