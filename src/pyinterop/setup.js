@@ -155,7 +155,10 @@ function hasflags(args, ...flags) {
 
 function main() {
   const args = process.argv.slice(2);
-  if (['--help', '-h'].some(arg => args.includes(arg))) {
+  const showHelp = hasflags(args, '-h', '--help');
+  const shouldList = hasflags(args, '-l', '--list');
+
+  if (showHelp) {
     console.log('freyr_setup_interop (c) 2020 Miraculous Owonubi');
     console.log('Setup inter-operational python dependencies for freyr-js');
     console.log();
@@ -171,7 +174,7 @@ function main() {
   }
   const pkgs = Object.entries(interoperPackages);
 
-  if (['-l', '--list'].some(arg => args.includes(arg))) {
+  if (shouldList) {
     pkgs.forEach(([name]) => console.log(name));
     return;
   }
