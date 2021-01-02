@@ -162,7 +162,7 @@ function main() {
     console.log('freyr_setup_interop (c) 2020 Miraculous Owonubi');
     console.log('Setup inter-operational python dependencies for freyr-js');
     console.log();
-    console.log('Usage: node setup.js [-l] [module...]');
+    console.log('Usage: node setup.js [-h] [-l] [module...]');
     console.log();
     console.log(' Options');
     console.log('   -l, --list   print list of installable modules');
