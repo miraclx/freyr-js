@@ -172,18 +172,18 @@ function main() {
     console.log(' Without any arguments, this sets up all installable modules');
     return;
   }
-  const pkgs = Object.entries(interoperPackages);
-
-  if (shouldList) {
-    pkgs.forEach(([name]) => console.log(name));
-    return;
-  }
 
   const preferredModule = args[0];
 
-  init(Object.fromEntries(pkgs.filter(([name]) => !preferredModule || name === preferredModule))).catch(err =>
-    console.log('An error occurred\n', err),
-  );
+  const pkgEntries = Object.entries(interoperPackages);
+  const pkgs = Object.fromEntries(pkgEntries.filter(([name]) => !preferredModule || name === preferredModule));
+
+  if (shouldList) {
+    pkgEntries.forEach(([name]) => console.log(`${name}${name in pkgs ? ' (*)' : ''}`));
+    return;
+  }
+
+  init(pkgs).catch(err => console.log('An error occurred\n', err));
 }
 
 main();
