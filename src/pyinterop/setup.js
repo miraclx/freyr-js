@@ -81,7 +81,7 @@ async function main() {
 
   if (await exists(STAGEDIR)) await $do('Resetting package stage', () => rmdir(STAGEDIR, {recursive: true}));
   await $do('Creating package stage', () => mkdir(STAGEDIR));
-  console.log(' (  stage  ) =', BASEDIR);
+  console.log(' (  stage  ) =', STAGEDIR);
 
   // youtube-dl
 
