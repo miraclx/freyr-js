@@ -7,3 +7,6 @@ bins/
 
 # ignore stage for testing
 stage/
+
+# ignore python packages
+src/pyinterop/interoper_pkgs/
