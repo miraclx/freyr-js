@@ -162,15 +162,15 @@ function main() {
     console.log('Usage: node setup.js [-l] [module]');
     console.log();
     console.log(' Options');
-    console.log('   -l       print list of installable modules');
-    console.log('   module   optional name of module to install');
+    console.log('   -l, --list   print list of installable modules');
+    console.log('   module       optional name of module to install');
     console.log();
     console.log(' Without any arguments, this sets up all installable modules');
     return;
   }
   const pkgs = Object.entries(interoperPackages);
 
-  if (args.includes('-l')) {
+  if (['-l', '--list'].some(arg => args.includes(arg))) {
     pkgs.forEach(([name]) => console.log(name));
     return;
   }
