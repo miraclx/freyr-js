@@ -53,6 +53,7 @@
   "dependencies": {
     "@yujinakayama/apple-music": "^0.4.0",
     "async": "^3.2.0",
+    "axios": "^0.19.2",
     "bluebird": "^3.7.2",
     "commander": "^6.2.1",
     "conf": "^7.1.2",
@@ -71,6 +72,7 @@
     "merge2": "^1.4.1",
     "minimatch": "^3.0.4",
     "mkdirp": "^1.0.4",
+    "mv": "^2.1.1",
     "node-cache": "^5.1.2",
     "open": "^7.3.0",
     "pretty-ms": "^7.0.1",
@@ -81,10 +83,10 @@
     "stripchar": "^1.2.1",
     "tmp": "^0.2.1",
     "tough-cookie": "^4.0.0",
+    "unzipper": "^0.10.11",
     "xbytes": "^1.6.2",
     "xprogress": "^0.17.3",
     "youtube-dl": "^3.0.2",
     "yt-search": "^2.5.1"
-  },
-  "devDependencies": {}
+  }
 }
