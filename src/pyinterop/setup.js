@@ -147,6 +147,12 @@ const interoperPackages = {
   },
 };
 
+function hasflags(args, ...flags) {
+  return flags
+    .map((flag, index) => ((index = args.indexOf(flag)) !== -1 && args.splice(index, 1), index))
+    .some(index => index !== -1);
+}
+
 function main() {
   const args = process.argv.slice(2);
   if (['--help', '-h'].some(arg => args.includes(arg))) {
