@@ -1,6 +1,9 @@
 import traceback
 import json
 import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "interoper_pkgs"))
 
 
 def add(*args):
