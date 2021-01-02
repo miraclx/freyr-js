@@ -72,7 +72,7 @@ async function $do(entryMsg, indent, fn) {
   return result;
 }
 
-async function main() {
+async function init(pkgs) {
   const BASEDIR = (_path => {
     while (!_path || fs.existsSync(_path)) _path = path.join(os.tmpdir(), `freyrsetup-${crypto.randomBytes(4).toString('hex')}`);
     return _path;
@@ -87,64 +87,62 @@ async function main() {
   await $do('Creating package stage', () => mkdir(STAGEDIR));
   console.log(' (  stage  ) =', STAGEDIR);
 
-  // youtube-dl
-
-  const ytdlFile = path.join(BASEDIR, 'raw@youtube-dl');
-
-  await promisifyStream(
-    dl('youtube-dl', 'https://yt-dl.org/downloads/latest/youtube-dl').pipe(fs.createWriteStream(ytdlFile)),
-    (stream, res, rej) => stream.on('error', rej).on('close', res),
-  );
-
-  const ytdlExtractedPath = path.join(BASEDIR, 'source@youtube-dl');
-
-  await $do('Parsing and processing youtube-dl', () =>
-    fs
-      .createReadStream(ytdlFile, {start: 22})
-      .pipe(unzipper.Extract({path: ytdlExtractedPath}))
-      .promise(),
-  );
-
-  await $do('Staging artifacts for youtube-dl', () =>
-    mv(path.join(ytdlExtractedPath, 'youtube_dl'), path.join(STAGEDIR, 'youtube_dl')),
-  );
-
-  // ytmusicapi
-
-  const {
-    data: {zipball_url: ytmusicapiUrl},
-  } = await $do('Querying latest version of ytmusicapi', () =>
-    axios.get('https://api.github.com/repos/sigma67/ytmusicapi/releases/latest'),
-  );
-
-  const ytmusicapiFile = path.join(BASEDIR, 'raw@ytmusicapi');
-
-  await promisifyStream(dl('ytmusicapi', ytmusicapiUrl).pipe(fs.createWriteStream(ytmusicapiFile)), (stream, res, rej) =>
-    stream.on('error', rej).on('finish', res),
-  );
-
-  await $do('Parsing and staging ytmusicapi', async () => {
-    const zip = fs.createReadStream(ytmusicapiFile).pipe(unzipper.Parse({forceStream: true}));
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const entry of zip) {
-      const {path: file, type} = entry;
-      if (type !== 'Directory') {
-        const pathStruct = file.split(path.sep).slice(1);
-        if (pathStruct[0] === 'ytmusicapi') {
-          const outPath = path.join(STAGEDIR, ...pathStruct);
-          await mkdir(path.dirname(outPath), {recursive: true});
-          await promisifyStream(entry.pipe(fs.createWriteStream(outPath)), (stream, res, rej) =>
+  console.log(`Packages`);
+  await Object.entries(pkgs)
+    .map(([name, opts]) => [name, {skip: 0, rootEntries: 0, ...opts}])
+    .reduce(
+      (former, [name, {url, skip, module, rootEntries}]) =>
+        (async () => {
+          await former;
+          console.log(` • [${name}]`);
+          const indent = 4;
+          url = typeof url === 'function' ? await url(indent) : url;
+          const rawFile = path.join(BASEDIR, `raw@${name}`);
+          await promisifyStream(dl(name, url, indent).pipe(fs.createWriteStream(rawFile)), (stream, res, rej) =>
             stream.on('error', rej).on('finish', res),
           );
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-      }
-      entry.autodrain();
-    }
-  });
+          await $do(`Parsing and staging ${name}`, indent, async () => {
+            const zip = fs.createReadStream(rawFile, {start: skip}).pipe(unzipper.Parse({forceStream: true}));
+            // eslint-disable-next-line no-restricted-syntax
+            for await (const entry of zip) {
+              const {path: file, type} = entry;
+              if (type !== 'Directory') {
+                const pathStruct = file.split(path.sep).slice(rootEntries);
+                if (pathStruct[0] === module) {
+                  const outPath = path.join(STAGEDIR, ...pathStruct);
+                  await mkdir(path.dirname(outPath), {recursive: true});
+                  await promisifyStream(entry.pipe(fs.createWriteStream(outPath)), (stream, res, rej) =>
+                    stream.on('error', rej).on('finish', res),
+                  );
+                  // eslint-disable-next-line no-continue
+                  continue;
+                }
+              }
+              entry.autodrain();
+            }
+          });
+        })(),
+      null,
+    );
 
   await $do('Cleaning up', () => rmdir(BASEDIR, {recursive: true}));
 }
 
-main().catch(err => console.log('An error occurred\n', err));
+main({
+  youtube_dl: {
+    url: 'https://yt-dl.org/downloads/latest/youtube-dl',
+    skip: 22, // skip first 22 bytes: env hashbang
+    module: 'youtube_dl',
+  },
+  ytmusicapi: {
+    url: async indent =>
+      /* get the latest release url */
+      (
+        await $do('Querying latest version of ytmusicapi', indent, () =>
+          axios.get('https://api.github.com/repos/sigma67/ytmusicapi/releases/latest'),
+        )
+      ).data.zipball_url,
+    module: 'ytmusicapi',
+    rootEntries: 1, // root entries to remove when unzipping
+  },
+}).catch(err => console.log('An error occurred\n', err));
