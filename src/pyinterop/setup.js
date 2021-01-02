@@ -100,7 +100,7 @@ async function init(pkgs) {
           );
           const moduleStage = path.join(STAGEDIR, module);
           if (await exists(moduleStage))
-            await $do(`Resetting module stage for ${name}`, () => rmdir(moduleStage, {recursive: true}));
+            await $do(`Resetting module stage for ${name}`, indent, () => rmdir(moduleStage, {recursive: true}));
           await $do(`Parsing and staging ${name}`, indent, async () => {
             const zip = fs.createReadStream(rawFile, {start: skip}).pipe(unzipper.Parse({forceStream: true}));
             // eslint-disable-next-line no-restricted-syntax
