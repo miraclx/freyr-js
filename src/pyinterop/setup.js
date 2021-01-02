@@ -83,8 +83,7 @@ async function init(pkgs) {
   await $do('Creating environment', () => mkdir(BASEDIR));
   console.log(' (workspace) =', BASEDIR);
 
-  if (await exists(STAGEDIR)) await $do('Resetting package stage', () => rmdir(STAGEDIR, {recursive: true}));
-  await $do('Creating package stage', () => mkdir(STAGEDIR));
+  if (!(await exists(STAGEDIR))) await $do('Creating package stage', () => mkdir(STAGEDIR));
   console.log(' (  stage  ) =', STAGEDIR);
 
   console.log(`Packages`);
@@ -101,6 +100,9 @@ async function init(pkgs) {
           await promisifyStream(dl(name, url, indent).pipe(fs.createWriteStream(rawFile)), (stream, res, rej) =>
             stream.on('error', rej).on('finish', res),
           );
+          const moduleStage = path.join(STAGEDIR, module);
+          if (await exists(moduleStage))
+            await $do(`Resetting module stage for ${name}`, () => rmdir(moduleStage, {recursive: true}));
           await $do(`Parsing and staging ${name}`, indent, async () => {
             const zip = fs.createReadStream(rawFile, {start: skip}).pipe(unzipper.Parse({forceStream: true}));
             // eslint-disable-next-line no-restricted-syntax
