@@ -15,16 +15,16 @@ const mkdir = promisify(fs.mkdir);
 const rmdir = promisify(fs.rmdir);
 const exists = promisify(fs.exists);
 
-function genProgressBar(fileName, urlMeta) {
+function genProgressBar(fileName, urlMeta, indent) {
   return xprogress.stream(
     urlMeta.size,
     urlMeta.chunkStack.map(chunk => chunk.size),
     {
       bar: {separator: '|'},
       template: [
-        '[:{label} :{fileName}] :{flipper}',
-        ' [:{bar:complete}] [:3{percentage}%] [:{speed}] (:{eta})',
-        ' [:{bar}] [:{size}]',
+        ':{indent}[:{label} :{fileName}] :{flipper}',
+        ':{indent} [:{bar:complete}] [:3{percentage}%] [:{speed}] (:{eta})',
+        ':{indent} [:{bar}] [:{size}]',
       ],
       clean: true,
       flipper: [...Array(10)].map((...[, i]) => `:{color}${'\u2022'.repeat(i + 1)}:{color:close}`),
@@ -32,25 +32,27 @@ function genProgressBar(fileName, urlMeta) {
       variables: {
         fileName,
         size: (stack, _size, total) => ((total = stack.total), `${stack.size()}${total !== Infinity ? `/:{size:total}` : ''}`),
+        indent: ' '.repeat(indent),
       },
     },
   );
 }
 
-function dl(fileName, url) {
+function dl(fileName, url, indent) {
   const feed = xget(url, {timeout: 5000})
-    .with('progressBar', urlMeta => genProgressBar(fileName, urlMeta))
+    .with('progressBar', urlMeta => genProgressBar(fileName, urlMeta, indent))
     .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
-    .on('end', () => feed.store.get('progressBar').end(`\x1b[36m[\u2713]\x1b[0m Successfully Downloaded ${fileName}\n`))
+    .on('end', () => feed.store.get('progressBar').end(`:{indent}\x1b[36m[\u2713]\x1b[0m Successfully Downloaded ${fileName}\n`))
     .on('retry', data => {
-      const msg = ` \x1b[33m(i)\x1b[0m [${data.meta ? 'meta' : data.index}]{${data.retryCount}/${data.maxRetries}} [${
+      const msg = `:{indent} \x1b[33m(i)\x1b[0m [${data.meta ? 'meta' : data.index}]{${data.retryCount}/${data.maxRetries}} [${
         data.lastErr.code
       }] (${data.lastErr}), retrying...`;
       if (data.store.has('progressBar')) data.store.get('progressBar').print(msg);
       else console.log(msg);
     })
     .on('error', err => {
-      const msg = 'index' in err ? `\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]` : `${err}`;
+      const msg =
+        'index' in err ? `:{indent}\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]` : `${err}`;
       if (feed.store.has('progressBar')) feed.store.get('progressBar').print(msg);
       else console.log(msg);
     });
