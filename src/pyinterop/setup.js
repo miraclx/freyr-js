@@ -61,8 +61,10 @@ function promisifyStream(stream, fn) {
   return new Promise((res, rej) => fn(stream, res, rej));
 }
 
-async function $do(entryMsg, fn) {
-  process.stdout.write(`\x1b[36m[•]\x1b[0m ${entryMsg}...`);
+async function $do(entryMsg, indent, fn) {
+  if (typeof indent === 'function') [fn, indent] = [indent, fn];
+  indent = indent || 0;
+  process.stdout.write(`${' '.repeat(indent)}\x1b[36m[•]\x1b[0m ${entryMsg}...`);
   const result = await fn();
   console.log('[\x1b[32mdone\x1b[0m]');
   return result;
