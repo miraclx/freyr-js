@@ -6,6 +6,7 @@ const {promisify} = require('util');
 
 const xget = require('libxget');
 const axios = require('axios');
+const stringd = require('stringd');
 const unzipper = require('unzipper');
 const xprogress = require('xprogress');
 
@@ -46,13 +47,13 @@ function dl(fileName, url, indent) {
         data.lastErr.code
       }] (${data.lastErr}), retrying...`;
       if (data.store.has('progressBar')) data.store.get('progressBar').print(msg);
-      else console.log(msg);
+      else console.log(stringd(msg, {indent: ' '.repeat(indent)}));
     })
     .on('error', err => {
       const msg =
         'index' in err ? `:{indent}\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]` : `${err}`;
       if (feed.store.has('progressBar')) feed.store.get('progressBar').print(msg);
-      else console.log(msg);
+      else console.log(stringd(msg, {indent: ' '.repeat(indent)}));
     });
   return feed;
 }
