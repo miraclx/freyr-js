@@ -98,4 +98,6 @@ async function main() {
   core.close();
 }
 
-main().catch(err => console.error('An error occurred\n', err));
+module.exports = PythonInterop;
+
+if (require.main === module) main().catch(err => console.error('An error occurred\n', err));
