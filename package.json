@@ -4,7 +4,8 @@
   "description": "A versatile, service-agnostic music downloader and manager",
   "main": "src/freyr.js",
   "scripts": {
-    "push": "git push github master"
+    "push": "git push github master",
+    "setup": "node src/pyinterop/setup.js"
   },
   "bin": {
     "freyr": "cli.js"
