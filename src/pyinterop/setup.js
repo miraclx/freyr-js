@@ -14,8 +14,6 @@ const mv = promisify($mv);
 const mkdir = promisify(fs.mkdir);
 const rmdir = promisify(fs.rmdir);
 const exists = promisify(fs.exists);
-const rename = promisify(fs.rename);
-const copyFile = promisify(fs.copyFile);
 
 function genProgressBar(fileName, urlMeta) {
   return xprogress.stream(
