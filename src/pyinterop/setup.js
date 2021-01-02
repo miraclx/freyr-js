@@ -163,6 +163,7 @@ function main() {
     console.log();
     console.log(' Options');
     console.log('   -l, --list   print list of installable modules');
+    console.log('   -h, --help   show help information');
     console.log('   module       optional name of module to install');
     console.log();
     console.log(' Without any arguments, this sets up all installable modules');
