@@ -171,7 +171,7 @@ function main() {
     console.log('   -l, --list         print list of installable modules');
     console.log('   -C, --no-cleanup   skip cleaning up temporary files after working');
     console.log('   -h, --help         show help information');
-    console.log('   module       optional name of module(s) to install');
+    console.log('   module             optional name of module(s) to install');
     console.log();
     console.log(' Without any arguments, this sets up all installable modules');
     return;
