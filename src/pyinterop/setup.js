@@ -10,6 +10,8 @@ const stringd = require('stringd');
 const unzipper = require('unzipper');
 const xprogress = require('xprogress');
 
+const deferrable = require('../deferrable');
+
 const mkdir = promisify(fs.mkdir);
 const rmdir = promisify(fs.rmdir);
 const exists = promisify(fs.exists);
@@ -188,15 +190,7 @@ function main() {
     return;
   }
 
-  const deferHandlers = [];
-  init(pkgs, shouldCleanup, (handler, caller) => {
-    deferHandlers.push(
-      (caller = index => ((index = deferHandlers.indexOf(caller)) !== -1 && deferHandlers.splice(index, 1), handler())),
-    );
-    return caller;
-  })
-    .catch(err => console.log('\x1b[31m[!]\x1b[0m An error occurred\n', err))
-    .then(() => Promise.allSettled(deferHandlers.map(caller => caller())));
+  deferrable(defer => init(pkgs, shouldCleanup, defer)).catch(err => console.log('\x1b[31m[!]\x1b[0m An error occurred\n', err));
 }
 
 main();
