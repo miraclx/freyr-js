@@ -80,9 +80,9 @@ async function init(pkgs) {
   const STAGEDIR = path.join(__dirname, 'interoper_pkgs');
 
   await $do('Creating temp dir', () => mkdir(TEMPDIR));
-  console.log(' ( tempdir ) =', TEMPDIR);
-
   if (!(await exists(STAGEDIR))) await $do('Creating package stage', () => mkdir(STAGEDIR));
+
+  console.log(' ( tempdir ) =', TEMPDIR);
   console.log(' (  stage  ) =', STAGEDIR);
 
   console.log(`Packages`);
