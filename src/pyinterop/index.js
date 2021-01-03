@@ -79,23 +79,30 @@ class PythonInterop {
 }
 
 async function main() {
-  const core = new PythonInterop();
+  // eslint-disable-next-line global-require
+  const deferrable = require('../deferrable');
 
-  const a = core.exec('add', 1, 2, 3);
-  const b = core.exec('add', 1, 2, 4);
-  console.log('1 + 2 + 3 =', await a);
-  console.log('1 + 2 + 4 =', await b);
+  await deferrable(async defer => {
+    const core = new PythonInterop();
 
-  const c = core.exec('factorial', 100);
-  const d = core.exec('factorial', 100);
-  console.log('100! =', BigInt(await c));
-  console.log('100! =', BigInt(await d));
+    const closeCore = defer(() => core.close());
 
-  console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
+    const a = core.exec('add', 1, 2, 3);
+    const b = core.exec('add', 1, 2, 4);
+    console.log('1 + 2 + 3 =', await a);
+    console.log('1 + 2 + 4 =', await b);
 
-  console.log(await core.exec('ytmusic:search', 'Billie Eilish Therefore I Am'));
+    const c = core.exec('factorial', 100);
+    const d = core.exec('factorial', 100);
+    console.log('100! =', BigInt(await c));
+    console.log('100! =', BigInt(await d));
 
-  core.close();
+    console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
+
+    console.log(await core.exec('ytmusic:search', 'Billie Eilish Therefore I Am'));
+
+    closeCore();
+  });
 }
 
 module.exports = PythonInterop;
