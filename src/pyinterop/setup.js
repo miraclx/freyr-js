@@ -72,15 +72,15 @@ async function $do(entryMsg, indent, fn) {
 }
 
 async function init(pkgs) {
-  const BASEDIR = (_path => {
+  const TEMPDIR = (_path => {
     while (!_path || fs.existsSync(_path)) _path = path.join(os.tmpdir(), `freyrsetup-${crypto.randomBytes(4).toString('hex')}`);
     return _path;
   })();
 
   const STAGEDIR = path.join(__dirname, 'interoper_pkgs');
 
-  await $do('Creating environment', () => mkdir(BASEDIR));
-  console.log(' (workspace) =', BASEDIR);
+  await $do('Creating temp dir', () => mkdir(TEMPDIR));
+  console.log(' ( tempdir ) =', TEMPDIR);
 
   if (!(await exists(STAGEDIR))) await $do('Creating package stage', () => mkdir(STAGEDIR));
   console.log(' (  stage  ) =', STAGEDIR);
@@ -95,7 +95,7 @@ async function init(pkgs) {
           console.log(` • [${name}]`);
           const indent = 4;
           url = typeof url === 'function' ? await url(indent) : url;
-          const rawFile = path.join(BASEDIR, `raw@${name}`);
+          const rawFile = path.join(TEMPDIR, `raw@${name}`);
           await promisifyStream(dl(name, url, indent).pipe(fs.createWriteStream(rawFile)), (stream, res, rej) =>
             stream.on('error', rej).on('finish', res),
           );
@@ -126,7 +126,7 @@ async function init(pkgs) {
       null,
     );
 
-  await $do('Cleaning up', () => rmdir(BASEDIR, {recursive: true}));
+  await $do('Cleaning up', () => rmdir(TEMPDIR, {recursive: true}));
 }
 
 const interoperPackages = {
