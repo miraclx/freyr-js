@@ -22,4 +22,6 @@ class YouTubeMusic extends Dispatcher {
   search = query => this.#dispatcher('search', query);
 }
 
-module.exports = {YouTube, YouTubeMusic};
+const closeConnection = () => core.close();
+
+module.exports = {YouTube, YouTubeMusic, closeConnection};
