@@ -5,7 +5,8 @@
   "main": "src/freyr.js",
   "scripts": {
     "push": "git push github master",
-    "setup": "node src/pyinterop/setup.js"
+    "setup": "node src/pyinterop/setup.js",
+    "postinstall": "npm run setup"
   },
   "bin": {
     "freyr": "cli.js"
