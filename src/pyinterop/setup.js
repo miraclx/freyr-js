@@ -71,7 +71,7 @@ async function $do(entryMsg, indent, fn) {
   return result;
 }
 
-async function init(pkgs) {
+async function init(pkgs, shouldCleanup) {
   const TEMPDIR = (_path => {
     while (!_path || fs.existsSync(_path)) _path = path.join(os.tmpdir(), `freyrsetup-${crypto.randomBytes(4).toString('hex')}`);
     return _path;
@@ -126,7 +126,8 @@ async function init(pkgs) {
       null,
     );
 
-  await $do('Cleaning up', () => rmdir(TEMPDIR, {recursive: true}));
+  if (shouldCleanup) await $do('Cleaning up', () => rmdir(TEMPDIR, {recursive: true}));
+  else console.log('\x1b[33m[i]\x1b[0m Skipped tempdir cleanup');
 }
 
 const interoperPackages = {
@@ -158,16 +159,18 @@ function main() {
   const args = process.argv.slice(2);
   const showHelp = hasflags(args, '-h', '--help');
   const shouldList = hasflags(args, '-l', '--list');
+  const shouldCleanup = !hasflags(args, '-C', '--no-cleanup');
 
   if (showHelp) {
     console.log('freyr_setup_interop (c) 2020 Miraculous Owonubi');
     console.log('Setup inter-operational python dependencies for freyr-js');
     console.log();
-    console.log('Usage: node setup.js [-h] [-l] [module...]');
+    console.log('Usage: node setup.js [-h] [-l] [-C] [module...]');
     console.log();
     console.log(' Options');
-    console.log('   -l, --list   print list of installable modules');
-    console.log('   -h, --help   show help information');
+    console.log('   -l, --list         print list of installable modules');
+    console.log('   -C, --no-cleanup   skip cleaning up temporary files after working');
+    console.log('   -h, --help         show help information');
     console.log('   module       optional name of module(s) to install');
     console.log();
     console.log(' Without any arguments, this sets up all installable modules');
@@ -182,7 +185,7 @@ function main() {
     return;
   }
 
-  init(pkgs).catch(err => console.log('An error occurred\n', err));
+  init(pkgs, shouldCleanup).catch(err => console.log('An error occurred\n', err));
 }
 
 main();
