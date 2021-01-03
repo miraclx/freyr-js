@@ -71,11 +71,15 @@ async function $do(entryMsg, indent, fn) {
   return result;
 }
 
-async function init(pkgs, shouldCleanup) {
+async function init(pkgs, shouldCleanup, defer) {
   const TEMPDIR = (_path => {
     while (!_path || fs.existsSync(_path)) _path = path.join(os.tmpdir(), `freyrsetup-${crypto.randomBytes(4).toString('hex')}`);
     return _path;
   })();
+  const cleanUp = defer(async () => {
+    if (shouldCleanup) await $do('Cleaning up', () => rmdir(TEMPDIR, {recursive: true}));
+    else console.log('\x1b[33m[i]\x1b[0m Skipped tempdir cleanup');
+  });
 
   const STAGEDIR = path.join(__dirname, 'interoper_pkgs');
 
@@ -126,8 +130,7 @@ async function init(pkgs, shouldCleanup) {
       null,
     );
 
-  if (shouldCleanup) await $do('Cleaning up', () => rmdir(TEMPDIR, {recursive: true}));
-  else console.log('\x1b[33m[i]\x1b[0m Skipped tempdir cleanup');
+  await cleanUp();
 }
 
 const interoperPackages = {
@@ -185,7 +188,15 @@ function main() {
     return;
   }
 
-  init(pkgs, shouldCleanup).catch(err => console.log('An error occurred\n', err));
+  const deferHandlers = [];
+  init(pkgs, shouldCleanup, (handler, caller) => {
+    deferHandlers.push(
+      (caller = index => ((index = deferHandlers.indexOf(caller)) !== -1 && deferHandlers.splice(index, 1), handler())),
+    );
+    return caller;
+  })
+    .catch(err => console.log('\x1b[31m[!]\x1b[0m An error occurred\n', err))
+    .then(() => Promise.allSettled(deferHandlers.map(caller => caller())));
 }
 
 main();
