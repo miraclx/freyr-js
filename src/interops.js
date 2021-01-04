@@ -5,13 +5,13 @@ const PythonInterop = require('./pyinterop');
 const core = new PythonInterop();
 
 class Dispatcher {
-  #dispatch = async (root, path, ...args) => {
+  #dispatch = async (root, method, ...args) => {
     let count = -1;
     [...args].reverse().some(item => ((count += 1), item !== undefined));
-    return core.exec(`${root.map(item => `${item}:`).join('')}${path}`, ...args.slice(0, count || Infinity));
+    return core.exec(`${root}:${method}`, ...args.slice(0, count || Infinity));
   };
 
-  static get = (obj, ...root) => (...args) => obj.#dispatch(root, ...args);
+  static get = (obj, root) => (...args) => obj.#dispatch(root, ...args);
 }
 
 class YouTube extends Dispatcher {
