@@ -99,13 +99,13 @@ async function main() {
 
     const closeCore = defer(() => core.close());
 
-    const a = core.exec('add', 1, 2, 3);
-    const b = core.exec('add', 1, 2, 4);
+    const a = core.exec('math:add', 1, 2, 3);
+    const b = core.exec('math:add', 1, 2, 4);
     console.log('1 + 2 + 3 =', await a);
     console.log('1 + 2 + 4 =', await b);
 
-    const c = core.exec('factorial', 100);
-    const d = core.exec('factorial', 100);
+    const c = core.exec('math:factorial', 100);
+    const d = core.exec('math:factorial', 100);
     console.log('100! =', BigInt(await c));
     console.log('100! =', BigInt(await d));
 
