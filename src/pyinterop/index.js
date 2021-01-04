@@ -29,12 +29,15 @@ class PythonInterop {
     record: new Map(),
     exitSecret: randomBytes(10).toString('hex'),
     bufferStack: {},
+    streams: {in: null, out: null},
   };
 
   constructor() {
-    (this.#core.proc = spawn('python', [join(__dirname, 'main.py'), this.#core.exitSecret], {stdio: 'pipe'})).stdout
-      .pipe(JSONParser(this.#core.bufferStack))
-      .on('data', this.#dataHandler.bind(this));
+    this.#core.proc = spawn('python', [join(__dirname, 'main.py'), this.#core.exitSecret], {
+      stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
+    });
+    [this.#core.streams.in, this.#core.streams.out] = [...this.#core.proc.stdio].slice(3);
+    this.#core.streams.in.pipe(JSONParser(this.#core.bufferStack)).on('data', this.#dataHandler.bind(this));
   }
 
   #dataHandler = function dataHandler(data) {
@@ -64,7 +67,7 @@ class PythonInterop {
       ),
       payload: {path, data},
     };
-    this.#core.proc.stdin.write(`${JSON.stringify(data)}\n`);
+    this.#core.streams.out.write(`${JSON.stringify(data)}\n`);
   };
 
   exec(path, ...args) {
@@ -75,7 +78,7 @@ class PythonInterop {
 
   #close = () => {
     this.#closeRequested = true;
-    return this.#core.proc.stdin.write(`{"C4NCL0S3":"${this.#core.exitSecret}"}\n`);
+    return this.#core.streams.out.write(`{"C4NCL0S3":"${this.#core.exitSecret}"}\n`);
   };
 
   #canClose = () => !this.#closeRequested && this.#core.proc.exitCode === null;
