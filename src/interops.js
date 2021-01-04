@@ -23,7 +23,9 @@ class YouTube extends Dispatcher {
 class YouTubeMusic extends Dispatcher {
   #dispatcher = Dispatcher.get(this, 'ytmusic');
 
-  search = query => this.#dispatcher('search', query);
+  search(query, filter, limit, ignoreSpelling) {
+    return this.#dispatcher('search', query, filter, limit, ignoreSpelling);
+  }
 }
 
 const closeConnection = () => core.close();

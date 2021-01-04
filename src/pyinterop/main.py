@@ -21,10 +21,10 @@ def youtube_lookup(url):
         return ydl.extract_info(url, download=False)
 
 
-def ytmusic_search(query):
+def ytmusic_search(*args):
     from ytmusicapi import YTMusic
     ytmusic = YTMusic()
-    return ytmusic.search(query)
+    return ytmusic.search(*args)
 
 
 handlers = {
