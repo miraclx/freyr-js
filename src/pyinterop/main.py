@@ -37,7 +37,7 @@ handlers = {
 
 def init_app(exit_secret):
     while True:
-        data = json.loads(sys.stdin.readline())
+        data = json.loads(receive())
         if data.get("C4NCL0S3") == exit_secret:
             break
         inputPayload = data["payload"]
@@ -53,8 +53,19 @@ def init_app(exit_secret):
             response["error"] = {"type": exc[0].__name__, "message": str(
                 exc[1]), "traceback": traceback.format_exc()}
         finally:
-            print(json.dumps(response), flush=True)
+            send(json.dumps(response))
+
+
+def send(msg):
+    outfile.write(msg + "\n")
+    outfile.flush()
+
+
+def receive():
+    return infile.readline()
 
 
 if __name__ == "__main__":
-    init_app(sys.argv[1])
+    global infile, outfile
+    with os.fdopen(3, 'w') as outfile, os.fdopen(4) as infile:
+        init_app(sys.argv[1])
