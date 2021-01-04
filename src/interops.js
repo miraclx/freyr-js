@@ -25,3 +25,20 @@ class YouTubeMusic extends Dispatcher {
 const closeConnection = () => core.close();
 
 module.exports = {YouTube, YouTubeMusic, closeConnection};
+
+async function main() {
+  // eslint-disable-next-line global-require
+  const deferrable = require('./deferrable');
+
+  await deferrable(async defer => {
+    defer(closeConnection);
+
+    const yt = new YouTube();
+    console.log(await yt.lookup('cuxNuMDet0M'));
+
+    const ytm = new YouTubeMusic();
+    console.log(await ytm.search('Billie Eilish Therefore I Am'));
+  });
+}
+
+if (require.main === module) main().catch(err => console.error('An error occurred\n', err));
