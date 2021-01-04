@@ -88,6 +88,8 @@ class PythonInterop {
   }
 }
 
+module.exports = PythonInterop;
+
 async function main() {
   // eslint-disable-next-line global-require
   const deferrable = require('../deferrable');
@@ -114,7 +116,5 @@ async function main() {
     closeCore();
   });
 }
-
-module.exports = PythonInterop;
 
 if (require.main === module) main().catch(err => console.error('An error occurred\n', err));
