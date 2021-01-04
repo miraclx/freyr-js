@@ -94,7 +94,7 @@ def init_app(exit_secret):
             response["error"] = {"type": exc[0].__name__, "message": str(
                 exc[1]), "traceback": traceback.format_exc()}
         finally:
-            send(json.dumps(response))
+            send(json.dumps(response, separators=(',', ':')))
 
 
 def send(msg):
