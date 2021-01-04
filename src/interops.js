@@ -5,7 +5,11 @@ const PythonInterop = require('./pyinterop');
 const core = new PythonInterop();
 
 class Dispatcher {
-  #dispatch = async (root, path, ...args) => core.exec(`${root.map(item => `${item}:`).join('')}${path}`, ...args);
+  #dispatch = async (root, path, ...args) => {
+    let count = -1;
+    [...args].reverse().some(item => ((count += 1), item !== undefined));
+    return core.exec(`${root.map(item => `${item}:`).join('')}${path}`, ...args.slice(0, count || Infinity));
+  };
 
   static get = (obj, ...root) => (...args) => obj.#dispatch(root, ...args);
 }
