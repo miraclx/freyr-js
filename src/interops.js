@@ -70,15 +70,19 @@ async function main() {
     defer(closeConnection);
 
     const yt = new YouTube();
-    console.log(await yt.lookup('cuxNuMDet0M'));
+    const feeds = await yt.lookup('cuxNuMDet0M');
+    console.log(feeds);
 
     const ytm = new YouTubeMusic();
-    console.log(await ytm.search('Billie Eilish Therefore I Am'));
+    const searchResult = await ytm.search('Billie Eilish Therefore I Am');
+    console.log(searchResult);
 
     const watchList = await ytm.getWatchPlaylist('oDn4eKyhSH4');
-    console.log(await ytm.getLyrics(watchList.lyrics));
+    const lyrics = await ytm.getLyrics(watchList.lyrics);
+    console.log(lyrics);
 
-    console.log(await ytm.getArtist('UCERrDZ8oN0U_n9MphMKERcg'));
+    const artist = await ytm.getArtist('UCERrDZ8oN0U_n9MphMKERcg');
+    console.log(artist);
   });
 }
 
