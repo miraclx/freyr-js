@@ -77,6 +77,8 @@ async function main() {
 
     const watchList = await ytm.getWatchPlaylist('oDn4eKyhSH4');
     console.log(await ytm.getLyrics(watchList.lyrics));
+
+    console.log(await ytm.getArtist('UCERrDZ8oN0U_n9MphMKERcg'));
   });
 }
 
