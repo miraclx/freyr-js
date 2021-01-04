@@ -108,5 +108,8 @@ def receive():
 
 if __name__ == "__main__":
     global infile, outfile
-    with os.fdopen(3, 'w') as outfile, os.fdopen(4) as infile:
-        init_app(sys.argv[1])
+    try:
+        with os.fdopen(3, 'w') as outfile, os.fdopen(4) as infile:
+            init_app(sys.argv[1])
+    except BrokenPipeError:
+        pass
