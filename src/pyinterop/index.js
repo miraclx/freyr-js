@@ -71,10 +71,17 @@ class PythonInterop {
     return new Promise((res, rej) => this.#execHandler(path, args, (err, data) => (err ? rej(err) : res(data))));
   }
 
-  #close = () => this.#core.proc.stdin.write(`{"C4NCL0S3":"${this.#core.exitSecret}"}\n`);
+  #closeRequested = false;
+
+  #close = () => {
+    this.#closeRequested = true;
+    return this.#core.proc.stdin.write(`{"C4NCL0S3":"${this.#core.exitSecret}"}\n`);
+  };
+
+  #canClose = () => !this.#closeRequested && this.#core.proc.exitCode === null;
 
   close() {
-    this.#close();
+    return this.#canClose() && this.#close();
   }
 }
 
