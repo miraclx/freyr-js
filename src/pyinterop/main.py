@@ -6,32 +6,41 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "interoper_pkgs"))
 
 
-def add(*args):
-    return sum(args)
+class Math:
+    def add(self, *args):
+        return sum(args)
+
+    def factorial(self, val):
+        import math
+        return str(math.factorial(val))
 
 
-def factorial(val):
-    import math
-    return str(math.factorial(val))
+class YouTube:
+    def _getCore(self):
+        if not hasattr(self, '__core'):
+            from youtube_dl import YoutubeDL
+            self.__core = YoutubeDL({"quiet": True})
+        return self.__core
+
+    def lookup(self, url):
+        return self._getCore().extract_info(url, download=False)
 
 
-def youtube_lookup(url):
-    from youtube_dl import YoutubeDL
-    with YoutubeDL({"quiet": True}) as ydl:
-        return ydl.extract_info(url, download=False)
+class YouTubeMusic:
+    def _getCore(self):
+        if not hasattr(self, '__core'):
+            from ytmusicapi import YTMusic
+            self.__core = YTMusic()
+        return self.__core
 
-
-def ytmusic_search(*args):
-    from ytmusicapi import YTMusic
-    ytmusic = YTMusic()
-    return ytmusic.search(*args)
+    def search(self, *args):
+        return self._getCore().search(*args)
 
 
 handlers = {
-    "add": add,
-    "factorial": factorial,
-    "youtube:lookup": youtube_lookup,
-    "ytmusic:search": ytmusic_search
+    "math": Math(),
+    "youtube": YouTube(),
+    "ytmusic": YouTubeMusic(),
 }
 
 
@@ -43,11 +52,22 @@ def init_app(exit_secret):
         inputPayload = data["payload"]
         response = {"qID": data["qID"]}
         try:
-            if inputPayload["path"] not in handlers:
+            [root, method] = inputPayload["path"].split(':')
+            if root not in handlers:
                 raise KeyError(
-                    f"Invalid query endpoint [{inputPayload['path']}]")
-            handler = handlers[inputPayload["path"]]
-            response["payload"] = json.dumps(handler(*inputPayload["data"]))
+                    f"Invalid root endpoint [{root}]")
+
+            try:
+                pointer = getattr(handlers[root], method)
+            except AttributeError:
+                raise AttributeError(
+                    f"Root object [{root}] has no attribute [{method}]")
+
+            if not callable(pointer):
+                raise ValueError(
+                    f"Root object attribute [{inputPayload['path']}] is not callable")
+
+            response["payload"] = json.dumps(pointer(*inputPayload["data"]))
         except:
             exc = sys.exc_info()
             response["error"] = {"type": exc[0].__name__, "message": str(
