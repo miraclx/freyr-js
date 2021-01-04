@@ -28,6 +28,34 @@ class YouTubeMusic extends Dispatcher {
   search(query, filter, limit, ignoreSpelling) {
     return this.#dispatcher('search', query, filter, limit, ignoreSpelling);
   }
+
+  getArtist(channelId) {
+    return this.#dispatcher('get_artist', channelId);
+  }
+
+  getArtistAlbums(channelId, params) {
+    return this.#dispatcher('get_artist_albums', channelId, params);
+  }
+
+  getAlbum(browseId) {
+    return this.#dispatcher('get_album', browseId);
+  }
+
+  getSong(videoId) {
+    return this.#dispatcher('get_song', videoId);
+  }
+
+  getLyrics(browseId) {
+    return this.#dispatcher('get_lyrics', browseId);
+  }
+
+  getWatchPlaylist(videoId, playlistId, limit, params) {
+    return this.#dispatcher('get_watch_playlist', videoId, playlistId, limit, params);
+  }
+
+  getPlaylist(self, playlistId, limit) {
+    return this.#dispatcher('get_playlist', playlistId, limit);
+  }
 }
 
 const closeConnection = () => core.close();
