@@ -17,7 +17,9 @@ class Dispatcher {
 class YouTube extends Dispatcher {
   #dispatcher = Dispatcher.get(this, 'youtube');
 
-  lookup = id => this.#dispatcher('lookup', id);
+  lookup(id) {
+    return this.#dispatcher('lookup', id);
+  }
 }
 
 class YouTubeMusic extends Dispatcher {
