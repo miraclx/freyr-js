@@ -74,6 +74,9 @@ async function main() {
 
     const ytm = new YouTubeMusic();
     console.log(await ytm.search('Billie Eilish Therefore I Am'));
+
+    const watchList = await ytm.getWatchPlaylist('oDn4eKyhSH4');
+    console.log(await ytm.getLyrics(watchList.lyrics));
   });
 }
 
