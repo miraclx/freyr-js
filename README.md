@@ -778,7 +778,7 @@ Used as values to the `-l, --filter` flag or as key-value pairs in the `filters`
 | key            |     syntax    |   description   | examples |
 | -------------- | :-----------: | --------------- | -------- |
 | `id`           |      glob     | Resource ID     | `id=1497949287`, `id=*149` |
-| `uri`          |      glob     | Resource URI    | `uri="*:+(track|album):*"` |
+| `uri`          |      glob     | Resource URI    | `uri="*:+(track\|album):*"` |
 | `title`        |      glob     | Track title     | `title="all*good girls*hell"` |
 | `album`        |      glob     | Track album     | `album="when we*fall*do we go*"` |
 | `artist`       |      glob     | Match an artist | `artist="Billie*"` |   |
