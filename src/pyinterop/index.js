@@ -91,6 +91,7 @@ class PythonInterop extends EventEmitter {
 
   #close = () => {
     this.#closeRequested = true;
+    this.emit('closeRequested');
     return this.#core.streams.out.write(`{"C4NCL0S3":"${this.#core.exitSecret}"}\n`);
   };
 
