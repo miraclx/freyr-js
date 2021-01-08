@@ -85,8 +85,8 @@ class PythonInterop extends EventEmitter {
 
   exec(path, ...args) {
     return new Promise((res, rej, err) => {
-      if (this.#closeRequested) err = new Error("PythonInterop: can't send message, peer shutting down...");
-      else if (!this.#stillRunning()) err = new Error("PythonInterop: can't send message, peer has shut down");
+      if (!this.#stillRunning()) err = new Error("PythonInterop: can't send message, peer has shut down");
+      else if (this.#closeRequested) err = new Error("PythonInterop: can't send message, peer shutting down...");
       else return this.#execHandler(path, args, (_err, data) => (_err ? rej(_err) : res(data)));
       return rej(err);
     });
