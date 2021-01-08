@@ -84,7 +84,12 @@ class PythonInterop extends EventEmitter {
   };
 
   exec(path, ...args) {
-    return new Promise((res, rej) => this.#execHandler(path, args, (err, data) => (err ? rej(err) : res(data))));
+    return new Promise((res, rej, err) => {
+      if (this.#closeRequested) err = new Error("PythonInterop: can't send message, peer shutting down...");
+      else if (!this.#stillRunning()) err = new Error("PythonInterop: can't send message, peer has shut down");
+      else return this.#execHandler(path, args, (_err, data) => (_err ? rej(_err) : res(data)));
+      return rej(err);
+    });
   }
 
   #closeRequested = false;
@@ -98,7 +103,9 @@ class PythonInterop extends EventEmitter {
     this.emit('closeRequested');
   };
 
-  #canClose = () => !this.#closeRequested && this.#core.proc.exitCode === null;
+  #stillRunning = () => this.#core.proc.exitCode === null;
+
+  #canClose = () => !this.#closeRequested && this.#stillRunning();
 
   close() {
     return new Promise(res => (this.#canClose() ? this.on('close', res).#close() : res()));
