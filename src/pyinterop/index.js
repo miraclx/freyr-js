@@ -137,7 +137,7 @@ async function main() {
 
     console.log(await core.exec('ytmusic:search', 'Billie Eilish Therefore I Am'));
 
-    closeCore();
+    await closeCore();
   });
 }
 
