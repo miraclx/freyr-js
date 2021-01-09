@@ -46,7 +46,8 @@ class TaskExecutor:
     def __init__(self, n_threads, handler):
         self._queue = queue.Queue()
         self._handler = handler
-        self._jobs = Parallelizer(self._queue.get, n_threads, self._handler)
+        self._jobs = Parallelizer(
+            self._queue.get, n_threads, self._handler, allowedExceptions=(KeyboardInterrupt,))
 
     def start(self):
         self._jobs.start()
@@ -123,10 +124,13 @@ if __name__ == "__main__":
                     if data.get("C4NCL0S3") == exit_secret:
                         break
                     tasker.send(data)
+            except KeyboardInterrupt:
+                tasker._jobs.raiseExcAll(KeyboardInterrupt)
+                sender._jobs.raiseExcAll(KeyboardInterrupt)
             finally:
                 tasker.cancel()
                 sender.cancel()
                 tasker.join()
                 sender.join()
-    except (BrokenPipeError, KeyboardInterrupt):
+    except BrokenPipeError:
         pass
