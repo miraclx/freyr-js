@@ -1,3 +1,4 @@
+import ctypes
 import threading
 from inspect import signature
 from eventemitter import EventEmitter
@@ -119,6 +120,22 @@ class Parallelizer(EventEmitter):
         for threadStack in self.__threads:
             threadStack["threadEvent"].emit("cancel")
         self.emit("cancel")
+
+    def raiseExc(self, n, exc):
+        if not (tid := getattr(self.__threads[n]["thread"], '_ident', None) or next(iter(
+                ([None] + [id for id, obj in threading._active.items() if obj is self.__threads[n]["thread"]]).pop, None), None)):
+            raise AssertionError("could not determine thread id")
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+            ctypes.c_long(tid), ctypes.py_object(exc))
+        if res == 0:
+            raise ValueError("invalid thread ID")
+        elif res != 1:
+            raise SystemError("PyThreadState_SetAsyncExc failed")
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
+
+    def raiseExcAll(self, exc):
+        for n, _ in enumerate(self.__threads):
+            self.raiseExc(n, exc)
 
     def pause(self):
         for threadStack in self.__threads:
