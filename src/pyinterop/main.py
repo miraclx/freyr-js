@@ -62,8 +62,6 @@ class TaskExecutor:
         [dq, self._queue.queue] = [self._queue.queue, deque()]
         self._jobs.resume()
         dq.append(None)
-        for studentStack in iter(dq.popleft, None):
-            studentStack["event"].set()
         return self
 
     def cancel(self):
