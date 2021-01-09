@@ -51,7 +51,6 @@ class PythonInterop extends EventEmitter {
       )[0]
       .pipe(JSONParser(this.#core.bufferStack))
       .on('data', this.#dataHandler.bind(this));
-    process.on('SIGINT', () => this.#core.proc.kill('SIGINT'));
   }
 
   #dataHandler = function dataHandler(data) {
