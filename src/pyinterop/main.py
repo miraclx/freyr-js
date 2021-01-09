@@ -66,6 +66,11 @@ class Utils:
         import time
         time.sleep(secs)
 
+    def current_thread(self):
+        from threading import current_thread
+        t = current_thread()
+        return {"name": t.name, "daemon": t.daemon, "ident": t.ident, "is_alive": t.is_alive(), "native_id": t.native_id}
+
 
 handlers = {
     "math": Math(),
