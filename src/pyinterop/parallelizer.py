@@ -5,7 +5,7 @@ from eventemitter import EventEmitter
 
 
 class Parallelizer(EventEmitter):
-    def __init__(self, items, jobs, handler, *, sentinel=None):
+    def __init__(self, items, jobs, handler, *, sentinel=None, allowedExceptions=()):
         super().__init__()
         try:
             jobs = min(jobs, len(items))
@@ -20,6 +20,7 @@ class Parallelizer(EventEmitter):
         self.__doneLock = threading.Lock()
         self.__started = threading.Event()
         self.__finished = threading.Event()
+        self.__allowedExceptions = allowedExceptions
         for job in range(jobs):
             self.__newThread(job)
 
@@ -55,6 +56,8 @@ class Parallelizer(EventEmitter):
                 finally:
                     for listener in listeners:
                         threadEvent.removeListener("cancel", listener)
+        except self.__allowedExceptions:
+            pass
         finally:
             self.__tickThread()
 
