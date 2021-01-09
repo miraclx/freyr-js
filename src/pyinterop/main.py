@@ -75,47 +75,6 @@ handlers = {
 }
 
 
-def init_app(exit_secret):
-    while True:
-        data = json.loads(receive())
-        if data.get("C4NCL0S3") == exit_secret:
-            break
-        inputPayload = data["payload"]
-        response = {"qID": data["qID"]}
-        try:
-            [root, method] = inputPayload["path"].split(':')
-            if root not in handlers:
-                raise KeyError(
-                    f"Invalid root endpoint [{root}]")
-
-            try:
-                pointer = getattr(handlers[root], method)
-            except AttributeError:
-                raise AttributeError(
-                    f"Root object [{root}] has no attribute [{method}]")
-
-            if not callable(pointer):
-                raise ValueError(
-                    f"Root object attribute [{inputPayload['path']}] is not callable")
-
-            response["payload"] = json.dumps(pointer(*inputPayload["data"]))
-        except:
-            exc = sys.exc_info()
-            response["error"] = {"type": exc[0].__name__, "message": str(
-                exc[1]), "traceback": traceback.format_exc()}
-        finally:
-            send(json.dumps(response, separators=(',', ':')))
-
-
-def send(msg):
-    outfile.write(msg + "\n")
-    outfile.flush()
-
-
-def receive():
-    return infile.readline()
-
-
 class TaskExecutor:
     def __init__(self, n_threads, handler):
         self._queue = queue.Queue()
@@ -150,9 +109,59 @@ class TaskExecutor:
 
 
 if __name__ == "__main__":
-    global infile, outfile
+    global infile, outfile, sender, tasker
+
+    def sender(response):
+        outfile.write(json.dumps(response, separators=(',', ':')) + "\n")
+        outfile.flush()
+
+    sender = TaskExecutor(1, sender)
+
+    def tasker(data):
+        inputPayload = data["payload"]
+        response = {"qID": data["qID"]}
+        try:
+            [root, method] = inputPayload["path"].split(':')
+            if root not in handlers:
+                raise KeyError(
+                    f"Invalid root endpoint [{root}]")
+
+            try:
+                pointer = getattr(handlers[root], method)
+            except AttributeError:
+                raise AttributeError(
+                    f"Root object [{root}] has no attribute [{method}]")
+
+            if not callable(pointer):
+                raise ValueError(
+                    f"Root object attribute [{inputPayload['path']}] is not callable")
+
+            response["payload"] = json.dumps(pointer(*inputPayload["data"]))
+        except:
+            exc = sys.exc_info()
+            response["error"] = {"type": exc[0].__name__, "message": str(
+                exc[1]), "traceback": traceback.format_exc()}
+        finally:
+            sender.send(response)
+
+    tasker = TaskExecutor(4, tasker)
+
+    tasker.start()
+    sender.start()
+
     try:
         with os.fdopen(3, 'w') as outfile, os.fdopen(4) as infile:
-            init_app(sys.argv[1])
+            try:
+                exit_secret = sys.argv[1]
+                while True:
+                    data = json.loads(infile.readline())
+                    if data.get("C4NCL0S3") == exit_secret:
+                        break
+                    tasker.send(data)
+            finally:
+                tasker.cancel()
+                sender.cancel()
+                tasker.join()
+                sender.join()
     except (BrokenPipeError, KeyboardInterrupt):
         pass
