@@ -120,7 +120,7 @@ class TaskExecutor:
     def __init__(self, n_threads, handler):
         self._queue = queue.Queue()
         self._handler = handler
-        self._jobs = Parallelizer(self._queue.get, 2, self._handler)
+        self._jobs = Parallelizer(self._queue.get, n_threads, self._handler)
 
     def start(self):
         self._jobs.start()
