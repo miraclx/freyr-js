@@ -44,7 +44,7 @@ class PythonInterop extends EventEmitter {
     ([this.#core.streams.in, this.#core.streams.out] = [
       ...(this.#core.proc = spawn('python', [join(__dirname, 'main.py'), this.#core.exitSecret], {
         stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
-      }).on('close', () => this.emit('close'))).stdio,
+      }).on('exit', () => this.emit('exit'))).stdio,
     ].slice(3, 5))
       .map((pipe, index) =>
         pipe.on('error', err => this.emit('error', ((err[PythonInterop.#interopErrorSymbol] = index ? 'send' : 'recv'), err))),
@@ -108,7 +108,7 @@ class PythonInterop extends EventEmitter {
   #canClose = () => !this.#closeRequested && this.#stillRunning();
 
   close() {
-    return new Promise(res => (this.#canClose() ? this.on('close', res).#close() : res()));
+    return new Promise(res => (this.#canClose() ? this.on('exit', res).#close() : res()));
   }
 }
 
