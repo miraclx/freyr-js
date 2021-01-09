@@ -61,8 +61,15 @@ class YouTubeMusic:
         return self._getCore().get_playlist(playlistId, *args)
 
 
+class Utils:
+    def sleep(self, secs):
+        import time
+        time.sleep(secs)
+
+
 handlers = {
     "math": Math(),
+    "utils": Utils(),
     "youtube": YouTube(),
     "ytmusic": YouTubeMusic(),
 }
