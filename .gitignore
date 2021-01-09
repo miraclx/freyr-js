@@ -11,3 +11,4 @@ stage/
 # ignore python packages
 src/pyinterop/interoper_pkgs/
 src/pyinterop/__pycache__/
+src/pyinterop/handlers/__pycache__/

@@ -1,4 +1,5 @@
 import traceback
+import importlib
 import queue
 import json
 import sys
@@ -18,49 +19,6 @@ class Math:
         return str(math.factorial(val))
 
 
-class YouTube:
-    def _getCore(self):
-        if not hasattr(self, '__core'):
-            from youtube_dl import YoutubeDL
-            self.__core = YoutubeDL({"quiet": True})
-        return self.__core
-
-    def lookup(self, url):
-        return self._getCore().extract_info(url, download=False)
-
-
-class YouTubeMusic:
-    def _getCore(self):
-        if not hasattr(self, '__core'):
-            from ytmusicapi import YTMusic
-            self.__core = YTMusic()
-        return self.__core
-
-    def search(self, query, *args):
-        return self._getCore().search(query, *args)
-
-    def get_artist(self, channelId):
-        return self._getCore().get_artist(channelId)
-
-    def get_artist_albums(self, channelId, params):
-        return self._getCore().get_artist_albums(channelId, params)
-
-    def get_album(self, browseId):
-        return self._getCore().get_album(browseId)
-
-    def get_song(self, videoId):
-        return self._getCore().get_song(videoId)
-
-    def get_lyrics(self, browseId):
-        return self._getCore().get_lyrics(browseId)
-
-    def get_watch_playlist(self, videoId, *args):
-        return self._getCore().get_watch_playlist(videoId, *args)
-
-    def get_playlist(self, playlistId, *args):
-        return self._getCore().get_playlist(playlistId, *args)
-
-
 class Utils:
     def sleep(self, secs):
         import time
@@ -75,9 +33,13 @@ class Utils:
 handlers = {
     "math": Math(),
     "utils": Utils(),
-    "youtube": YouTube(),
-    "ytmusic": YouTubeMusic(),
 }
+
+for py in (f[:-3] for f in os.listdir(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "handlers")) if f.endswith('.py')):
+    if (cls := getattr(importlib.import_module(
+            '.'.join(['handlers', py])), '__INTEROP_EXPORT__', None)):
+        handlers[py] = cls()
 
 
 class TaskExecutor:
