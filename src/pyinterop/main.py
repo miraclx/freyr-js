@@ -1,7 +1,10 @@
 import traceback
+import queue
 import json
 import sys
 import os
+
+from parallelizer import Parallelizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "interoper_pkgs"))
 
@@ -104,6 +107,39 @@ def send(msg):
 
 def receive():
     return infile.readline()
+
+
+class TaskExecutor:
+    def __init__(self, n_threads, handler):
+        self._queue = queue.Queue()
+        self._handler = handler
+        self._jobs = Parallelizer(self._queue.get, 2, self._handler)
+
+    def start(self):
+        self._jobs.start()
+        return self
+
+    def send(self, task):
+        self._queue.put(task)
+        return self
+
+    def clear(self):
+        from collections import deque
+        self._jobs.pause()
+        [dq, self._queue.queue] = [self._queue.queue, deque()]
+        self._jobs.resume()
+        dq.append(None)
+        for studentStack in iter(dq.popleft, None):
+            studentStack["event"].set()
+        return self
+
+    def cancel(self):
+        self._jobs.cancel()
+        self.clear()
+        self._queue.put(None)
+
+    def join(self):
+        self._jobs.joinAll()
 
 
 if __name__ == "__main__":
