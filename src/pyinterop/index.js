@@ -133,6 +133,15 @@ async function main() {
     console.log('100! =', BigInt(await c));
     console.log('100! =', BigInt(await d));
 
+    console.time('e');
+    const e = core.exec('utils:sleep', 4);
+    console.time('f');
+    const f = core.exec('utils:sleep', 4);
+    await e;
+    console.timeEnd('e');
+    await f;
+    console.timeEnd('f');
+
     console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
 
     console.log(await core.exec('ytmusic:search', 'Billie Eilish Therefore I Am'));
