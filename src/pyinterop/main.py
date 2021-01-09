@@ -147,5 +147,5 @@ if __name__ == "__main__":
     try:
         with os.fdopen(3, 'w') as outfile, os.fdopen(4) as infile:
             init_app(sys.argv[1])
-    except BrokenPipeError:
+    except (BrokenPipeError, KeyboardInterrupt):
         pass
