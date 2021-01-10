@@ -59,8 +59,9 @@ class PythonInterop extends EventEmitter {
                         (await promisify(execFile)(cmd, ['-c', 'import sys;print(sys.version_info.major)'])).stdout.trim(),
                         10,
                       ) >= 3;
-                  } catch {
-                    // ignore error
+                  } catch (er) {
+                    // throw all errors that isn't a "not found"
+                    if (er.code !== 'ENOENT') throw er;
                   }
                 return {ret, path: cmd};
               })(),
