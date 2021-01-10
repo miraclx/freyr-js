@@ -44,6 +44,7 @@ class PythonInterop extends EventEmitter {
 
   constructor() {
     super();
+    // TODO: synchronously do this
     // find the first command whose python version is v3
     Promise.all(
       ['python', 'python3']
