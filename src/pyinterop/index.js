@@ -1,8 +1,9 @@
 const {join} = require('path');
-const {spawn} = require('child_process');
+const {promisify} = require('util');
 const {Transform} = require('stream');
 const {randomBytes} = require('crypto');
 const {EventEmitter} = require('events');
+const {spawn, execFile} = require('child_process');
 
 function getUniqOn(size, map, handler, uniq) {
   while (!uniq || map.has(uniq)) uniq = randomBytes(size).toString('hex');
@@ -43,18 +44,51 @@ class PythonInterop extends EventEmitter {
 
   constructor() {
     super();
-    ([this.#core.streams.in, this.#core.streams.out] = [
-      ...(this.#core.proc = spawn('python', [join(__dirname, 'main.py'), this.#core.exitSecret], {
-        stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
-      })
-        .on('spawn', () => ((this.#hasLaunched = true), this.emit('ready')))
-        .on('exit', () => this.emit('exit'))).stdio,
-    ].slice(3, 5))
-      .map((pipe, index) =>
-        pipe.on('error', err => this.emit('error', ((err[PythonInterop.#interopErrorSymbol] = index ? 'send' : 'recv'), err))),
-      )[0]
-      .pipe(JSONParser(this.#core.bufferStack))
-      .on('data', this.#dataHandler.bind(this));
+    // find the first command whose python version is v3
+    Promise.all(
+      ['python', 'python3']
+        .reduce(
+          (stack, cmd, prev) => {
+            return stack.concat([
+              (prev = stack.pop()),
+              (async (ret = false) => {
+                if (!(await prev).ret)
+                  try {
+                    ret =
+                      parseInt(
+                        (await promisify(execFile)(cmd, ['-c', 'import sys;print(sys.version_info.major)'])).stdout.trim(),
+                        10,
+                      ) >= 3;
+                  } catch {
+                    // ignore error
+                  }
+                return {ret, path: cmd};
+              })(),
+            ]);
+          },
+          [{}],
+        )
+        .slice(1),
+    ).then((cmds, cmd) => {
+      if (!(cmd = cmds.find(({ret}) => ret))) {
+        const er = 'Failed to find a supported version of python, please make sure python version 3 is in your path';
+        this.emit('error', new Error(er));
+      } else
+        ([this.#core.streams.in, this.#core.streams.out] = [
+          ...(this.#core.proc = spawn(cmd.path, [join(__dirname, 'main.py'), this.#core.exitSecret], {
+            stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
+          })
+            .on('spawn', () => ((this.#hasLaunched = true), this.emit('ready')))
+            .on('exit', () => this.emit('exit'))).stdio,
+        ].slice(3, 5))
+          .map((pipe, index) =>
+            pipe.on('error', err =>
+              this.emit('error', ((err[PythonInterop.#interopErrorSymbol] = index ? 'send' : 'recv'), err)),
+            ),
+          )[0]
+          .pipe(JSONParser(this.#core.bufferStack))
+          .on('data', this.#dataHandler.bind(this));
+    });
   }
 
   #dataHandler = function dataHandler(data) {
