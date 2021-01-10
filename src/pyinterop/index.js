@@ -148,7 +148,7 @@ class PythonInterop extends EventEmitter {
     this.emit('closeRequested');
   };
 
-  #stillRunning = () => this.#core.proc.exitCode === null;
+  #stillRunning = () => !this.#hasLaunched || this.#core.proc.exitCode === null;
 
   #canClose = () => !this.#closeRequested && this.#stillRunning();
 
