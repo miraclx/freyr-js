@@ -44,7 +44,9 @@ class PythonInterop extends EventEmitter {
     ([this.#core.streams.in, this.#core.streams.out] = [
       ...(this.#core.proc = spawn('python', [join(__dirname, 'main.py'), this.#core.exitSecret], {
         stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
-      }).on('exit', () => this.emit('exit'))).stdio,
+      })
+        .on('spawn', () => this.emit('ready'))
+        .on('exit', () => this.emit('exit'))).stdio,
     ].slice(3, 5))
       .map((pipe, index) =>
         pipe.on('error', err => this.emit('error', ((err[PythonInterop.#interopErrorSymbol] = index ? 'send' : 'recv'), err))),
