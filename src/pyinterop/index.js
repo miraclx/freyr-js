@@ -39,13 +39,15 @@ class PythonInterop extends EventEmitter {
     streams: {in: null, out: null},
   };
 
+  #hasLaunched = false;
+
   constructor() {
     super();
     ([this.#core.streams.in, this.#core.streams.out] = [
       ...(this.#core.proc = spawn('python', [join(__dirname, 'main.py'), this.#core.exitSecret], {
         stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
       })
-        .on('spawn', () => this.emit('ready'))
+        .on('spawn', () => ((this.#hasLaunched = true), this.emit('ready')))
         .on('exit', () => this.emit('exit'))).stdio,
     ].slice(3, 5))
       .map((pipe, index) =>
@@ -82,7 +84,13 @@ class PythonInterop extends EventEmitter {
       ),
       payload: {path, data},
     };
-    this.#core.streams.out.write(`${JSON.stringify(data)}\n`);
+    this.#write(data);
+  };
+
+  #write = data => {
+    this.#hasLaunched
+      ? this.#core.streams.out.write(`${JSON.stringify(data)}\n`)
+      : this.on('ready', this.#write.bind(this, data));
   };
 
   exec(path, ...args) {
@@ -101,7 +109,8 @@ class PythonInterop extends EventEmitter {
   }
 
   #close = () => {
-    this.#closeRequested = this.#core.streams.out.write(`{"C4NCL0S3":"${this.#core.exitSecret}"}\n`);
+    this.#closeRequested = true;
+    this.#write({C4NCL0S3: this.#core.exitSecret});
     this.emit('closeRequested');
   };
 
