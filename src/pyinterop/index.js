@@ -63,7 +63,7 @@ class PythonInterop extends EventEmitter {
       // eslint-disable-next-line consistent-return
       .then(cmds => {
         const best = cmds
-          .filter(res => !!res && res.ver >= [3, 8, 0])
+          .filter(res => !!res && res.ver >= [3, 8, 0]) // at least python version 3.8.0
           .sort(({ver: a}, {ver: b}) => (a > b ? -1 : 0))
           .shift();
         if (!best) {
