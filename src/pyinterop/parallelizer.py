@@ -125,8 +125,9 @@ class Parallelizer(EventEmitter):
         self.emit("cancel")
 
     def raiseExc(self, n, exc):
-        if not (tid := getattr(self.__threads[n]["thread"], '_ident', None) or next(iter(
-                ([None] + [id for id, obj in threading._active.items() if obj is self.__threads[n]["thread"]]).pop, None), None)):
+        tid = getattr(self.__threads[n]["thread"], '_ident', None) or next(iter(
+            ([None] + [id for id, obj in threading._active.items() if obj is self.__threads[n]["thread"]]).pop, None), None)
+        if not tid:
             raise AssertionError("could not determine thread id")
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             ctypes.c_long(tid), ctypes.py_object(exc))
