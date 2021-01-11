@@ -37,8 +37,9 @@ handlers = {
 
 for py in (f[:-3] for f in os.listdir(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "handlers")) if f.endswith('.py')):
-    if (cls := getattr(importlib.import_module(
-            '.'.join(['handlers', py])), '__INTEROP_EXPORT__', None)):
+    cls = getattr(importlib.import_module(
+        '.'.join(['handlers', py])), '__INTEROP_EXPORT__', None)
+    if cls:
         handlers[py] = cls()
 
 
