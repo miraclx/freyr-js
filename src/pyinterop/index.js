@@ -44,40 +44,34 @@ class PythonInterop extends EventEmitter {
 
   constructor() {
     super();
-    // TODO: synchronously do this
-    // find the first command whose python version is v3
-    Promise.all(
-      ['python', 'python3']
-        .reduce(
-          (stack, cmd, prev) => {
-            return stack.concat([
-              (prev = stack.pop()),
-              (async (ret = false) => {
-                if (!(await prev).ret)
-                  try {
-                    ret =
-                      parseInt(
-                        (await promisify(execFile)(cmd, ['-c', 'import sys;print(sys.version_info.major)'])).stdout.trim(),
-                        10,
-                      ) >= 3;
-                  } catch (er) {
-                    // throw all errors that isn't a "not found"
-                    if (er.code !== 'ENOENT') throw er;
-                  }
-                return {ret, path: cmd};
-              })(),
-            ]);
-          },
-          [{}],
-        )
-        .slice(1),
-    ).then((cmds, cmd) => {
-      if (!(cmd = cmds.find(({ret}) => ret))) {
-        const er = 'Failed to find a supported version of python, please make sure python version 3 is in your path';
-        this.emit('error', new Error(er));
-      } else
+    // find the first command whose python version is at least v3.8
+    const pythonVersions = ['python', 'python3', 'python3.8', 'python3.9']
+      .reduce((stack, cmd, prev) => {
+        return stack.concat([
+          (prev = stack.pop()),
+          Promise.resolve(prev)
+            .catch(() => {}) // silence previous run errors, but wait for completion
+            .then(() =>
+              promisify(execFile)(cmd, ['-c', 'import sys;print(list(sys.version_info)[:3])'])
+                .then(({stdout}) => ({cmd, ver: JSON.parse(stdout)}))
+                .catch(err => (err.code === 'ENOENT' ? null : Promise.reject(err))),
+            ),
+        ]);
+      }, [])
+      .slice(1); // prune the first undefined item
+    Promise.all(pythonVersions)
+      // eslint-disable-next-line consistent-return
+      .then(cmds => {
+        const best = cmds
+          .filter(res => !!res && res.ver >= [3, 8, 0])
+          .sort(({ver: a}, {ver: b}) => (a > b ? -1 : 0))
+          .shift();
+        if (!best)
+          return Promise.reject(
+            new Error('Failed to find a supported version of python, please make sure python version 3 is in your path'),
+          );
         ([this.#core.streams.in, this.#core.streams.out] = [
-          ...(this.#core.proc = spawn(cmd.path, [join(__dirname, 'main.py'), this.#core.exitSecret], {
+          ...(this.#core.proc = spawn(best.cmd, [join(__dirname, 'main.py'), this.#core.exitSecret], {
             stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
           })
             .on('spawn', () => ((this.#hasLaunched = true), this.emit('ready')))
@@ -90,7 +84,8 @@ class PythonInterop extends EventEmitter {
           )[0]
           .pipe(JSONParser(this.#core.bufferStack))
           .on('data', this.#dataHandler.bind(this));
-    });
+      })
+      .catch(err => this.emit('error', err));
   }
 
   #dataHandler = function dataHandler(data) {
