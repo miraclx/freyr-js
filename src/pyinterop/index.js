@@ -66,10 +66,10 @@ class PythonInterop extends EventEmitter {
           .filter(res => !!res && res.ver >= [3, 8, 0])
           .sort(({ver: a}, {ver: b}) => (a > b ? -1 : 0))
           .shift();
-        if (!best)
-          return Promise.reject(
-            new Error('Failed to find a supported version of python, please make sure python version 3 is in your path'),
-          );
+        if (!best) {
+          const er = 'No compatible python interpreter found, please make sure python>=v3.8 is installed and in your path';
+          return Promise.reject(new Error(er));
+        }
         ([this.#core.streams.in, this.#core.streams.out] = [
           ...(this.#core.proc = spawn(best.cmd, [join(__dirname, 'main.py'), this.#core.exitSecret], {
             stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
