@@ -43,10 +43,16 @@ class PythonInterop extends EventEmitter {
 
   #hasLaunched = false;
 
-  constructor() {
+  constructor(version) {
+    if (
+      version !== undefined &&
+      !(Array.isArray(version) && version.every(value => typeof value === 'number') && version >= [3, 0, 0])
+    )
+      throw new Error(`Invalid version specification. Expected an array of numbers with at least v3.0.0`);
+    version = version || [3, 0, 0]; // default to at least python version 3.0.0
     super();
-    // find the first command whose python version is at least v3.8
-    const pythonVersions = ['python', 'python3', 'python3.8', 'python3.9']
+    // find the first command whose python version is at least v3
+    const pythonVersions = ['python', 'python3', 'python3.6', 'python3.7', 'python3.8', 'python3.9']
       .reduce((stack, cmd, prev) => {
         return stack.concat([
           (prev = stack.pop()),
@@ -64,11 +70,13 @@ class PythonInterop extends EventEmitter {
       // eslint-disable-next-line consistent-return
       .then(cmds => {
         const best = cmds
-          .filter(res => !!res && res.ver >= [3, 8, 0]) // at least python version 3.8.0
+          .filter(res => !!res && res.ver >= version)
           .sort(({ver: a}, {ver: b}) => (a > b ? -1 : 0))
           .shift();
         if (!best) {
-          const er = 'No compatible python interpreter found, please make sure python>=v3.8 is installed and in your path';
+          const er = `No compatible python interpreter found, please make sure python>=v${version.join(
+            '.',
+          )} is installed and in your path`;
           return Promise.reject(new Error(er));
         }
         this.emit('interpreter', (this.#core.interpreter = {...best}));
