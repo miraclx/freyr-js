@@ -163,6 +163,7 @@ async function main() {
 
   await deferrable(async defer => {
     const core = new PythonInterop();
+    core.on('interpreter', ({cmd, ver}) => console.log(`Python Interpreter cmd: [${cmd}], version: ${ver.join('.')}`));
 
     const closeCore = defer(() => core.close());
 
