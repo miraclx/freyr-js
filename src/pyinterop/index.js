@@ -26,6 +26,12 @@ function JSONParser(stack) {
   });
 }
 
+function gtEq(a, b) {
+  const maxLen = Math.max(a.length, b.length);
+  [a, b].map(arr => arr.push(...Array(maxLen - arr.length).fill(0)));
+  return a.map((v, i) => [v || 0, b[i] || 0]).every(([l, r]) => l >= r);
+}
+
 class PythonInterop extends EventEmitter {
   static #interopErrorSymbol = Symbol('PyInterop Named Pipe');
 
@@ -46,7 +52,7 @@ class PythonInterop extends EventEmitter {
   constructor(version) {
     if (
       version !== undefined &&
-      !(Array.isArray(version) && version.every(value => typeof value === 'number') && version >= [3, 0, 0])
+      !(Array.isArray(version) && version.every(value => typeof value === 'number') && gtEq(version, [3, 0, 0]))
     )
       throw new Error(`Invalid version specification. Expected an array of numbers with at least v3.0.0`);
     version = version || [3, 0, 0]; // default to at least python version 3.0.0
@@ -70,7 +76,7 @@ class PythonInterop extends EventEmitter {
       // eslint-disable-next-line consistent-return
       .then(cmds => {
         const best = cmds
-          .filter(res => !!res && res.ver >= version)
+          .filter(res => !!res && gtEq(res.ver, version))
           .sort(({ver: a}, {ver: b}) => (a > b ? -1 : 0))
           .shift();
         if (!best) {
