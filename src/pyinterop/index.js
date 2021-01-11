@@ -38,6 +38,7 @@ class PythonInterop extends EventEmitter {
     exitSecret: randomBytes(10).toString('hex'),
     bufferStack: {},
     streams: {in: null, out: null},
+    interpreter: null,
   };
 
   #hasLaunched = false;
@@ -70,7 +71,7 @@ class PythonInterop extends EventEmitter {
           const er = 'No compatible python interpreter found, please make sure python>=v3.8 is installed and in your path';
           return Promise.reject(new Error(er));
         }
-        this.emit('interpreter', {...best});
+        this.emit('interpreter', (this.#core.interpreter = {...best}));
         ([this.#core.streams.in, this.#core.streams.out] = [
           ...(this.#core.proc = spawn(best.cmd, [join(__dirname, 'main.py'), this.#core.exitSecret], {
             stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
@@ -87,6 +88,24 @@ class PythonInterop extends EventEmitter {
           .on('data', this.#dataHandler.bind(this));
       })
       .catch(err => this.emit('error', err));
+  }
+
+  #awaitInterpreter = () => {
+    const handlers = [];
+    const clean = () => handlers.forEach(([event, handler]) => this.removeListener(event, handler));
+    const reg = (event, fn) => {
+      const handler = (...args) => (clean(), fn(...args));
+      handlers.push([event, handler]);
+      this.once(event, handler);
+    };
+    return new Promise((res, rej) => {
+      reg('interpreter', res);
+      reg('error', rej);
+    });
+  };
+
+  async getInterpreter() {
+    return {...(this.#core.interpreter || (await this.#awaitInterpreter()))};
   }
 
   #dataHandler = function dataHandler(data) {
@@ -163,7 +182,9 @@ async function main() {
 
   await deferrable(async defer => {
     const core = new PythonInterop();
-    core.on('interpreter', ({cmd, ver}) => console.log(`Python Interpreter cmd: [${cmd}], version: ${ver.join('.')}`));
+
+    const {cmd, ver} = await core.getInterpreter();
+    console.log(`Python Interpreter cmd: [${cmd}], version: ${ver.join('.')}`);
 
     const closeCore = defer(() => core.close());
 
