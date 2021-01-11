@@ -70,6 +70,7 @@ class PythonInterop extends EventEmitter {
           const er = 'No compatible python interpreter found, please make sure python>=v3.8 is installed and in your path';
           return Promise.reject(new Error(er));
         }
+        this.emit('interpreter', {...best});
         ([this.#core.streams.in, this.#core.streams.out] = [
           ...(this.#core.proc = spawn(best.cmd, [join(__dirname, 'main.py'), this.#core.exitSecret], {
             stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
