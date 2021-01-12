@@ -12,7 +12,7 @@ class Dispatcher {
   };
 
   static get = (obj, root, ...initArgs) => {
-    let init = obj.#dispatch(root, '_interop_init', ...initArgs).catch(() => {});
+    const init = obj.#dispatch(root, '_interop_init', ...initArgs).catch(() => {});
     return (...args) => init.then(() => obj.#dispatch(root, ...args));
   };
 }
