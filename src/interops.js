@@ -12,6 +12,9 @@ class Dispatcher {
   };
 
   static get = (obj, root, initArgs = [], options = {}) => {
+    if (typeof initArgs == 'object' && !Array.isArray(initArgs)) [initArgs, options] = [Array.isArray(options) ? options : [], initArgs];
+    options ||= {};
+    console.log(obj, root, initArgs, options);
     const init = obj
       .#dispatch(root, '_interop_init', ...initArgs)
       // throw errorCode 2 only if we must be initialized
