@@ -226,6 +226,7 @@ async function main() {
     console.log((await core.exec('utils:current_thread')).name);
     console.log((await core.exec('utils:current_thread')).name);
 
+    await core.exec('youtube:_interop_init', {quiet: true});
     console.log(await core.exec('youtube:lookup', 'cuxNuMDet0M'));
 
     console.log(await core.exec('ytmusic:search', 'Billie Eilish Therefore I Am'));

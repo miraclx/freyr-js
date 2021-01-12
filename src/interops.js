@@ -11,11 +11,14 @@ class Dispatcher {
     return core.exec(`${root}:${method}`, ...args.slice(0, -count || Infinity));
   };
 
-  static get = (obj, root) => (...args) => obj.#dispatch(root, ...args);
+  static get = (obj, root, ...initArgs) => {
+    let init = obj.#dispatch(root, '_interop_init', ...initArgs).catch(() => {});
+    return (...args) => init.then(() => obj.#dispatch(root, ...args));
+  };
 }
 
 class YouTube extends Dispatcher {
-  #dispatcher = Dispatcher.get(this, 'youtube');
+  #dispatcher = Dispatcher.get(this, 'youtube', {quiet: true});
 
   lookup(id) {
     return this.#dispatcher('lookup', id);

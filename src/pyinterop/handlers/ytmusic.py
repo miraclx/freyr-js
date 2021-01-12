@@ -1,9 +1,14 @@
 class YouTubeMusic:
+    __interop_args = ()
+
     def _getCore(self):
         if not hasattr(self, '__core'):
             from ytmusicapi import YTMusic
-            self.__core = YTMusic()
+            self.__core = YTMusic(*self.__interop_args)
         return self.__core
+
+    def _interop_init(self, *args):
+        self.__interop_args = args
 
     def search(self, query, *args):
         return self._getCore().search(query, *args)
