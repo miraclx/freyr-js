@@ -57,6 +57,10 @@ class PythonInterop extends EventEmitter {
       throw new Error(`Invalid version specification. Expected an array of numbers with at least v3.0.0`);
     version = version || [3, 0, 0]; // default to at least python version 3.0.0
     super();
+    this.#init(version);
+  }
+
+  #init = version => {
     // find the first command whose python version is at least v3
     const pythonVersions = ['python', 'python3', 'python3.6', 'python3.7', 'python3.8', 'python3.9']
       .reduce((stack, cmd, prev) => {
@@ -102,7 +106,7 @@ class PythonInterop extends EventEmitter {
           .on('data', this.#dataHandler.bind(this));
       })
       .catch(err => this.emit('error', err));
-  }
+  };
 
   #awaitInterpreter = () => {
     const handlers = [];
