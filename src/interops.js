@@ -12,7 +12,8 @@ class Dispatcher {
   };
 
   static get = (obj, root, initArgs = [], options = {}) => {
-    if (typeof initArgs == 'object' && !Array.isArray(initArgs)) [initArgs, options] = [Array.isArray(options) ? options : [], initArgs];
+    if (typeof initArgs === 'object' && !Array.isArray(initArgs))
+      [initArgs, options] = [Array.isArray(options) ? options : [], initArgs];
     options ||= {};
     console.log(obj, root, initArgs, options);
     const init = obj
@@ -32,7 +33,7 @@ class YouTube extends Dispatcher {
 }
 
 class YouTubeMusic extends Dispatcher {
-  #dispatcher = Dispatcher.get(this, 'ytmusic', [], {mustInit: false});
+  #dispatcher = Dispatcher.get(this, 'ytmusic', {mustInit: false});
 
   search(query, filter, limit, ignoreSpelling) {
     return this.#dispatcher('search', query, filter, limit, ignoreSpelling);
