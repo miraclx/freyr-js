@@ -133,6 +133,7 @@ class PythonInterop extends EventEmitter {
               err.stack,
               ...['----- Python Traceback -----', ...error.traceback.split('\n')].map(line => `    ${line}`),
             ].join('\n');
+            if (error.code) err.errorCode = error.code;
             return err;
           })(data.error),
       JSON.parse(payload),
