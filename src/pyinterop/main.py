@@ -87,19 +87,23 @@ if __name__ == "__main__":
     def tasker(data):
         inputPayload = data["payload"]
         response = {"qID": data["qID"]}
+        err_code = None
         try:
             [root, method] = inputPayload["path"].split(':')
             if root not in handlers:
+                err_code = 1
                 raise KeyError(
                     f"Invalid root endpoint [{root}]")
 
             try:
                 pointer = getattr(handlers[root], method)
             except AttributeError:
+                err_code = 2
                 raise AttributeError(
                     f"Root object [{root}] has no attribute [{method}]")
 
             if not callable(pointer):
+                err_code = 3
                 raise ValueError(
                     f"Root object attribute [{inputPayload['path']}] is not callable")
 
@@ -107,7 +111,7 @@ if __name__ == "__main__":
         except:
             exc = sys.exc_info()
             response["error"] = {"type": exc[0].__name__, "message": str(
-                exc[1]), "traceback": traceback.format_exc()}
+                exc[1]), "traceback": traceback.format_exc(), "code": err_code}
         finally:
             sender.send(response)
 
