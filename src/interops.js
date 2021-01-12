@@ -11,14 +11,17 @@ class Dispatcher {
     return core.exec(`${root}:${method}`, ...args.slice(0, -count || Infinity));
   };
 
-  static get = (obj, root, ...initArgs) => {
-    const init = obj.#dispatch(root, '_interop_init', ...initArgs).catch(() => {});
+  static get = (obj, root, initArgs = [], options = {}) => {
+    const init = obj
+      .#dispatch(root, '_interop_init', ...initArgs)
+      // throw errorCode 2 only if we must be initialized
+      .catch(err => (!options.mustInit && err.errorCode === 2) || Promise.reject(err));
     return (...args) => init.then(() => obj.#dispatch(root, ...args));
   };
 }
 
 class YouTube extends Dispatcher {
-  #dispatcher = Dispatcher.get(this, 'youtube', {quiet: true});
+  #dispatcher = Dispatcher.get(this, 'youtube', [{quiet: true}], {mustInit: false});
 
   lookup(id) {
     return this.#dispatcher('lookup', id);
@@ -26,7 +29,7 @@ class YouTube extends Dispatcher {
 }
 
 class YouTubeMusic extends Dispatcher {
-  #dispatcher = Dispatcher.get(this, 'ytmusic');
+  #dispatcher = Dispatcher.get(this, 'ytmusic', [], {mustInit: false});
 
   search(query, filter, limit, ignoreSpelling) {
     return this.#dispatcher('search', query, filter, limit, ignoreSpelling);
