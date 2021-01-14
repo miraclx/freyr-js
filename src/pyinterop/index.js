@@ -95,7 +95,7 @@ class PythonInterop extends EventEmitter {
             stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
           })
             .on('spawn', () => ((this.#hasLaunched = true), this.emit('ready')))
-            .on('exit', () => this.emit('exit'))).stdio,
+            .on('exit', () => (this.#core.proc.ref(), this.emit('exit')))).stdio,
         ].slice(3, 5))
           .map((pipe, index) =>
             pipe.on('error', err =>
@@ -178,18 +178,23 @@ class PythonInterop extends EventEmitter {
     return this.#closeRequested;
   }
 
-  #close = () => {
+  #close = (cb, wait, timeout) => {
     this.#closeRequested = true;
+    const timer = setTimeout(() => this.#core.proc.unref(), timeout || 0);
+    if (wait) this.on('exit', () => (cb(), clearTimeout(timer)));
     this.#write({C4NCL0S3: this.#core.exitSecret});
     this.emit('closeRequested');
+    if (!wait) cb();
   };
 
   #stillRunning = () => !this.#hasLaunched || this.#core.proc.exitCode === null;
 
   #canClose = () => !this.#closeRequested && this.#stillRunning();
 
-  close() {
-    return new Promise(res => (this.#canClose() ? this.on('exit', res).#close() : res()));
+  stillRunning = this.#stillRunning;
+
+  close({timeout = 0, wait = false} = {}) {
+    return new Promise(res => (this.#canClose() ? this.#close(res, wait, timeout) : res()));
   }
 }
 
