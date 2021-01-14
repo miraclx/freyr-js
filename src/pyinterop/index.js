@@ -193,7 +193,7 @@ class PythonInterop extends EventEmitter {
 
   stillRunning = this.#stillRunning;
 
-  close({timeout = 0, wait = false} = {}) {
+  close({timeout = 5000, wait = true} = {}) {
     return new Promise(res => (this.#canClose() ? this.#close(res, wait, timeout) : res()));
   }
 }
