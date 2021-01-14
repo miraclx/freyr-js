@@ -191,7 +191,10 @@ class PythonInterop extends EventEmitter {
   #close = (cb, wait, timeout, detachIPC) => {
     this.#closeRequested = true;
     const timer = setTimeout(() => this.#core.proc.unref(), timeout || 0);
-    if (wait) this.on('exit', () => (cb(), clearTimeout(timer)));
+    this.on('exit', () => {
+      clearTimeout(timer);
+      if (wait) cb();
+    });
     this.#sendPrivilegedMessage({close: true, detachIPC});
     this.emit('closeRequested');
     if (!wait) cb();
