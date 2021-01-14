@@ -41,7 +41,7 @@ class PythonInterop extends EventEmitter {
 
   #core = {
     record: new Map(),
-    exitSecret: randomBytes(10).toString('hex'),
+    privKey: randomBytes(10).toString('hex'),
     bufferStack: {},
     streams: {in: null, out: null},
     interpreter: null,
@@ -91,7 +91,7 @@ class PythonInterop extends EventEmitter {
         }
         this.emit('interpreter', (this.#core.interpreter = {...best}));
         ([this.#core.streams.in, this.#core.streams.out] = [
-          ...(this.#core.proc = spawn(best.cmd, [join(__dirname, 'main.py'), this.#core.exitSecret], {
+          ...(this.#core.proc = spawn(best.cmd, [join(__dirname, 'main.py'), this.#core.privKey], {
             stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe'],
           })
             .on('spawn', () => ((this.#hasLaunched = true), this.emit('ready')))
@@ -178,11 +178,21 @@ class PythonInterop extends EventEmitter {
     return this.#closeRequested;
   }
 
+  #sendPrivilegedMessage = options => {
+    options ||= {};
+    const cmdMap = {close: 'C4NCL0S3'};
+    this.#write({
+      [this.#core.privKey]: Object.entries(options)
+        .filter(([, val]) => !!val)
+        .map(([cmd]) => cmdMap[cmd]),
+    });
+  };
+
   #close = (cb, wait, timeout) => {
     this.#closeRequested = true;
     const timer = setTimeout(() => this.#core.proc.unref(), timeout || 0);
     if (wait) this.on('exit', () => (cb(), clearTimeout(timer)));
-    this.#write({C4NCL0S3: this.#core.exitSecret});
+    this.#sendPrivilegedMessage({close: true});
     this.emit('closeRequested');
     if (!wait) cb();
   };

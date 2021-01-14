@@ -123,11 +123,13 @@ if __name__ == "__main__":
     try:
         with os.fdopen(3, 'w') as outfile, os.fdopen(4) as infile:
             try:
-                exit_secret = sys.argv[1]
+                priv_key = sys.argv[1]
                 while True:
                     data = json.loads(infile.readline())
-                    if data.get("C4NCL0S3") == exit_secret:
-                        break
+                    cmd_args = data.get(priv_key, None)
+                    if cmd_args and type(cmd_args) == list:
+                        if "C4NCL0S3" in cmd_args:
+                            break
                     tasker.send(data)
             except KeyboardInterrupt:
                 tasker._jobs.raiseExcAll(KeyboardInterrupt)
