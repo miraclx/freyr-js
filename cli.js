@@ -38,6 +38,7 @@ const StackLogger = require('./src/stack_logger');
 const packageJson = require('./package.json');
 const streamUtils = require('./src/stream_utils');
 const parseSearchFilter = require('./src/filter_parser');
+const {closeConnection} = require('./src/interops');
 
 function parseMeta(params) {
   return Object.entries(params || {})
@@ -1330,6 +1331,7 @@ async function init(queries, options) {
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===========================');
   }
+  await closeConnection();
 }
 
 const program = commander
