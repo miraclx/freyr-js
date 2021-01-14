@@ -179,10 +179,9 @@ class PythonInterop extends EventEmitter {
   }
 
   #sendPrivilegedMessage = options => {
-    options ||= {};
     const cmdMap = {close: 'C4NCL0S3', detachIPC: 'CL0S3IPC'};
     this.#write({
-      [this.#core.privKey]: Object.entries(options)
+      [this.#core.privKey]: Object.entries(options || {})
         .filter(([, val]) => !!val)
         .map(([cmd]) => cmdMap[cmd]),
     });
