@@ -128,6 +128,9 @@ if __name__ == "__main__":
                     data = json.loads(infile.readline())
                     cmd_args = data.get(priv_key, None)
                     if cmd_args and type(cmd_args) == list:
+                        if "CL0S3IPC" in cmd_args:
+                            infile.close()
+                            outfile.close()
                         if "C4NCL0S3" in cmd_args:
                             break
                     tasker.send(data)

@@ -180,7 +180,7 @@ class PythonInterop extends EventEmitter {
 
   #sendPrivilegedMessage = options => {
     options ||= {};
-    const cmdMap = {close: 'C4NCL0S3'};
+    const cmdMap = {close: 'C4NCL0S3', detachIPC: 'CL0S3IPC'};
     this.#write({
       [this.#core.privKey]: Object.entries(options)
         .filter(([, val]) => !!val)
@@ -188,11 +188,11 @@ class PythonInterop extends EventEmitter {
     });
   };
 
-  #close = (cb, wait, timeout) => {
+  #close = (cb, wait, timeout, detachIPC) => {
     this.#closeRequested = true;
     const timer = setTimeout(() => this.#core.proc.unref(), timeout || 0);
     if (wait) this.on('exit', () => (cb(), clearTimeout(timer)));
-    this.#sendPrivilegedMessage({close: true});
+    this.#sendPrivilegedMessage({close: true, detachIPC});
     this.emit('closeRequested');
     if (!wait) cb();
   };
@@ -203,8 +203,8 @@ class PythonInterop extends EventEmitter {
 
   stillRunning = this.#stillRunning;
 
-  close({timeout = 5000, wait = true} = {}) {
-    return new Promise(res => (this.#canClose() ? this.#close(res, wait, timeout) : res()));
+  close({timeout = 5000, wait = true, detachIPC = false} = {}) {
+    return new Promise(res => (this.#canClose() ? this.#close(res, wait, timeout, detachIPC) : res()));
   }
 }
 
