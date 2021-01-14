@@ -5,14 +5,14 @@ const got = require('got').default;
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
 const {StripChar} = require('stripchar');
-const youtubedl = require('youtube-dl');
 
 const most = require('../most_polyfill');
 const walk = require('../walkr');
 const symbols = require('../symbols');
 const AsyncQueue = require('../async_queue');
+const {YouTube: YTCore} = require('../interops');
 
-const _ytdlGet = util.promisify(youtubedl.getInfo);
+const ytCore = new YTCore();
 
 function YouTubeSearchError(message, statusCode, status, body) {
   this.name = 'YouTubeSearchError';
@@ -40,11 +40,6 @@ YouTubeSearchError.prototype = Error.prototype;
  *   }[]
  * )} YouTubeSearchResult
  */
-
-function genAsyncGetFeedsFn(url) {
-  const loadFeeds = async () => _ytdlGet(url, ['--socket-timeout=20', '--no-cache-dir']);
-  return loadFeeds;
-}
 
 class YouTubeMusic {
   static [symbols.meta] = {
@@ -320,7 +315,7 @@ class YouTubeMusic {
             duration: item.duration,
             duration_ms: item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000,
             videoId: item.videoId,
-            getFeeds: genAsyncGetFeedsFn(item.videoId),
+            getFeeds: () => ytCore.lookup(item.videoId),
           };
           final[item.videoId].accuracy = calculateAccuracyFor(final[item.videoId]);
         }
@@ -452,7 +447,7 @@ class YouTube {
               videoId: item.videoId,
               xFilters: source.xFilters,
               accuracy: calculateAccuracyFor(item),
-              getFeeds: genAsyncGetFeedsFn(item.videoId),
+              getFeeds: () => ytCore.lookup(item.videoId),
             };
         });
     });

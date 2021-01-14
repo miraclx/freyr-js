@@ -87,7 +87,6 @@
     "unzipper": "^0.10.11",
     "xbytes": "^1.6.2",
     "xprogress": "^0.17.3",
-    "youtube-dl": "^3.0.2",
     "yt-search": "^2.5.1"
   }
 }
