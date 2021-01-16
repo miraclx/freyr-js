@@ -396,7 +396,7 @@ async function init(queries, options) {
       '-t, --meta-tries',
       'number',
     );
-    options.cover = options.cover && xpath.basename(options.cover);
+    options.cover &&= xpath.basename(options.cover);
     options.chunks = CHECK_FLAG_IS_NUM(options.chunks, '-n, --chunks', 'number');
     options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
