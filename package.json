@@ -83,7 +83,7 @@
     "tough-cookie": "^4.0.0",
     "xbytes": "^1.6.2",
     "xprogress": "^0.17.3",
-    "youtube-dl": "^3.0.2",
+    "youtube-dl": "github:miraclx/node-youtube-dl",
     "yt-search": "^2.5.1"
   },
   "devDependencies": {}
