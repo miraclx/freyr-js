@@ -4,7 +4,9 @@
   "description": "A versatile, service-agnostic music downloader and manager",
   "main": "src/freyr.js",
   "scripts": {
-    "push": "git push github master"
+    "push": "git push github master",
+    "setup": "node src/pyinterop/setup.js",
+    "postinstall": "npm run setup"
   },
   "bin": {
     "freyr": "cli.js"
@@ -53,6 +55,7 @@
   "dependencies": {
     "@yujinakayama/apple-music": "github:yujinakayama/apple-music-node#dependabot/npm_and_yarn/axios-0.21.1",
     "async": "^3.2.0",
+    "axios": "^0.21.1",
     "bluebird": "^3.7.2",
     "commander": "^6.2.1",
     "conf": "^7.1.2",
@@ -81,10 +84,9 @@
     "stripchar": "^1.2.1",
     "tmp": "^0.2.1",
     "tough-cookie": "^4.0.0",
+    "unzipper": "^0.10.11",
     "xbytes": "^1.6.2",
     "xprogress": "^0.17.3",
-    "youtube-dl": "^3.0.2",
     "yt-search": "^2.5.1"
-  },
-  "devDependencies": {}
+  }
 }
