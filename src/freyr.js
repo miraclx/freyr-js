@@ -44,7 +44,7 @@ class FreyrCore {
   }
 
   constructor(ServiceConfig, AuthServer, serverOpts) {
-    ServiceConfig = ServiceConfig || {};
+    ServiceConfig ||= {};
     this.ENGINES = FreyrCore.ENGINES.map(Engine => new Engine(ServiceConfig[Engine[symbols.meta].ID], AuthServer, serverOpts));
   }
 
