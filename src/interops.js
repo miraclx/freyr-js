@@ -2,7 +2,7 @@
 
 const PythonInterop = require('./pyinterop');
 
-const core = new PythonInterop();
+const core = new PythonInterop([3, 2, 0]);
 
 class Dispatcher {
   #dispatch = async (root, method, ...args) => {
