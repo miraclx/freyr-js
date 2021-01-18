@@ -79,8 +79,9 @@ if __name__ == "__main__":
     global infile, outfile, sender, tasker
 
     def sender(response):
-        outfile.write(json.dumps(response, separators=(',', ':')) + "\n")
-        outfile.flush()
+        if not outfile.closed:
+            outfile.write(json.dumps(response, separators=(',', ':')) + "\n")
+            outfile.flush()
 
     sender = TaskExecutor(1, sender)
 
