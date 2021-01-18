@@ -131,6 +131,8 @@ if __name__ == "__main__":
                         if "CL0S3IPC" in cmd_args:
                             infile.close()
                             outfile.close()
+                        if "F0RC3QU1T" in cmd_args:
+                            raise KeyboardInterrupt
                         if "C4NCL0S3" in cmd_args:
                             break
                     tasker.send(data)
