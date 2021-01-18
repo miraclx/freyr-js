@@ -12,10 +12,14 @@
 <div align="center">
 
 # [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/miraclx/freyr-js) ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs) [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs) [![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) ![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic) ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js) [![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)](https://github.com/miraclx/freyr-js/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmiraclx%2Ffreyr-js.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmiraclx%2Ffreyr-js?ref=badge_shield)
 
   <sub>Built with ❤︎ by
   <a href="https://github.com/miraclx">Miraculous Owonubi</a>
 </div>
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmiraclx%2Ffreyr-js.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmiraclx%2Ffreyr-js?ref=badge_large)
 
 ## Demo
 
