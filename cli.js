@@ -20,7 +20,6 @@ const isOnline = require('is-online');
 const prettyMs = require('pretty-ms');
 const commander = require('commander');
 const minimatch = require('minimatch');
-const youtubedl = require('youtube-dl');
 const filenamify = require('filenamify');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
@@ -593,12 +592,6 @@ async function init(queries, options) {
       if (!(await isBinaryFile(options.atomicParsley)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
     } else atomicParsley(true);
-
-    if (options.youtubeDl) {
-      if (!fs.existsSync(options.youtubeDl))
-        throw new Error(`\x1b[31myoutube-dl\x1b[0m: Script not found [${options.youtubeDl}]`);
-      youtubedl.setYtdlBinary(options.youtubeDl);
-    }
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
