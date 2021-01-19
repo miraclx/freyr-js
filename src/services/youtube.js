@@ -279,6 +279,8 @@ class YouTubeMusic {
 
     const results = await this.#search({query: artists.concat(track).join(' ')});
     const strippedTitle = StripChar.RSspecChar(track).toLowerCase();
+    const strippedArtists = artists.map(artist => StripChar.RSspecChar(artist).toLowerCase());
+    const strippedMeta = [strippedTitle, ...strippedArtists].join(' ');
     const validSections = [
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
@@ -288,11 +290,12 @@ class YouTubeMusic {
         item &&
         'title' in item &&
         most(
-          StripChar.RSspecChar(item.title)
-            .replace(/\s{2,}/g, ' ')
-            .toLowerCase()
-            .split(' '),
-          text => strippedTitle.includes(text),
+          [...item.title.split(' '), ...item.artists.map(artist => artist.name)].map(name =>
+            StripChar.RSspecChar(name)
+              .replace(/\s{2,}/g, ' ')
+              .toLowerCase(),
+          ),
+          text => strippedMeta.includes(text),
         ),
     );
     function calculateAccuracyFor(item) {
