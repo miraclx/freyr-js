@@ -1442,7 +1442,6 @@ program
   .option('--no-browser', 'disable auto-launching of user browser')
   .option('--no-net-check', 'disable internet connection check')
   .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
-  .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary')
   .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
@@ -1459,7 +1458,6 @@ program
     console.log('Environment Variables:');
     console.log('  SHOW_DEBUG_STACK             show extended debug information');
     console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
-    console.log('  YOUTUBE_DL_PATH              custom youtube-dl path, alternatively use `--youtube-dl`');
     console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
     console.log('');
     console.log('Info:');
