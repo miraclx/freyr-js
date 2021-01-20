@@ -75,8 +75,8 @@ class TaskExecutor:
         self._jobs.joinAll()
 
 
-if __name__ == "__main__":
-    global infile, outfile, sender, tasker
+def main():
+    infile, outfile = None, None
 
     def sender(response):
         if not outfile.closed:
@@ -147,3 +147,7 @@ if __name__ == "__main__":
                 sender.join()
     except BrokenPipeError:
         pass
+
+
+if __name__ == "__main__":
+    main()
