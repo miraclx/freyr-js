@@ -243,7 +243,7 @@ if __name__ == "__main__":
             thread = threading.current_thread()
             print(" * item %d on %a, init (cancel = %a)" %
                   (item, thread.getName(), doCancel()))
-            doCancel(lambda: event.set())
+            doCancel(event.set)
             event.wait()
             print(" * item %d on %a, done (cancel = %a)" %
                   (item, thread.getName(), doCancel()))
