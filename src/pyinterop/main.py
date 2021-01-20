@@ -128,7 +128,7 @@ def main():
                 while True:
                     data = json.loads(infile.readline())
                     cmd_args = data.get(priv_key, None)
-                    if cmd_args and type(cmd_args) == list:
+                    if cmd_args and isinstance(cmd_args, list):
                         if "CL0S3IPC" in cmd_args:
                             infile.close()
                             outfile.close()
