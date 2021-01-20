@@ -66,7 +66,7 @@ class StackLogger {
    * @param {boolean} [opts.autoTick] Whether or not to auto tick printers.
    */
   constructor(opts) {
-    opts ||= {};
+    opts = opts || {};
     this.#store.isTTY = opts.isTTY || false;
     this.#store.persist = opts.persist || false;
     this.#store.output = opts.output;

@@ -27,9 +27,9 @@ function hookupListeners() {
 }
 
 async function genFile(opts) {
-  opts ||= {};
+  opts = opts || {};
   if (opts.filename) {
-    opts.tmpdir ||= tmpdir();
+    opts.tmpdir = opts.tmpdir || tmpdir();
     if (!(await exists(opts.tmpdir))) throw new Error('tmpdir does not exist');
     const dir = join(opts.tmpdir, opts.dirname || '.');
     await mkdirp(dir);
