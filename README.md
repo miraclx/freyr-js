@@ -1020,8 +1020,8 @@ To facilitate development and experimentation through Docker, Dockerfiles are pr
 
 | Base Image OS | Average Build Network Usage | Average Disk Usage | File |
 | :-----------: | :--------: | :-------: | :---------------------------: |
-| Alpine (musl) | ~ 80 MB    | ~ 210 MB  | [`docker/Dockerfile.alpine`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine)    |
-| Arch Linux    | ~ 200 MB   | ~ 1.04 GB | [`docker/Dockerfile.archlinux`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.archlinux) |
+| Alpine (musl) | ~ 80 MB    | ~ 182 MB  | [`docker/Dockerfile.alpine`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine)    |
+| Arch Linux    | ~ 190 MB   | ~ 1.2 GB | [`docker/Dockerfile.archlinux`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.archlinux) |
 
 ``` bash
 # building with default dockerfile (alpine)
