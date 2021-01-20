@@ -109,7 +109,7 @@ def main():
                     f"Root object attribute [{inputPayload['path']}] is not callable")
 
             response["payload"] = json.dumps(pointer(*inputPayload["data"]))
-        except:
+        except:  # pylint: disable=bare-except
             exc = sys.exc_info()
             response["error"] = {"type": exc[0].__name__, "message": str(
                 exc[1]), "traceback": traceback.format_exc(), "code": err_code}
