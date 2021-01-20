@@ -6,6 +6,7 @@ LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
 
 # Install dependencies, trim unneeded large packages and clean cache
 RUN pacman -Sy --noconfirm \
+  git \
   npm \
   nodejs \
   python \

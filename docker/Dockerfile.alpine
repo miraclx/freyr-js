@@ -8,6 +8,7 @@ LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
 RUN apk add \
   --no-cache \
   -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  git \
   npm \
   nodejs \
   python3 \
