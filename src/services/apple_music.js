@@ -4,7 +4,7 @@ const path = require('path');
 
 const Promise = require('bluebird');
 const NodeCache = require('node-cache');
-const {Client} = require('@yujinakayama/apple-music');
+const {Client} = require('@miraclx/apple-music');
 
 const symbols = require('../symbols');
 
