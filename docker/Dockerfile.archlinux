@@ -17,7 +17,7 @@ RUN pacman -Sy --noconfirm \
   && yes | pacman -Scc \
   && rm -r /var/lib/pacman/* \
   && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+ \
-  && rm /usr/lib/python3.8/config-3.8-x86_64-linux-gnu/libpython3.8.a
+  && rm /usr/lib/python3.9/config-3.9-x86_64-linux-gnu/libpython3.9.a
 
 # Create freyr group. Then add root to freyr group.
 RUN groupadd -g 1000 freyr \
