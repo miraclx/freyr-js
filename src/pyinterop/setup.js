@@ -50,7 +50,7 @@ function dl(fileName, url, indent) {
         data.maxRetries
       }} ${data.lastErr.code ? `[${data.lastErr.code}] ` : ''}(${data.lastErr}), retrying...`;
       if (data.store.has('progressBar')) data.store.get('progressBar').print(msg);
-      else console.log(msg);
+      else console.warn(msg);
     })
     .on('error', err => {
       const msg =
@@ -58,7 +58,7 @@ function dl(fileName, url, indent) {
           ? `${' '.repeat(indent)}\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]`
           : `${err}`;
       if (feed.store.has('progressBar')) feed.store.get('progressBar').print(msg);
-      else console.log(msg);
+      else console.error(msg);
     });
   return feed;
 }
@@ -194,7 +194,7 @@ function main() {
   }
 
   deferrable(defer => init(pkgs, shouldCleanup, defer)).catch(err => {
-    console.log('\x1b[31m[!]\x1b[0m An error occurred\n', err.stack || err);
+    console.error('\x1b[31m[!]\x1b[0m An error occurred\n', err.stack || err);
     process.exit(1);
   });
 }
