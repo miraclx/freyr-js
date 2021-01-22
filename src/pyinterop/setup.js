@@ -51,14 +51,6 @@ function dl(fileName, url, indent) {
       }} ${data.lastErr.code ? `[${data.lastErr.code}] ` : ''}(${data.lastErr}), retrying...`;
       if (data.store.has('progressBar')) data.store.get('progressBar').print(msg);
       else console.warn(msg);
-    })
-    .on('error', err => {
-      const msg =
-        'index' in err
-          ? `${' '.repeat(indent)}\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]`
-          : `${err}`;
-      if (feed.store.has('progressBar')) feed.store.get('progressBar').print(msg);
-      else console.error(msg);
     });
   return feed;
 }
