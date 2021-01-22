@@ -2,6 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
+const {pipeline} = require('stream');
 const {promisify} = require('util');
 
 const xget = require('libxget');
