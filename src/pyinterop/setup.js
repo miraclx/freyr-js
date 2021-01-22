@@ -192,7 +192,9 @@ function main() {
     return;
   }
 
-  deferrable(defer => init(pkgs, shouldCleanup, defer)).catch(err => console.log('\x1b[31m[!]\x1b[0m An error occurred\n', err));
+  deferrable(defer => init(pkgs, shouldCleanup, defer)).catch(err =>
+    console.log('\x1b[31m[!]\x1b[0m An error occurred\n', err.stack || err),
+  );
 }
 
 main();
