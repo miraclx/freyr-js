@@ -294,6 +294,7 @@ class YouTubeMusic {
       item =>
         item &&
         'title' in item &&
+        ['song', 'video'].includes(item.type) &&
         most(
           [...item.title.split(' '), ...item.artists.map(artist => artist.name)].map(name =>
             StripChar.RSspecChar(name)
