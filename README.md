@@ -128,14 +128,6 @@ Android (Termux): `apt install nodejs`
 </details>
 
 <details>
-<summary>youtube-dl @ latest</summary>
-
-* automatically fetched by installing this package
-* optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your `PATH`
-
-</details>
-
-<details>
 <summary>AtomicParsley >= 0.9.6</summary>
 
 <https://github.com/wez/atomicparsley/releases/latest/>
