@@ -104,8 +104,8 @@ async function init(pkgs, shouldCleanup, defer) {
           const indent = 4;
           url = typeof url === 'function' ? await url(indent) : url;
           const rawFile = path.join(TEMPDIR, `raw@${name}`);
-          await promisifyStream(dl(name, url, indent).pipe(fs.createWriteStream(rawFile)), (stream, res, rej) =>
-            stream.on('error', rej).on('finish', res),
+          await promisifyStream(dl(name, url, indent), (stream, res, rej) =>
+            pipeline(stream, fs.createWriteStream(rawFile), err => (err ? rej(err) : res())),
           );
           const moduleStage = path.join(STAGEDIR, module);
           if (await exists(moduleStage))
