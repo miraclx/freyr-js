@@ -45,17 +45,19 @@ function dl(fileName, url, indent) {
     .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.size))
     .on('end', () => feed.store.get('progressBar').end(`:{indent}\x1b[36m[\u2713]\x1b[0m Successfully Downloaded ${fileName}\n`))
     .on('retry', data => {
-      const msg = `:{indent} \x1b[33m(i)\x1b[0m [${data.meta ? 'meta' : data.index}]{${data.retryCount}/${data.maxRetries}} ${
-        data.lastErr.code ? `[${data.lastErr.code}] ` : ''
-      }(${data.lastErr}), retrying...`;
+      const msg = `${' '.repeat(indent)} \x1b[33m(i)\x1b[0m [${data.meta ? 'meta' : data.index}]{${data.retryCount}/${
+        data.maxRetries
+      }} ${data.lastErr.code ? `[${data.lastErr.code}] ` : ''}(${data.lastErr}), retrying...`;
       if (data.store.has('progressBar')) data.store.get('progressBar').print(msg);
-      else console.log(stringd(msg, {indent: ' '.repeat(indent)}));
+      else console.log(msg);
     })
     .on('error', err => {
       const msg =
-        'index' in err ? `:{indent}\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]` : `${err}`;
+        'index' in err
+          ? `${' '.repeat(indent)}\x1b[31m[!]\x1b[0m An error occurred [${err && (err.message || err.stack)}]`
+          : `${err}`;
       if (feed.store.has('progressBar')) feed.store.get('progressBar').print(msg);
-      else console.log(stringd(msg, {indent: ' '.repeat(indent)}));
+      else console.log(msg);
     });
   return feed;
 }
