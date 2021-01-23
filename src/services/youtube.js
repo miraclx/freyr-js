@@ -296,10 +296,9 @@ class YouTubeMusic {
         'title' in item &&
         ['song', 'video'].includes(item.type) &&
         most(
-          [...item.title.split(' '), ...item.artists.map(artist => artist.name)].map(name =>
-            StripChar.RSspecChar(name)
-              .replace(/\s{2,}/g, ' ')
-              .toLowerCase(),
+          [...item.title.split(' '), ...item.artists.map(artist => artist.name)].reduce(
+            (all, text) => ((text = StripChar.RSspecChar(text)) ? all.concat([text.replace(/\s{2,}/g, ' ').toLowerCase()]) : all),
+            [],
           ),
           text => strippedMeta.includes(text),
         ),
