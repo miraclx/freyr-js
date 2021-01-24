@@ -137,7 +137,7 @@ Android (Termux): `apt install nodejs`
 </details>
 
 <details>
-<summary>AtomicParsley >= 0.9.6</summary>
+<summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
 
 <https://github.com/wez/atomicparsley/releases/latest>
 
