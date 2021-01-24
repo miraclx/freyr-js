@@ -115,15 +115,16 @@ Android (Termux): `apt install nodejs`
 <details>
 <summary>ffmpeg >= 0.9</summary>
 
-* Windows + macOS
-  * Download: <https://ffmpeg.zeranoe.com/builds/>
-  * must be defined within your `PATH`
+<https://ffmpeg.org/download.html>
+
+* Windows + macOS:
+  * Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
+  * make sure it's available in your `PATH`
   * otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
-* Linux _(check individual package managers)_
+* Linux: _(check individual package managers)_
   * Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
   * Arch Linux: `sudo pacman -S ffmpeg`
   * Android (Termux): `apt install ffmpeg`
-  * otherwise, compile from source, fetch a pre-built static binary or package at <https://ffmpeg.org/download.html>
 
 </details>
 
