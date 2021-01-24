@@ -105,7 +105,8 @@ POSIX: [nvm](https://github.com/nvm-sh/nvm) recommended.
 
 ``` bash
 # install node with this nvm command
-$ nvm install v12
+# freyr works with a minimum of v12
+$ nvm install --lts
 ```
 
 Android (Termux): `apt install nodejs`
