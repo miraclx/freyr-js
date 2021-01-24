@@ -139,13 +139,18 @@ Android (Termux): `apt install nodejs`
 <details>
 <summary>AtomicParsley >= 0.9.6</summary>
 
-<https://github.com/wez/atomicparsley/releases/latest/>
+<https://github.com/wez/atomicparsley/releases/latest>
 
 * Windows:
-  * Chocolatey: <https://chocolatey.org/packages/atomicparsley>
   * Manually:
-    * Download archive from the repo releases
-    * unzip and place the `AtomicParsley.exe` in your `PATH` or the `bins/windows` folder. Create the folders if unexistent.
+    * Download the [latest](https://github.com/wez/atomicparsley/releases/latest) release
+    * unzip and place the `AtomicParsley.exe` in your `PATH`.
+    * or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
+  * Chocolatey: <https://chocolatey.org/packages/atomicparsley>
+* macOS: _(the brew package isn't recommended)_
+  * Download the [latest](https://github.com/wez/atomicparsley/releases/latest) release
+  * unzip and place the `AtomicParsley` in your `PATH`.
+  * or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
 * POSIX: _(check individual package managers)_
   * Debian: `sudo apt-get install atomicparsley`
   * Arch Linux: `sudo pacman -S atomicparsley`
