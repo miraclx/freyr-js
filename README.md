@@ -85,7 +85,7 @@ As an alternative to setting up freyr and its dependencies on your host system, 
 <details>
 <summary>python >= v3.2</summary>
 
-<https://www.python.org/downloads/>
+Download for your individual platforms here <https://www.python.org/downloads/>
 
 POSIX: _(check individual package managers)_
 
@@ -99,7 +99,7 @@ POSIX: _(check individual package managers)_
 <details>
 <summary>nodejs >= v12.0.0</summary>
 
-<https://nodejs.org/en/download/>
+Download for your individual platforms here <https://nodejs.org/en/download/>
 
 POSIX: [nvm](https://github.com/nvm-sh/nvm) recommended.
 
@@ -114,9 +114,9 @@ Android (Termux): `apt install nodejs`
 </details>
 
 <details>
-<summary>ffmpeg >= 0.9</summary>
+<summary>ffmpeg >= v0.9</summary>
 
-<https://ffmpeg.org/download.html>
+Download for your individual platforms here <https://ffmpeg.org/download.html>
 
 * Windows + macOS:
   * Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
@@ -139,8 +139,6 @@ Android (Termux): `apt install nodejs`
 
 <details>
 <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
-
-<https://github.com/wez/atomicparsley/releases/latest>
 
 * Windows:
   * Manually:
