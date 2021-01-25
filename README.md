@@ -89,8 +89,8 @@ Download for your individual platforms here <https://www.python.org/downloads/>
 
 Linux: _(check individual package managers)_
 
-* *Debian: `sudo apt-get install python3.6`
-* *Arch Linux: `sudo pacman -S python`
+* \* Debian: `sudo apt-get install python3.6`
+* \* Arch Linux: `sudo pacman -S python`
 * Android (Termux): `apt install python`
 * Alpine Linux: `sudo apk add python3`
 * _(`*`: should already be preinstalled)_
