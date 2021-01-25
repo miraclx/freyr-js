@@ -11,7 +11,7 @@
 
 <div align="center">
 
-# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master) ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js) [![](https://tokei.rs/b1/github/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs) [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs) [![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) ![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic) ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js) [![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)](https://github.com/miraclx/freyr-js/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
+# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master) ![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js) [![](https://tokei.rs/b1/github/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds) [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs) [![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) ![NodeJS Version](https://img.shields.io/badge/node-%3e%3D%20v12-green&plastic) ![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js) [![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)](https://github.com/miraclx/freyr-js/issues) ![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)
 
   <sub>Built with ❤︎ by
   <a href="https://github.com/miraclx">Miraculous Owonubi</a>
@@ -36,7 +36,7 @@ yarn global add https://github.com/miraclx/freyr-js.git
 
 ### Docker
 
-We provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs) (automated builds from this repo).
+We provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs/tags) (automated builds from this repo).
 
 Pull the image:
 
@@ -46,8 +46,8 @@ docker pull freyrcli/freyrjs
 
 | Base Image      | Size | Tag |
 | :-------------: | :--: |:-------- |
-| Alpine (musl) * | ![Docker Image Size (:alpine)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker) | `freyrcli/freyrjs:latest` |
-| Arch Linux      | ![Docker Image Size (:archlinux)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/archlinux?color=gray&label=%20&logo=docker) | `freyrcli/freyrjs:archlinux` |
+| Alpine (musl) * | [![Docker Image Size (:alpine)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker)](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest) | `freyrcli/freyrjs:latest` |
+| Arch Linux      | [![Docker Image Size (:archlinux)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/archlinux?color=gray&label=%20&logo=docker)](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=archlinux) | `freyrcli/freyrjs:archlinux` |
 
 *: default
 
