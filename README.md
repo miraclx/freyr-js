@@ -87,7 +87,7 @@ As an alternative to setting up freyr and its dependencies on your host system, 
 
 Download for your individual platforms here <https://www.python.org/downloads/>
 
-POSIX: _(check individual package managers)_
+Linux: _(check individual package managers)_
 
 * *Debian: `sudo apt-get install python3.6`
 * *Arch Linux: `sudo pacman -S python`
@@ -102,7 +102,7 @@ POSIX: _(check individual package managers)_
 
 Download for your individual platforms here <https://nodejs.org/en/download/>
 
-POSIX: [nvm](https://github.com/nvm-sh/nvm) recommended.
+macOS + Linux: [nvm](https://github.com/nvm-sh/nvm) recommended.
 
 ``` bash
 # install node with this nvm command
