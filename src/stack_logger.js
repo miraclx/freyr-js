@@ -15,14 +15,14 @@ function isActivelyWritable(stream) {
   );
 }
 
-function doMagicToGetPersistentStream(store, prop = null, isTTY = false) {
+function getPersistentStream(store, prop = null, isTTY = false) {
   // if persistence is allowed and one active stream exists, return that
   // else, if stored stream is active, return that
   // else, if prop is active, return that
   // else, test stdout and stderr for activity
   // else, create forced tty. Store if persistence is allowed
   const devices = [
-    [store.cache ? doMagicToGetPersistentStream.persist : null, true], // if you want persistence, forward any created device
+    [store.cache ? getPersistentStream.persist : null, true], // if you want persistence, forward any created device
     [store.output, store.isTTY],
     [prop, isTTY],
     [process.stdout, true],
@@ -38,7 +38,7 @@ function doMagicToGetPersistentStream(store, prop = null, isTTY = false) {
     device = new tty.WriteStream(fs.openSync('/dev/tty', 'w'));
     store.output = device;
     store.isTTY = true;
-    if (store.cache) doMagicToGetPersistentStream.persist = device;
+    if (store.cache) getPersistentStream.persist = device;
   }
   return device;
 }
@@ -138,7 +138,7 @@ class StackLogger {
    * @param {boolean} [isTTY] Whether or not fallback stream is expected to be a TTY (default: `false`)
    */
   _write(content, stream, isTTY = false) {
-    const out = doMagicToGetPersistentStream(this.#store, stream, isTTY);
+    const out = getPersistentStream(this.#store, stream, isTTY);
     out.write(content);
   }
 
