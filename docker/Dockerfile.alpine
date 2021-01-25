@@ -7,17 +7,24 @@ LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
 # Install dependencies and clean cache
 RUN apk add \
   --no-cache \
-  -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
   git \
+  libstdc++ \
   npm \
   nodejs \
   python3 \
   ffmpeg \
-  atomicparsley \
   bash \
   which \
   && ln /usr/bin/python3 /usr/bin/python \
   && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+
+
+# bootstrap
+RUN mkdir /bins && \
+  # install atomicparsley
+  wget https://github.com/miraclx/atomicparsley/releases/download/20_test_alpine_release/AtomicParsleyAlpine.zip && \
+  unzip -j AtomicParsleyAlpine.zip AtomicParsley -d /bins
+
+ENV PATH "/bins:$PATH"
 
 # Create freyr group. Then add root to freyr group.
 RUN addgroup -g 1000 freyr \
