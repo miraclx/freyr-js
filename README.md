@@ -92,6 +92,7 @@ POSIX: _(check individual package managers)_
 * *Debian: `sudo apt-get install python3.6`
 * *ArchLinux: `sudo pacman -S python`
 * Android (Termux): `apt install python`
+* Alpine Linux: `sudo apk add python3`
 * _(`*`: should already be preinstalled)_
 
 </details>
@@ -109,7 +110,8 @@ POSIX: [nvm](https://github.com/nvm-sh/nvm) recommended.
 $ nvm install --lts
 ```
 
-Android (Termux): `apt install nodejs`
+* Android (Termux): `apt install nodejs`
+* Alpine Linux: `sudo apk add nodejs`
 
 </details>
 
@@ -126,6 +128,7 @@ Download for your individual platforms here <https://ffmpeg.org/download.html>
   * Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
   * Arch Linux: `sudo pacman -S ffmpeg`
   * Android (Termux): `apt install ffmpeg`
+  * Alpine Linux: `sudo apk add ffmpeg`
 
 </details>
 
