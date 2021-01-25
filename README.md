@@ -140,17 +140,20 @@ Download for your individual platforms here <https://ffmpeg.org/download.html>
 <details>
 <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
 
+First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
+
+Then;
+
 * Windows:
-  * Manually:
-    * Download the [latest](https://github.com/wez/atomicparsley/releases/latest) release
-    * unzip and place the `AtomicParsley.exe` in your `PATH`.
-    * or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
-  * Chocolatey: <https://chocolatey.org/packages/atomicparsley>
+  * unzip and place the `AtomicParsley.exe` in your `PATH`.
+  * or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
 * macOS: _(the brew package isn't recommended)_
-  * Download the [latest](https://github.com/wez/atomicparsley/releases/latest) release
   * unzip and place the `AtomicParsley` in your `PATH`.
   * or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
 * POSIX: _(check individual package managers)_
+  * Manually:
+    * unzip and place the `AtomicParsley` in your `PATH`.
+    * or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
   * Debian: `sudo apt-get install atomicparsley`
   * Arch Linux: `sudo pacman -S atomicparsley`
   * Android (Termux): `apt install atomicparsley`
