@@ -150,35 +150,14 @@ Then;
 * Windows:
   * unzip and place the `AtomicParsley.exe` in your `PATH`.
   * or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
-* macOS: _(the brew package isn't recommended)_
+* Linux + macOS _(the brew package isn't recommended)_:
   * unzip and place the `AtomicParsley` in your `PATH`.
   * or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
-* Linux:
-  * Manually:
-    * unzip and place the `AtomicParsley` in your `PATH`.
-    * or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
-  * Package Managers:
-    * Debian: `sudo apt-get install atomicparsley`
-    * Arch Linux: `sudo pacman -S atomicparsley`
-    * Android (Termux): `apt install atomicparsley`
-    * Build from source:
-
-      ``` bash
-      # download the tarball
-      $ curl https://github.com/wez/atomicparsley/archive/20200701.154658.b0d6223.tar.gz -o atomicparsley-20200701.154658.b0d6223.tar.gz
-
-      # gunzip and untar
-      $ tar -xzvf atomicparsley-20200701.154658.b0d6223.tar.gz
-
-      # build
-      $ cd atomicparsley-20200701.154658.b0d6223
-      $ cmake .
-      $ cmake --build . --config Release
-
-      # To install locally (project only)
-      $ mkdir -p $PROJECT_DIR/bins/posix # ensure directory exists
-      $ cp ./AtomicParsley $PROJECT_DIR/bins/posix
-      ```
+* Alternatively:
+  * Debian: `sudo apt-get install atomicparsley`
+  * Arch Linux: `sudo pacman -S atomicparsley`
+  * Android (Termux): `apt install atomicparsley`
+  * Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
 
 </details>
 
