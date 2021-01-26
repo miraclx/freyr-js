@@ -1019,6 +1019,12 @@ async function init(queries, options) {
       } catch (err) {
         return {code: -1, err};
       }
+      if ((track[symbols.errorStack] || {}).code === 1)
+        return {
+          code: -1,
+          err: new Error("local-typed tracks aren't supported"),
+          meta: {track: {uri: track[symbols.errorStack].uri}},
+        };
       const outFileDir = xpath.join(
         BASE_DIRECTORY,
         ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
@@ -1253,8 +1259,8 @@ async function init(queries, options) {
               ? 'Unknown postprocessing error'
               : 'Unknown track processing error';
           embedLogger.error(
-            `\u2022 [\u2715] ${
-              trackStat.meta ? `${trackStat.meta.trackName} [${trackStat.meta.track.uri}]` : '<unknown track>'
+            `\u2022 [\u2715] ${trackStat.meta && trackStat.meta.trackName ? `${trackStat.meta.trackName}` : '<unknown track>'}${
+              trackStat.meta && trackStat.meta.track.uri ? ` [${trackStat.meta.track.uri}]` : ''
             } (failed:${reason ? ` ${reason}` : ''}${
               trackStat.err ? ` [${trackStat.err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || trackStat.err}]` : ''
             })`,
