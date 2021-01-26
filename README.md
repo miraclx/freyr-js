@@ -143,7 +143,7 @@ Download for your individual platforms here <https://ffmpeg.org/download.html>
 <details>
 <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
 
-First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
+First, download the latest release for your individual platforms here <https://github.com/miraclx/atomicparsley/releases/tag/20_test_alpine_release>
 
 Then;
 
