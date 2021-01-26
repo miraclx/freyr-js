@@ -132,7 +132,7 @@ class Parallelizer(EventEmitter):
             ctypes.c_long(tid), ctypes.py_object(exc))
         if res == 0:
             raise ValueError("invalid thread ID")
-        elif res != 1:
+        if res != 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
             raise SystemError("PyThreadState_SetAsyncExc failed")
 
