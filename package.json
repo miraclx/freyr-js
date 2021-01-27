@@ -64,6 +64,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "got": "^11.8.1",
     "hh-mm-ss": "^1.2.0",
+    "html-entities": "^2.0.6",
     "is-online": "^9.0.0",
     "isbinaryfile": "^4.0.6",
     "libxget": "^0.8.3",
