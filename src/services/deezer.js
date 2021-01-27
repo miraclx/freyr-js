@@ -10,14 +10,13 @@ const AsyncQueue = require('../async_queue');
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
-function WebapiError(message, statusCode, status) {
-  this.name = 'WebapiError';
-  this.message = message || '';
-  if (status) this.status = status;
-  if (statusCode) this.statusCode = statusCode;
+class WebapiError extends Error {
+  constructor(message, statusCode, status) {
+    super(message);
+    if (status) this.status = status;
+    if (statusCode) this.statusCode = statusCode;
+  }
 }
-
-WebapiError.prototype = Error.prototype;
 
 class DeezerCore {
   legacyApiUrl = 'https://api.deezer.com';

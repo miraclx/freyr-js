@@ -13,16 +13,14 @@ const symbols = require('../symbols');
 const AsyncQueue = require('../async_queue');
 
 const _ytdlGet = util.promisify(youtubedl.getInfo);
-
-function YouTubeSearchError(message, statusCode, status, body) {
-  this.name = 'YouTubeSearchError';
-  this.message = message || '';
-  if (status) this.status = status;
-  if (statusCode) this.statusCode = statusCode;
-  if (body) this.body = body;
+class YouTubeSearchError extends Error {
+  constructor(message, statusCode, status, body) {
+    super(message);
+    if (status) this.status = status;
+    if (statusCode) this.statusCode = statusCode;
+    if (body) this.body = body;
+  }
 }
-
-YouTubeSearchError.prototype = Error.prototype;
 
 /**
  * @typedef {(
