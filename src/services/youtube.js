@@ -82,6 +82,8 @@ class YouTubeMusic {
           ),
         ),
       );
+    if (response.req.res.url === 'https://music.youtube.com/coming-soon/')
+      throw new YouTubeSearchError('YouTube Music is not available in your country');
     return response.body;
   };
 
