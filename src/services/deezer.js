@@ -18,6 +18,8 @@ class WebapiError extends Error {
   }
 }
 
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
 class DeezerCore {
   legacyApiUrl = 'https://api.deezer.com';
 
@@ -26,7 +28,17 @@ class DeezerCore {
     searchParams: {output: 'json'},
   });
 
+  #validatorData = {expires: 0, queries: []};
+
+  validatorQueue = new AsyncQueue('validatorQueue', 1, async now => {
+    if (this.#validatorData.queries.length === 50)
+      await sleep(this.#validatorData.expires - Date.now()).then(() => Promise.all(this.#validatorData.queries));
+    if (this.#validatorData.expires <= (now = Date.now())) this.#validatorData = {expires: now + 5000, queries: []};
+    return new Promise(res => this.#validatorData.queries.push(new Promise(res_ => res(res_))));
+  });
+
   async legacyApiCall(ref, opts) {
+    const ticketFree = await this.validatorQueue.push();
     const response = await this.requestObject
       .get(ref, {
         prefixUrl: this.legacyApiUrl,
@@ -38,6 +50,7 @@ class DeezerCore {
           err.response ? err.response.statusCode : null,
         );
       });
+    ticketFree();
     if (response.body && typeof response.body === 'object' && 'error' in response.body)
       throw new WebapiError(
         `${response.body.error.code} [${response.body.error.type}]: ${response.body.error.message}`,
