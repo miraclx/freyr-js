@@ -21,6 +21,27 @@
 
 [![ASCII Demo](https://github.com/miraclx/freyr-js/raw/master/media/demo.gif)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2 "Click to view ASCII")
 
+## Support the project
+
+#### Donate via
+
+[![Patreon Donation](https://img.shields.io/badge/Patreon-donate-f96854?logo=patreon)](https://patreon.com/miraclx)
+[![Liberapay receiving](https://img.shields.io/badge/Liberapay-donate-f6c915?logo=liberapay)](https://liberapay.com/miraclx)
+[![Ko-fi Donation](https://img.shields.io/badge/-donate-ff5e5b?logo=Ko-fi&label=Ko-fi)](https://ko-fi.com/miraclx)
+
+#### Crypto
+
+- Via Coinbase (`BTC`, `ETH`, `USDC`, `LTC`, `DAI`, `BCH`):
+
+	- Support us with [`$5`](https://commerce.coinbase.com/checkout/96849d29-e051-4855-8bac-97f3f2e1a7a8) | [`$10`](https://commerce.coinbase.com/checkout/c8901c03-217a-475a-a764-98cdc6f561e9) | [`$15`](https://commerce.coinbase.com/checkout/e9be7d37-1ee7-4cc6-9daf-fde68c0697cc) | [`$20`](https://commerce.coinbase.com/checkout/4254e8a5-2071-445c-a0bd-c43a4e0d09b0)
+	- Donate [anything you want](https://commerce.coinbase.com/checkout/466d703a-fbd7-41c9-8366-9bdd3e240755)
+
+- Or Directly:
+
+	- [![BTC](https://img.shields.io/badge/-Bitcoin-5b5b5b?logo=bitcoin)](https://explorer.btc.com/btc/address/bc1qqe5y9kw7ewne8njdces8e4ajx5u7zhfftdvl33): `bc1qqe5y9kw7ewne8njdces8e4ajx5u7zhfftdvl33`
+	- [![XLM](https://img.shields.io/badge/-Stellar-5b5b5b?logo=stellar)](https://keybase.io/miraclx): `GB6GPPXXJTQ6EFYQQ4PFA4WEAT5G2DIDILOEDLYH76743UUVDDU4KOWY`
+	- [![ZEC](https://img.shields.io/badge/-Zcash-5b5b5b?logo=cash-app&logoColor=ecb127)](https://keybase.io/miraclx): `zs10awcwm4uwpjr3mxxdwe03fda0j0zn95s4hu3qxlvhfajjw8es98ftmpaava7zh735x9s22pan0l`
+
 ## Installation
 
 ### Manually
