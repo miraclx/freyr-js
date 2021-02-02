@@ -858,6 +858,7 @@ To preview filter rules specification, use the `filter` subcommand.
 | [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
 | [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
 | Youtube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
+| Tidal (See [#33](https://github.com/miraclx/freyr-js/issues/33)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 
 ### Metadata Availability
 
