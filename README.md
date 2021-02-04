@@ -702,6 +702,9 @@ Defaults are in the [conf.json](conf.json) file.
     },
     "apple_music": {
       "developerToken": "DEVELOPER_TOKEN"
+    },
+    "deezer": {
+      "retries": 5
     }
   }
 }
@@ -766,7 +769,17 @@ After successfully acquiring the developer token, include the `developerToken` t
 <details>
 <summary>Deezer</summary>
 
+* `deezer`: \<object\>
+  * `retries`: \<number\>
+
 Authentication unrequired. API is freely accessible.
+
+Because of the 50 requests / 5 seconds limit enforced on an IP-basis for Deezer's API [See #32],
+occasionally a `Quota limit exceeded` error would be thrown by the API server.
+
+To combat this, freyr employs request batching, managed delays and finally, retries when things go awry.
+
+You can configure how many retries you want freyr to make before accepting failure.
 
 </details>
 
