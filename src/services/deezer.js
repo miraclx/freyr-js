@@ -61,8 +61,10 @@ class DeezerCore {
       });
   };
 
+  totalTrials = 5;
+
   async legacyApiCall(ref, opts) {
-    const response = await this.#sendRequest(ref, opts, 5).catch(err => {
+    const response = await this.#sendRequest(ref, opts, this.totalTrials || 5).catch(err => {
       throw new WebapiError(
         `${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`,
         err.response ? err.response.statusCode : null,
@@ -129,6 +131,10 @@ class Deezer {
     core: new DeezerCore(),
     cache: new NodeCache(),
   };
+
+  constructor(config) {
+    if (config && 'retries' in config) this.#store.core.totalTrials = config.retries + 1;
+  }
 
   loadConfig(_config) {}
 

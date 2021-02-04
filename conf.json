@@ -51,6 +51,9 @@
     "apple_music": {
       "storefront": "us",
       "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjA4MjU0Njg2LCJleHAiOjE2MjM4MDY2ODZ9.8IHFWwdOMMrd7Yt3S4_pdWs4F3d8WQBQPNcetrz__XE2gPKb6EN7J95O-E7LaAf3lzLxoMkalYkyqzA-ssMTOw"
+    },
+    "deezer": {
+      "retries": 2
     }
   }
 }
