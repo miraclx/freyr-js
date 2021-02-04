@@ -72,8 +72,11 @@ class DeezerCore {
     });
 
     let error;
-    if ((error = this.#getIfHasError(response)))
-      throw new WebapiError(`${error.code} [${error.type}]: ${error.message}`, null, error.code);
+    if ((error = this.#getIfHasError(response))) {
+      const err = new WebapiError(`${error.code} [${error.type}]: ${error.message}`, null, error.code);
+      if (error[this.#retrySymbol]) err[this.#retrySymbol] = error[this.#retrySymbol];
+      throw err;
+    }
 
     return response.body;
   }
