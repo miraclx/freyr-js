@@ -30,6 +30,11 @@ class DeezerCore {
 
   #validatorData = {expires: 0, queries: []};
 
+  #retrySymbol = Symbol('DeezerCoreRetryCount');
+
+  #getIfHasError = response =>
+    response.body && typeof response.body === 'object' && 'error' in response.body && response.body.error;
+
   validatorQueue = new AsyncQueue('validatorQueue', 1, async now => {
     if (this.#validatorData.queries.length === 50)
       await sleep(this.#validatorData.expires - Date.now()).then(() => Promise.all(this.#validatorData.queries));
@@ -37,27 +42,37 @@ class DeezerCore {
     return new Promise(res => this.#validatorData.queries.push(new Promise(res_ => res(res_))));
   });
 
-  async legacyApiCall(ref, opts) {
-    const ticketFree = await this.validatorQueue.push();
-    const response = await this.requestObject
+  #sendRequest = async (ref, opts, retries) => {
+    retries = typeof retries === 'object' ? retries : {prior: 0, remaining: retries};
+    const ticketFree = await this.validatorQueue[retries.prior === 0 ? 'push' : 'unshift']();
+    return this.requestObject
       .get(ref, {
         prefixUrl: this.legacyApiUrl,
         searchParams: opts,
       })
       .finally(ticketFree)
-      .catch(err => {
-        throw new WebapiError(
-          `${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`,
-          err.response ? err.response.statusCode : null,
-        );
+      .then((response, error) => {
+        if ((error = this.#getIfHasError(response)) && error.code === 4 && error.message === 'Quota limit exceeded') {
+          error[this.#retrySymbol] = retries.prior;
+          if (retries.remaining > 1)
+            return this.#sendRequest(ref, opts, {prior: retries.prior + 1, remaining: retries.remaining - 1});
+        }
+        return response;
       });
+  };
 
-    if (response.body && typeof response.body === 'object' && 'error' in response.body)
+  async legacyApiCall(ref, opts) {
+    const response = await this.#sendRequest(ref, opts, 5).catch(err => {
       throw new WebapiError(
-        `${response.body.error.code} [${response.body.error.type}]: ${response.body.error.message}`,
-        null,
-        response.body.error.code,
+        `${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`,
+        err.response ? err.response.statusCode : null,
       );
+    });
+
+    let error;
+    if ((error = this.#getIfHasError(response)))
+      throw new WebapiError(`${error.code} [${error.type}]: ${error.message}`, null, error.code);
+
     return response.body;
   }
 
