@@ -30,7 +30,7 @@ class DeezerCore {
 
   #validatorData = {expires: 0, queries: []};
 
-  #retrySymbol = Symbol('DeezerCoreRetryCount');
+  #retrySymbol = Symbol('DeezerCoreTrialCount');
 
   #getIfHasError = response =>
     response.body && typeof response.body === 'object' && 'error' in response.body && response.body.error;
@@ -53,7 +53,7 @@ class DeezerCore {
       .finally(ticketFree)
       .then((response, error) => {
         if ((error = this.#getIfHasError(response)) && error.code === 4 && error.message === 'Quota limit exceeded') {
-          error[this.#retrySymbol] = retries.prior;
+          error[this.#retrySymbol] = retries.prior + 1;
           if (retries.remaining > 1)
             return this.#sendRequest(ref, opts, {prior: retries.prior + 1, remaining: retries.remaining - 1});
         }
