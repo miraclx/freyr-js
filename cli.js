@@ -1169,13 +1169,13 @@ async function init(queries, options) {
         onInit: '[\u2022] Awaiting user authentication...',
       });
     }
+    service.loadConfig(freyrCoreConfig.get(`services.${service[symbols.meta].ID}`));
     if (service.isAuthed()) logger.write('[authenticated]\n');
     else {
       logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
-      const config = freyrCoreConfig.get(`services.${service[symbols.meta].ID}`);
       const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`).tick();
-      service.canTryLogin(config)
-        ? (await processPromise(service.login(config), loginLogger, {onInit: '[\u2022] Logging in...'})) ||
+      service.canTryLogin()
+        ? (await processPromise(service.login(), loginLogger, {onInit: '[\u2022] Logging in...'})) ||
           (await coreAuth(loginLogger))
         : await coreAuth(loginLogger);
     }

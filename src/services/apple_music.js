@@ -43,6 +43,8 @@ class AppleMusic {
     this.#store.isAuthenticated = !!config.developerToken;
   }
 
+  loadConfig(_config) {}
+
   hasOnceAuthed() {
     throw Error('Unimplemented: [AppleMusic:hasOnceAuthed()]');
   }

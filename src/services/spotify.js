@@ -50,6 +50,12 @@ class Spotify {
     });
   }
 
+  loadConfig(config) {
+    if (config.expiry) this.#store.expiry = config.expiry;
+    if (config.access_token) this.#store.core.setAccessToken(config.access_token);
+    if (config.refresh_token) this.#store.core.setRefreshToken(config.refresh_token);
+  }
+
   hasOnceAuthed() {
     return this.#store.isAuthenticated;
   }
@@ -59,7 +65,7 @@ class Spotify {
   }
 
   isAuthed() {
-    return this.#store.isAuthenticated && this.accessTokenIsValid();
+    return this.accessTokenIsValid();
   }
 
   newAuth() {
@@ -85,8 +91,8 @@ class Spotify {
     this.#store.expiry = Date.now() + expiry * 1000;
   }
 
-  canTryLogin(config) {
-    return !!(this.#store.core.getRefreshToken() || config.refresh_token);
+  canTryLogin() {
+    return !!this.#store.core.getRefreshToken();
   }
 
   hasProps() {
@@ -102,10 +108,8 @@ class Spotify {
   }
 
   async login(config) {
-    if (config.refresh_token) this.#store.core.setRefreshToken(config.refresh_token);
-    this.setExpiry(config.expires_in);
-    if (this.accessTokenIsValid()) this.#store.core.setAccessToken(config.access_token);
-    else {
+    if (config) this.loadConfig(config);
+    if (!this.accessTokenIsValid()) {
       const data = await this.#store.core.refreshAccessToken();
       this.#store.core.setAccessToken(data.body.access_token);
       this.setExpiry(data.body.expires_in);

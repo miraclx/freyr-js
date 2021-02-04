@@ -115,6 +115,8 @@ class Deezer {
     cache: new NodeCache(),
   };
 
+  loadConfig(_config) {}
+
   hasOnceAuthed() {
     throw Error('Unimplemented: [Deezer:hasOnceAuthed()]');
   }
