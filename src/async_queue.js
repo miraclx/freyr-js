@@ -65,6 +65,19 @@ class AsyncQueue {
     }, concurrency || 1);
   }
 
+  #_register = (objects, meta, handler) => {
+    const promises = (Array.isArray(objects) ? objects : [[objects, meta]]).map(objectBlocks => {
+      const [data, args] = Array.isArray(objectBlocks) ? objectBlocks : [objectBlocks, meta];
+      return insulate(
+        this.#store.queue[handler]({
+          data: insulate(data),
+          args: insulate(args !== undefined ? (Array.isArray(args) ? args : [args]) : []),
+        }),
+      );
+    });
+    return Array.isArray(objects) ? promises : promises[0];
+  };
+
   /**
    * Add a new `task` to the queue. Return a promise that fulfils on completion and rejects if an error occurs.
    * A second argument `meta` can define any additional data to be processed along with it.
@@ -107,16 +120,18 @@ class AsyncQueue {
    * // 10^2 = 100
    */
   push(objects, meta) {
-    const promises = (Array.isArray(objects) ? objects : [[objects, meta]]).map(objectBlocks => {
-      const [data, args] = Array.isArray(objectBlocks) ? objectBlocks : [objectBlocks, meta];
-      return insulate(
-        this.#store.queue.pushAsync({
-          data: insulate(data),
-          args: insulate(args !== undefined ? (Array.isArray(args) ? args : [args]) : []),
-        }),
-      );
-    });
-    return Array.isArray(objects) ? promises : promises[0];
+    return this.#_register(objects, meta, 'pushAsync');
+  }
+
+  /**
+   * Like `this.push()` but adds a task to the front of the queue
+   * @typedef {() => any} ExecFn
+   * @param {ExecFn|ExecFn[]|Array<[ExecFn, any]>} objects
+   * @param {any} meta
+   * @returns {Promise<any>}
+   */
+  unshift(objects, meta) {
+    return this.#_register(objects, meta, 'unshiftAsync');
   }
 
   /**
