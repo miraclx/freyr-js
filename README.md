@@ -207,7 +207,7 @@ Usage: freyr [options] [query...]
 <details>
 <summary> <code>freyr get --help</code> </summary>
 
-``` text
+``` console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -302,7 +302,7 @@ Info:
 <details>
 <summary> <code>freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01</code> </summary>
 
-``` text
+``` console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -361,7 +361,7 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443 </code> </summary>
 
-``` text
+``` console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -444,7 +444,7 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://www.deezer.com/us/artist/14808825 </code> </summary>
 
-``` text
+``` console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
