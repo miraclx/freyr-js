@@ -10,6 +10,7 @@ const youtubedl = require('youtube-dl');
 const most = require('../most_polyfill');
 const walk = require('../walkr');
 const symbols = require('../symbols');
+const textUtils = require('../textUtils');
 const AsyncQueue = require('../async_queue');
 
 const _ytdlGet = util.promisify(youtubedl.getInfo);
@@ -282,10 +283,8 @@ class YouTubeMusic {
       throw new Error('<artist>, if defined must be a valid array of strings');
     if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
 
-    const results = await this.#search({query: artists.concat(track).join(' ')});
-    const strippedTitle = StripChar.RSspecChar(track).toLowerCase();
-    const strippedArtists = artists.map(artist => StripChar.RSspecChar(artist).toLowerCase());
-    const strippedMeta = [strippedTitle, ...strippedArtists].join(' ');
+    const results = await this.#search({query: [track, ...artists].join(' ')});
+    const strippedMeta = textUtils.stripText([...track.split(' '), ...artists]);
     const validSections = [
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
@@ -295,13 +294,10 @@ class YouTubeMusic {
         item &&
         'title' in item &&
         ['song', 'video'].includes(item.type) &&
-        most(
-          [...item.title.split(' '), ...item.artists.map(artist => artist.name)].reduce(
-            (all, text) => ((text = StripChar.RSspecChar(text)) ? all.concat([text.replace(/\s{2,}/g, ' ').toLowerCase()]) : all),
-            [],
-          ),
-          text => strippedMeta.includes(text),
-        ),
+        textUtils.getWeight(
+          strippedMeta,
+          textUtils.stripText([...item.title.split(' '), ...item.artists.map(artist => artist.name)]),
+        ) > 70,
     );
     function calculateAccuracyFor(item) {
       let accuracy = 0;
