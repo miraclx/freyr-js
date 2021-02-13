@@ -10,7 +10,7 @@ const {StripChar} = require('stripchar');
 const most = require('../most_polyfill');
 const walk = require('../walkr');
 const symbols = require('../symbols');
-const textUtils = require('../textUtils');
+const textUtils = require('../text_utils');
 const AsyncQueue = require('../async_queue');
 
 const _ytdlGet = util.promisify(youtubedl.getInfo);
