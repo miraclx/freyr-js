@@ -2,7 +2,23 @@ const {StripChar} = require('stripchar');
 
 /**
  * Stripout invalid characters, symbols and unnecessary spaces
+ *
+ * - this will converge all repetitive whitespace to a max of 1
+ * - this will convert all strings to their lower case equivalents
+ * - this will automatically remove all repetitions in the array
+ *
  * @param {string[]} data An array of strings to be stripped
+ *
+ * @example
+ * stripText([
+ *   "$a$B$c$", "#A#b#C",
+ *   "c O  n   V    e     R      g       E"
+ * ]); // [ "abc", "c o n v e r g e" ]
+ *
+ * stripText([
+ *   "Hello, World!",
+ *   "Hey, I'm David, What's Up?"
+ * ]); // [ "hello world", "hey im david whats up" ]
  */
 function stripText(data) {
   return [
