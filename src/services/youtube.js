@@ -5,9 +5,7 @@ const got = require('got').default;
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
 const youtubedl = require('youtube-dl');
-const {StripChar} = require('stripchar');
 
-const most = require('../most_polyfill');
 const walk = require('../walkr');
 const symbols = require('../symbols');
 const textUtils = require('../text_utils');
