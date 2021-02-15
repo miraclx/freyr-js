@@ -417,7 +417,7 @@ class YouTube {
       accuracy += (cur => cur * (80 / 100) * (item.views / highestViews))(100 - accuracy);
       // bump accuracy by 60% if video author matches track author
       accuracy += (cur =>
-        most(artists, artist => item.author.name.toLowerCase().includes(artist.toLowerCase())) ? (60 / 100) * cur : 0)(
+        textUtils.getWeight(strippedArtists, textUtils.stripText([item.author.name])) >= 80 ? (60 / 100) * cur : 0)(
         100 - accuracy,
       );
       return accuracy;
