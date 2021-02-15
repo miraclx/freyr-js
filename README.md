@@ -640,7 +640,7 @@ This configuration file resides within the user config directory per-platform. e
 All configuration is to be defined within a `conf.json` file in the root of the project.
 This file should be of `JSON` format and is to be structured as such.
 
-Defaults are in the [conf.json](conf.json) file.
+Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/conf.json) file.
 
 * `server`: \<object\> The server URL configuration same as on an individual services' callback option.
   * `hostname`: \<string\>
@@ -716,7 +716,7 @@ Defaults are in the [conf.json](conf.json) file.
 
 ### Service Configuration
 
-The [conf.json](conf.json) file already includes some API tokens for service authentication and should work right out of the box. [See [Project specific configuration](#project-specific-configuration)]
+The [conf.json](https://github.com/miraclx/freyr-js/blob/master/conf.json) file already includes some API tokens for service authentication and should work right out of the box. [See [Project specific configuration](#project-specific-configuration)]
 
 <details>
 <summary>Spotify</summary>
@@ -774,7 +774,7 @@ After successfully acquiring the developer token, include the `developerToken` t
 
 Authentication unrequired. API is freely accessible.
 
-Because of the 50 requests / 5 seconds limit enforced on an IP-basis for Deezer's API [See #32],
+Because of the 50 requests / 5 seconds limit enforced on an IP-basis for Deezer's API [See [#32](https://github.com/miraclx/freyr-js/issues/6)],
 occasionally a `Quota limit exceeded` error would be thrown by the API server.
 
 To combat this, freyr employs request batching, managed delays and finally, retries when things go awry.
@@ -867,9 +867,9 @@ To preview filter rules specification, use the `filter` subcommand.
 
 | Service | Track | Album | Artist | Playlist | [URI Short Tags](#uris) |
 | :-----: | :---: | :---: | :----: | :------: | :------------: |
-| [Spotify](src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    | `spotify:` |
-| [Apple Music](src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
-| [Deezer](src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
+| [Spotify](https://github.com/miraclx/freyr-js/blob/master/src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    | `spotify:` |
+| [Apple Music](https://github.com/miraclx/freyr-js/blob/master/src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
+| [Deezer](https://github.com/miraclx/freyr-js/blob/master/src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
 | Youtube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 | Tidal (See [#33](https://github.com/miraclx/freyr-js/issues/33)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 
