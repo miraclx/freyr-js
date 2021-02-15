@@ -42,9 +42,22 @@ function stripText(data) {
  * // intersection = ["hello", "are", "you"];
  * // what percentage of `a` is the intersection
  * let c = getWeight(a, b); // 60
+ *
+ * // AND lookups
+ * getWeight(
+ *   ["jacob cane", "jessica cane"],
+ *   ["cane"]
+ * ); // 0
+ *
+ * getWeight(
+ *   ["jacob cane", "jessica cane"],
+ *   ["cane", "jessica", "jacob"]
+ * ); // 100
  */
 function getWeight(a, b) {
-  return (b = b.join(' ')), (a.filter(v => b.includes(v)).length / a.length) * 100;
+  return (
+    ((b = b.join(' ').split(' ')), a.map(v => v.split(' ').every(p => b.includes(p))).filter(v => !!v).length / a.length) * 100
+  );
 }
 
 module.exports = {stripText, getWeight};
