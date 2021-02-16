@@ -68,7 +68,7 @@ function check_bin_is_existent(bin, path) {
 function wrapCliInterface(binaryName, binaryPath) {
   return (file, args, cb) => {
     const isWin = process.platform === 'win32';
-    const path = xpath.relative(__dirname, xpath.join('./bins', isWin ? 'windows' : 'posix'));
+    const path = xpath.join(__dirname, 'bins', isWin ? 'windows' : 'posix');
     if (!binaryPath) {
       const err = new Error(`Unable to find an executable ${binaryName} binary. Please install.`);
       if (!check_bin_is_existent(binaryName, path))
