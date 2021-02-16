@@ -7,7 +7,6 @@ const {promisify} = require('util');
 
 const xget = require('libxget');
 const axios = require('axios');
-const stringd = require('stringd');
 const unzipper = require('unzipper');
 const xprogress = require('xprogress');
 
