@@ -49,10 +49,10 @@
 Ensure all [requirements](#requirements) are satisfied before installing.
 
 ``` bash
-npm install -g git+https://github.com/miraclx/freyr-js.git
+npm install -g miraclx/freyr-js
 
 # alternatively, with yarn
-yarn global add https://github.com/miraclx/freyr-js.git
+yarn global add miraclx/freyr-js
 ```
 
 ### Docker
