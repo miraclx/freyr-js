@@ -1480,6 +1480,95 @@ program
     console.log('  the base directory with the name of the playlist that lists the tracks');
   });
 
+async function depsMgr(deps, action, files, argSys, isWin) {
+  (argSys = deps.opts().sys), (isWin = argSys ? argSys === 'windows' : process.platform === 'win32');
+  console.log(action, files, isWin);
+  throw Error(`Unimplemented: [CLI:deps ${action}]`);
+}
+
+const deps = program
+  .command('deps', {hidden: true})
+  .description('Local binary dependency manager')
+  .option('--sys <platform>', 'plaform override (valid: windows,posix)', spec => {
+    if (!['windows', 'posix'].includes(spec))
+      throw new Error(`invalid platform specification, expected \`windows\` or \`posix\`, found [${spec}]`);
+    return spec;
+  })
+  .on('--help', () => {
+    console.log('');
+    console.log('Info:');
+    console.log('  This is a merely a helper command for managing the `bins/{posix|windows}` directory');
+    console.log('');
+    console.log('Examples:');
+    console.log('  $ freyr deps load ./AtomicParsley');
+    console.log('    # load AtomicParsley for the current platform');
+    console.log('  $ freyr deps unload AtomicParsley');
+    console.log('    # unload AtomicParsley for the current platform');
+    console.log('  $ freyr deps ls');
+    console.log('    # list all loaded binary dependencies');
+  });
+
+deps
+  .command('load')
+  .alias('ld')
+  .alias('i')
+  .alias('in')
+  .arguments('<files...>')
+  .description('Load the files into the local bin directory')
+  .action(files => depsMgr(deps, 'load', files))
+  .on('--help', () => {
+    console.log('');
+    console.log('Hint:');
+    console.log('  - Aliases: i | in | ld | load');
+    console.log('  - Use the `--sys <plaform>` flag to be platform specific');
+    console.log('');
+    console.log('Examples:');
+    console.log('  $ freyr deps ld ./AtomicParsley');
+    console.log('    # load AtomicParsley for the current platform');
+    console.log('  $ freyr deps --sys posix ld AtomicParsley');
+    console.log('    # load AtomicParsley specifically for posix');
+  });
+
+deps
+  .command('unload')
+  .alias('rm')
+  .alias('u')
+  .alias('un')
+  .arguments('<files...>')
+  .description('Unload the files from the local bin directory')
+  .action(files => depsMgr(deps, 'unload', files))
+  .on('--help', () => {
+    console.log('');
+    console.log('Hint:');
+    console.log('  - Aliases: u | un | rm | unload');
+    console.log('  - Use the `--sys <plaform>` flag to be platform specific');
+    console.log('');
+    console.log('Examples:');
+    console.log('  $ freyr deps rm ./AtomicParsley');
+    console.log('    # unload AtomicParsley for the current platform');
+    console.log('  $ freyr deps --sys windows rm AtomicParsley');
+    console.log('    # unload AtomicParsley specifically for windows');
+  });
+
+deps
+  .command('list')
+  .alias('ls')
+  .alias('l')
+  .description('List the currently loaded binaries')
+  .action(() => depsMgr(deps, 'list'))
+  .on('--help', () => {
+    console.log('');
+    console.log('Hint:');
+    console.log('  - Aliases: l | ls | list');
+    console.log('  - Use the `--sys <plaform>` flag to filter the list to be platform specific');
+    console.log('');
+    console.log('Examples:');
+    console.log('  $ freyr deps ls');
+    console.log('    # list all locally loaded binary dependencies');
+    console.log('  $ freyr deps --sys windows ls');
+    console.log('    # list locally loaded binary dependencies for windows');
+  });
+
 program
   .command('serve', {hidden: true})
   .arguments('[port]')
