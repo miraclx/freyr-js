@@ -48,12 +48,22 @@
 
 Ensure all [requirements](#requirements) are satisfied before installing.
 
-``` bash
-npm install -g miraclx/freyr-js
+- Install globally via [NPM](https://github.com/npm/cli) *(yarn is not supported [See [#39](https://github.com/miraclx/freyr-js/issues/39)])*:
 
-# alternatively, with yarn
-yarn global add miraclx/freyr-js
-```
+  ``` bash
+  npm install -g miraclx/freyr-js
+  ```
+
+- Or alternatively, you can build from source:
+
+  ``` bash
+  git clone https://github.com/miraclx/freyr-js.git freyr-js
+  cd freyr-js
+  npm install
+
+  # to have access to the freyr command globally
+  npm link
+  ```
 
 ### Docker
 
