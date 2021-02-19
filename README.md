@@ -19,7 +19,7 @@
 
 ## Demo
 
-[![ASCII Demo](https://github.com/miraclx/freyr-js/raw/master/media/demo.gif)](https://asciinema.org/a/kM2pEzBT3xJNfHGBb13aRcnup?autoplay=1&speed=2 "Click to view ASCII")
+[![ASCII Demo](https://github.com/miraclx/freyr-js/raw/master/media/demo.gif)](https://asciinema.org/a/KH5xyBq9G8Wf5Dyvj6AfqXwYr?autoplay=1 "Click to view ASCII")
 
 ## Support the project
 
