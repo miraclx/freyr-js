@@ -1067,13 +1067,27 @@ To preview filter rules specification, use the `filter` subcommand.
 Feel free to clone and use in adherance to the [license](#license). Pull requests are very much welcome.
 
 ``` bash
-git clone https://github.com/miraclx/freyr-js.git
+git clone https://github.com/miraclx/freyr-js.git freyr-js
 cd freyr-js
-npm install
-
-# don't forget to register the freyr command
-npm link
 ```
+
+- If using [NPM](https://github.com/npm/cli):
+
+  ``` bash
+  npm install
+
+  # to have access to the freyr command globally
+  npm link
+  ```
+
+- If using [Yarn](https://github.com/yarnpkg/yarn):
+
+  ``` bash
+  yarn install
+
+  # to have access to the freyr command globally
+  yarn link
+  ```
 
 ### Docker Development
 
