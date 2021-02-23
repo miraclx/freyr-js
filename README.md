@@ -62,7 +62,8 @@ You can use either of these options to install freyr:
   yarn global add miraclx/freyr-js
   ```
 
-- Or alternatively, you can build from source:
+- <details>
+  <summary>Or alternatively, you can build from source</summary>
 
   ``` bash
   git clone https://github.com/miraclx/freyr-js.git freyr-js
@@ -86,6 +87,8 @@ You can use either of these options to install freyr:
     # to have access to the freyr command globally
     yarn link
     ```
+
+  </details>
 
 ### Docker
 
