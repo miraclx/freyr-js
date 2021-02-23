@@ -33,14 +33,14 @@
 
 - Via Coinbase (`BTC`, `ETH`, `USDC`, `LTC`, `DAI`, `BCH`):
 
-	- Support us with [`$5`](https://commerce.coinbase.com/checkout/96849d29-e051-4855-8bac-97f3f2e1a7a8) | [`$10`](https://commerce.coinbase.com/checkout/c8901c03-217a-475a-a764-98cdc6f561e9) | [`$15`](https://commerce.coinbase.com/checkout/e9be7d37-1ee7-4cc6-9daf-fde68c0697cc) | [`$20`](https://commerce.coinbase.com/checkout/4254e8a5-2071-445c-a0bd-c43a4e0d09b0)
-	- Donate [anything you want](https://commerce.coinbase.com/checkout/466d703a-fbd7-41c9-8366-9bdd3e240755)
+  - Support us with [`$5`](https://commerce.coinbase.com/checkout/96849d29-e051-4855-8bac-97f3f2e1a7a8) | [`$10`](https://commerce.coinbase.com/checkout/c8901c03-217a-475a-a764-98cdc6f561e9) | [`$15`](https://commerce.coinbase.com/checkout/e9be7d37-1ee7-4cc6-9daf-fde68c0697cc) | [`$20`](https://commerce.coinbase.com/checkout/4254e8a5-2071-445c-a0bd-c43a4e0d09b0)
+  - Donate [anything you want](https://commerce.coinbase.com/checkout/466d703a-fbd7-41c9-8366-9bdd3e240755)
 
 - Or Directly:
 
-	- [![BTC](https://img.shields.io/badge/-Bitcoin-5b5b5b?logo=bitcoin)](https://explorer.btc.com/btc/address/bc1qqe5y9kw7ewne8njdces8e4ajx5u7zhfftdvl33): `bc1qqe5y9kw7ewne8njdces8e4ajx5u7zhfftdvl33`
-	- [![XLM](https://img.shields.io/badge/-Stellar-5b5b5b?logo=stellar)](https://keybase.io/miraclx): `GB6GPPXXJTQ6EFYQQ4PFA4WEAT5G2DIDILOEDLYH76743UUVDDU4KOWY`
-	- [![ZEC](https://img.shields.io/badge/-Zcash-5b5b5b?logo=cash-app&logoColor=ecb127)](https://keybase.io/miraclx): `zs10awcwm4uwpjr3mxxdwe03fda0j0zn95s4hu3qxlvhfajjw8es98ftmpaava7zh735x9s22pan0l`
+  - [![BTC](https://img.shields.io/badge/-Bitcoin-5b5b5b?logo=bitcoin)](https://explorer.btc.com/btc/address/bc1qqe5y9kw7ewne8njdces8e4ajx5u7zhfftdvl33): `bc1qqe5y9kw7ewne8njdces8e4ajx5u7zhfftdvl33`
+  - [![XLM](https://img.shields.io/badge/-Stellar-5b5b5b?logo=stellar)](https://keybase.io/miraclx): `GB6GPPXXJTQ6EFYQQ4PFA4WEAT5G2DIDILOEDLYH76743UUVDDU4KOWY`
+  - [![ZEC](https://img.shields.io/badge/-Zcash-5b5b5b?logo=cash-app&logoColor=ecb127)](https://keybase.io/miraclx): `zs10awcwm4uwpjr3mxxdwe03fda0j0zn95s4hu3qxlvhfajjw8es98ftmpaava7zh735x9s22pan0l`
 
 ## Installation
 
@@ -145,11 +145,11 @@ Download for your individual platforms here <https://www.python.org/downloads/>
 
 Linux: _(check individual package managers)_
 
-* \* Debian: `sudo apt-get install python3.6`
-* \* Arch Linux: `sudo pacman -S python`
-* Android (Termux): `apt install python`
-* Alpine Linux: `sudo apk add python3`
-* _(`*`: should already be preinstalled)_
+- \* Debian: `sudo apt-get install python3.6`
+- \* Arch Linux: `sudo pacman -S python`
+- Android (Termux): `apt install python`
+- Alpine Linux: `sudo apk add python3`
+- _(`*`: should already be preinstalled)_
 
 </details>
 
@@ -166,8 +166,8 @@ macOS + Linux: [nvm](https://github.com/nvm-sh/nvm) recommended.
 $ nvm install --lts
 ```
 
-* Android (Termux): `apt install nodejs`
-* Alpine Linux: `sudo apk add nodejs`
+- Android (Termux): `apt install nodejs`
+- Alpine Linux: `sudo apk add nodejs`
 
 </details>
 
@@ -176,23 +176,23 @@ $ nvm install --lts
 
 Download for your individual platforms here <https://ffmpeg.org/download.html>
 
-* Windows + macOS:
-  * Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
-  * make sure it's available in your `PATH`
-  * otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
-* Linux: _(check individual package managers)_
-  * Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
-  * Arch Linux: `sudo pacman -S ffmpeg`
-  * Android (Termux): `apt install ffmpeg`
-  * Alpine Linux: `sudo apk add ffmpeg`
+- Windows + macOS:
+  - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
+  - make sure it's available in your `PATH`
+  - otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
+- Linux: _(check individual package managers)_
+  - Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
+  - Arch Linux: `sudo pacman -S ffmpeg`
+  - Android (Termux): `apt install ffmpeg`
+  - Alpine Linux: `sudo apk add ffmpeg`
 
 </details>
 
 <details>
 <summary>youtube-dl @ latest</summary>
 
-* automatically fetched by installing this package
-* optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your `PATH`
+- automatically fetched by installing this package
+- optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your `PATH`
 
 </details>
 
@@ -203,17 +203,17 @@ First, download the latest release for your individual platforms here <https://g
 
 Then;
 
-* Windows:
-  * unzip and place the `AtomicParsley.exe` in your `PATH`.
-  * or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
-* Linux + macOS _(the brew package isn't recommended)_:
-  * unzip and place the `AtomicParsley` in your `PATH`.
-  * or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
-* Alternatively:
-  * Debian: `sudo apt-get install atomicparsley`
-  * Arch Linux: `sudo pacman -S atomicparsley`
-  * Android (Termux): `apt install atomicparsley`
-  * Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
+- Windows:
+  - unzip and place the `AtomicParsley.exe` in your `PATH`.
+  - or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
+- Linux + macOS _(the brew package isn't recommended)_:
+  - unzip and place the `AtomicParsley` in your `PATH`.
+  - or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
+- Alternatively:
+  - Debian: `sudo apt-get install atomicparsley`
+  - Arch Linux: `sudo pacman -S atomicparsley`
+  - Android (Termux): `apt install atomicparsley`
+  - Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
 
 </details>
 
@@ -638,25 +638,25 @@ Successfully written to [queue_of_uris.txt]
 
 ### Features
 
-* Multi-service support [See [Service Support](#service-support)]
-* Playlist generation (per playlist (default) / per query (optional))
-* Batch download from queue file
-* Simultaneous chunked downloads (powered by [[libxget-js](https://github.com/miraclx/libxget-js)])
-* Efficient concurrency
-* Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
-* Album art embedding & export
-* Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>`
-* Resilient visual progressbar per track download (powered by [[xprogress](https://github.com/miraclx/xprogress)])
-* Stats on runtime completion
-  * runtime duration
-  * number of successfully processed tracks
-  * output directory
-  * cover art name
-  * total output size
-  * total network usage
-  * network usage for media
-  * network usage for album art
-  * output bitrate
+- Multi-service support [See [Service Support](#service-support)]
+- Playlist generation (per playlist (default) / per query (optional))
+- Batch download from queue file
+- Simultaneous chunked downloads (powered by [[libxget-js](https://github.com/miraclx/libxget-js)])
+- Efficient concurrency
+- Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
+- Album art embedding & export
+- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>`
+- Resilient visual progressbar per track download (powered by [[xprogress](https://github.com/miraclx/xprogress)])
+- Stats on runtime completion
+  - runtime duration
+  - number of successfully processed tracks
+  - output directory
+  - cover art name
+  - total output size
+  - total network usage
+  - network usage for media
+  - network usage for album art
+  - output bitrate
 
 ### Configuration
 
@@ -677,43 +677,43 @@ This file should be of `JSON` format and is to be structured as such.
 
 Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/conf.json) file.
 
-* `server`: \<object\> The server URL configuration same as on an individual services' callback option.
-  * `hostname`: \<string\>
-  * `port`: \<number\>
-  * `useHttps`: \<boolean\>
-* `concurrency`: \<object\>
-  * `queries`: \<number\> The number of queries to be processed concurrently.
-  * `tracks`: \<number\> The number of tracks to be actively processed in parallel.
-  * `trackStage`: \<number\> The number of tracks to concurrently preprocess before being pushed to the main trackQueue.
-  * `downloader`: \<number\> The number of tracks to be concurrently downloaded in parallel.
-  * `encoder`: \<number\> The total number of tracks to be concurrently undergo encoding.
-  * `embedder`: \<number\> The total number of tracks to be concurrently embedded in parallel.
-* `opts`: \<object\>
-  * `netCheck`: \<boolean\> Whether or not to check network access at program start.
-  * `attemptAuth`: \<boolean\> Whether or not to process authentication.
-  * `autoOpenBrowser`: \<boolean\> Whether or not to automatically open user browser.
-* `filters`: \<[FilterRules](#filterrules)[]\> Filter rules each track must match to be downloaded.
-* `dirs`: \<object\>
-  * `output`: \<string\> Default download directory. Default: `"."`
-  * `cache`: \<string\> Default temp download directory. Default: `"<tmp>"`
-* `playlist`: \<object\>
-  * `always`: \<boolean\> Always create playlists for collections and non-collections alike.
-  * `append`: \<boolean\> Append non-collection tracks onto the playlist file.
-  * `escape`: \<boolean\> Escape `#` characters within playlist entries paths.
-  * `forceAppend`: \<boolean\> Force append collection tracks.
-  * `dir`: \<string\> Default playlist save directory.
-  * `namespace`: \<string\> Prefix namespace to prepend to track paths.
-* `image`: \<object|number|string\> An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
-  * `width`: \<number|string\>
-  * `height`: \<number|string\>
-* `downloader`: \<object\>
-  * `memCache`: \<boolean\> Whether or not to use in-memory caching for download chunks.
-  * `cacheSize`: \<number\> Maximum size of bytes to be cached per download.
-  * `order`: \<array\> Service download sources order.
-    * Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
-    * supported: `youtube`, `yt_music`
-    * default: `[ "yt_music", "youtube" ]`
-* `services`: \<[ServiceConfiguration](#service-configuration): object\>
+- `server`: \<object\> The server URL configuration same as on an individual services' callback option.
+  - `hostname`: \<string\>
+  - `port`: \<number\>
+  - `useHttps`: \<boolean\>
+- `concurrency`: \<object\>
+  - `queries`: \<number\> The number of queries to be processed concurrently.
+  - `tracks`: \<number\> The number of tracks to be actively processed in parallel.
+  - `trackStage`: \<number\> The number of tracks to concurrently preprocess before being pushed to the main trackQueue.
+  - `downloader`: \<number\> The number of tracks to be concurrently downloaded in parallel.
+  - `encoder`: \<number\> The total number of tracks to be concurrently undergo encoding.
+  - `embedder`: \<number\> The total number of tracks to be concurrently embedded in parallel.
+- `opts`: \<object\>
+  - `netCheck`: \<boolean\> Whether or not to check network access at program start.
+  - `attemptAuth`: \<boolean\> Whether or not to process authentication.
+  - `autoOpenBrowser`: \<boolean\> Whether or not to automatically open user browser.
+- `filters`: \<[FilterRules](#filterrules)[]\> Filter rules each track must match to be downloaded.
+- `dirs`: \<object\>
+  - `output`: \<string\> Default download directory. Default: `"."`
+  - `cache`: \<string\> Default temp download directory. Default: `"<tmp>"`
+- `playlist`: \<object\>
+  - `always`: \<boolean\> Always create playlists for collections and non-collections alike.
+  - `append`: \<boolean\> Append non-collection tracks onto the playlist file.
+  - `escape`: \<boolean\> Escape `#` characters within playlist entries paths.
+  - `forceAppend`: \<boolean\> Force append collection tracks.
+  - `dir`: \<string\> Default playlist save directory.
+  - `namespace`: \<string\> Prefix namespace to prepend to track paths.
+- `image`: \<object|number|string\> An object with fields pertaining to an image's properties or a number defining its size. (\<width\>x\<height\> or \<size\> as \<size\>x\<size\>)
+  - `width`: \<number|string\>
+  - `height`: \<number|string\>
+- `downloader`: \<object\>
+  - `memCache`: \<boolean\> Whether or not to use in-memory caching for download chunks.
+  - `cacheSize`: \<number\> Maximum size of bytes to be cached per download.
+  - `order`: \<array\> Service download sources order.
+    - Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
+    - supported: `youtube`, `yt_music`
+    - default: `[ "yt_music", "youtube" ]`
+- `services`: \<[ServiceConfiguration](#service-configuration): object\>
 
 <details>
 <summary>Example JSON</summary>
@@ -756,10 +756,10 @@ The [conf.json](https://github.com/miraclx/freyr-js/blob/master/conf.json) file 
 <details>
 <summary>Spotify</summary>
 
-* `spotify`: \<object\>
-  * `clientId`: \<string\>
-  * `clientSecret`: \<string\>
-  * `refreshToken`: \<string\>
+- `spotify`: \<object\>
+  - `clientId`: \<string\>
+  - `clientSecret`: \<string\>
+  - `refreshToken`: \<string\>
 
 Spotify requires a `clientId` and a `clientSecret` that can be gotten from their developer dashboard.
 
@@ -783,9 +783,9 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
 <details>
 <summary>Apple Music</summary>
 
-* `apple_music`: \<object\>
-  * `storefront`: \<string\>
-  * `developerToken`: \<string\>
+- `apple_music`: \<object\>
+  - `storefront`: \<string\>
+  - `developerToken`: \<string\>
 
 This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
@@ -804,8 +804,8 @@ After successfully acquiring the developer token, include the `developerToken` t
 <details>
 <summary>Deezer</summary>
 
-* `deezer`: \<object\>
-  * `retries`: \<number\>
+- `deezer`: \<object\>
+  - `retries`: \<number\>
 
 Authentication unrequired. API is freely accessible.
 
@@ -820,14 +820,14 @@ You can configure how many retries you want freyr to make before accepting failu
 
 ### Return Codes
 
-* 0: OK
-* 1: Invalid query
-* 2: Invalid flag value
-* 3: Invalid / Inexistent configuration file
-* 4: Network error
-* 5: Error with working directory
-* 6: Failed to initialize a freyr instance
-* 7: An error occurred checking dependency paths
+- 0: OK
+- 1: Invalid query
+- 2: Invalid flag value
+- 3: Invalid / Inexistent configuration file
+- 4: Network error
+- 5: Error with working directory
+- 6: Failed to initialize a freyr instance
+- 7: An error occurred checking dependency paths
 
 ### FilterRules
 
@@ -1119,17 +1119,17 @@ alias freyrd='docker run -it --entrypoint bash freyr-dev:latest'
 
 Optionally, you can use these interesting flags to customize the experience.
 
-* `-h freyr-dev` sets the container hostname to `freyr-dev`
-* `-m 1G` sets the container memory limit
-* `-v $PWD:/data` mounts the current working directory to `/data` within the container.
-* `--cpus 2` limits the container to using 2 CPU cores
+- `-h freyr-dev` sets the container hostname to `freyr-dev`
+- `-m 1G` sets the container memory limit
+- `-v $PWD:/data` mounts the current working directory to `/data` within the container.
+- `--cpus 2` limits the container to using 2 CPU cores
 
 The freyr source would be available in the `/freyr` directory within the container along with a globally registered command `freyr` for calling the script.
 
 For more information and documentation about docker, please refer to its official website:
 
-* <https://www.docker.com/>
-* <https://docs.docker.com/>
+- <https://www.docker.com/>
+- <https://docs.docker.com/>
 
 ## License
 
