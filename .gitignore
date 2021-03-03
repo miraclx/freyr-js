@@ -1,6 +1,5 @@
 # ignore local package files
 node_modules/
-package-lock.json
 
 # ignore binaries
 bins/
