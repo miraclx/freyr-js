@@ -42,7 +42,7 @@ WORKDIR /data
 VOLUME ["/data"]
 
 # Set entrypoint and default cmd
-ENTRYPOINT ["freyr", "-d", "/data"]
+ENTRYPOINT ["freyr"]
 CMD ["--help"]
 
 # BUILD
