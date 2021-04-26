@@ -113,7 +113,7 @@ class AppleMusic {
       album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
       images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
-      album_artist: albumInfo.artists[0],
+      album_artist: albumInfo.artists ? albumInfo.artists[0] : undefined,
       track_number: trackInfo.attributes.trackNumber,
       total_tracks: albumInfo.ntracks,
       release_date: (date =>
@@ -182,15 +182,16 @@ class AppleMusic {
   }
 
   wrapPlaylistData(playlistObject) {
+    const attrs = playlistObject.attributes
     return {
       id: playlistObject.id,
-      uri: playlistObject.attributes.url,
-      name: playlistObject.attributes.name,
+      uri: attrs.url,
+      name: attrs.name,
       followers: null,
-      description: playlistObject.attributes.description.short,
+      description: attrs.description ? attrs.description.short : undefined,
       owner_id: null,
-      owner_name: playlistObject.attributes.curatorName,
-      type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
+      owner_name: attrs.curatorName,
+      type: attrs.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
       ntracks: playlistObject.relationships.tracks.data.length,
       tracks: playlistObject.relationships.tracks.data,
     };
