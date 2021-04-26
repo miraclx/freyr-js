@@ -25,7 +25,6 @@
 
 #### Donate via
 
-[![PayPal Donation](https://img.shields.io/badge/PayPal-donate-026cb8?logo=paypal)](https://paypal.me/miraclx)
 [![Patreon Donation](https://img.shields.io/badge/Patreon-donate-f96854?logo=patreon)](https://patreon.com/miraclx)
 [![Liberapay receiving](https://img.shields.io/badge/Liberapay-donate-f6c915?logo=liberapay)](https://liberapay.com/miraclx)
 [![Ko-fi Donation](https://img.shields.io/badge/-donate-ff5e5b?logo=Ko-fi&label=Ko-fi)](https://ko-fi.com/miraclx)
