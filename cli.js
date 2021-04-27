@@ -1081,7 +1081,7 @@ async function init(queries, options) {
     logger.log(`\u27a4 Year: ${new Date(album.release_date).getFullYear()}`);
     if (album.genres.length) logger.log(`\u27a4 Genres: ${album.genres.join(', ')}`);
     const collationLogger = queryLogger.log(`[\u2022] Collating [${album.name}]...`).tick();
-    const tracks = await processPromise(service.getAlbumTracks(album.uri), collationLogger, {
+    const tracks = await processPromise(service.getAlbumTracks(album.uri, options.storefront), collationLogger, {
       onInit: '[\u2022] Inquiring tracks...',
     });
     if (!tracks) throw new Error('Failed to collect album tracks');
@@ -1103,17 +1103,17 @@ async function init(queries, options) {
     logger.log(`\u27a4 Artist: ${artist.name}`);
     if (artist.followers) logger.log(`\u27a4 Followers: ${`${artist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
     if (artist.genres && artist.genres.length) logger.log(`\u27a4 Genres: ${artist.genres.join(', ')}`);
-    const albumsStack = await processPromise(service.getArtistAlbums(artist.uri), logger, {
+    const albumsStack = await processPromise(service.getArtistAlbums(artist.uri, options.storefront), logger, {
       onInit: '> Gathering collections...',
     });
     if (!albumsStack) return;
     const collationLogger = queryLogger.log(`[\u2022] Collating...`).tick();
     return Promise.mapSeries(albumsStack, async ({uri}, index) => {
-      const album = await service.getAlbum(uri);
+      const album = await service.getAlbum(uri, options.storefront);
       const albumLogger = collationLogger
         .log(`(${prePadNum(index + 1, albumsStack.length)}) [${album.name}] (${album.type})`)
         .tick();
-      const tracks = await processPromise(service.getAlbumTracks(album.uri), albumLogger, {
+      const tracks = await processPromise(service.getAlbumTracks(album.uri, options.storefront), albumLogger, {
         onInit: '[\u2022] Inquiring tracks...',
       });
       if (!(tracks && tracks.length)) return;
@@ -1141,7 +1141,7 @@ async function init(queries, options) {
     if (playlist.followers) logger.log(`\u27a4 Followers: ${`${playlist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
     logger.log(`\u27a4 Tracks: ${playlist.ntracks}`);
     const collationLogger = queryLogger.log(`[\u2022] Collating...`).tick();
-    const tracks = await processPromise(service.getPlaylistTracks(playlist.uri), collationLogger, {
+    const tracks = await processPromise(service.getPlaylistTracks(playlist.uri, options.storefront), collationLogger, {
       onInit: '[\u2022] Inquiring tracks...',
     });
     if (!tracks) throw new Error('Failed to collect playlist tracks');
