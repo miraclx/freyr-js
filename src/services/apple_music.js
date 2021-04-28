@@ -182,16 +182,15 @@ class AppleMusic {
   }
 
   wrapPlaylistData(playlistObject) {
-    const attrs = playlistObject.attributes
     return {
       id: playlistObject.id,
-      uri: attrs.url,
-      name: attrs.name,
+      uri: playlistObject.attributes.url,
+      name: playlistObject.attributes.name,
       followers: null,
-      description: attrs.description ? attrs.description.short : undefined,
+      description: (playlistObject.attributes.description || {short: null}).short,
       owner_id: null,
-      owner_name: attrs.curatorName,
-      type: attrs.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
+      owner_name: playlistObject.attributes.curatorName,
+      type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
       ntracks: playlistObject.relationships.tracks.data.length,
       tracks: playlistObject.relationships.tracks.data,
     };
