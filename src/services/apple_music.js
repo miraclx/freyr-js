@@ -187,7 +187,7 @@ class AppleMusic {
       uri: playlistObject.attributes.url,
       name: playlistObject.attributes.name,
       followers: null,
-      description: playlistObject.attributes.description.short,
+      description: (playlistObject.attributes.description || {short: null}).short,
       owner_id: null,
       owner_name: playlistObject.attributes.curatorName,
       type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
