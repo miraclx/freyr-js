@@ -116,14 +116,7 @@ class AppleMusic {
       album_artist: albumInfo.artists[0],
       track_number: trackInfo.attributes.trackNumber,
       total_tracks: albumInfo.ntracks,
-      release_date: (date =>
-        [
-          [date.year, 4],
-          [date.month, 2],
-          [date.day, 2],
-        ]
-          .map(([val, size]) => val.toString().padStart(size, '0'))
-          .join('-'))(trackInfo.attributes.releaseDate),
+      release_date: albumInfo.release_date,
       disc_number: trackInfo.attributes.discNumber,
       contentRating: trackInfo.attributes.contentRating,
       isrc: trackInfo.attributes.isrc,
