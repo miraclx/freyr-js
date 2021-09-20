@@ -189,14 +189,6 @@ Download for your individual platforms here <https://ffmpeg.org/download.html>
 </details>
 
 <details>
-<summary>youtube-dl @ latest</summary>
-
-- automatically fetched by installing this package
-- optionally, you can fetch the source yourself <https://github.com/ytdl-org/youtube-dl> and include in your `PATH`
-
-</details>
-
-<details>
 <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
 
 First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
@@ -310,7 +302,6 @@ Options:
   --no-browser                 disable auto-launching of user browser
   --no-net-check               disable internet connection check
   --ffmpeg <PATH>              explicit path to the ffmpeg binary
-  --youtube-dl <PATH>          explicit path to the youtube-dl binary
   --atomic-parsley <PATH>      explicit path to the atomic-parsley binary
   --no-stats                   don't show the stats on completion
   --pulsate-bar                show a pulsating bar
@@ -321,7 +312,6 @@ Options:
 Environment Variables:
   SHOW_DEBUG_STACK             show extended debug information
   FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`
-  YOUTUBE_DL_PATH              custom youtube-dl path, alternatively use `--youtube-dl`
   ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
 
 Info:

@@ -20,7 +20,6 @@ const isOnline = require('is-online');
 const prettyMs = require('pretty-ms');
 const commander = require('commander');
 const minimatch = require('minimatch');
-const youtubedl = require('youtube-dl');
 const filenamify = require('filenamify');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
@@ -593,12 +592,6 @@ async function init(queries, options) {
       if (!(await isBinaryFile(options.atomicParsley)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
     } else atomicParsley(true);
-
-    if (options.youtubeDl) {
-      if (!fs.existsSync(options.youtubeDl))
-        throw new Error(`\x1b[31myoutube-dl\x1b[0m: Script not found [${options.youtubeDl}]`);
-      youtubedl.setYtdlBinary(options.youtubeDl);
-    }
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
@@ -1454,7 +1447,6 @@ program
   .option('--no-browser', 'disable auto-launching of user browser')
   .option('--no-net-check', 'disable internet connection check')
   .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
-  .option('--youtube-dl <PATH>', 'explicit path to the youtube-dl binary')
   .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
   .option('--no-stats', "don't show the stats on completion")
   .option('--pulsate-bar', 'show a pulsating bar')
@@ -1471,7 +1463,6 @@ program
     console.log('Environment Variables:');
     console.log('  SHOW_DEBUG_STACK             show extended debug information');
     console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
-    console.log('  YOUTUBE_DL_PATH              custom youtube-dl path, alternatively use `--youtube-dl`');
     console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
     console.log('');
     console.log('Info:');

@@ -4,14 +4,13 @@ const util = require('util');
 const got = require('got').default;
 const Promise = require('bluebird');
 const ytSearch = require('yt-search');
-const youtubedl = require('youtube-dl');
+const youtubedl = require('youtube-dl-exec');
 
 const walk = require('../walkr');
 const symbols = require('../symbols');
 const textUtils = require('../text_utils');
 const AsyncQueue = require('../async_queue');
 
-const _ytdlGet = util.promisify(youtubedl.getInfo);
 class YouTubeSearchError extends Error {
   constructor(message, statusCode, status, body) {
     super(message);
@@ -39,8 +38,12 @@ class YouTubeSearchError extends Error {
  */
 
 function genAsyncGetFeedsFn(url) {
-  const loadFeeds = async () => _ytdlGet(url, ['--socket-timeout=20', '--no-cache-dir']);
-  return loadFeeds;
+  return () =>
+    youtubedl(url, {
+      socketTimeout: 20,
+      cacheDir: false,
+      dumpSingleJson: true,
+    });
 }
 
 class YouTubeMusic {
