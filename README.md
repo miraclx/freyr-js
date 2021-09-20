@@ -92,43 +92,24 @@ You can use either of these options to install freyr:
 
 ### Docker
 
-We provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs/tags) (automated builds from this repo).
+For convenience, we provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest) (automated builds from this repo) so you can skip the setup and build process and get right into it.
 
-Pull the image:
+Image Size: [![Docker Image Size](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker)](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest)
 
-``` bash
-docker pull freyrcli/freyrjs
-```
-
-| Base Image      | Size | Tag |
-| :-------------: | :--: |:-------- |
-| Alpine (musl) * | [![Docker Image Size (:alpine)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker)](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest) | `freyrcli/freyrjs:latest` |
-| Arch Linux      | [![Docker Image Size (:archlinux)](https://img.shields.io/docker/image-size/freyrcli/freyrjs/archlinux?color=gray&label=%20&logo=docker)](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=archlinux) | `freyrcli/freyrjs:archlinux` |
-
-*: default
-
-#### Usage (Docker)
-
-<details>
-<summary> Structure </summary>
+#### Usage (docker)
 
 ``` bash
-docker run -it --rm -v $PWD:/data <tag> [options, arguments and queries...]
+docker run -it --rm -v $PWD:/data freyrcli/freyrjs [options, arguments and queries...]
 ```
 
-</details>
-
-Example, with the `freyrcli/freyrjs:latest` tag:
+You can also create a handy alias to skip remembering that whole line everytime
 
 ``` bash
-docker run -it --rm -v $PWD:/data freyrcli/freyrjs:latest
+alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 ```
 
-Alternatively, create a handy alias
-
-``` bash
-alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs:latest'
-```
+> The `-v $PWD:/data` part sets the working directory for freyr to the current working directory.
+> For example, you can use `-v ~/Music/freyr:/data` to set the work directory and consequently, default save location to `~/Music/freyr`.
 
 [See [Docker Development](#docker-development)]
 
@@ -1081,30 +1062,21 @@ cd freyr-js
 
 ### Docker Development
 
-To facilitate development and experimentation through Docker, Dockerfiles are provided in the `docker/` folder for your convenience.
-
-| Base Image OS | Average Build Network Usage | Average Disk Usage | File |
-| :-----------: | :--------: | :-------: | :---------------------------: |
-| Alpine (musl) | ~ 80 MB    | ~ 182 MB  | [`docker/Dockerfile.alpine`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.alpine)    |
-| Arch Linux    | ~ 190 MB   | ~ 1.2 GB | [`docker/Dockerfile.archlinux`](https://github.com/miraclx/freyr-js/raw/master/docker/Dockerfile.archlinux) |
+The default provided [Dockerfile](https://github.com/miraclx/freyr-js/raw/master/Dockerfile) builds minimal alpine images. Average build network usage is ~ 80 MB and disk usage is ~ 180 MB.
 
 ``` bash
-# building with default dockerfile (alpine)
 git clone https://github.com/miraclx/freyr-js.git freyr
 cd freyr
-docker build -t freyr-dev:latest .
-
-# alternatively, you can use any other dockerfile
-docker build -t freyr-dev:archlinux -f docker/Dockerfile.archlinux .
+docker build -t freyr-dev .
 ```
 
 Afterwards, you can drop into the container by explicitly defining the entrypoint
 
 ``` bash
-docker run -it --entrypoint bash freyr-dev:latest
+docker run -it --entrypoint bash freyr-dev
 
 # Alternatively, create a handy alias
-alias freyrd='docker run -it --entrypoint bash freyr-dev:latest'
+alias freyrsh='docker run -it --entrypoint bash freyr-dev'
 ```
 
 Optionally, you can use these interesting flags to customize the experience.
