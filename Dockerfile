@@ -21,7 +21,7 @@ RUN apk add \
 # bootstrap
 RUN mkdir /bins && \
   # install atomicparsley
-  wget -nv https://github.com/miraclx/atomicparsley/releases/download/20_test_alpine_release/AtomicParsleyAlpine.zip && \
+  wget -nv https://github.com/wez/atomicparsley/releases/download/20210715.151551.e7ad03a/AtomicParsleyAlpine.zip && \
   unzip -j AtomicParsleyAlpine.zip AtomicParsley -d /bins
 
 ENV PATH "/bins:$PATH"
