@@ -46,47 +46,102 @@
 
 ### Manually
 
-Ensure all [requirements](#requirements) are satisfied before installing.
+<details>
+<summary id="requirements"> Requirements </summary>
 
-You can use either of these options to install freyr:
+  <sub> *Hey there, you might want to consider a cleaner and straight-forward installation method, without having to manually setup the requirements. If so, checkout the [Docker installation method](#docker)* </sub>
 
-- Install globally via [NPM](https://github.com/npm/cli):
+  <details>
+  <summary>python >= v3.2</summary>
+
+  Download for your individual platforms here <https://www.python.org/downloads/>
+
+  Linux: _(check individual package managers)_
+
+  - Debian: `sudo apt-get install python3.6`
+  - Arch Linux: `sudo pacman -S python`
+  - Android (Termux): `apt install python`
+  - Alpine Linux: `sudo apk add python3`
+
+  </details>
+
+  <details>
+  <summary>nodejs >= v12.0.0</summary>
+
+  Download for your individual platforms here <https://nodejs.org/en/download/>
+
+  macOS + Linux: [nvm](https://github.com/nvm-sh/nvm) recommended.
 
   ``` bash
-  npm install -g miraclx/freyr-js
+  # install node with this nvm command
+  # freyr works with a minimum of v12
+  $ nvm install --lts
   ```
 
-- Install globally via [Yarn](https://github.com/yarnpkg/yarn):
+  - Android (Termux): `apt install nodejs`
+  - Alpine Linux: `sudo apk add nodejs`
 
-  ``` bash
-  yarn global add miraclx/freyr-js
-  ```
+  </details>
+
+  <details>
+  <summary>ffmpeg >= v0.9</summary>
+
+  Download for your individual platforms here <https://ffmpeg.org/download.html>
+
+  - Windows + macOS:
+    - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
+    - make sure it's available in your `PATH`
+    - otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
+  - Linux: _(check individual package managers)_
+    - Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
+    - Arch Linux: `sudo pacman -S ffmpeg`
+    - Android (Termux): `apt install ffmpeg`
+    - Alpine Linux: `sudo apk add ffmpeg`
+
+  </details>
+
+  <details>
+  <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
+
+  First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
+
+  Then;
+
+  - Windows:
+    - unzip and place the `AtomicParsley.exe` in your `PATH`.
+    - or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
+  - Linux + macOS _(the brew package isn't recommended)_:
+    - unzip and place the `AtomicParsley` in your `PATH`.
+    - or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
+  - Alternatively:
+    - Debian: `sudo apt-get install atomicparsley`
+    - Arch Linux: `sudo pacman -S atomicparsley`
+    - Android (Termux): `apt install atomicparsley`
+    - Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
+
+  </details>
+
+
+  ---
+</details>
+
+First start by ensuring all requirements listed above are satisfied. Thereafter, you can use either of these options to install freyr:
+
+- [NPM](https://github.com/npm/cli): `npm install -g miraclx/freyr-js`
+- [Yarn](https://github.com/yarnpkg/yarn): `yarn global add miraclx/freyr-js`
 
 - <details>
-  <summary>Or alternatively, you can build from source</summary>
+  <summary>Or you can build from source</summary>
 
   ``` bash
-  git clone https://github.com/miraclx/freyr-js.git freyr-js
-  cd freyr-js
+  git clone https://github.com/miraclx/freyr-js.git freyr
+  cd freyr
   ```
 
-  - If using npm:
-
-    ``` bash
-    npm install
-
-    # to have access to the freyr command globally
-    npm link
-    ```
-
-  - If using yarn:
-
-    ``` bash
-    yarn install
-
-    # to have access to the freyr command globally
-    yarn link
-    ```
+  | % | NPM | Yarn |
+  | - | --- | ---- |
+  | pull dependencies | `npm install` | `yarn install` |
+  | install globally | `npm link` | `yarn link` |
 
   </details>
 
@@ -114,81 +169,6 @@ alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 [See [Docker Development](#docker-development)]
 
 ## Getting Started
-
-### Requirements
-
-As an alternative to setting up freyr and its dependencies on your host system, consider the [Docker installation method](#docker) for a containerized experience.
-
-<details>
-<summary>python >= v3.2</summary>
-
-Download for your individual platforms here <https://www.python.org/downloads/>
-
-Linux: _(check individual package managers)_
-
-- \* Debian: `sudo apt-get install python3.6`
-- \* Arch Linux: `sudo pacman -S python`
-- Android (Termux): `apt install python`
-- Alpine Linux: `sudo apk add python3`
-- _(`*`: should already be preinstalled)_
-
-</details>
-
-<details>
-<summary>nodejs >= v12.0.0</summary>
-
-Download for your individual platforms here <https://nodejs.org/en/download/>
-
-macOS + Linux: [nvm](https://github.com/nvm-sh/nvm) recommended.
-
-``` bash
-# install node with this nvm command
-# freyr works with a minimum of v12
-$ nvm install --lts
-```
-
-- Android (Termux): `apt install nodejs`
-- Alpine Linux: `sudo apk add nodejs`
-
-</details>
-
-<details>
-<summary>ffmpeg >= v0.9</summary>
-
-Download for your individual platforms here <https://ffmpeg.org/download.html>
-
-- Windows + macOS:
-  - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
-  - make sure it's available in your `PATH`
-  - otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
-- Linux: _(check individual package managers)_
-  - Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
-  - Arch Linux: `sudo pacman -S ffmpeg`
-  - Android (Termux): `apt install ffmpeg`
-  - Alpine Linux: `sudo apk add ffmpeg`
-
-</details>
-
-<details>
-<summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
-
-First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
-
-Then;
-
-- Windows:
-  - unzip and place the `AtomicParsley.exe` in your `PATH`.
-  - or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
-- Linux + macOS _(the brew package isn't recommended)_:
-  - unzip and place the `AtomicParsley` in your `PATH`.
-  - or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
-- Alternatively:
-  - Debian: `sudo apt-get install atomicparsley`
-  - Arch Linux: `sudo pacman -S atomicparsley`
-  - Android (Termux): `apt install atomicparsley`
-  - Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
-
-</details>
 
 ### Usage
 
@@ -1038,8 +1018,8 @@ To preview filter rules specification, use the `filter` subcommand.
 Feel free to clone and use in adherance to the [license](#license). Pull requests are very much welcome.
 
 ``` bash
-git clone https://github.com/miraclx/freyr-js.git freyr-js
-cd freyr-js
+git clone https://github.com/miraclx/freyr-js.git freyr
+cd freyr
 ```
 
 - If using [NPM](https://github.com/npm/cli):
