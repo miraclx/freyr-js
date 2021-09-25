@@ -6,3 +6,5 @@ bins/
 
 # ignore stage for testing
 stage/
+
+AtomicParsley.exe
