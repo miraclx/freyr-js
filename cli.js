@@ -77,7 +77,7 @@ function wrapCliInterface(binaryName, binaryPath) {
     }
 
     if (typeof file === 'string') {
-      spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
+      spawn(binaryPath, [file, ...parseMeta(args)], { env: extendPathOnEnv(path) }).on('close', cb);
     }
   };
 }
@@ -580,7 +580,6 @@ async function init(queries, options) {
 
   const atomicParsley = wrapCliInterface('AtomicParsley', options.atomicParsley);
 
-
   try {
     if (options.ffmpeg) {
       if (!fs.existsSync(options.ffmpeg)) throw new Error(`\x1b[31mffmpeg\x1b[0m: Binary not found [${options.ffmpeg}]`);
@@ -844,6 +843,10 @@ async function init(queries, options) {
           // ----
           ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.trackId, 'name=MusicBrainzTrackId', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.artistId, 'name=MusicBrainzArtistId', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.albumId, 'name=MusicBrainzAlbumId', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.albumArtistId, 'name=MusicBrainzAlbumArtistId', 'domain=com.apple.iTunes'],
           [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
           [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
@@ -877,25 +880,7 @@ async function init(queries, options) {
         //   ['albumartist', 'NAME'], // soaa
         // ],
       })
-        .finally(() => {
-          /* Good location for code not found
-          var mutagen = require('mutagen');
-    
-          var edits = {
-            MusicBrainzTrackId: track.musicBrainz.trackId,
-            MusicBrainzArtistId: track.musicBrainz.artistId,
-            MusicBrainzAlbumId: track.musicBrainz.albumId,
-            MusicBrainzAlbumArtistId: track.musicBrainz.albumArtistId,
-          };
-          mutagen.edit(meta.outFilePath, edits, function (err) {
-            if (err) {
-              return console.log(err);
-            }
-            console.log('done');
-          });
-          */
-          files.image.file.removeCallback()
-        })
+        .finally(() => files.image.file.removeCallback())
         .catch(err => Promise.reject({err, code: 8}));
     },
   );
@@ -1107,7 +1092,6 @@ async function init(queries, options) {
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
-      
       const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
