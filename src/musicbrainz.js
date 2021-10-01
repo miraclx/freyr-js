@@ -45,8 +45,7 @@ async function gatherMusicBrainzMetadata(track, trackLogger)
         }
         //
       }).catch(error => {
-        trackLogger.write('[failed]\n');
-        trackLogger.log(error);
+        trackLogger.write(`[failed, ${error.message}]\n`);
       });
     }
 	return musicBrainz;
