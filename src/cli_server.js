@@ -59,9 +59,7 @@ class AuthServer extends events.EventEmitter {
     this.#store.stateKey = 'auth_state';
     this.#store.baseUrl = `http${opts.useHttps ? 's' : ''}://${this.#store.hostname}:${this.#store.port}`;
     this.#store.callbackRoute = '/callback';
-    this.#store.express = express()
-      .use(cors())
-      .use(cookieParser());
+    this.#store.express = express().use(cors()).use(cookieParser());
   }
 
   getRedirectURL() {

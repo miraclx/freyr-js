@@ -124,7 +124,8 @@ class Deezer {
       isSourceable: false,
     },
     // https://www.debuggex.com/r/IuFIxSZGFJ07tOkR
-    VALID_URL: /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/,
+    VALID_URL:
+      /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(.+))|(?:deezer:(track|album|artist|playlist):(.+))/,
     PROP_SCHEMA: {},
   };
 
