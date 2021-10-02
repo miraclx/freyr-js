@@ -31,10 +31,10 @@ const symbols = require('./src/symbols');
 const fileMgr = require('./src/file_mgr');
 const pFlatten = require('./src/p_flatten');
 const FreyrCore = require('./src/freyr');
-const MusicBrainz = require('./src/musicbrainz.js');
 const AuthServer = require('./src/cli_server');
 const AsyncQueue = require('./src/async_queue');
 const parseRange = require('./src/parse_range');
+const musicBrainz = require('./src/musicbrainz.js');
 const StackLogger = require('./src/stack_logger');
 const packageJson = require('./package.json');
 const streamUtils = require('./src/stream_utils');
@@ -44,7 +44,13 @@ function parseMeta(params) {
   return Object.entries(params || {})
     .filter(([, value]) => ![undefined, null].includes(value))
     .map(([key, value]) =>
-      Array.isArray(value) ? value.map(tx => (tx ? [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])] : '')) : [`--${key}`, value],
+      Array.isArray(value)
+        ? value
+            .filter(val => val !== undefined)
+            .map((tx, args) =>
+              (args = Array.isArray(tx) ? tx : [tx]).every(val => val !== undefined) ? [`--${key}`, ...args] : [],
+            )
+        : [`--${key}`, value],
     )
     .flat(Infinity);
 }
@@ -78,7 +84,7 @@ function wrapCliInterface(binaryName, binaryPath) {
     }
 
     if (typeof file === 'string') {
-      spawn(binaryPath, [file, ...parseMeta(args)], { env: extendPathOnEnv(path) }).on('close', cb);
+      spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
     }
   };
 }
@@ -850,14 +856,18 @@ async function init(queries, options) {
         gapless: options.gapless, // pgap
         rDNSatom: [
           // ----
-          ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.trackId, 'name=MusicBrainzTrackId', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.artistId, 'name=MusicBrainzArtistId', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.albumId, 'name=MusicBrainzAlbumId', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.albumArtistId, 'name=MusicBrainzAlbumArtistId', 'domain=com.apple.iTunes'],
           [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.trackId, 'name="MusicBrainz Track Id"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.artistId, 'name="MusicBrainz Artist Id"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.artistId, 'name="MusicBrainz Album Artist Id"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.releaseId, 'name="MusicBrainz Album Id"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
           [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
           [
             `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
@@ -882,12 +892,12 @@ async function init(queries, options) {
         encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
         encodedBy: 'd3vc0dr', // ©enc
         artwork: files.image.file.name, // covr
-        // sortOrder: [
-        //   ['name', 'NAME'], // sonm
-        //   ['album', 'NAME'], // soal
-        //   ['artist', 'NAME'], // soar
-        //   ['albumartist', 'NAME'], // soaa
-        // ],
+        sortOrder: [
+          // ['name', 'NAME'], // sonm
+          // ['album', 'NAME'], // soal
+          ['artist', track.musicBrainz.artistSortOrder], // soar
+          ['albumartist', track.musicBrainz.artistSortOrder], // soaa
+        ],
       })
         .finally(() => files.image.file.removeCallback())
         .catch(err => Promise.reject({err, code: 8}));
@@ -989,6 +999,10 @@ async function init(queries, options) {
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
+    track.musicBrainz = await processPromise(props.extraTrackMeta, trackLogger, {
+      onInit: '| \u27a4 Pulling extra metadata...',
+      onErr: '[skipped]',
+    });
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
@@ -1003,8 +1017,6 @@ async function init(queries, options) {
       noVal: '[Unable to collect source feeds]',
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
-
-    track.musicBrainz = await MusicBrainz.gatherMusicBrainzMetadata(track, trackLogger);
 
     const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
@@ -1047,11 +1059,14 @@ async function init(queries, options) {
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = fs.existsSync(outFilePath);
       const processTrack = !fileExists || options.force;
-      let collectSources;
-      if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
+      let collectSources, extraTrackMeta;
+      if (processTrack) {
+        collectSources = buildSourceCollectorFor(track, results => results[0]);
+        if (track.isrc) extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront);
+      }
       const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
-        .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
+        .push({track, meta, props: {collectSources, extraTrackMeta, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
         .catch(errObject => ({meta, code: 10, ...errObject}));
     },
