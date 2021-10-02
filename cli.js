@@ -89,8 +89,9 @@ function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalByt
         Number.isFinite(maxRetries) ? `/:{color(yellow)}${maxRetries}:{color:close(yellow)}` : ''
       }}: `,
       lastErr
-        ? `${lastErr.code ? `[:{color(yellow)}${lastErr.code}:{color:close(yellow)}] ` : ''}(:{color(yellow)}${lastErr.message ||
-            lastErr}:{color:close(yellow)}) `
+        ? `${lastErr.code ? `[:{color(yellow)}${lastErr.code}:{color:close(yellow)}] ` : ''}(:{color(yellow)}${
+            lastErr.message || lastErr
+          }:{color:close(yellow)}) `
         : '',
       totalBytes
         ? `(:{color(cyan)}${
@@ -618,20 +619,27 @@ async function init(queries, options) {
         }
         let {namespace} = Config.playlist;
         namespace = namespace ? xurl.format(xurl.parse(namespace)).concat('/') : '';
-        validStats.forEach(({meta: {track: {uri, name, artists, duration}, service, outFilePath}}) =>
-          plStream.write(
-            [
-              '',
-              `#${service[symbols.meta].DESC} URI: ${uri}`,
-              `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
-              `${namespace.concat(
-                (entry => (!Config.playlist.escape ? entry : encodeURI(entry).replace(/#/g, '%23')))(
-                  xpath.relative(BASE_DIRECTORY, outFilePath),
-                ),
-              )}`,
-              '',
-            ].join('\n'),
-          ),
+        validStats.forEach(
+          ({
+            meta: {
+              track: {uri, name, artists, duration},
+              service,
+              outFilePath,
+            },
+          }) =>
+            plStream.write(
+              [
+                '',
+                `#${service[symbols.meta].DESC} URI: ${uri}`,
+                `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
+                `${namespace.concat(
+                  (entry => (!Config.playlist.escape ? entry : encodeURI(entry).replace(/#/g, '%23')))(
+                    xpath.relative(BASE_DIRECTORY, outFilePath),
+                  ),
+                )}`,
+                '',
+              ].join('\n'),
+            ),
         );
         plStream.close();
         logger.write('[done]\n');
@@ -990,10 +998,7 @@ async function init(queries, options) {
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
     const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
-    meta.fingerprint = crypto
-      .createHash('md5')
-      .update(`${audioSource.source.videoId} ${feedMeta.format_id}`)
-      .digest('hex');
+    meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
       .catch(errObject => Promise.reject({meta, code: 5, ...(errObject.code ? errObject : {err: errObject})}));
@@ -1520,7 +1525,7 @@ program
   )
   .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters (unimplemented)')
   .option('--profile <PROFILE>', 'configuration context with which to process the search and download')
-  .action((args, cmd) => {
+  .action((_args, _cmd) => {
     throw Error('Unimplemented: [CLI:search]');
   })
   .on('--help', () => {

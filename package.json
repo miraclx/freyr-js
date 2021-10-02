@@ -87,5 +87,11 @@
     "xprogress": "^0.17.3",
     "youtube-dl-exec": "^1.2.6",
     "yt-search": "^2.5.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "2.3.2"
   }
 }

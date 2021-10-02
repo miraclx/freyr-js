@@ -1,0 +1,42 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2021,
+    "ecmaFeatures": {
+      "modules": true
+    }
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      1,
+      {
+        "trailingComma": "all",
+        "printWidth": 130,
+        "bracketSpacing": false,
+        "arrowParens": "avoid",
+        "singleQuote": true
+      }
+    ],
+    "no-empty": 0,
+    "no-cond-assign": 0,
+    "no-sparse-arrays": 0,
+    "no-unused-vars": [
+      1,
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  }
+}
