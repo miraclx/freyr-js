@@ -1,4 +1,5 @@
 const got = require('got');
+const NodeCache = require('node-cache');
 const {parseStringPromise: xml2js} = require('xml2js');
 
 class MusicBrainzError extends Error {
@@ -8,22 +9,29 @@ class MusicBrainzError extends Error {
   }
 }
 
+let cache = new NodeCache();
+
 async function query(entity_type, entity, args) {
-  let response = await got(`https://musicbrainz.org/ws/2/${entity_type}/${entity}?inc=artists+releases+discids`, {
-    searchParams: {...args, ...('inc' in args ? {inc: args.inc.join('+')} : {}), ...(args.json ? {fmt: 'json'} : {})},
-  });
-  let body;
-  try {
-    body = response.body.startsWith('<?xml')
-      ? await xml2js(response.body, {trim: true, mergeAttrs: true, explicitRoot: false, explicitArray: false})
-      : JSON.parse(response.body);
-  } catch {
-    throw new MusicBrainzError('Invalid Server Response');
+  let inc = Array.isArray(args.inc) ? args.inc.join('+') : '';
+  let key = `${entity_type}:${entity}:${inc}`;
+  if (!cache.has(key)) {
+    let response = await got(`https://musicbrainz.org/ws/2/${entity_type}/${entity}?inc=artists+releases+discids`, {
+      searchParams: {...args, ...(inc ? {inc} : {}), ...(args.json ? {fmt: 'json'} : {})},
+    });
+    let body;
+    try {
+      body = response.body.startsWith('<?xml')
+        ? await xml2js(response.body, {trim: true, mergeAttrs: true, explicitRoot: false, explicitArray: false})
+        : JSON.parse(response.body);
+    } catch {
+      throw new MusicBrainzError('Invalid Server Response');
+    }
+    if (response.statusCode !== 200) {
+      throw new MusicBrainzError(body.error || 'An error occurred', response.statusCode);
+    }
+    cache.set(key, body);
   }
-  if (response.statusCode !== 200) {
-    throw new MusicBrainzError(body.error || 'An error occurred', response.statusCode);
-  }
-  return body;
+  return cache.get(key);
 }
 
 async function lookupISRC(isrc, storefront) {
