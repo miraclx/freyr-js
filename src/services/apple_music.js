@@ -147,13 +147,15 @@ class AppleMusic {
       images: albumObject.attributes.artwork,
       label: albumObject.attributes.recordLabel,
       release_date: (date =>
-        [
-          [date.year, 4],
-          [date.month, 2],
-          [date.day, 2],
-        ]
-          .map(([val, size]) => val.toString().padStart(size, '0'))
-          .join('-'))(albumObject.attributes.releaseDate),
+        typeof date === 'string'
+          ? date
+          : [
+              [date.year, 4],
+              [date.month, 2],
+              [date.day, 2],
+            ]
+              .map(([val, size]) => val.toString().padStart(size, '0'))
+              .join('-'))(albumObject.attributes.releaseDate),
       ntracks: albumObject.attributes.trackCount,
       tracks: albumObject.relationships.tracks.data,
       getImage(width, height) {
