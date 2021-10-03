@@ -16,7 +16,7 @@ async function query(entity_type, entity, args) {
   let key = `${entity_type}:${entity}:${inc}`;
   if (!cache.has(key)) {
     let response = await got(`https://musicbrainz.org/ws/2/${entity_type}/${entity}?inc=artists+releases+discids`, {
-      searchParams: {...args, ...(inc ? {inc} : {}), ...(args.json ? {fmt: 'json'} : {})},
+      searchParams: {...(inc ? {inc} : {}), ...(args.json ? {fmt: 'json'} : {})},
     });
     let body;
     try {
