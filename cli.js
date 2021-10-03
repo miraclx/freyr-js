@@ -454,6 +454,7 @@ async function init(queries, options) {
       netCheck: true,
       attemptAuth: true,
       autoOpenBrowser: true,
+      musicBrainz: false,
     },
     dirs: {
       output: '.',
@@ -517,6 +518,7 @@ async function init(queries, options) {
     netCheck: options.netCheck,
     attemptAuth: options.auth,
     autoOpenBrowser: options.browser,
+    musicBrainz: options.musicbrainz,
   });
   Config.playlist = lodash.merge(Config.playlist, {
     always: !!options.playlist,
@@ -1000,7 +1002,8 @@ async function init(queries, options) {
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
     track.musicBrainz = await processPromise(props.extraTrackMeta, trackLogger, {
-      onInit: '| \u27a4 Pulling extra metadata...',
+      onInit: '| \u27a4 Sourcing extra metadata...',
+      noVal: () => '[skipped]\n',
       onErr: err => `[failed, ${err.statusCode ? `(${err.statusCode}) ` : ''}${err.message}]\n`,
     });
     trackLogger.log('| \u27a4 Collating sources...');
@@ -1062,7 +1065,7 @@ async function init(queries, options) {
       let collectSources, extraTrackMeta;
       if (processTrack) {
         collectSources = buildSourceCollectorFor(track, results => results[0]);
-        if (track.isrc) extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront);
+        if (Config.opts.musicBrainz && track.isrc) extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront);
       }
       const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
@@ -1419,6 +1422,7 @@ program
     ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
     'yt_music',
   )
+  .option('-m, --musicbrainz', 'attempt to source and embed extra metadata from MusicBrainz')
   .option(
     '-l, --filter <MATCH>',
     [
@@ -1469,7 +1473,7 @@ program
   )
   .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
   .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
-  .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
+  .option('-M, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
   .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
   .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
   .option('--no-auth', 'skip authentication procedure')

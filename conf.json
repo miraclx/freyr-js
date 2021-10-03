@@ -15,7 +15,8 @@
   "opts": {
     "netCheck": true,
     "attemptAuth": true,
-    "autoOpenBrowser": true
+    "autoOpenBrowser": true,
+    "musicBrainz": false
   },
   "filters": [],
   "dirs": {
