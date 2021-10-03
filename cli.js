@@ -83,9 +83,7 @@ function wrapCliInterface(binaryName, binaryPath) {
       binaryPath = ensureBinExtIfWindows(isWin, binaryName);
     }
 
-    if (typeof file === 'string') {
-      spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
-    }
+    if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
   };
 }
 
@@ -1065,7 +1063,8 @@ async function init(queries, options) {
       let collectSources, extraTrackMeta;
       if (processTrack) {
         collectSources = buildSourceCollectorFor(track, results => results[0]);
-        if (Config.opts.musicBrainz && track.isrc) extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront);
+        if (Config.opts.musicBrainz && track.isrc)
+          extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront || 'us');
       }
       const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
