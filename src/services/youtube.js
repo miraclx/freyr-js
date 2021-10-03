@@ -39,7 +39,8 @@ class YouTubeSearchError extends Error {
 
 function genAsyncGetFeedsFn(url) {
   return () =>
-    youtubedl(url, {
+    youtubedl(null, {
+      '--': [url],
       socketTimeout: 20,
       cacheDir: false,
       dumpSingleJson: true,

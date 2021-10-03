@@ -1007,14 +1007,14 @@ async function init(queries, options) {
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
         onInit: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
-        arrIsEmpty: '[Unable to gather sources]',
+        arrIsEmpty: () => '[Unable to gather sources]\n',
         onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]\n`,
       }),
     );
     if ('err' in audioSource) return {meta, code: 1, err: audioSource.err}; // zero sources found
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
       onInit: '| \u27a4 Awaiting audiofeeds...',
-      noVal: '[Unable to collect source feeds]',
+      noVal: () => '[Unable to collect source feeds]\n',
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
@@ -1208,13 +1208,13 @@ async function init(queries, options) {
     const queryLogger = stackLogger.log(`[${query}]`).tick();
     const service = await processPromise(freyrCore.identifyService(query), queryLogger, {
       onInit: '[\u2022] Identifying service...',
-      noVal: '(failed: \x1b[33mInvalid Query\x1b[0m)\n',
+      noVal: () => '(failed: \x1b[33mInvalid Query\x1b[0m)\n',
       onPass: engine => `[${engine[symbols.meta].DESC}]\n`,
     });
     if (!service) return;
     const isAuthenticated = !!(await processPromise(authQueue.push(service, queryLogger), queryLogger, {
       onInit: '[\u2022] Checking authentication...',
-      noVal: '[\u2715] Failed to authenticate client!\n',
+      noVal: () => '[\u2715] Failed to authenticate client!\n',
       onPass: false,
     }));
     if (!isAuthenticated) return;
