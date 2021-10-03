@@ -1000,11 +1000,12 @@ async function init(queries, options) {
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
-    track.musicBrainz = await processPromise(props.extraTrackMeta, trackLogger, {
-      onInit: '| \u27a4 Sourcing extra metadata...',
-      noVal: () => '[skipped]\n',
-      onErr: err => `[failed, ${err.statusCode ? `(${err.statusCode}) ` : ''}${err.message}]\n`,
-    });
+    track.musicBrainz =
+      (await processPromise(props.extraTrackMeta, trackLogger, {
+        onInit: '| \u27a4 Sourcing extra metadata...',
+        noVal: () => '[skipped]\n',
+        onErr: err => `[failed, ${err.statusCode ? `(${err.statusCode}) ` : ''}${err.message}]\n`,
+      })) || {};
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
