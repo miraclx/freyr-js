@@ -47,10 +47,11 @@ async function lookupISRC(isrc, storefront) {
     artistSortOrder: artistMeta['sort-name'],
     releaseGroupId: release['release-group'].id,
     releaseType: release['release-group']['primary-type'],
-    barcode: release.barcode,
+    releaseCountry: release.country,
     releaseStatus: release.status.toLowerCase(),
-    script: release['text-representation'].script,
     media: release.media[0].format,
+    script: release['text-representation'].script,
+    barcode: release.barcode,
   };
 }
 

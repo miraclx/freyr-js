@@ -866,6 +866,7 @@ async function init(queries, options) {
           [track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
           [track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
           [track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
+          [track.musicBrainz.releaseCountry, 'name="MusicBrainz Album Release Country"', 'domain=com.apple.iTunes'],
           [track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
           [track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
           [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
