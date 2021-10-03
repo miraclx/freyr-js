@@ -1001,7 +1001,7 @@ async function init(queries, options) {
     }
     track.musicBrainz = await processPromise(props.extraTrackMeta, trackLogger, {
       onInit: '| \u27a4 Pulling extra metadata...',
-      onErr: '[skipped]',
+      onErr: err => `[failed, ${err.statusCode ? `(${err.statusCode}) ` : ''}${err.message}]\n`,
     });
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
