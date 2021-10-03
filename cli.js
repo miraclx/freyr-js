@@ -1065,8 +1065,10 @@ async function init(queries, options) {
       let collectSources, extraTrackMeta;
       if (processTrack) {
         collectSources = buildSourceCollectorFor(track, results => results[0]);
-        if (Config.opts.musicBrainz && track.isrc)
+        if (Config.opts.musicBrainz && track.isrc) {
           extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront || 'us');
+          Promise.resolve(extraTrackMeta).catch(() => {}); // diffuse any caught error in the meantime
+        }
       }
       const meta = {trackName, outFileDir, outFilePath, track, service};
       return trackQueue
