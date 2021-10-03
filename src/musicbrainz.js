@@ -57,7 +57,7 @@ async function lookupISRC(isrc, storefront) {
     artistId: artistMeta.id,
     artistSortOrder: artistMeta['sort-name'],
     releaseGroupId: release['release-group'].id,
-    releaseType: release['release-group']['primary-type'],
+    releaseType: release['release-group']['primary-type'].toLowerCase(),
     releaseCountry: release.country,
     releaseStatus: release.status.toLowerCase(),
     media: release.media[0].format,
