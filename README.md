@@ -165,6 +165,8 @@ alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 
 > The `-v $PWD:/data` part sets the working directory for freyr to the current working directory.
 > For example, you can use `-v ~/Music/freyr:/data` to set the work directory and consequently, default save location to `~/Music/freyr`.
+>
+> Please ensure the folder on the host already exists, create it if not. Otherwise, docker autocreates the folder as root and that causes unpleasant `Permission Denied` issues when you run freyr.
 
 [See [Docker Development](#docker-development)]
 

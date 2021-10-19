@@ -18,28 +18,29 @@ RUN apk add \
   && ln /usr/bin/python3 /usr/bin/python \
   && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+
 
-# bootstrap
-RUN mkdir /bins && \
-  # install atomicparsley
-  wget -nv https://github.com/wez/atomicparsley/releases/download/20210715.151551.e7ad03a/AtomicParsleyAlpine.zip && \
-  unzip -j AtomicParsleyAlpine.zip AtomicParsley -d /bins
-
+# install atomicparsley
+RUN mkdir /bins \
+  && wget -nv https://github.com/wez/atomicparsley/releases/download/20210715.151551.e7ad03a/AtomicParsleyAlpine.zip \
+  && unzip -j AtomicParsleyAlpine.zip AtomicParsley -d /bins \
+  && rm -v AtomicParsleyAlpine.zip
 ENV PATH "/bins:$PATH"
 
-# Create freyr group. Then add root to freyr group.
+# Create freyr user and group
 RUN addgroup -g 1000 freyr \
-  && addgroup root freyr \
-  && mkdir /freyr \
-  && chown :freyr /freyr
+  && adduser -DG freyr freyr \
+  && echo freyr:freyr | chpasswd
 
 # Stage and install freyr
 COPY . /freyr
 RUN npm install --global --unsafe-perm /freyr \
-  && npm cache clean --force
+  && npm cache clean --force \
+  && mkdir /data \
+  && chown -R freyr:freyr /freyr /data
 
 # Set and mount workdir
+USER freyr
 WORKDIR /data
-VOLUME ["/data"]
+VOLUME /data
 
 # Set entrypoint and default cmd
 ENTRYPOINT ["freyr"]
