@@ -68,7 +68,7 @@
     "html-entities": "^2.0.6",
     "is-online": "^9.0.0",
     "isbinaryfile": "^4.0.6",
-    "libxget": "^0.8.3",
+    "libxget": "^0.9.0",
     "lodash": "^4.17.20",
     "merge2": "^1.4.1",
     "minimatch": "^3.0.4",
