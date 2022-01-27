@@ -127,8 +127,8 @@
 
 First start by ensuring all requirements listed above are satisfied. Thereafter, you can use either of these options to install freyr:
 
-- [NPM](https://github.com/npm/cli): `npm install -g miraclx/freyr-js`
-- [Yarn](https://github.com/yarnpkg/yarn): `yarn global add miraclx/freyr-js`
+- [NPM](https://github.com/npm/cli): `npm install -g freyr`
+- [Yarn](https://github.com/yarnpkg/yarn): `yarn global add freyr`
 
 - <details>
   <summary>Or you can build from source</summary>
