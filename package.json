@@ -53,7 +53,7 @@
   "dependencies": {
     "@miraclx/apple-music": "^0.4.0",
     "async": "^3.2.0",
-    "axios": "^0.21.4",
+    "axios": "^0.25.0",
     "bluebird": "^3.7.2",
     "commander": "^6.2.1",
     "conf": "^7.1.2",
