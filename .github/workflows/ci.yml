@@ -1,0 +1,161 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: docker build -t freyrcli/freyrjs .
+
+  install:
+    runs-on: ubuntu-20.04
+    needs: [ docker-build ]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y ffmpeg ripgrep atomicparsley
+
+    - name: Install freyr
+      run: npm install --global .
+
+    - name: Prep Testing Stage
+      run: |
+        mkdir -p ./CI/{spotify,apple_music,deezer}/{track,album,artist,playlist}
+
+        cat << EOF > ./CI/prep.sh
+          freyr() {
+            export FREYR_OUTPUT=\$(script -qfc "freyr \$@" /dev/null | tee \$(tty))
+          }
+        EOF
+
+        echo "RIPGREP_CONFIG_PATH=./CI/ripgreprc" >> $GITHUB_ENV
+        cat << EOF > ./CI/ripgreprc
+          --fixed-strings
+          --passthru
+        EOF
+
+  test-track:
+    runs-on: ubuntu-20.04
+    needs: [ install ]
+
+    steps:
+    - name: Download track via Spotify
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/spotify/track
+
+          freyr https://open.spotify.com/track/5FNS5Vj69AhRGJWjhrAd01
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [01]" \
+            | rg "✕ Failed:  [00]"
+
+    - name: Download track via Apple Music
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/apple_music/track
+
+          freyr https://music.apple.com/us/album/elio-irl/1547735824?i=1547736100
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [01]" \
+            | rg "✕ Failed:  [00]"
+
+    - name: Download track via Deezer
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/deezer/track
+
+          freyr https://www.deezer.com/en/track/1189202982
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [01]" \
+            | rg "✕ Failed:  [00]"
+
+    - name: Download track via Deezer
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/deezer/track
+
+          freyr https://www.deezer.com/en/track/1189202982
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [01]" \
+            | rg "✕ Failed:  [00]"
+
+  test-album:
+    runs-on: ubuntu-20.04
+    needs: [ install ]
+
+    steps:
+    - name: Download album via Spotify
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/spotify/album
+
+          freyr https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [04]" \
+            | rg "✕ Failed:  [00]"
+
+    - name: Download album via Apple Music
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/apple_music/album
+
+          freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [04]" \
+            | rg "✕ Failed:  [00]"
+
+    - name: Download album via Deezer
+      uses: nick-invision/retry@v2.4.0
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          . ./CI/prep.sh && cd ./CI/deezer/album
+
+          freyr https://www.deezer.com/en/album/123330212
+          echo $FREYR_OUTPUT \
+            | rg "[•] Collation Complete" \
+            | rg "[•] Total tracks: [04]" \
+            | rg "✕ Failed:  [00]"
+
+  # test-artist:
+  # test-playlist:
+  # docker-publish:
