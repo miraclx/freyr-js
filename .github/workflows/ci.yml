@@ -71,12 +71,17 @@ jobs:
             echo "::endgroup::"
           }
 
-          validate() {
+          _validate() {
             echo "::group::[\$attempts/3] Verifying..."
-            res=\$(cat .freyr_log | rg "[•] Collation Complete")
+            res=\$(cat .freyr_log)
             for arg in "\$@"; do
               res=\$(echo "\$res" | rg "\$arg")
+              if [[ \$? != 0 ]]; then return 1; fi
             done > /dev/null
+          }
+
+          validate() {
+            _validate "[•] Collation Complete" "\$@"
           }
         EOF
 
