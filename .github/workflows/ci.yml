@@ -17,7 +17,7 @@ jobs:
     - name: Build
       run: docker build -t freyrcli/freyrjs .
 
-  install:
+  tests:
     runs-on: ubuntu-latest
     needs: [ docker-build ]
 
@@ -49,12 +49,7 @@ jobs:
           --passthru
         EOF
 
-  test-track:
-    runs-on: ubuntu-latest
-    needs: [ install ]
-
-    steps:
-    - name: Download track via Spotify
+    - name: Spotify - Download Track
       uses: nick-invision/retry@v2.4.0
       with:
         max_attempts: 3
@@ -68,7 +63,7 @@ jobs:
             | rg "[•] Total tracks: [01]" \
             | rg "✕ Failed:  [00]"
 
-    - name: Download track via Apple Music
+    - name: Apple Music - Download Track
       uses: nick-invision/retry@v2.4.0
       with:
         max_attempts: 3
@@ -82,7 +77,7 @@ jobs:
             | rg "[•] Total tracks: [01]" \
             | rg "✕ Failed:  [00]"
 
-    - name: Download track via Deezer
+    - name: Deezer - Download Track
       uses: nick-invision/retry@v2.4.0
       with:
         max_attempts: 3
@@ -96,26 +91,7 @@ jobs:
             | rg "[•] Total tracks: [01]" \
             | rg "✕ Failed:  [00]"
 
-    - name: Download track via Deezer
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/deezer/track
-
-          freyr https://www.deezer.com/en/track/1189202982
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]"
-
-  test-album:
-    runs-on: ubuntu-latest
-    needs: [ install ]
-
-    steps:
-    - name: Download album via Spotify
+    - name: Spotify - Download Album
       uses: nick-invision/retry@v2.4.0
       with:
         max_attempts: 3
@@ -129,7 +105,7 @@ jobs:
             | rg "[•] Total tracks: [04]" \
             | rg "✕ Failed:  [00]"
 
-    - name: Download album via Apple Music
+    - name: Apple Music - Download Album
       uses: nick-invision/retry@v2.4.0
       with:
         max_attempts: 3
@@ -143,7 +119,7 @@ jobs:
             | rg "[•] Total tracks: [04]" \
             | rg "✕ Failed:  [00]"
 
-    - name: Download album via Deezer
+    - name: Deezer - Download Album
       uses: nick-invision/retry@v2.4.0
       with:
         max_attempts: 3
