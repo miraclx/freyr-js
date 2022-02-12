@@ -54,10 +54,12 @@ jobs:
 
           RG_SRC="\$(which rg)"
           rg() {
-            echo "rg: pattern: [\$@]" > /dev/stderr
+            printf "rg: pattern: /\$@/" > /dev/stderr
             \$RG_SRC --fixed-strings --passthru "\$@"
-            if [[ \$? != 0 ]]; then
-              echo "::error::rg: failed to match" > /dev/stderr
+            if [[ \$? == 0 ]]; then
+              echo " (matched)" > /dev/stderr
+            else
+              echo " (failed to match)" > /dev/stderr
               return 1
             fi
           }
