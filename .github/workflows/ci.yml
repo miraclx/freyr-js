@@ -28,18 +28,22 @@ jobs:
 
         cat << EOF > ./CI/prep.sh
           freyr() {
+            echo "::group::[\$attempts/3] Downloading..."
             script -qfc "freyr \$@" /dev/null | tee .freyr_log
+            echo "::endgroup::"
           }
 
           exec_retry() {
             cmd="\$(cat)" && attempts=1
-            until {
-              echo "::group::Downloading.. (attempt: \$attempts/3)"
-              eval "\$cmd"
-            }; do
-              echo "::error::Download attempt \$attempts/3 failed.$( [[ \$attempts < 3 ]] && " Retrying.." )"
+            until eval "\$cmd"; do
               echo "::endgroup::"
-              if (( ++attempts > 3 )); then return 1; fi
+              if (( attempts <= 3 )); then
+                echo "::warning::[\$attempts/3] Download failed, retrying.."
+                : \$(( attempts += 1 ))
+              else
+                echo "::error::[\$attempts/3] Download failed."
+                return 1
+              fi
             done
             echo "::endgroup::"
             echo "::group::View Files"
@@ -56,6 +60,14 @@ jobs:
               return 1
             fi
           }
+
+          validate() {
+            echo "::group::[\$attempts/3] Verifying..."
+            res=\$(cat .freyr_log | rg "[•] Collation Complete")
+            for arg in "\$@"; do
+              res=\$(echo "\$res" | rg "\$arg")
+            done > /dev/null
+          }
         EOF
 
     - name: Spotify - Download Track
@@ -64,10 +76,9 @@ jobs:
 
         exec_retry << EOF
           freyr https://open.spotify.com/track/5FNS5Vj69AhRGJWjhrAd01
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]" > /dev/null
+          validate \
+            "[•] Total tracks: [01]" \
+            "✕ Failed:  [00]"
         EOF
 
     - name: Spotify - Download Album
@@ -76,10 +87,9 @@ jobs:
 
         exec_retry << EOF
           freyr https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [04]" \
-            | rg "✕ Failed:  [00]" > /dev/null
+          validate \
+            "[•] Total tracks: [04]" \
+            "✕ Failed:  [00]"
         EOF
 
     # - name: Spotify - Download Artist
@@ -91,10 +101,9 @@ jobs:
 
         exec_retry << EOF
           freyr https://music.apple.com/us/album/elio-irl/1547735824?i=1547736100
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]" > /dev/null
+          validate \
+            "[•] Total tracks: [01]" \
+            "✕ Failed:  [00]"
         EOF
 
     - name: Apple Music - Download Album
@@ -103,10 +112,9 @@ jobs:
 
         exec_retry << EOF
           freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [04]" \
-            | rg "✕ Failed:  [00]" > /dev/null
+          validate \
+            "[•] Total tracks: [04]" \
+            "✕ Failed:  [00]"
         EOF
 
     # - name: Apple Music - Download Artist
@@ -118,10 +126,9 @@ jobs:
 
         exec_retry << EOF
           freyr https://www.deezer.com/en/track/1189202982
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]" > /dev/null
+          validate \
+            "[•] Total tracks: [01]" \
+            "✕ Failed:  [00]"
         EOF
 
     - name: Deezer - Download Album
@@ -130,10 +137,9 @@ jobs:
 
         exec_retry << EOF
           freyr https://www.deezer.com/en/album/123330212
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [04]" \
-            | rg "✕ Failed:  [00]" > /dev/null
+          validate \
+            "[•] Total tracks: [04]" \
+            "✕ Failed:  [00]"
         EOF
 
     # - name: Deezer - Download Artist
