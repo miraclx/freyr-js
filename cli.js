@@ -1335,6 +1335,7 @@ async function init(queries, options) {
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===========================');
   }
+  setTimeout(process.exit, 1000);
 }
 
 const program = commander
