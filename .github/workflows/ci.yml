@@ -60,6 +60,7 @@ jobs:
       run: |
         . ./CI/prep.sh && cd ./CI/spotify/track
 
+        type exec_retry
         exec_retry << EOF
           freyr https://open.spotify.com/track/5FNS5Vj69AhRGJWjhrAd01
           cat .freyr_log \
