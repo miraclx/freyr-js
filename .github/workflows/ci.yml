@@ -50,7 +50,15 @@ jobs:
             done
           }
 
-          alias rg="rg --fixed-strings --passthru"
+          RG_SRC="\$(which rg)"
+          rg() {
+            echo "rg: pattern: [\$@]"
+            \$RG_SRC --fixed-strings --passthru "\$@"
+            if [[ \$? != 0 ]]; then
+              echo "::error::rg: failed to match"
+              return 1
+            fi
+          }
         EOF
 
     - name: Spotify - Download Track
@@ -62,7 +70,7 @@ jobs:
           cat .freyr_log \
             | rg "[•] Collation Complete" \
             | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]"
+            | rg "✕ Failed:  [00]" > /dev/null
         EOF
 
   #   - name: Apple Music - Download Track
