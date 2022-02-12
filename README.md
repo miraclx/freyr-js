@@ -325,7 +325,7 @@ Checking directory permissions...[done]
  [•] Embedding Metadata...
   • [✓] 01 Slow Dance
 [•] Collation Complete
-========== Stats ==========
+============ Stats ============
  [•] Runtime: [31.7s]
  [•] Total queries: [01]
  [•] Total tracks: [01]
@@ -339,7 +339,7 @@ Checking directory permissions...[done]
      ♫ Media: 3.02 MB
      ➤ Album Art: 106.76 KB
  [•] Output bitrate: 320k
-===========================
+===============================
 ```
 
 </details>
@@ -408,7 +408,7 @@ Checking directory permissions...[done]
   • [✓] 03 Nothing Ever Changes
   • [✓] 04 Love's a Waste
 [•] Collation Complete
-========== Stats ==========
+============ Stats ============
  [•] Runtime: [2m 2.3s]
  [•] Total queries: [01]
  [•] Total tracks: [04]
@@ -422,7 +422,7 @@ Checking directory permissions...[done]
      ♫ Media: 12.73 MB
      ➤ Album Art: 619.43 KB
  [•] Output bitrate: 320k
-===========================
+===============================
 ```
 
 </details>
@@ -475,7 +475,7 @@ Checking directory permissions...[done]
   • [✓] 01 i think i wanna be alone
   • [✓] 01 no friends
 [•] Collation Complete
-========== Stats ==========
+============ Stats ============
  [•] Runtime: [54.6s]
  [•] Total queries: [01]
  [•] Total tracks: [02]
@@ -489,7 +489,7 @@ Checking directory permissions...[done]
      ♫ Media: 3.50 MB
      ➤ Album Art: 157.16 KB
  [•] Output bitrate: 320k
-===========================
+===============================
 ```
 
 </details>
