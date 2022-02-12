@@ -37,7 +37,7 @@ jobs:
             cmd="\$(cat)" && attempts=1
             until eval "\$cmd"; do
               echo "::endgroup::"
-              if (( attempts <= 3 )); then
+              if (( attempts < 3 )); then
                 echo "::warning::[\$attempts/3] Download failed, retrying.."
                 : \$(( attempts += 1 ))
               else
