@@ -1328,7 +1328,7 @@ async function init(queries, options) {
     stackLogger.log(`     \u00bb Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
     stackLogger.log(
       `     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]${
-        finalStats.new ? ` (new: ${prePadNum(finalStats.new, 10)})` : ''
+        finalStats.passed > finalStats.new ? ` (new: ${prePadNum(finalStats.new, 10)})` : ''
       }`,
     );
     stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
