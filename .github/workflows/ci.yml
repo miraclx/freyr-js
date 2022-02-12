@@ -154,7 +154,7 @@ jobs:
     # - name: Deezer - Download Artist
     # - name: Deezer - Download Playlist
 
-  docker_build:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
