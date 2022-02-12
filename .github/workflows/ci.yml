@@ -7,19 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  docker_build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-
-    - name: Build
-      run: docker build -t freyrcli/freyrjs .
-
   tests:
     runs-on: ubuntu-latest
-    needs: [ docker_build ]
 
     steps:
     - name: Checkout Repository
@@ -86,6 +75,9 @@ jobs:
             | rg "✕ Failed:  [00]" > /dev/null
         EOF
 
+    # - name: Spotify - Download Artist
+    # - name: Spotify - Download Playlist
+
     - name: Apple Music - Download Track
       run: |
         . ./CI/prep.sh && cd ./CI/apple_music/track
@@ -109,6 +101,9 @@ jobs:
             | rg "[•] Total tracks: [04]" \
             | rg "✕ Failed:  [00]" > /dev/null
         EOF
+
+    # - name: Apple Music - Download Artist
+    # - name: Apple Music - Download Playlist
 
     - name: Deezer - Download Track
       run: |
@@ -134,6 +129,15 @@ jobs:
             | rg "✕ Failed:  [00]" > /dev/null
         EOF
 
-  # # test-artist:
-  # # test-playlist:
-  # # docker-publish:
+    # - name: Deezer - Download Artist
+    # - name: Deezer - Download Playlist
+
+  docker_build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: docker build -t freyrcli/freyrjs .
