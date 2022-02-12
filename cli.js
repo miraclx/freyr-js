@@ -300,9 +300,9 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
       return minimatch(object.name, spec, {nocase: !props.filterCase});
     },
     type(spec, object) {
-      if (spec && !['album', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
+      if (spec && !['album', 'single', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
       if (!('compilation' in object)) return;
-      return spec === 'compilation' ? object.compilation : !object.compilation;
+      return spec === object.album_type;
     },
     artist(spec, object, props) {
       if (!('artists' in object)) return;
