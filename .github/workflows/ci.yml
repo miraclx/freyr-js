@@ -33,11 +33,15 @@ jobs:
 
           exec_retry() {
             cmd="\$(cat)" && attempts=1
+            echo "::group::freyr run"
             until eval "\$cmd"; do
               echo "::warning::Attempt \$attempts failed."
               if (( ++attempts > 3 )); then return 1; fi
             done
+            echo "::endgroup::"
+            echo "::group::Final Tree"
             tree -sh
+            echo "::endgroup::"
           }
 
           RG_SRC="\$(which rg)"
