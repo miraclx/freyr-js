@@ -41,6 +41,13 @@ jobs:
           freyr() {
             script -qfc "freyr \$@" /dev/null | tee .freyr_log
           }
+
+          exec_retry() {
+            cmd="$(cat)" && attempts=1
+            until eval "$cmd" || (( attempts++ > 3 )); do
+                echo "::warning::Attempt $((attempts - 1)) failed."
+            done
+          }
         EOF
 
         echo "RIPGREP_CONFIG_PATH='$PWD/CI/ripgreprc'" >> $GITHUB_ENV
@@ -50,89 +57,87 @@ jobs:
         EOF
 
     - name: Spotify - Download Track
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/spotify/track
+      run: |
+        . ./CI/prep.sh && cd ./CI/spotify/track
 
+        exec_retry << EOF
           freyr https://open.spotify.com/track/5FNS5Vj69AhRGJWjhrAd01
           cat .freyr_log \
             | rg "[•] Collation Complete" \
             | rg "[•] Total tracks: [01]" \
             | rg "✕ Failed:  [00]"
+        EOF
 
-    - name: Apple Music - Download Track
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/apple_music/track
+  #   - name: Apple Music - Download Track
+  #     uses: nick-invision/retry@v2.4.0
+  #     with:
+  #       max_attempts: 3
+  #       timeout_minutes: 5
+  #       command: |
+  #         . ./CI/prep.sh && cd ./CI/apple_music/track
 
-          freyr https://music.apple.com/us/album/elio-irl/1547735824?i=1547736100
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]"
+  #         freyr https://music.apple.com/us/album/elio-irl/1547735824?i=1547736100
+  #         cat .freyr_log \
+  #           | rg "[•] Collation Complete" \
+  #           | rg "[•] Total tracks: [01]" \
+  #           | rg "✕ Failed:  [00]"
 
-    - name: Deezer - Download Track
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/deezer/track
+  #   - name: Deezer - Download Track
+  #     uses: nick-invision/retry@v2.4.0
+  #     with:
+  #       max_attempts: 3
+  #       timeout_minutes: 5
+  #       command: |
+  #         . ./CI/prep.sh && cd ./CI/deezer/track
 
-          freyr https://www.deezer.com/en/track/1189202982
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [01]" \
-            | rg "✕ Failed:  [00]"
+  #         freyr https://www.deezer.com/en/track/1189202982
+  #         cat .freyr_log \
+  #           | rg "[•] Collation Complete" \
+  #           | rg "[•] Total tracks: [01]" \
+  #           | rg "✕ Failed:  [00]"
 
-    - name: Spotify - Download Album
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/spotify/album
+  #   - name: Spotify - Download Album
+  #     uses: nick-invision/retry@v2.4.0
+  #     with:
+  #       max_attempts: 3
+  #       timeout_minutes: 5
+  #       command: |
+  #         . ./CI/prep.sh && cd ./CI/spotify/album
 
-          freyr https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [04]" \
-            | rg "✕ Failed:  [00]"
+  #         freyr https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B
+  #         cat .freyr_log \
+  #           | rg "[•] Collation Complete" \
+  #           | rg "[•] Total tracks: [04]" \
+  #           | rg "✕ Failed:  [00]"
 
-    - name: Apple Music - Download Album
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/apple_music/album
+  #   - name: Apple Music - Download Album
+  #     uses: nick-invision/retry@v2.4.0
+  #     with:
+  #       max_attempts: 3
+  #       timeout_minutes: 5
+  #       command: |
+  #         . ./CI/prep.sh && cd ./CI/apple_music/album
 
-          freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [04]" \
-            | rg "✕ Failed:  [00]"
+  #         freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443
+  #         cat .freyr_log \
+  #           | rg "[•] Collation Complete" \
+  #           | rg "[•] Total tracks: [04]" \
+  #           | rg "✕ Failed:  [00]"
 
-    - name: Deezer - Download Album
-      uses: nick-invision/retry@v2.4.0
-      with:
-        max_attempts: 3
-        timeout_minutes: 5
-        command: |
-          . ./CI/prep.sh && cd ./CI/deezer/album
+  #   - name: Deezer - Download Album
+  #     uses: nick-invision/retry@v2.4.0
+  #     with:
+  #       max_attempts: 3
+  #       timeout_minutes: 5
+  #       command: |
+  #         . ./CI/prep.sh && cd ./CI/deezer/album
 
-          freyr https://www.deezer.com/en/album/123330212
-          cat .freyr_log \
-            | rg "[•] Collation Complete" \
-            | rg "[•] Total tracks: [04]" \
-            | rg "✕ Failed:  [00]"
+  #         freyr https://www.deezer.com/en/album/123330212
+  #         cat .freyr_log \
+  #           | rg "[•] Collation Complete" \
+  #           | rg "[•] Total tracks: [04]" \
+  #           | rg "✕ Failed:  [00]"
 
-  # test-artist:
-  # test-playlist:
-  # docker-publish:
+  # # test-artist:
+  # # test-playlist:
+  # # docker-publish:
