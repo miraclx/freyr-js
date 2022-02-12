@@ -47,7 +47,8 @@ jobs:
             done
             echo "::endgroup::"
             echo "::group::View Files"
-            tree -sh
+            STAGE=\$(realpath --relative-to=../.. .) && cd ../..
+            tree -sh \$STAGE
             echo "::endgroup::"
           }
 
