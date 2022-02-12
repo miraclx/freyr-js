@@ -43,9 +43,9 @@ jobs:
           }
 
           exec_retry() {
-            cmd="$(cat)" && attempts=1
-            until eval "$cmd" || (( attempts++ > 3 )); do
-                echo "::warning::Attempt $((attempts - 1)) failed."
+            cmd="\$(cat)" && attempts=1
+            until eval "\$cmd" || (( attempts++ > 3 )); do
+                echo "::warning::Attempt \$((attempts - 1)) failed."
             done
           }
         EOF
@@ -60,7 +60,6 @@ jobs:
       run: |
         . ./CI/prep.sh && cd ./CI/spotify/track
 
-        type exec_retry
         exec_retry << EOF
           freyr https://open.spotify.com/track/5FNS5Vj69AhRGJWjhrAd01
           cat .freyr_log \
