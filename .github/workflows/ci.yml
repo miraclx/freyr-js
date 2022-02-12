@@ -43,7 +43,7 @@ jobs:
           }
         EOF
 
-        echo "RIPGREP_CONFIG_PATH=./CI/ripgreprc" >> $GITHUB_ENV
+        echo "RIPGREP_CONFIG_PATH='$PWD/CI/ripgreprc'" >> $GITHUB_ENV
         cat << EOF > ./CI/ripgreprc
           --fixed-strings
           --passthru
