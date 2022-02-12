@@ -41,7 +41,8 @@ jobs:
 
           freyr() {
             echo "::group::[\$attempts/3] Downloading..."
-            script -qfc "freyr \$@" /dev/null | tee .freyr_log
+            cmdline="freyr \$@"
+            script -qfc "\$cmdline" /dev/null | tee .freyr_log
             echo "::endgroup::"
             i=\$(cat .freyr_log | \$RG_SRC -n '.' | \$RG_SRC --fixed-strings '[•] Embedding Metadata' | cut -d':' -f1)
             if [[ \$i ]]; then
