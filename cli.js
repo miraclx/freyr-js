@@ -343,11 +343,10 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
 
 function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
   // use different rules to indicate "OR", not "AND"
-  const coreHandler = (rules, trackObject = {}, uncontain = false) => {
-    try {
-      rules.forEach(ruleObject =>
+  const coreHandler = (rules, trackObject, error = null) => {
+    for (let ruleObject of rules) {
+      try {
         Object.entries(ruleObject).forEach(([rule, value]) => {
-          if (!(rule in RULE_HANDLERS || RULE_DEFAULTS.includes(rule))) throw new Error(`Invalid filter rule: [${rule}]`);
           try {
             const status = (
               RULE_HANDLERS[rule] ||
@@ -355,26 +354,33 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
                 if (!(rule in object)) return;
                 return minimatch(`${object[rule]}`, spec, {nocase: !props.filterCase});
               })
-            )(`${value}`, trackObject, props);
+            )(value, trackObject, props);
             if (status !== undefined && !status) throw new Error(`expected \`${value}\``);
           } catch (reason) {
             throw new Error(`<${rule}>, ${reason.message}`);
           }
-        }),
-      );
-      return {status: true, reason: null};
-    } catch (reason) {
-      if (uncontain) throw new Error(`Filter rule: ${reason.message}`);
-      return {status: false, reason};
+        });
+        return {status: true, reason: null};
+      } catch (reason) {
+        error = reason;
+      }
     }
+    if (error) return {status: false, reason: error};
+    return {status: true, reason: null};
   };
-  const rules = (arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []);
-  const wrappedHandler = (trackObject = {}, uncontain = false) => coreHandler(rules, trackObject, uncontain);
-  const handler = (...args) => wrappedHandler(...args);
+  const chk = rules => {
+    rules
+      .reduce((a, r) => a.concat(Object.keys(r)), [])
+      .forEach(rule => {
+        if (!(rule in RULE_HANDLERS || RULE_DEFAULTS.includes(rule))) throw new Error(`Invalid filter rule: [${rule}]`);
+      });
+    return rules;
+  };
+  const rules = chk((arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []));
+  const handler = (trackObject = {}) => coreHandler(rules, trackObject);
   handler.extend = _rules => {
     if (!Array.isArray(_rules)) throw new TypeError('Filter rules must be a valid array');
-    coreHandler(_rules, {}, true);
-    rules.push(..._rules);
+    rules.push(...chk(_rules));
     return handler;
   };
   return handler;
@@ -404,7 +410,7 @@ async function init(queries, options) {
     options.input = await PROCESS_INPUT_ARG(options.input);
     options.config = await PROCESS_CONFIG_ARG(options.config);
     if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
-    (options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase}))({}, true);
+    options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase});
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
