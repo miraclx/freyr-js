@@ -101,7 +101,15 @@ jobs:
             "✕ Failed:  [00]"
         EOF
 
-    # - name: Spotify - Download Artist
+    - name: Spotify - Download Artist
+      run: |
+        . ./CI/prep.sh && cd ./CI/spotify/artist
+
+        exec_retry << EOF
+          freyr https://open.spotify.com/artist/4adSXA1GDOxNG7Zw89YHyz
+          validate "✕ Failed:  [00]"
+        EOF
+
     # - name: Spotify - Download Playlist
 
     - name: Apple Music - Download Track
@@ -126,7 +134,15 @@ jobs:
             "✕ Failed:  [00]"
         EOF
 
-    # - name: Apple Music - Download Artist
+    - name: Apple Music - Download Artist
+      run: |
+        . ./CI/prep.sh && cd ./CI/apple_music/artist
+
+        exec_retry << EOF
+          freyr https://music.apple.com/us/artist/mazie/1508029053
+          validate "✕ Failed:  [00]"
+        EOF
+
     # - name: Apple Music - Download Playlist
 
     - name: Deezer - Download Track
@@ -151,7 +167,15 @@ jobs:
             "✕ Failed:  [00]"
         EOF
 
-    # - name: Deezer - Download Artist
+    - name: Deezer - Download Artist
+      run: |
+        . ./CI/prep.sh && cd ./CI/deezer/artist
+
+        exec_retry << EOF
+          freyr https://www.deezer.com/en/artist/14808825
+          validate "✕ Failed:  [00]"
+        EOF
+
     # - name: Deezer - Download Playlist
 
   docker:
