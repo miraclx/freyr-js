@@ -1321,7 +1321,7 @@ async function init(queries, options) {
     {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, new: 0, failed: 0, skipped: 0},
   );
   if (options.stats) {
-    stackLogger.log('========== Stats ==========');
+    stackLogger.log('============ Stats ============');
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
     stackLogger.log(` [\u2022] Total queries: [${prePadNum(totalQueries.length, 10)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
@@ -1339,7 +1339,7 @@ async function init(queries, options) {
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
     stackLogger.log(`     \u27a4 Album Art: ${xbytes(finalStats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
-    stackLogger.log('===========================');
+    stackLogger.log('===============================');
   }
   setTimeout(process.exit, 1000);
 }
