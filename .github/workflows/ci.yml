@@ -50,10 +50,7 @@ jobs:
           }
         EOF
 
-        echo "RIPGREP_CONFIG_PATH='$PWD/CI/ripgreprc'" >> $GITHUB_ENV
-        cat << EOF > "$PWD/CI/ripgreprc"
-          --fixed-strings
-          --passthru
+          alias rg="rg --fixed-strings --passthru"
         EOF
 
     - name: Spotify - Download Track
