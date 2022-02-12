@@ -48,6 +48,7 @@ jobs:
               echo "::warning::Attempt \$attempts failed."
               if (( ++attempts > 3 )); then return 1; fi
             done
+            tree -sh
           }
 
           RG_SRC="\$(which rg)"
