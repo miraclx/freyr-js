@@ -143,6 +143,7 @@ class Spotify {
           artists: trackInfo.artists.map(artist => artist.name),
           album: albumInfo.name,
           album_uri: albumInfo.uri,
+          album_type: albumInfo.type,
           images: albumInfo.images,
           duration: trackInfo.duration_ms,
           album_artist: albumInfo.artists[0],

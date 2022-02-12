@@ -198,6 +198,7 @@ class Deezer {
       artists: [trackInfo.artist.name],
       album: albumInfo.name,
       album_uri: `deezer:album:${albumInfo.id}`,
+      album_type: albumInfo.type,
       images: albumInfo.images,
       duration: trackInfo.duration * 1000,
       album_artist: albumInfo.artists[0],
@@ -211,7 +212,7 @@ class Deezer {
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,
       composers: trackInfo.contributors.map(composer => composer.name).join(', '),
-      compilation: albumInfo.record_type === 'compile',
+      compilation: albumInfo.type === 'compilation',
       getImage: albumInfo.getImage,
     };
   }
