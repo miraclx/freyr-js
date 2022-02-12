@@ -112,6 +112,7 @@ class AppleMusic {
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
       album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
+      album_type: albumInfo.type,
       images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
       album_artist: albumInfo.artists[0],

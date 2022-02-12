@@ -300,9 +300,9 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
       return minimatch(object.name, spec, {nocase: !props.filterCase});
     },
     type(spec, object) {
-      if (spec && !['album', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
+      if (spec && !['album', 'single', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
       if (!('compilation' in object)) return;
-      return spec === 'compilation' ? object.compilation : !object.compilation;
+      return spec === object.album_type;
     },
     artist(spec, object, props) {
       if (!('artists' in object)) return;
@@ -356,7 +356,7 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
                 return minimatch(`${object[rule]}`, spec, {nocase: !props.filterCase});
               })
             )(`${value}`, trackObject, props);
-            if (status !== undefined && !status) throw new Error(`Expected \`${value}\``);
+            if (status !== undefined && !status) throw new Error(`expected \`${value}\``);
           } catch (reason) {
             throw new Error(`<${rule}>, ${reason.message}`);
           }
@@ -972,13 +972,13 @@ async function init(queries, options) {
     const filterStat = options.filter(track, false);
     if (!filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
-      return {meta, code: 0, skip_reason: new Error(`Filtered out: ${filterStat.reason.message}`), complete: false};
+      return {meta, code: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
     }
 
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, code: 0, skip_reason: new Error('Exists'), complete: true};
+        return {meta, code: 0, skip_reason: 'exists', complete: true};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
@@ -1265,7 +1265,7 @@ async function init(queries, options) {
             })`,
           );
         } else if (trackStat.code === 0)
-          embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: [${trackStat.skip_reason}])`);
+          embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: ${trackStat.skip_reason})`);
         else
           embedLogger.log(
             `\u2022 [\u2713] ${trackStat.meta.trackName}${
@@ -1311,20 +1311,26 @@ async function init(queries, options) {
         total.mediaSize += audio;
         total.imageSize += image;
       }
-      if (current.code === 0) total.skipped += 1;
-      else if (!('code' in current)) total.passed += 1;
+      if (current.code === 0)
+        if (current.complete) total.passed += 1;
+        else total.skipped += 1;
+      else if (!('code' in current)) (total.new += 1), (total.passed += 1);
       else total.failed += 1;
       return total;
     },
-    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, failed: 0, skipped: 0},
+    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, new: 0, failed: 0, skipped: 0},
   );
   if (options.stats) {
-    stackLogger.log('========== Stats ==========');
+    stackLogger.log('============ Stats ============');
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
     stackLogger.log(` [\u2022] Total queries: [${prePadNum(totalQueries.length, 10)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
     stackLogger.log(`     \u00bb Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
-    stackLogger.log(`     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]`);
+    stackLogger.log(
+      `     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]${
+        finalStats.passed > finalStats.new ? ` (new: ${prePadNum(finalStats.new, 10)})` : ''
+      }`,
+    );
     stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
     stackLogger.log(` [\u2022] Cover Art: ${options.cover} (${Config.image.height}x${Config.image.width})`);
@@ -1333,8 +1339,9 @@ async function init(queries, options) {
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
     stackLogger.log(`     \u27a4 Album Art: ${xbytes(finalStats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
-    stackLogger.log('===========================');
+    stackLogger.log('===============================');
   }
+  setTimeout(process.exit, 1000);
 }
 
 const program = commander
