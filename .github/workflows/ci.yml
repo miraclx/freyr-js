@@ -115,8 +115,8 @@ jobs:
 
         exec_retry << EOF
           freyr https://open.spotify.com/artist/4adSXA1GDOxNG7Zw89YHyz \
-            -l album="the rainbow cassette" \
-            -l album="make believe"
+            -l album=\"the rainbow cassette\" \
+            -l album=\"make believe\"
           validate \
             "✓ Passed:  [10]" \
             "✕ Failed:  [00]"
@@ -154,8 +154,8 @@ jobs:
 
         exec_retry << EOF
           freyr https://music.apple.com/us/artist/mazie/1508029053 \
-            -l album="the rainbow cassette" \
-            -l album="make believe"
+            -l album=\"the rainbow cassette\" \
+            -l album=\"make believe\"
           validate \
             "✓ Passed:  [10]" \
             "✕ Failed:  [00]"
@@ -193,8 +193,8 @@ jobs:
 
         exec_retry << EOF
           freyr https://www.deezer.com/en/artist/14808825 \
-            -l album="the rainbow cassette" \
-            -l album="make believe"
+            -l album=\"the rainbow cassette\" \
+            -l album=\"make believe\"
           validate \
             "✓ Passed:  [10]" \
             "✕ Failed:  [00]"
