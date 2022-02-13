@@ -1,8 +1,7 @@
 RG_SRC="$(which rg)"
 rg() {
-  printf "rg: pattern: /$@/" > /dev/stderr
-  $RG_SRC --fixed-strings --passthru "$@"
-  if [[ $? == 0 ]]; then
+  printf "rg: pattern: /$*/" > /dev/stderr
+  if $RG_SRC --fixed-strings --passthru "$@"; then
     echo " (matched)" > /dev/stderr
   else
     echo " (failed to match)" > /dev/stderr
@@ -12,13 +11,12 @@ rg() {
 
 freyr() {
   echo "::group::[$attempts/3] Downloading..."
-  cmdline="freyr $@"
-  script -qfc "$cmdline" /dev/null | tee .freyr_log
+  script -qfc "freyr $*" /dev/null | tee .freyr_log
   echo "::endgroup::"
-  i=$(cat .freyr_log | $RG_SRC -n '.' | $RG_SRC --fixed-strings '[•] Embedding Metadata' | cut -d':' -f1)
+  i=$($RG_SRC -n '.' .freyr_log | $RG_SRC --fixed-strings '[•] Embedding Metadata' | cut -d':' -f1)
   if [[ $i ]]; then
     echo "::group::[$attempts/3] View Download Status"
-    cat .freyr_log | tail +$i
+    tail +$i .freyr_log
     echo "::endgroup::"
   fi
 }
@@ -44,9 +42,8 @@ exec_retry() {
 
 validate() {
   echo "::group::[$attempts/3] Verifying..."
-  res=$(cat .freyr_log)
+  res=$(<.freyr_log)
   for arg in "[•] Collation Complete" "$@"; do
-    res=$(echo "$res" | rg "$arg")
-    if [[ $? != 0 ]]; then return 1; fi
+    res=$(echo "$res" | rg "$arg") || return 1
   done > /dev/null
 }
