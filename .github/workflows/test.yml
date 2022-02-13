@@ -14,12 +14,12 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - name: Install freyr
+    - name: Install Freyr
       run: npm ci && npm link
 
     - name: Prep Testing Stage
@@ -71,12 +71,12 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - name: Install freyr
+    - name: Install Freyr
       run: npm ci && npm link
 
     - name: Prep Testing Stage
@@ -128,12 +128,12 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - name: Install freyr
+    - name: Install Freyr
       run: npm ci && npm link
 
     - name: Prep Testing Stage
