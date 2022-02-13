@@ -796,7 +796,7 @@ Used as values to the `-l, --filter` flag or as key-value pairs in the `filters`
 | `album`        |      glob     | Track album     | `album="when we*fall*do we go*"` |
 | `artist`       |      glob     | Match an artist | `artist="Billie*"` |   |
 | `trackn`       | [Numeric Range](#ranges) | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
-| `type`         |     Static    | `album` \| `compilation` | `type=compilation` |
+| `type`         |     Static    | `album` \| `single` \| `compilation` | `type=single` |
 | `duration`     |  [Timed Range](#timed-ranges)  | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
 | `explicit`     |     Static    | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
 | `album_artist` |      glob     | Album artist | `album_artist="Billie Eilish"` |
