@@ -220,9 +220,9 @@ jobs:
         . .github/workflows/ci-prep.sh && cd ./CI/deezer/playlist
 
         exec_retry << EOF
-          freyr https://www.deezer.com/en/playlist/8252965022
+          freyr https://www.deezer.com/en/playlist/10004168842
           validate \
-            "✓ Passed:  [03]" \
+            "✓ Passed:  [05]" \
             "✕ Failed:  [00]"
         EOF
 
