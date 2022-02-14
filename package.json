@@ -85,7 +85,7 @@
     "tough-cookie": "^4.0.0",
     "xbytes": "^1.6.2",
     "xprogress": "^0.17.3",
-    "youtube-dl-exec": "^1.2.6",
+    "youtube-dl-exec": "^2.0.0",
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
