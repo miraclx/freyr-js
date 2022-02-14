@@ -19,6 +19,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
+    - uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
     - name: Install Freyr
       run: npm ci && npm link
 
@@ -85,6 +92,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
+    - uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
     - name: Install Freyr
       run: npm ci && npm link
 
@@ -150,6 +164,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
 
     - name: Install Freyr
       run: npm ci && npm link
