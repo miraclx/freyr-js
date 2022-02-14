@@ -74,7 +74,7 @@
     "minimatch": "^3.0.4",
     "mkdirp": "^1.0.4",
     "node-cache": "^5.1.2",
-    "open": "^7.3.0",
+    "open": "^8.0.0",
     "pretty-ms": "^7.0.1",
     "spotify-uri": "^1.1.0",
     "spotify-web-api-node": "^5.0.0",
