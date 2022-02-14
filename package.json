@@ -63,7 +63,7 @@
     "express": "^4.17.1",
     "filenamify": "^4.3.0",
     "fluent-ffmpeg": "^2.1.2",
-    "got": "^11.8.1",
+    "got": "^12.0.0",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.0.6",
     "is-online": "^9.0.0",
