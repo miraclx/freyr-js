@@ -62,7 +62,16 @@ jobs:
             "✕ Failed:  [00]"
         EOF
 
-    # - name: Spotify - Download Playlist
+    - name: Spotify - Download Playlist
+      run: |
+        . .github/workflows/ci-prep.sh && cd ./CI/spotify/playlist
+
+        exec_retry << EOF
+          freyr https://open.spotify.com/playlist/5KcCGEx7fFqXYNiJkSQ5KT
+          validate \
+            "✓ Passed:  [05]" \
+            "✕ Failed:  [00]"
+        EOF
 
   apple_music:
     runs-on: ubuntu-latest
@@ -119,7 +128,16 @@ jobs:
             "✕ Failed:  [00]"
         EOF
 
-    # - name: Apple Music - Download Playlist
+    - name: Apple Music - Download Playlist
+      run: |
+        . .github/workflows/ci-prep.sh && cd ./CI/apple_music/playlist
+
+        exec_retry << EOF
+          freyr https://music.apple.com/us/playlist/songs-from-up-next-bazzi/pl.56c4bdf909954beca0cf69379a48144f
+          validate \
+            "✓ Passed:  [06]" \
+            "✕ Failed:  [00]"
+        EOF
 
   deezer:
     runs-on: ubuntu-latest
@@ -176,7 +194,17 @@ jobs:
             "✕ Failed:  [00]"
         EOF
 
-    # - name: Deezer - Download Playlist
+    - name: Deezer - Download Playlist
+      run: |
+        . .github/workflows/ci-prep.sh && cd ./CI/deezer/playlist
+
+        exec_retry << EOF
+          freyr https://www.deezer.com/en/playlist/8252965022
+          validate \
+            "✓ Passed:  [03]" \
+            "✕ Failed:  [00]"
+        EOF
+
 
   docker:
     runs-on: ubuntu-latest
