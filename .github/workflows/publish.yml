@@ -39,7 +39,7 @@ jobs:
         images: freyrcli/freyrjs
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@7f9d37fa544684fb73bfe4835ed7214c255ce02b
+      uses: docker/build-push-action@fe02965b4878556fce19e4f0aa608d7d09ed629b
       with:
         context: .
         push: true
