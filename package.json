@@ -56,7 +56,7 @@
     "axios": "^0.25.0",
     "bluebird": "^3.7.2",
     "commander": "^9.0.0",
-    "conf": "^7.1.2",
+    "conf": "^10.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "country-data": "0.0.31",
