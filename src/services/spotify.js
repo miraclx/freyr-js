@@ -130,7 +130,8 @@ class Spotify {
 
   parseURI(uri) {
     const parsed = spotifyUri(this.validateType(uri));
-    return {...parsed, uri: spotifyUri.formatURI(parsed), url: spotifyUri.formatOpenURL(parsed)};
+    parsed.url = spotifyUri.formatOpenURL(parsed);
+    return parsed;
   }
 
   wrapTrackMeta(trackInfo, albumInfo = trackInfo.album) {
