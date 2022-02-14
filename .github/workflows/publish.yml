@@ -34,7 +34,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta
-      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+      uses: docker/metadata-action@2cad85de2462ab92a22ff973a347fb25c91d6082
       with:
         images: freyrcli/freyrjs
 
