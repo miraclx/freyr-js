@@ -1,0 +1,36 @@
+{
+  "labels": [
+    "dependencies"
+  ],
+  "extends": [
+    "config:base"
+  ],
+  "schedule": "every weekend",
+  "packageRules": [
+    {
+      "enabled": false,
+      "matchFiles": [
+        ".github/workflows/publish.yml"
+      ],
+      "matchPackageNames": [
+        "docker/login-action",
+        "docker/metadata-action",
+        "docker/build-push-action"
+      ]
+    },
+    {
+      // got >=v12 is an ESM package
+      "matchPackageNames": [
+        "got"
+      ],
+      "allowedVersions": "<12"
+    },
+    {
+      // filenamify >=v5 is an ESM package
+      "matchPackageNames": [
+        "filenamify"
+      ],
+      "allowedVersions": "<5"
+    }
+  ]
+}
