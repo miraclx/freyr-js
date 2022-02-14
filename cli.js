@@ -1352,7 +1352,6 @@ async function init(queries, options) {
 
 const program = commander
   .addHelpCommand(true)
-  .passCommandToAction(false)
   .storeOptionsAsProperties(true)
   .name('freyr')
   .description(packageJson.description)
