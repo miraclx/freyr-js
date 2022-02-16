@@ -4,6 +4,7 @@ LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
   version="latest" \
   tag="alpine"
 
+# hadolint ignore=DL3018
 # Install dependencies and clean cache
 RUN apk add \
   --no-cache \
@@ -25,6 +26,7 @@ RUN mkdir /bins \
   && rm -v AtomicParsleyAlpine.zip
 ENV PATH "/bins:$PATH"
 
+# hadolint ignore=DL4006
 # Create freyr user and group
 RUN addgroup -g 1000 freyr \
   && adduser -DG freyr freyr \
