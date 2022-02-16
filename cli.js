@@ -64,18 +64,24 @@ function check_bin_is_existent(bin, path) {
   return status === 0;
 }
 
-function wrapCliInterface(binaryName, binaryPath) {
-  return (file, args, cb) => {
-    const isWin = process.platform === 'win32';
-    const path = xpath.join(__dirname, 'bins', isWin ? 'windows' : 'posix');
-    if (!binaryPath) {
-      const err = new Error(`Unable to find an executable ${binaryName} binary. Please install.`);
-      if (!check_bin_is_existent(binaryName, path))
-        if (typeof file === 'boolean') throw err;
-        else return cb(err);
-      binaryPath = ensureBinExtIfWindows(isWin, binaryName);
-    }
+function wrapCliInterface(binaryNames, binaryPath) {
+  binaryNames = Array.isArray(binaryNames) ? binaryNames : [binaryNames];
+  const isWin = process.platform === 'win32';
+  const path = xpath.join(__dirname, 'bins', isWin ? 'windows' : 'posix');
 
+  if (!binaryPath) {
+    for (let name of binaryNames) {
+      if (!check_bin_is_existent(name, path)) continue;
+      binaryPath = ensureBinExtIfWindows(isWin, name);
+      break;
+    }
+    if (!binaryPath)
+      throw new Error(
+        `Unable to find an executable named ${(a =>
+          [a.slice(0, -1).join(', '), ...a.slice(-1)].filter(e => e != '').join(' or '))(binaryNames)}. Please install.`,
+      );
+  }
+  return (file, args, cb) => {
     if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
   };
 }
@@ -583,7 +589,7 @@ async function init(queries, options) {
 
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
 
-  const atomicParsley = wrapCliInterface('AtomicParsley', options.atomicParsley);
+  let atomicParsley;
 
   try {
     if (options.ffmpeg) {
@@ -598,7 +604,8 @@ async function init(queries, options) {
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
       if (!(await isBinaryFile(options.atomicParsley)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
-    } else atomicParsley(true);
+    }
+    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], options.atomicParsley);
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
