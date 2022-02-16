@@ -290,10 +290,10 @@ class AppleMusic {
       (await this.getArtist(uris)).albums.map(album => `apple_music:album:${album}`),
       100,
       store,
-      async (items, storefront) =>
-        Promise.mapSeries(
-          (await this.#store.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-          album => this.wrapAlbumData(album),
+      (items, storefront) =>
+        this.getAlbum(
+          items.map(item => item.uri),
+          storefront,
         ),
     );
   }

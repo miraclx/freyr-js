@@ -70,12 +70,14 @@ function initTest() {
     console.log(parseBlock.parsed);
     values.forEach(value => console.log(`[${value.toString().padStart(2)}] ${parseBlock.check(value)}`));
   }
+  // jscpd:ignore-start
   function test_time(spec, values) {
     console.log('%j', spec);
     const parseBlock = parseRange.time(spec);
     console.log(parseBlock.parsed);
     values.forEach(value => console.log(`[${value.toString().padStart(2)}] ${parseBlock.check(value)}`));
   }
+  // jscpd:ignore-end
 
   test_num('     ', [1, 2, 3]);
   test_num('7    ', [6, 7, 8]);
