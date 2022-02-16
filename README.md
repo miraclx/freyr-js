@@ -1,4 +1,3 @@
-<!-- editorconfig-checker-disable-file -->
 <!-- markdownlint-disable MD001 MD007 MD041 MD023 -->
 
 <div align="center">
@@ -86,7 +85,7 @@
 
   macOS + Linux: [nvm](https://github.com/nvm-sh/nvm) recommended.
 
-  ``` bash
+  ```bash
   # install node with this nvm command
   # freyr works with a minimum of v12
   $ nvm install --lts
@@ -146,7 +145,7 @@ First start by ensuring all requirements listed above are satisfied. Thereafter,
 - <details>
   <summary>Or you can build from source</summary>
 
-  ``` bash
+  ```bash
   git clone https://github.com/miraclx/freyr-js.git freyr
   cd freyr
   ```
@@ -166,13 +165,13 @@ Image Size: [![Docker Image Size](https://img.shields.io/docker/image-size/freyr
 
 #### Usage (docker)
 
-``` bash
+```bash
 docker run -it --rm -v $PWD:/data freyrcli/freyrjs [options, arguments and queries...]
 ```
 
 You can also create a handy alias to skip remembering that whole line everytime
 
-``` bash
+```bash
 alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 ```
 
@@ -187,7 +186,7 @@ alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 
 ### Usage
 
-``` text
+```text
 Usage: freyr [options] [query...]
 Usage: freyr [options] [subcommand]
 ```
@@ -202,7 +201,7 @@ Usage: freyr [options] [subcommand]
 
 *The `get` subcommand is implicit and default.
 
-``` text
+```text
 Usage: freyr [options] get [options] [query...]
 Usage: freyr [options] [query...]
 ```
@@ -210,7 +209,7 @@ Usage: freyr [options] [query...]
 <details>
 <summary> <code>freyr get --help</code> </summary>
 
-``` console
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -303,7 +302,7 @@ Info:
 <details>
 <summary> <code>freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01</code> </summary>
 
-``` console
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -362,7 +361,7 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443 </code> </summary>
 
-``` console
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -445,7 +444,7 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://www.deezer.com/us/artist/14808825 </code> </summary>
 
-``` console
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -513,7 +512,7 @@ Checking directory permissions...[done]
 
 Queries can be collated to be processed at once.
 
-``` bash
+```bash
 freyr query1 query2 ... queryN
 ```
 
@@ -524,7 +523,7 @@ Queries should be on separate lines.
 
 Lines starting with a `#` are treated as comments and ignored. comments can also be inlined with everything following the `#` character ignored.
 
-``` text
+```text
 # ./queue.txt
 
 # Hailee Steinfeld
@@ -535,7 +534,7 @@ https://open.spotify.com/track/7GCVboEDzfL3NKp1NrAgHR # (track) Wrong Direction
 https://open.spotify.com/album/3stadz88XVpHcXnVYMHc4J
 ```
 
-``` bash
+```bash
 freyr -i ./queue.txt
 ```
 
@@ -583,7 +582,7 @@ Creating freyr-compatible queue output.
 <details>
 <summary> <code> freyr urify https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B --no-header --no-logo --no-tag </code> </summary>
 
-``` text
+```text
 spotify:album:2D23kwwoy2JpZVuJwzE42B
 [+] Urify complete
 ```
@@ -593,7 +592,7 @@ spotify:album:2D23kwwoy2JpZVuJwzE42B
 <details>
 <summary> <code> freyr urify -i queue_of_urls.txt -o queue_of_uris.txt --no-header --no-logo </code> </summary>
 
-``` text
+```text
 [+] Urify complete
 Successfully written to [queue_of_uris.txt]
 ```
@@ -684,7 +683,7 @@ Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/
 <details>
 <summary>Example JSON</summary>
 
-``` json
+```json
 {
   "server": {
     "hostname": "localhost",
@@ -849,7 +848,7 @@ To preview filter rules specification, use the `filter` subcommand.
 <details>
 <summary> <code> freyr filter title="all*good girls*hell",artist="*eilish",trackn="4..=5" --no-header --no-logo </code> </summary>
 
-``` text
+```text
 [
   {
     "query": "*",
@@ -1032,14 +1031,14 @@ To preview filter rules specification, use the `filter` subcommand.
 
 Feel free to clone and use in adherance to the [license](#license). Pull requests are very much welcome.
 
-``` bash
+```bash
 git clone https://github.com/miraclx/freyr-js.git freyr
 cd freyr
 ```
 
 - If using [NPM](https://github.com/npm/cli):
 
-  ``` bash
+  ```bash
   npm install
 
   # to have access to the freyr command globally
@@ -1048,7 +1047,7 @@ cd freyr
 
 - If using [Yarn](https://github.com/yarnpkg/yarn):
 
-  ``` bash
+  ```bash
   yarn install
 
   # to have access to the freyr command globally
@@ -1059,7 +1058,7 @@ cd freyr
 
 The default provided [Dockerfile](https://github.com/miraclx/freyr-js/raw/master/Dockerfile) builds minimal alpine images. Average build network usage is ~ 80 MB and disk usage is ~ 180 MB.
 
-``` bash
+```bash
 git clone https://github.com/miraclx/freyr-js.git freyr
 cd freyr
 docker build -t freyr-dev .
@@ -1067,7 +1066,7 @@ docker build -t freyr-dev .
 
 Afterwards, you can drop into the container by explicitly defining the entrypoint
 
-``` bash
+```bash
 docker run -it --entrypoint bash freyr-dev
 
 # Alternatively, create a handy alias
