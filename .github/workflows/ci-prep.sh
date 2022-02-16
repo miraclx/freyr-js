@@ -2,7 +2,7 @@
 
 RG_SRC="$(which rg)"
 rg() {
-  printf "rg: pattern: /$*/" > /dev/stderr
+  printf 'rg: pattern: %s' "/$*/" > /dev/stderr
   if $RG_SRC --fixed-strings --passthru "$@"; then
     echo " (matched)" > /dev/stderr
   else
