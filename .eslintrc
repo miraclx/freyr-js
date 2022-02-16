@@ -19,7 +19,9 @@
   "plugins": [
     "prettier"
   ],
-  "ignorePatterns": "**/*.json?(5)",
+  "ignorePatterns": [
+    "**/*.json?(5)"
+  ],
   "rules": {
     "prettier/prettier": [
       1,
