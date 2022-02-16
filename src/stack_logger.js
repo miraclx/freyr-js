@@ -182,8 +182,7 @@ class StackLogger {
    * @param {...any} msgs Messages to write out
    */
   error(...msgs) {
-    this._write(this.getText(this.#store.indent, msgs).concat('\n'), process.stderr, true);
-    return this.#store.autoTick ? this.tick(this.#store.indentSize) : this;
+    return this.warn(...msgs);
   }
 
   /**

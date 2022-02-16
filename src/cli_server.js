@@ -19,7 +19,7 @@ function wrapHTML(opts) {
       border-radius: 14px;
       text-align: center;
     }
-  
+
     .center-v {
       margin: 0;
       position: absolute;
@@ -28,7 +28,7 @@ function wrapHTML(opts) {
       transform: translate(-50%, -50%);
     }
   </style>
-  
+
   <div class="box center-v center-h">
     <h1>FreyrCLI</h1>
     <hr width="45%" />

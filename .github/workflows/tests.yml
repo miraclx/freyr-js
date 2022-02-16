@@ -1,3 +1,4 @@
+---
 name: tests
 
 on:
@@ -238,3 +239,28 @@ jobs:
 
     - name: Test Docker Build
       run: docker build -t freyrcli/freyrjs .
+
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        # Full git history is needed to get a proper list of changed files within `super-linter`
+        fetch-depth: 0
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Lint Code Base
+      uses: github/super-linter@v4
+      env:
+        VALIDATE_ALL_CODEBASE: false
+        DEFAULT_BRANCH: master
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        LINTER_RULES_PATH: /
+        JAVASCRIPT_ES_CONFIG_FILE: .eslintrc
+        JSCPD_CONFIG_FILE: .github/linters/.jscpd.json
+        VALIDATE_JAVASCRIPT_STANDARD: false
