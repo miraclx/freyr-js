@@ -1,3 +1,4 @@
+<!-- editorconfig-checker-disable-file -->
 <!-- markdownlint-disable MD001 MD007 MD041 MD023 -->
 
 <div align="center">
