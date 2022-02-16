@@ -209,6 +209,7 @@ Usage: freyr [options] [query...]
 <details>
 <summary> <code>freyr get --help</code> </summary>
 
+<!-- editorconfig-checker-disable -->
 ```console
     ____
    / __/_______  __  _______
@@ -294,6 +295,7 @@ Info:
   their respective folders. However, a m3u8 playlist file is generated in
   the base directory with the name of the playlist that lists the tracks
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -302,6 +304,7 @@ Info:
 <details>
 <summary> <code>freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01</code> </summary>
 
+<!-- editorconfig-checker-disable -->
 ```console
     ____
    / __/_______  __  _______
@@ -353,6 +356,7 @@ Checking directory permissions...[done]
  [•] Output bitrate: 320k
 ===============================
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -361,6 +365,7 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443 </code> </summary>
 
+<!-- editorconfig-checker-disable -->
 ```console
     ____
    / __/_______  __  _______
@@ -436,6 +441,7 @@ Checking directory permissions...[done]
  [•] Output bitrate: 320k
 ===============================
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -444,6 +450,7 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://www.deezer.com/us/artist/14808825 </code> </summary>
 
+<!-- editorconfig-checker-disable -->
 ```console
     ____
    / __/_______  __  _______
@@ -503,6 +510,7 @@ Checking directory permissions...[done]
  [•] Output bitrate: 320k
 ===============================
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
