@@ -20,7 +20,8 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "**/*.json?(5)"
+    "**/*.json",
+    "**/*.json5"
   ],
   "rules": {
     "prettier/prettier": [
