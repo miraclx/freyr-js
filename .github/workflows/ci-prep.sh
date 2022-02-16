@@ -18,7 +18,7 @@ freyr() {
   i=$($RG_SRC -n '.' .freyr_log | $RG_SRC --fixed-strings '[•] Embedding Metadata' | cut -d':' -f1)
   if [[ $i ]]; then
     echo "::group::[$attempts/3] View Download Status"
-    tail +$i .freyr_log
+    tail +"$i" .freyr_log
     echo "::endgroup::"
   fi
 }
@@ -38,7 +38,7 @@ exec_retry() {
   echo "::endgroup::"
   echo "::group::View Files"
   STAGE=$(realpath --relative-to=../.. .) && cd ../..
-  tree -sh $STAGE
+  tree -sh "$STAGE"
   echo "::endgroup::"
 }
 
