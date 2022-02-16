@@ -1,17 +1,28 @@
-<h1 align="center">
+<div align="center">
   <a href="https://github.com/miraclx/freyr-js">
     <img src="https://github.com/miraclx/freyr-js/raw/master/media/logo.gif" alt="FreyrJS - connoisseur of music">
   </a>
-  <br> FreyrJS </br>
-</h1>
 
-<h4 align="center">
-  A versatile, service-agnostic music downloader and manager
-</h4>
+  # Freyr
 
-<div align="center">
+  <h4>
+    A versatile, service-agnostic music downloader and manager
+  </h4>
 
-# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master) [![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds) [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs) [![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v12-brightgreen)](https://github.com/miraclx/freyr-js) [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js) [![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)](https://github.com/miraclx/freyr-js/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx)
+  [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master)
+  [![License](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![test](https://github.com/miraclx/freyr-js/actions/workflows/test.yml/badge.svg)](https://github.com/miraclx/freyr-js/actions/workflows/test.yml)
+  [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds)
+
+  [![NPM Downloads](https://badgen.net/npm/dm/freyr)](https://www.npmjs.com/package/freyr)
+  [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs)
+  [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v12-brightgreen)](https://github.com/miraclx/freyr-js)
+  [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js)
+
+  [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
 
   <sub>Built with ❤︎ by
   <a href="https://github.com/miraclx">Miraculous Owonubi</a>
