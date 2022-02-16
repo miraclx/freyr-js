@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD001 MD007 MD041 MD023 -->
+
 <div align="center">
   <a href="https://github.com/miraclx/freyr-js">
     <img src="https://github.com/miraclx/freyr-js/raw/master/media/logo.gif" alt="FreyrJS - connoisseur of music">
@@ -60,7 +62,7 @@
 <details>
 <summary id="requirements"> Requirements </summary>
 
-  <sub> *Hey there, you might want to consider a cleaner and straight-forward installation method, without having to manually setup the requirements. If so, checkout the [Docker installation method](#docker)* </sub>
+  <sub> _Hey there, you might want to consider a cleaner and straight-forward installation method, without having to manually setup the requirements. If so, checkout the [Docker installation method](#docker)_ </sub>
 
   <details>
   <summary>python >= v3.2</summary>
@@ -131,7 +133,6 @@
     - Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
 
   </details>
-
 
   ---
 </details>
