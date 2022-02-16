@@ -762,7 +762,7 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
   - `storefront`: \<string\>
   - `developerToken`: \<string\>
 
-This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
+This library already includes a predefined developer token that should work at will. This developer token is the default token, extracted off the Apple Music site. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
 To create a custom developer token, please refer to the Apple Music documentation on this topic.
 
@@ -880,7 +880,7 @@ To preview filter rules specification, use the `filter` subcommand.
 | [Spotify](https://github.com/miraclx/freyr-js/blob/master/src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    | `spotify:` |
 | [Apple Music](https://github.com/miraclx/freyr-js/blob/master/src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
 | [Deezer](https://github.com/miraclx/freyr-js/blob/master/src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
-| Youtube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
+| YouTube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 | Tidal (See [#33](https://github.com/miraclx/freyr-js/issues/33)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 
 ### Metadata Availability
@@ -1092,7 +1092,7 @@ Optionally, you can use these interesting flags to customize the experience.
 
 The freyr source would be available in the `/freyr` directory within the container along with a globally registered command `freyr` for calling the script.
 
-For more information and documentation about docker, please refer to its official website:
+For more information and documentation about docker, please refer to its official site:
 
 - <https://www.docker.com/>
 - <https://docs.docker.com/>
