@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 RG_SRC="$(which rg)"
 rg() {
   printf "rg: pattern: /$*/" > /dev/stderr
