@@ -45,7 +45,7 @@ Depending on the URLs you provide freyr, it will;
 2. Then, it queries sources (e.g. YouTube), classifies the results to find you the best sounding, most accurate audio and downloads that in the raw format.
 3. Next, it processes each track, encoding them in an [Apple AAC](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format (`.m4a` file extension) at a bitrate of `320kbps` for high quality.
 4. Then, it embeds all the metadata and the album art into each track.
-5. And finally, it organizes all the files into a structured library.
+5. And finally, it organizes all the files into a structured library ([example](https://miraclx.github.io/freyr-demo-library/)).
 
 ### Metadata Availability
 
@@ -656,7 +656,7 @@ Successfully written to [queue_of_uris.txt]
 - Efficient concurrency
 - Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
 - Album art embedding & export
-- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>`
+- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>` ([example](https://miraclx.github.io/freyr-demo-library/))
 - Resilient visual progressbar per track download (powered by [[xprogress](https://github.com/miraclx/xprogress)])
 - Stats on runtime completion
   - runtime duration
