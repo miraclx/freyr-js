@@ -24,6 +24,7 @@ const filenamify = require('filenamify');
 const TimeFormat = require('hh-mm-ss');
 const ProgressBar = require('xprogress');
 const countryData = require('country-data');
+const {bootstrap} = require('global-agent');
 const {isBinaryFile} = require('isbinaryfile');
 const {decode: entityDecode} = require('html-entities');
 
@@ -394,6 +395,10 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
 
 async function init(queries, options) {
   const initTimeStamp = Date.now();
+
+  process.env['GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE'] = '';
+  bootstrap();
+
   const stackLogger = new StackLogger({indentSize: 1, autoTick: false});
   if (!((Array.isArray(queries) && queries.length > 0) || options.input))
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid query'), process.exit(1);
