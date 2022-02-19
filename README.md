@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD001 MD007 MD041 MD023 -->
+<!-- markdownlint-disable MD001 MD007 MD023 MD041 -->
 
 <div align="center">
   <a href="https://github.com/miraclx/freyr-js">
@@ -8,7 +8,7 @@
   # Freyr
 
   <h4>
-    A versatile, service-agnostic music downloader and manager
+    Download songs from Spotify, Apple Music and Deezer.
   </h4>
 
   [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx)
@@ -28,11 +28,45 @@
 
   <sub>Built with ❤︎ by
   <a href="https://github.com/miraclx">Miraculous Owonubi</a>
+
 </div>
 
 ## Demo
 
 [![ASCII Demo](https://github.com/miraclx/freyr-js/raw/master/media/demo.gif)](https://asciinema.org/a/KH5xyBq9G8Wf5Dyvj6AfqXwYr?autoplay=1 "Click to view ASCII")
+
+## Overview
+
+### What freyr does
+
+Depending on the URLs you provide freyr, it will;
+
+1. Extract track metadata (`title`, `album`, `artist`, etc.) from the streaming service (Spotify if you provide a Spotify URL).
+2. Then, it queries sources (e.g. YouTube), classifies the results to find you the best sounding, most accurate audio and downloads that in the raw format.
+3. Next, it processes each track, encoding them in an [Apple AAC](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format (`.m4a` file extension) at a bitrate of `320kbps` for high quality.
+4. Then, it embeds all the metadata and the album art into each track.
+5. And finally, it organizes all the files into a structured library ([example](https://miraclx.github.io/freyr-demo-library/)).
+
+### Metadata Availability
+
+Here's a list of the metadata that freyr can extract from each streaming service:
+
+|      Meta      | Spotify | Apple Music | Deezer |
+| :------------: | :-----: | :---------: | :----: |
+| `Title`        |   ✔   |     ✔     |   ✔  |
+| `Artist`       |   ✔   |     ✔     |   ✔  |
+| `Composer`     |   ✗   |     ✔     |   ✔  |
+| `Album`        |   ✔   |     ✔     |   ✔  |
+| `Genre`        |   ✗   |     ✔     |   ✔  |
+| `Track Number` |   ✔   |     ✔     |   ✔  |
+| `Disk Number`  |   ✔   |     ✔     |   ✔  |
+| `Release Date` |   ✔   |     ✔     |   ✔  |
+| `Rating`       |   ✔   |     ✔     |   ✔  |
+| `Album Artist` |   ✔   |     ✔     |   ✔  |
+| `ISRC`         |   ✔   |     ✔     |   ✔  |
+| `Label`        |   ✔   |     ✔     |   ✔  |
+| `Copyright`    |   ✔   |     ✔     |   ✗  |
+| `Cover Art`    |   ✔   |     ✔     |   ✔  |
 
 ## Support the project
 
@@ -135,6 +169,8 @@
     - Build from source: See [wez/AtomicParsley](https://github.com/wez/atomicparsley)
 
   </details>
+
+  > _Please note that [YouTube Music](https://music.youtube.com/) must be available in your region for freyr to successfully work, this is because freyr sources raw audio from [YouTube Music](https://music.youtube.com/)._
 
   ---
 </details>
@@ -620,7 +656,7 @@ Successfully written to [queue_of_uris.txt]
 - Efficient concurrency
 - Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
 - Album art embedding & export
-- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>`
+- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>` ([example](https://miraclx.github.io/freyr-demo-library/))
 - Resilient visual progressbar per track download (powered by [[xprogress](https://github.com/miraclx/xprogress)])
 - Stats on runtime completion
   - runtime duration
@@ -882,25 +918,6 @@ To preview filter rules specification, use the `filter` subcommand.
 | [Deezer](https://github.com/miraclx/freyr-js/blob/master/src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
 | YouTube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 | Tidal (See [#33](https://github.com/miraclx/freyr-js/issues/33)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
-
-### Metadata Availability
-
-|      Meta      | Spotify | Apple Music | Deezer |
-| :------------: | :-----: | :---------: | :----: |
-| `Title`        |   ✔   |     ✔     |   ✔  |
-| `Artist`       |   ✔   |     ✔     |   ✔  |
-| `Composer`     |   ✗   |     ✔     |   ✔  |
-| `Album`        |   ✔   |     ✔     |   ✔  |
-| `Genre`        |   ✗   |     ✔     |   ✔  |
-| `Track Number` |   ✔   |     ✔     |   ✔  |
-| `Disk Number`  |   ✔   |     ✔     |   ✔  |
-| `Release Date` |   ✔   |     ✔     |   ✔  |
-| `Rating`       |   ✔   |     ✔     |   ✔  |
-| `Album Artist` |   ✔   |     ✔     |   ✔  |
-| `ISRC`         |   ✔   |     ✔     |   ✔  |
-| `Label`        |   ✔   |     ✔     |   ✔  |
-| `Copyright`    |   ✔   |     ✔     |   ✗  |
-| `Cover Art`    |   ✔   |     ✔     |   ✔  |
 
 <details>
 <summary id="ssue"> <strong> Short Service URI Examples </strong> </summary>
