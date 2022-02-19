@@ -89,7 +89,7 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.17.0",
+    "@babel/eslint-parser": "7.17.0",
     "eslint": "8.9.0",
     "eslint-plugin-prettier": "4.0.0",
     "prettier": "2.5.1"
