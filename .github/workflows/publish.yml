@@ -67,11 +67,11 @@ jobs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         export GIT_CURRENT_TAG="${GITHUB_REF#refs/tags/}"
         echo "::notice::Current Git Tag: \"${GIT_CURRENT_TAG}\""
-        echo "GIT_CURRENT_TAG=${GIT_CURRENT_TAG}" >> $GITHUB_ENV
+        echo "GIT_CURRENT_TAG=${GIT_CURRENT_TAG}" >> "$GITHUB_ENV"
         export GIT_CURRENT_TAG_COMMIT="$(git rev-list -n1 "${GIT_CURRENT_TAG}")"
         export GIT_PREVIOUS_REF="$(git describe --tags --abbrev=0 "${GIT_CURRENT_TAG_COMMIT}^1" 2>/dev/null || git rev-list --max-parents=0 HEAD)"
         echo "::notice::Previous Git Tag / Ref: \"${GIT_PREVIOUS_REF}\""
-        echo "GIT_PREVIOUS_REF=${GIT_PREVIOUS_REF}" >> $GITHUB_ENV
+        echo "GIT_PREVIOUS_REF=${GIT_PREVIOUS_REF}" >> "$GITHUB_ENV"
 
     - name: Extract release notes
       id: extract-release-notes
