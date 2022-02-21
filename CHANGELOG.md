@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2021-02-21
+
 - All dependencies updated.
 - Support `"single"` specification in `"type"` filter. <https://github.com/miraclx/freyr-js/pull/124>
 - Address hanging problem on exit. <https://github.com/miraclx/freyr-js/pull/125>
@@ -24,5 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/miraclx/freyr-js/releases/tag/v0.5.0
