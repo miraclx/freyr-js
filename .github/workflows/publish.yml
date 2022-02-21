@@ -85,7 +85,7 @@ jobs:
         tag_name: ${{ env.GIT_CURRENT_TAG }}
         release_name: ${{ env.GIT_CURRENT_TAG }}
         body: |
-          > [![][npm-badge]][npm-url] [![][docker-badge]][docker-url] [![][github-badge]][github-url]
+          [![][npm-badge]][npm-url] [![][docker-badge]][docker-url] [![][github-badge]][github-url]
 
           ## What's changed?
 
