@@ -72,6 +72,7 @@ jobs:
         GIT_PREVIOUS_REF="$(git describe --tags --abbrev=0 "${GIT_CURRENT_TAG_COMMIT}^1" 2>/dev/null || git rev-list --max-parents=0 HEAD)"
         echo "::notice::Previous Git Tag / Ref: \"${GIT_PREVIOUS_REF}\""
         echo "GIT_PREVIOUS_REF=${GIT_PREVIOUS_REF}" >> "$GITHUB_ENV"
+        echo "FREYR_VERSION=${GIT_CURRENT_TAG#v}" >> "$GITHUB_ENV"
 
     - name: Extract release notes
       id: extract-release-notes
@@ -93,9 +94,9 @@ jobs:
 
           **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ env.GIT_PREVIOUS_REF }}...${{ env.GIT_CURRENT_TAG }}
 
-          [npm-url]: https://www.npmjs.com/package/freyr/v/${GIT_CURRENT_TAG#v}
+          [npm-url]: https://www.npmjs.com/package/freyr/v/${{ env.FREYR_VERSION }}
           [npm-badge]: https://img.shields.io/badge/npm-gray?logo=npm
-          [docker-url]: https://hub.docker.com/repository/docker/freyrcli/freyrjs/tags?name=${{ env.GIT_CURRENT_TAG }}
+          [docker-url]: https://hub.docker.com/repository/docker/freyrcli/freyrjs/tags?name=v${{ env.FREYR_VERSION }}
           [docker-badge]: https://img.shields.io/badge/docker-gray?logo=docker
-          [github-url]: https://github.com/miraclx/freyr-js/releases/tag/${{ env.GIT_CURRENT_TAG }}
+          [github-url]: https://github.com/miraclx/freyr-js/releases/tag/v${{ env.FREYR_VERSION }}
           [github-badge]: https://img.shields.io/badge/github-gray?logo=github
