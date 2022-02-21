@@ -1764,9 +1764,8 @@ function main(argv) {
     console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
   }
   if (showHeader) {
-    const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
-    console.log(credits);
-    console.log('-'.repeat(credits.length));
+    const credits = `freyr - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
+    console.log([credits, '-'.repeat(credits.length)].join('\n'));
   }
   if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   (async () => program.parseAsync(argv))().catch(er => {
