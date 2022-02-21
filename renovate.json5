@@ -15,7 +15,8 @@
       "matchPackageNames": [
         "docker/login-action",
         "docker/metadata-action",
-        "docker/build-push-action"
+        "docker/build-push-action",
+        "ffurrer2/extract-release-notes"
       ]
     },
     {

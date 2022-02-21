@@ -10,15 +10,18 @@ jobs:
   npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - run: npm ci
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
   docker:
     runs-on: ubuntu-latest
@@ -46,3 +49,54 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [ npm, docker ]
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        # fetch tags for cargo ws publish
+        # might be a simple `fetch-tags: true` option soon, see https://github.com/actions/checkout/pull/579
+        fetch-depth: 0
+
+    - name: Bootstrap
+      run: |
+        git config user.name github-actions
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        GIT_CURRENT_TAG="${GITHUB_REF#refs/tags/}"
+        echo "::notice::Current Git Tag: \"${GIT_CURRENT_TAG}\""
+        echo "GIT_CURRENT_TAG=${GIT_CURRENT_TAG}" >> "$GITHUB_ENV"
+        GIT_CURRENT_TAG_COMMIT="$(git rev-list -n1 "${GIT_CURRENT_TAG}")"
+        GIT_PREVIOUS_REF="$(git describe --tags --abbrev=0 "${GIT_CURRENT_TAG_COMMIT}^1" 2>/dev/null || git rev-list --max-parents=0 HEAD)"
+        echo "::notice::Previous Git Tag / Ref: \"${GIT_PREVIOUS_REF}\""
+        echo "GIT_PREVIOUS_REF=${GIT_PREVIOUS_REF}" >> "$GITHUB_ENV"
+        echo "FREYR_VERSION=${GIT_CURRENT_TAG#v}" >> "$GITHUB_ENV"
+
+    - name: Extract release notes
+      id: extract-release-notes
+      uses: ffurrer2/extract-release-notes@c24866884b7a0d2fd2095be2e406b6f260479da8
+
+    - name: Create release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.GIT_CURRENT_TAG }}
+        release_name: ${{ env.GIT_CURRENT_TAG }}
+        body: |
+          [![][npm-badge]][npm-url] [![][docker-badge]][docker-url] [![][github-badge]][github-url]
+
+          ## What's changed?
+
+          ${{ steps.extract-release-notes.outputs.release_notes }}
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ env.GIT_PREVIOUS_REF }}...${{ env.GIT_CURRENT_TAG }}
+
+          [npm-url]: https://www.npmjs.com/package/freyr/v/${{ env.FREYR_VERSION }}
+          [npm-badge]: https://img.shields.io/badge/npm-gray?logo=npm
+          [docker-url]: https://hub.docker.com/repository/docker/freyrcli/freyrjs/tags?name=v${{ env.FREYR_VERSION }}
+          [docker-badge]: https://img.shields.io/badge/docker-gray?logo=docker
+          [github-url]: https://github.com/miraclx/freyr-js/releases/tag/v${{ env.FREYR_VERSION }}
+          [github-badge]: https://img.shields.io/badge/github-gray?logo=github
