@@ -1756,18 +1756,20 @@ program
   });
 
 function main(argv) {
-  const showBanner = !argv.includes('--no-logo');
-  const showHeader = !argv.includes('--no-header');
-  if (showBanner) {
-    // eslint-disable-next-line global-require
-    const banner = require('./banner'); // require banner only when needed
-    console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+  if (!(argv.includes('-v') || argv.includes('--version'))) {
+    const showBanner = !argv.includes('--no-logo');
+    const showHeader = !argv.includes('--no-header');
+    if (showBanner) {
+      // eslint-disable-next-line global-require
+      const banner = require('./banner'); // require banner only when needed
+      console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+    }
+    if (showHeader) {
+      const credits = `freyr - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
+      console.log([credits, '-'.repeat(credits.length)].join('\n'));
+    }
+    if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   }
-  if (showHeader) {
-    const credits = `freyr - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
-    console.log([credits, '-'.repeat(credits.length)].join('\n'));
-  }
-  if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   (async () => program.parseAsync(argv))().catch(er => {
     console.error(
       `\x1b[31m[!] Fatal Error\x1b[0m: ${
