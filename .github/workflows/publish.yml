@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - uses: actions/setup-node@v3
       with:
@@ -28,7 +28,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Log in to Docker Hub
       uses: docker/login-action@42d299face0c5c43a0487c477f595ac9cf22f1a7
@@ -55,7 +55,7 @@ jobs:
     needs: [ npm, docker ]
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         # fetch tags for cargo ws publish
         # might be a simple `fetch-tags: true` option soon, see https://github.com/actions/checkout/pull/579
