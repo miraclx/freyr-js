@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2021-03-31
+
 - Simplified the output of using the `-v, --version`. <https://github.com/miraclx/freyr-js/pull/152>
 - Dropped extra version in the header. <https://github.com/miraclx/freyr-js/pull/153>
 - Update dependencies.
@@ -33,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/miraclx/freyr-js/releases/tag/v0.5.0
