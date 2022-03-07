@@ -22,7 +22,7 @@
   [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v12-brightgreen)](https://github.com/miraclx/freyr-js)
   [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js)
 
-  [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js?category=code)](https://github.com/miraclx/freyr-js)
   [![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
   [![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
 
