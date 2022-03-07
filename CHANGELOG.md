@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `actions/setup-node`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/155>
   - `actions/checkout`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/156>
 
-## [0.6.0] - 2021-02-21
+## [0.6.0] - 2022-02-21
 
 - All dependencies updated.
 - Support `"single"` specification in `"type"` filter. <https://github.com/miraclx/freyr-js/pull/124>
@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documents the dependency on YouTube for sourcing audio. <https://github.com/miraclx/freyr-js/pull/142>
 - Documentation now links to file index of an example library – <https://miraclx.github.io/freyr-demo-library/>.
 
-## [0.5.0] - 2021-01-27
+## [0.5.0] - 2022-01-27
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
