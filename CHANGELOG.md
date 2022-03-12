@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simplified the output of using the `-v, --version`. <https://github.com/miraclx/freyr-js/pull/152>
 - Dropped extra version in the header. <https://github.com/miraclx/freyr-js/pull/153>
 - Update dependencies.
-  - `eslint`: `8.9.0` -> `8.10.0`. <https://github.com/miraclx/freyr-js/pull/154>
+  - `eslint`: `8.9.0` -> `8.11.0`. <https://github.com/miraclx/freyr-js/pull/154> <https://github.com/miraclx/freyr-js/pull/161>
   - `actions/setup-node`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/155>
   - `actions/checkout`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/156>
 
