@@ -34,7 +34,9 @@ RUN addgroup -g 1000 freyr \
 
 # Stage and install freyr
 COPY . /freyr
-RUN npm install --global --unsafe-perm /freyr \
+RUN cd /freyr \
+  && npm ci \
+  && npm link --unsafe-perm \
   && npm cache clean --force \
   && mkdir /data \
   && chown -R freyr:freyr /freyr /data
