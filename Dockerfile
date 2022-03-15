@@ -34,8 +34,8 @@ RUN addgroup -g 1000 freyr \
 
 # Stage and install freyr
 COPY . /freyr
-RUN cd /freyr \
-  && npm ci \
+WORKDIR /freyr
+RUN npm ci \
   && npm link \
   && npm cache clean --force \
   && mkdir /data \
