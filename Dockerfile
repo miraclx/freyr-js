@@ -36,7 +36,7 @@ RUN addgroup -g 1000 freyr \
 COPY . /freyr
 RUN cd /freyr \
   && npm ci \
-  && npm link --unsafe-perm \
+  && npm link \
   && npm cache clean --force \
   && mkdir /data \
   && chown -R freyr:freyr /freyr /data
