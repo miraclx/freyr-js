@@ -1,4 +1,4 @@
-FROM alpine:3.15.2
+FROM alpine:3.15.4
 LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
   name="freyrcli" \
   version="latest" \
