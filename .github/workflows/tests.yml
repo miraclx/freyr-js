@@ -22,7 +22,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -95,7 +95,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -168,7 +168,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
