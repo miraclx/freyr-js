@@ -1,25 +1,72 @@
-<h1 align="center">
+<!-- markdownlint-disable MD001 MD007 MD023 MD041 -->
+
+<div align="center">
   <a href="https://github.com/miraclx/freyr-js">
     <img src="https://github.com/miraclx/freyr-js/raw/master/media/logo.gif" alt="FreyrJS - connoisseur of music">
   </a>
-  <br> FreyrJS </br>
-</h1>
 
-<h4 align="center">
-  A versatile, service-agnostic music downloader and manager
-</h4>
+  # Freyr
 
-<div align="center">
+  <h4>
+    Download songs from Spotify, Apple Music and Deezer.
+  </h4>
 
-# [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx) [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master) [![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds) [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs) [![GitHub](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v12-brightgreen)](https://github.com/miraclx/freyr-js) [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js) [![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)](https://github.com/miraclx/freyr-js) [![GitHub issues](https://img.shields.io/github/issues/miraclx/freyr-js)](https://github.com/miraclx/freyr-js/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![GitHub](https://img.shields.io/badge/by-miraclx-gray&plastic)](https://github.com/miraclx)
+  [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master)
+  [![License](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![CI checks](https://github.com/miraclx/freyr-js/actions/workflows/tests.yml/badge.svg)](https://github.com/miraclx/freyr-js/actions/workflows/tests.yml)
+  [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds)
+
+  [![NPM Downloads](https://badgen.net/npm/dm/freyr)](https://www.npmjs.com/package/freyr)
+  [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs)
+  [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v12-brightgreen)](https://github.com/miraclx/freyr-js)
+  [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js)
+
+  [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js?category=code)](https://github.com/miraclx/freyr-js)
+  [![GitHub top language](https://img.shields.io/github/languages/top/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
 
   <sub>Built with ❤︎ by
   <a href="https://github.com/miraclx">Miraculous Owonubi</a>
+
 </div>
 
 ## Demo
 
 [![ASCII Demo](https://github.com/miraclx/freyr-js/raw/master/media/demo.gif)](https://asciinema.org/a/KH5xyBq9G8Wf5Dyvj6AfqXwYr?autoplay=1 "Click to view ASCII")
+
+## Overview
+
+### What freyr does
+
+Depending on the URLs you provide freyr, it will;
+
+1. Extract track metadata (`title`, `album`, `artist`, etc.) from the streaming service (Spotify if you provide a Spotify URL).
+2. Then, it queries sources (e.g. YouTube), classifies the results to find you the best sounding, most accurate audio and downloads that in the raw format.
+3. Next, it processes each track, encoding them in an [Apple AAC](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format (`.m4a` file extension) at a bitrate of `320kbps` for high quality.
+4. Then, it embeds all the metadata and the album art into each track.
+5. And finally, it organizes all the files into a structured library ([example](https://miraclx.github.io/freyr-demo-library/)).
+
+### Metadata Availability
+
+Here's a list of the metadata that freyr can extract from each streaming service:
+
+|      Meta      | Spotify | Apple Music | Deezer |
+| :------------: | :-----: | :---------: | :----: |
+| `Title`        |   ✔   |     ✔     |   ✔  |
+| `Artist`       |   ✔   |     ✔     |   ✔  |
+| `Composer`     |   ✗   |     ✔     |   ✔  |
+| `Album`        |   ✔   |     ✔     |   ✔  |
+| `Genre`        |   ✗   |     ✔     |   ✔  |
+| `Track Number` |   ✔   |     ✔     |   ✔  |
+| `Disk Number`  |   ✔   |     ✔     |   ✔  |
+| `Release Date` |   ✔   |     ✔     |   ✔  |
+| `Rating`       |   ✔   |     ✔     |   ✔  |
+| `Album Artist` |   ✔   |     ✔     |   ✔  |
+| `ISRC`         |   ✔   |     ✔     |   ✔  |
+| `Label`        |   ✔   |     ✔     |   ✔  |
+| `Copyright`    |   ✔   |     ✔     |   ✗  |
+| `Cover Art`    |   ✔   |     ✔     |   ✔  |
 
 ## Support the project
 
@@ -49,7 +96,7 @@
 <details>
 <summary id="requirements"> Requirements </summary>
 
-  <sub> *Hey there, you might want to consider a cleaner and straight-forward installation method, without having to manually setup the requirements. If so, checkout the [Docker installation method](#docker)* </sub>
+  <sub> _Hey there, you might want to consider a cleaner and straight-forward installation method, without having to manually setup the requirements. If so, checkout the [Docker installation method](#docker)_ </sub>
 
   <details>
   <summary>python >= v3.2</summary>
@@ -72,7 +119,7 @@
 
   macOS + Linux: [nvm](https://github.com/nvm-sh/nvm) recommended.
 
-  ``` bash
+  ```bash
   # install node with this nvm command
   # freyr works with a minimum of v12
   $ nvm install --lts
@@ -86,7 +133,9 @@
   <details>
   <summary>ffmpeg >= v0.9</summary>
 
+  <!-- textlint-disable -->
   Download for your individual platforms here <https://ffmpeg.org/download.html>
+  <!-- textlint-enable -->
 
   - Windows + macOS:
     - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
@@ -121,19 +170,20 @@
 
   </details>
 
+  > _Please note that [YouTube Music](https://music.youtube.com/) must be available in your region for freyr to successfully work, this is because freyr sources raw audio from [YouTube Music](https://music.youtube.com/)._
 
   ---
 </details>
 
 First start by ensuring all requirements listed above are satisfied. Thereafter, you can use either of these options to install freyr:
 
-- [NPM](https://github.com/npm/cli): `npm install -g miraclx/freyr-js`
-- [Yarn](https://github.com/yarnpkg/yarn): `yarn global add miraclx/freyr-js`
+- [NPM](https://github.com/npm/cli): `npm install -g freyr`
+- [Yarn](https://github.com/yarnpkg/yarn): `yarn global add freyr`
 
 - <details>
   <summary>Or you can build from source</summary>
 
-  ``` bash
+  ```bash
   git clone https://github.com/miraclx/freyr-js.git freyr
   cd freyr
   ```
@@ -153,18 +203,20 @@ Image Size: [![Docker Image Size](https://img.shields.io/docker/image-size/freyr
 
 #### Usage (docker)
 
-``` bash
+```bash
 docker run -it --rm -v $PWD:/data freyrcli/freyrjs [options, arguments and queries...]
 ```
 
 You can also create a handy alias to skip remembering that whole line everytime
 
-``` bash
+```bash
 alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 ```
 
 > The `-v $PWD:/data` part sets the working directory for freyr to the current working directory.
 > For example, you can use `-v ~/Music/freyr:/data` to set the work directory and consequently, default save location to `~/Music/freyr`.
+>
+> Please ensure the folder on the host already exists, create it if not. Otherwise, docker autocreates the folder as root and that causes unpleasant `Permission Denied` issues when you run freyr.
 
 [See [Docker Development](#docker-development)]
 
@@ -172,7 +224,7 @@ alias freyr='docker run -it --rm -v $PWD:/data freyrcli/freyrjs'
 
 ### Usage
 
-``` text
+```text
 Usage: freyr [options] [query...]
 Usage: freyr [options] [subcommand]
 ```
@@ -187,7 +239,7 @@ Usage: freyr [options] [subcommand]
 
 *The `get` subcommand is implicit and default.
 
-``` text
+```text
 Usage: freyr [options] get [options] [query...]
 Usage: freyr [options] [query...]
 ```
@@ -195,7 +247,8 @@ Usage: freyr [options] [query...]
 <details>
 <summary> <code>freyr get --help</code> </summary>
 
-``` console
+<!-- editorconfig-checker-disable -->
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -280,6 +333,7 @@ Info:
   their respective folders. However, a m3u8 playlist file is generated in
   the base directory with the name of the playlist that lists the tracks
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -288,7 +342,8 @@ Info:
 <details>
 <summary> <code>freyr spotify:track:5FNS5Vj69AhRGJWjhrAd01</code> </summary>
 
-``` console
+<!-- editorconfig-checker-disable -->
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -323,7 +378,7 @@ Checking directory permissions...[done]
  [•] Embedding Metadata...
   • [✓] 01 Slow Dance
 [•] Collation Complete
-========== Stats ==========
+============ Stats ============
  [•] Runtime: [31.7s]
  [•] Total queries: [01]
  [•] Total tracks: [01]
@@ -337,8 +392,9 @@ Checking directory permissions...[done]
      ♫ Media: 3.02 MB
      ➤ Album Art: 106.76 KB
  [•] Output bitrate: 320k
-===========================
+===============================
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -347,7 +403,8 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443 </code> </summary>
 
-``` console
+<!-- editorconfig-checker-disable -->
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -406,7 +463,7 @@ Checking directory permissions...[done]
   • [✓] 03 Nothing Ever Changes
   • [✓] 04 Love's a Waste
 [•] Collation Complete
-========== Stats ==========
+============ Stats ============
  [•] Runtime: [2m 2.3s]
  [•] Total queries: [01]
  [•] Total tracks: [04]
@@ -420,8 +477,9 @@ Checking directory permissions...[done]
      ♫ Media: 12.73 MB
      ➤ Album Art: 619.43 KB
  [•] Output bitrate: 320k
-===========================
+===============================
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -430,7 +488,8 @@ Checking directory permissions...[done]
 <details>
 <summary> <code> freyr https://www.deezer.com/us/artist/14808825 </code> </summary>
 
-``` console
+<!-- editorconfig-checker-disable -->
+```console
     ____
    / __/_______  __  _______
   / /_/ ___/ _ \/ / / / ___/
@@ -473,7 +532,7 @@ Checking directory permissions...[done]
   • [✓] 01 i think i wanna be alone
   • [✓] 01 no friends
 [•] Collation Complete
-========== Stats ==========
+============ Stats ============
  [•] Runtime: [54.6s]
  [•] Total queries: [01]
  [•] Total tracks: [02]
@@ -487,8 +546,9 @@ Checking directory permissions...[done]
      ♫ Media: 3.50 MB
      ➤ Album Art: 157.16 KB
  [•] Output bitrate: 320k
-===========================
+===============================
 ```
+<!-- editorconfig-checker-enable -->
 
 </details>
 
@@ -498,7 +558,7 @@ Checking directory permissions...[done]
 
 Queries can be collated to be processed at once.
 
-``` bash
+```bash
 freyr query1 query2 ... queryN
 ```
 
@@ -509,7 +569,7 @@ Queries should be on separate lines.
 
 Lines starting with a `#` are treated as comments and ignored. comments can also be inlined with everything following the `#` character ignored.
 
-``` text
+```text
 # ./queue.txt
 
 # Hailee Steinfeld
@@ -520,7 +580,7 @@ https://open.spotify.com/track/7GCVboEDzfL3NKp1NrAgHR # (track) Wrong Direction
 https://open.spotify.com/album/3stadz88XVpHcXnVYMHc4J
 ```
 
-``` bash
+```bash
 freyr -i ./queue.txt
 ```
 
@@ -568,7 +628,7 @@ Creating freyr-compatible queue output.
 <details>
 <summary> <code> freyr urify https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B --no-header --no-logo --no-tag </code> </summary>
 
-``` text
+```text
 spotify:album:2D23kwwoy2JpZVuJwzE42B
 [+] Urify complete
 ```
@@ -578,7 +638,7 @@ spotify:album:2D23kwwoy2JpZVuJwzE42B
 <details>
 <summary> <code> freyr urify -i queue_of_urls.txt -o queue_of_uris.txt --no-header --no-logo </code> </summary>
 
-``` text
+```text
 [+] Urify complete
 Successfully written to [queue_of_uris.txt]
 ```
@@ -596,7 +656,7 @@ Successfully written to [queue_of_uris.txt]
 - Efficient concurrency
 - Bitrate specification (valid: 96, 128, 160, 192, 256, 320)
 - Album art embedding & export
-- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>`
+- Proper track organisation i.e `FOLDER/<Artist Name>/<Album Name>/<Track Name>` ([example](https://miraclx.github.io/freyr-demo-library/))
 - Resilient visual progressbar per track download (powered by [[xprogress](https://github.com/miraclx/xprogress)])
 - Stats on runtime completion
   - runtime duration
@@ -669,7 +729,7 @@ Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/
 <details>
 <summary>Example JSON</summary>
 
-``` json
+```json
 {
   "server": {
     "hostname": "localhost",
@@ -738,7 +798,7 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
   - `storefront`: \<string\>
   - `developerToken`: \<string\>
 
-This library already includes a pre-defined developer token that should work at will. This developer token is the default token, extracted off the Apple Music website. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
+This library already includes a predefined developer token that should work at will. This developer token is the default token, extracted off the Apple Music site. While this developer token could expire over time, we'll try to update with the most recent developer token as time goes on.
 
 To create a custom developer token, please refer to the Apple Music documentation on this topic.
 
@@ -794,7 +854,7 @@ Used as values to the `-l, --filter` flag or as key-value pairs in the `filters`
 | `album`        |      glob     | Track album     | `album="when we*fall*do we go*"` |
 | `artist`       |      glob     | Match an artist | `artist="Billie*"` |   |
 | `trackn`       | [Numeric Range](#ranges) | Match a track number range | `trackn="2..5"`, `trackn="4..=5"` |
-| `type`         |     Static    | `album` \| `compilation` | `type=compilation` |
+| `type`         |     Static    | `album` \| `single` \| `compilation` | `type=single` |
 | `duration`     |  [Timed Range](#timed-ranges)  | Track duration | `duration="3s.."`, `duration="2:30..3:00"`, `duration="..=3m"` |
 | `explicit`     |     Static    | `true` \| `false` \| `inoffensive` | `explicit=true`, `explicit=inoffensive` |
 | `album_artist` |      glob     | Album artist | `album_artist="Billie Eilish"` |
@@ -834,7 +894,7 @@ To preview filter rules specification, use the `filter` subcommand.
 <details>
 <summary> <code> freyr filter title="all*good girls*hell",artist="*eilish",trackn="4..=5" --no-header --no-logo </code> </summary>
 
-``` text
+```text
 [
   {
     "query": "*",
@@ -856,27 +916,8 @@ To preview filter rules specification, use the `filter` subcommand.
 | [Spotify](https://github.com/miraclx/freyr-js/blob/master/src/services/spotify.js) |   ✔   |   ✔   |    ✔   |     ✔    | `spotify:` |
 | [Apple Music](https://github.com/miraclx/freyr-js/blob/master/src/services/apple_music.js) |   ✔   |   ✔   |    ✔   |     ✔    | `apple_music:` |
 | [Deezer](https://github.com/miraclx/freyr-js/blob/master/src/services/deezer.js) |   ✔   |   ✔   |    ✔   |     ✔    | `deezer:` |
-| Youtube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
+| YouTube Music (See [#6](https://github.com/miraclx/freyr-js/issues/6)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
 | Tidal (See [#33](https://github.com/miraclx/freyr-js/issues/33)) |   ✗   |   ✗   |    ✗   |     ✗    | ✗ |
-
-### Metadata Availability
-
-|      Meta      | Spotify | Apple Music | Deezer |
-| :------------: | :-----: | :---------: | :----: |
-| `Title`        |   ✔   |     ✔     |   ✔  |
-| `Artist`       |   ✔   |     ✔     |   ✔  |
-| `Composer`     |   ✗   |     ✔     |   ✔  |
-| `Album`        |   ✔   |     ✔     |   ✔  |
-| `Genre`        |   ✗   |     ✔     |   ✔  |
-| `Track Number` |   ✔   |     ✔     |   ✔  |
-| `Disk Number`  |   ✔   |     ✔     |   ✔  |
-| `Release Date` |   ✔   |     ✔     |   ✔  |
-| `Rating`       |   ✔   |     ✔     |   ✔  |
-| `Album Artist` |   ✔   |     ✔     |   ✔  |
-| `ISRC`         |   ✔   |     ✔     |   ✔  |
-| `Label`        |   ✔   |     ✔     |   ✔  |
-| `Copyright`    |   ✔   |     ✔     |   ✗  |
-| `Cover Art`    |   ✔   |     ✔     |   ✔  |
 
 <details>
 <summary id="ssue"> <strong> Short Service URI Examples </strong> </summary>
@@ -1017,14 +1058,14 @@ To preview filter rules specification, use the `filter` subcommand.
 
 Feel free to clone and use in adherance to the [license](#license). Pull requests are very much welcome.
 
-``` bash
+```bash
 git clone https://github.com/miraclx/freyr-js.git freyr
 cd freyr
 ```
 
 - If using [NPM](https://github.com/npm/cli):
 
-  ``` bash
+  ```bash
   npm install
 
   # to have access to the freyr command globally
@@ -1033,7 +1074,7 @@ cd freyr
 
 - If using [Yarn](https://github.com/yarnpkg/yarn):
 
-  ``` bash
+  ```bash
   yarn install
 
   # to have access to the freyr command globally
@@ -1044,7 +1085,7 @@ cd freyr
 
 The default provided [Dockerfile](https://github.com/miraclx/freyr-js/raw/master/Dockerfile) builds minimal alpine images. Average build network usage is ~ 80 MB and disk usage is ~ 180 MB.
 
-``` bash
+```bash
 git clone https://github.com/miraclx/freyr-js.git freyr
 cd freyr
 docker build -t freyr-dev .
@@ -1052,7 +1093,7 @@ docker build -t freyr-dev .
 
 Afterwards, you can drop into the container by explicitly defining the entrypoint
 
-``` bash
+```bash
 docker run -it --entrypoint bash freyr-dev
 
 # Alternatively, create a handy alias
@@ -1068,7 +1109,7 @@ Optionally, you can use these interesting flags to customize the experience.
 
 The freyr source would be available in the `/freyr` directory within the container along with a globally registered command `freyr` for calling the script.
 
-For more information and documentation about docker, please refer to its official website:
+For more information and documentation about docker, please refer to its official site:
 
 - <https://www.docker.com/>
 - <https://docs.docker.com/>

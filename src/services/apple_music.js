@@ -4,7 +4,7 @@ const path = require('path');
 
 const Promise = require('bluebird');
 const NodeCache = require('node-cache');
-const {Client} = require('@miraclx/apple-music');
+const {Client} = require('@yujinakayama/apple-music');
 
 const symbols = require('../symbols');
 
@@ -112,6 +112,7 @@ class AppleMusic {
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
       album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
+      album_type: albumInfo.type,
       images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
       album_artist: albumInfo.artists[0],
@@ -147,13 +148,15 @@ class AppleMusic {
       images: albumObject.attributes.artwork,
       label: albumObject.attributes.recordLabel,
       release_date: (date =>
-        [
-          [date.year, 4],
-          [date.month, 2],
-          [date.day, 2],
-        ]
-          .map(([val, size]) => val.toString().padStart(size, '0'))
-          .join('-'))(albumObject.attributes.releaseDate),
+        typeof date === 'string'
+          ? date
+          : [
+              [date.year, 4],
+              [date.month, 2],
+              [date.day, 2],
+            ]
+              .map(([val, size]) => val.toString().padStart(size, '0'))
+              .join('-'))(albumObject.attributes.releaseDate),
       ntracks: albumObject.attributes.trackCount,
       tracks: albumObject.relationships.tracks.data,
       getImage(width, height) {
@@ -287,10 +290,10 @@ class AppleMusic {
       (await this.getArtist(uris)).albums.map(album => `apple_music:album:${album}`),
       100,
       store,
-      async (items, storefront) =>
-        Promise.mapSeries(
-          (await this.#store.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-          album => this.wrapAlbumData(album),
+      (items, storefront) =>
+        this.getAlbum(
+          items.map(item => item.uri),
+          storefront,
         ),
     );
   }

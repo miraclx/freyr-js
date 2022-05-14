@@ -71,18 +71,24 @@ function check_bin_is_existent(bin, path) {
   return status === 0;
 }
 
-function wrapCliInterface(binaryName, binaryPath) {
-  return (file, args, cb) => {
-    const isWin = process.platform === 'win32';
-    const path = xpath.join(__dirname, 'bins', isWin ? 'windows' : 'posix');
-    if (!binaryPath) {
-      const err = new Error(`Unable to find an executable ${binaryName} binary. Please install.`);
-      if (!check_bin_is_existent(binaryName, path))
-        if (typeof file === 'boolean') throw err;
-        else return cb(err);
-      binaryPath = ensureBinExtIfWindows(isWin, binaryName);
-    }
+function wrapCliInterface(binaryNames, binaryPath) {
+  binaryNames = Array.isArray(binaryNames) ? binaryNames : [binaryNames];
+  const isWin = process.platform === 'win32';
+  const path = xpath.join(__dirname, 'bins', isWin ? 'windows' : 'posix');
 
+  if (!binaryPath) {
+    for (let name of binaryNames) {
+      if (!check_bin_is_existent(name, path)) continue;
+      binaryPath = ensureBinExtIfWindows(isWin, name);
+      break;
+    }
+    if (!binaryPath)
+      throw new Error(
+        `Unable to find an executable named ${(a =>
+          [a.slice(0, -1).join(', '), ...a.slice(-1)].filter(e => e != '').join(' or '))(binaryNames)}. Please install.`,
+      );
+  }
+  return (file, args, cb) => {
     if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
   };
 }
@@ -307,9 +313,9 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
       return minimatch(object.name, spec, {nocase: !props.filterCase});
     },
     type(spec, object) {
-      if (spec && !['album', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
+      if (spec && !['album', 'single', 'compilation'].includes(spec)) throw new Error(`Invalid rule specification: \`${spec}\``);
       if (!('compilation' in object)) return;
-      return spec === 'compilation' ? object.compilation : !object.compilation;
+      return spec === object.album_type;
     },
     artist(spec, object, props) {
       if (!('artists' in object)) return;
@@ -350,11 +356,10 @@ const [RULE_DEFAULTS, RULE_HANDLERS] = [
 
 function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
   // use different rules to indicate "OR", not "AND"
-  const coreHandler = (rules, trackObject = {}, uncontain = false) => {
-    try {
-      rules.forEach(ruleObject =>
+  const coreHandler = (rules, trackObject, error = null) => {
+    for (let ruleObject of rules) {
+      try {
         Object.entries(ruleObject).forEach(([rule, value]) => {
-          if (!(rule in RULE_HANDLERS || RULE_DEFAULTS.includes(rule))) throw new Error(`Invalid filter rule: [${rule}]`);
           try {
             const status = (
               RULE_HANDLERS[rule] ||
@@ -362,26 +367,33 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
                 if (!(rule in object)) return;
                 return minimatch(`${object[rule]}`, spec, {nocase: !props.filterCase});
               })
-            )(`${value}`, trackObject, props);
-            if (status !== undefined && !status) throw new Error(`Expected \`${value}\``);
+            )(value, trackObject, props);
+            if (status !== undefined && !status) throw new Error(`expected \`${value}\``);
           } catch (reason) {
             throw new Error(`<${rule}>, ${reason.message}`);
           }
-        }),
-      );
-      return {status: true, reason: null};
-    } catch (reason) {
-      if (uncontain) throw new Error(`Filter rule: ${reason.message}`);
-      return {status: false, reason};
+        });
+        return {status: true, reason: null};
+      } catch (reason) {
+        error = reason;
+      }
     }
+    if (error) return {status: false, reason: error};
+    return {status: true, reason: null};
   };
-  const rules = (arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []);
-  const wrappedHandler = (trackObject = {}, uncontain = false) => coreHandler(rules, trackObject, uncontain);
-  const handler = (...args) => wrappedHandler(...args);
+  const chk = rules => {
+    rules
+      .reduce((a, r) => a.concat(Object.keys(r)), [])
+      .forEach(rule => {
+        if (!(rule in RULE_HANDLERS || RULE_DEFAULTS.includes(rule))) throw new Error(`Invalid filter rule: [${rule}]`);
+      });
+    return rules;
+  };
+  const rules = chk((arrayOfFields || []).reduce((a, v) => a.concat(parseSearchFilter(v).filters), []));
+  const handler = (trackObject = {}) => coreHandler(rules, trackObject);
   handler.extend = _rules => {
     if (!Array.isArray(_rules)) throw new TypeError('Filter rules must be a valid array');
-    coreHandler(_rules, {}, true);
-    rules.push(..._rules);
+    rules.push(...chk(_rules));
     return handler;
   };
   return handler;
@@ -411,7 +423,7 @@ async function init(queries, options) {
     options.input = await PROCESS_INPUT_ARG(options.input);
     options.config = await PROCESS_CONFIG_ARG(options.config);
     if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
-    (options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase}))({}, true);
+    options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase});
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
@@ -586,7 +598,7 @@ async function init(queries, options) {
 
   const sourceStack = freyrCore.sortSources(Config.downloader.order);
 
-  const atomicParsley = wrapCliInterface('AtomicParsley', options.atomicParsley);
+  let atomicParsley;
 
   try {
     if (options.ffmpeg) {
@@ -601,7 +613,8 @@ async function init(queries, options) {
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
       if (!(await isBinaryFile(options.atomicParsley)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
-    } else atomicParsley(true);
+    }
+    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], options.atomicParsley);
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
@@ -990,13 +1003,13 @@ async function init(queries, options) {
     const filterStat = options.filter(track, false);
     if (!filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
-      return {meta, code: 0, skip_reason: new Error(`Filtered out: ${filterStat.reason.message}`), complete: false};
+      return {meta, code: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
     }
 
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, code: 0, skip_reason: new Error('Exists'), complete: true};
+        return {meta, code: 0, skip_reason: 'exists', complete: true};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
@@ -1295,7 +1308,7 @@ async function init(queries, options) {
             })`,
           );
         } else if (trackStat.code === 0)
-          embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: [${trackStat.skip_reason}])`);
+          embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: ${trackStat.skip_reason})`);
         else
           embedLogger.log(
             `\u2022 [\u2713] ${trackStat.meta.trackName}${
@@ -1341,20 +1354,26 @@ async function init(queries, options) {
         total.mediaSize += audio;
         total.imageSize += image;
       }
-      if (current.code === 0) total.skipped += 1;
-      else if (!('code' in current)) total.passed += 1;
+      if (current.code === 0)
+        if (current.complete) total.passed += 1;
+        else total.skipped += 1;
+      else if (!('code' in current)) (total.new += 1), (total.passed += 1);
       else total.failed += 1;
       return total;
     },
-    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, failed: 0, skipped: 0},
+    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, new: 0, failed: 0, skipped: 0},
   );
   if (options.stats) {
-    stackLogger.log('========== Stats ==========');
+    stackLogger.log('============ Stats ============');
     stackLogger.log(` [\u2022] Runtime: [${prettyMs(Date.now() - initTimeStamp)}]`);
     stackLogger.log(` [\u2022] Total queries: [${prePadNum(totalQueries.length, 10)}]`);
     stackLogger.log(` [\u2022] Total tracks: [${prePadNum(trackStats.length, 10)}]`);
     stackLogger.log(`     \u00bb Skipped: [${prePadNum(finalStats.skipped, 10)}]`);
-    stackLogger.log(`     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]`);
+    stackLogger.log(
+      `     \u2713 Passed:  [${prePadNum(finalStats.passed, 10)}]${
+        finalStats.passed > finalStats.new ? ` (new: ${prePadNum(finalStats.new, 10)})` : ''
+      }`,
+    );
     stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
     stackLogger.log(` [\u2022] Cover Art: ${options.cover} (${Config.image.height}x${Config.image.width})`);
@@ -1363,13 +1382,13 @@ async function init(queries, options) {
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
     stackLogger.log(`     \u27a4 Album Art: ${xbytes(finalStats.imageSize)}`);
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
-    stackLogger.log('===========================');
+    stackLogger.log('===============================');
   }
+  setTimeout(process.exit, 1000);
 }
 
 const program = commander
   .addHelpCommand(true)
-  .passCommandToAction(false)
   .storeOptionsAsProperties(true)
   .name('freyr')
   .description(packageJson.description)
@@ -1768,19 +1787,20 @@ program
   });
 
 function main(argv) {
-  const showBanner = !argv.includes('--no-logo');
-  const showHeader = !argv.includes('--no-header');
-  if (showBanner) {
-    // eslint-disable-next-line global-require
-    const banner = require('./banner'); // require banner only when needed
-    console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+  if (!(argv.includes('-v') || argv.includes('--version'))) {
+    const showBanner = !argv.includes('--no-logo');
+    const showHeader = !argv.includes('--no-header');
+    if (showBanner) {
+      // eslint-disable-next-line global-require
+      const banner = require('./banner'); // require banner only when needed
+      console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+    }
+    if (showHeader) {
+      const credits = `freyr - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
+      console.log([credits, '-'.repeat(credits.length)].join('\n'));
+    }
+    if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   }
-  if (showHeader) {
-    const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
-    console.log(credits);
-    console.log('-'.repeat(credits.length));
-  }
-  if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   (async () => program.parseAsync(argv))().catch(er => {
     console.error(
       `\x1b[31m[!] Fatal Error\x1b[0m: ${

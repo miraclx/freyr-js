@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
     "es6": true,
@@ -7,16 +7,21 @@
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2021,
+    "ecmaVersion": "latest",
     "ecmaFeatures": {
       "modules": true
-    }
+    },
+    "requireConfigFile": false
   },
   "extends": [
     "eslint:recommended"
   ],
   "plugins": [
     "prettier"
+  ],
+  "ignorePatterns": [
+    "**/*.json",
+    "**/*.json5"
   ],
   "rules": {
     "prettier/prettier": [

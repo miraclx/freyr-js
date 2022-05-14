@@ -20,6 +20,18 @@ class YouTubeSearchError extends Error {
   }
 }
 
+function _getSearchArgs(artists, track, duration) {
+  if (typeof track === 'number') [track, duration] = [, track];
+  if (!Array.isArray(artists))
+    if (track && artists) artists = [artists];
+    else [artists, track] = [[], artists || track];
+  if (typeof track !== 'string') throw new Error('<track> must be a valid string');
+  if (artists.some(artist => typeof artist !== 'string'))
+    throw new Error('<artist>, if defined must be a valid array of strings');
+  if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
+  return [artists, track, duration];
+}
+
 /**
  * @typedef {(
  *   {
@@ -276,14 +288,7 @@ class YouTubeMusic {
    * @returns {YouTubeSearchResult} YouTubeMusicSearchResults
    */
   async search(artists, track, duration) {
-    if (typeof track === 'number') [track, duration] = [, track];
-    if (!Array.isArray(artists))
-      if (track && artists) artists = [artists];
-      else [artists, track] = [[], artists || track];
-    if (typeof track !== 'string') throw new Error('<track> must be a valid string');
-    if (artists.some(artist => typeof artist !== 'string'))
-      throw new Error('<artist>, if defined must be a valid array of strings');
-    if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
+    [artists, track, duration] = _getSearchArgs(artists, track, duration);
 
     const results = await this.#search({query: [track, ...artists].join(' ')});
     const strippedMeta = textUtils.stripText([...track.split(' '), ...artists]);
@@ -384,14 +389,7 @@ class YouTube {
    * @returns {YouTubeSearchResult} YouTubeSearchResults
    */
   async search(artists, track, duration) {
-    if (typeof track === 'number') [track, duration] = [, track];
-    if (!Array.isArray(artists))
-      if (track && artists) artists = [artists];
-      else [artists, track] = [[], artists || track];
-    if (typeof track !== 'string') throw new Error('<track> must be a valid string');
-    if (artists.some(artist => typeof artist !== 'string'))
-      throw new Error('<artist>, if defined must be a valid array of strings');
-    if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
+    [artists, track, duration] = _getSearchArgs(artists, track, duration);
 
     const strippedArtists = textUtils.stripText(artists);
     const strippedMeta = [...textUtils.stripText(track.split(' ')), ...strippedArtists];
