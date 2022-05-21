@@ -99,7 +99,7 @@
       "node-fzf": {
         ".": "0.11.0",
         "cli-color": "2.0.0",
-        "string-width": "5.1.0"
+        "string-width": "5.1.2"
       }
     },
     "@yujinakayama/apple-music": {
