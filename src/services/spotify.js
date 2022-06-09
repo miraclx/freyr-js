@@ -119,7 +119,7 @@ class Spotify {
   }
 
   validateType(uri) {
-    const {type} = spotifyUri(uri);
+    const {type} = spotifyUri.parse(uri);
     if (!['local', ...validUriTypes].includes(type)) throw new Error(`Spotify URI type [${type}] is invalid.`);
     return uri;
   }
@@ -129,7 +129,7 @@ class Spotify {
   }
 
   parseURI(uri) {
-    const parsed = spotifyUri(this.validateType(uri));
+    const parsed = spotifyUri.parse(this.validateType(uri));
     parsed.url = spotifyUri.formatOpenURL(parsed);
     return parsed;
   }

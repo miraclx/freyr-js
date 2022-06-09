@@ -53,7 +53,7 @@
   "dependencies": {
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.0",
-    "axios": "^0.26.0",
+    "axios": "^0.27.0",
     "bluebird": "^3.7.2",
     "commander": "^9.0.0",
     "conf": "^10.0.0",
@@ -67,7 +67,7 @@
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.0.6",
     "is-online": "^9.0.0",
-    "isbinaryfile": "^4.0.6",
+    "isbinaryfile": "^5.0.0",
     "libxget": "^0.9.2",
     "lodash": "^4.17.20",
     "merge2": "^1.4.1",
@@ -76,7 +76,7 @@
     "node-cache": "^5.1.2",
     "open": "^8.0.0",
     "pretty-ms": "^7.0.1",
-    "spotify-uri": "^2.0.0",
+    "spotify-uri": "^3.0.0",
     "spotify-web-api-node": "^5.0.0",
     "stringd": "^2.1.0",
     "stringd-colors": "^1.9.0",
@@ -89,21 +89,21 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.17.0",
-    "eslint": "8.10.0",
+    "@babel/eslint-parser": "7.18.2",
+    "eslint": "8.17.0",
     "eslint-plugin-prettier": "4.0.0",
-    "prettier": "2.5.1"
+    "prettier": "2.6.2"
   },
   "overrides": {
     "yt-search": {
       "node-fzf": {
         ".": "0.11.0",
-        "cli-color": "2.0.0",
-        "string-width": "5.1.0"
+        "cli-color": "2.0.2",
+        "string-width": "5.1.2"
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "0.26.0"
+      "axios": "0.27.2"
     }
   }
 }
