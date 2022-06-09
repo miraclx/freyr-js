@@ -89,7 +89,7 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.17.0",
+    "@babel/eslint-parser": "7.18.2",
     "eslint": "8.13.0",
     "eslint-plugin-prettier": "4.0.0",
     "prettier": "2.6.2"
@@ -98,8 +98,8 @@
     "yt-search": {
       "node-fzf": {
         ".": "0.11.0",
-        "cli-color": "2.0.0",
-        "string-width": "5.1.0"
+        "cli-color": "2.0.2",
+        "string-width": "5.1.2"
       }
     },
     "@yujinakayama/apple-music": {
