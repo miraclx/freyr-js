@@ -7,15 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.0] - 2022-03-31
+## [0.7.0] - 2022-06-09
 
+- Updated Apple Music access key. <https://github.com/miraclx/freyr-js/pull/191>
 - Simplified the output of using the `-v, --version`. <https://github.com/miraclx/freyr-js/pull/152>
 - Dropped extra version in the header. <https://github.com/miraclx/freyr-js/pull/153>
 - Fixed issue with docker build not bundling dependencies. <https://github.com/miraclx/freyr-js/pull/165>
 - Update dependencies.
-  - `eslint`: `8.9.0` -> `8.11.0`. <https://github.com/miraclx/freyr-js/pull/154> <https://github.com/miraclx/freyr-js/pull/161>
-  - `actions/setup-node`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/155>
-  - `actions/checkout`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/156>
 
 ## [0.6.0] - 2022-02-21
 
