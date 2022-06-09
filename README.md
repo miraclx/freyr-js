@@ -254,9 +254,9 @@ Usage: freyr [options] [query...]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.7.0
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Usage: freyr get [options] [query...]
 
@@ -349,9 +349,9 @@ Info:
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.7.0
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [spotify:track:5FNS5Vj69AhRGJWjhrAd01]
@@ -410,9 +410,9 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.7.0
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443]
@@ -495,9 +495,9 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.7.0
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [https://www.deezer.com/us/artist/14808825]
