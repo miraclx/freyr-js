@@ -53,7 +53,7 @@
   "dependencies": {
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.0",
-    "axios": "^0.26.0",
+    "axios": "^0.27.0",
     "bluebird": "^3.7.2",
     "commander": "^9.0.0",
     "conf": "^10.0.0",
@@ -103,7 +103,7 @@
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "0.26.0"
+      "axios": "0.27.2"
     }
   }
 }
