@@ -96,7 +96,7 @@ jobs:
 
           [npm-url]: https://www.npmjs.com/package/freyr/v/${{ env.FREYR_VERSION }}
           [npm-badge]: https://img.shields.io/badge/npm-gray?logo=npm
-          [docker-url]: https://hub.docker.com/repository/docker/freyrcli/freyrjs/tags?name=v${{ env.FREYR_VERSION }}
+          [docker-url]: https://hub.docker.com/r/freyrcli/freyrjs/tags?name=v${{ env.FREYR_VERSION }}
           [docker-badge]: https://img.shields.io/badge/docker-gray?logo=docker
           [github-url]: https://github.com/miraclx/freyr-js/releases/tag/v${{ env.FREYR_VERSION }}
           [github-badge]: https://img.shields.io/badge/github-gray?logo=github
