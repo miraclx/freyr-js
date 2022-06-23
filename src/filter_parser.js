@@ -21,12 +21,10 @@ function parseFilters(filterLine) {
     : [];
 }
 
-function parseSearchFilter(pattern) {
+export default function parseSearchFilter(pattern) {
   let [query, filters] = dissociate(pattern, '@').map(str => str.trim());
   if (!filters) [query, filters] = [filters, query];
   filters = parseFilters(filters);
   if (!query && (filters[0] || []).length === 1) [query] = filters.shift();
   return {query: query ? deescapeFilterPart(query) : '*', filters: Object.fromEntries(filters)};
 }
-
-module.exports = parseSearchFilter;

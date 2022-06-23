@@ -1,12 +1,12 @@
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this, max-classes-per-file */
-const url = require('url');
-const path = require('path');
+import url from 'url';
+import path from 'path';
 
-const got = require('got').default;
-const NodeCache = require('node-cache');
+import got from 'got';
+import NodeCache from 'node-cache';
 
-const symbols = require('../symbols');
-const AsyncQueue = require('../async_queue');
+import symbols from '../symbols.js';
+import AsyncQueue from '../async_queue.js';
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
@@ -20,7 +20,7 @@ class WebapiError extends Error {
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 
-class DeezerCore {
+export class DeezerCore {
   legacyApiUrl = 'https://api.deezer.com';
 
   requestObject = got.extend({
@@ -114,7 +114,7 @@ class DeezerCore {
   getPlaylistTracks = this.processList((id, opts) => this.getPlaylist(`${id}/tracks`, opts));
 }
 
-class Deezer {
+export default class Deezer {
   static [symbols.meta] = {
     ID: 'deezer',
     DESC: 'Deezer',
@@ -356,6 +356,3 @@ class Deezer {
     return processor ? processor(results) : results;
   }
 }
-
-module.exports = Deezer;
-module.exports.DeezerCore = DeezerCore;

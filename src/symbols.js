@@ -1,4 +1,7 @@
-module.exports = {
-  meta: Symbol('FreyrServiceMeta'),
-  errorStack: Symbol('FreyrErrorStack'),
+const meta = Symbol('FreyrServiceMeta');
+const errorStack = Symbol('FreyrErrorStack');
+
+export default {
+  meta,
+  errorStack,
 };
