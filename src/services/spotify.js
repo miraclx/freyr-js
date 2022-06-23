@@ -1,14 +1,14 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this */
-const Promise = require('bluebird');
-const NodeCache = require('node-cache');
-const spotifyUri = require('spotify-uri');
-const SpotifyWebApi = require('spotify-web-api-node');
+import Promise from 'bluebird';
+import NodeCache from 'node-cache';
+import * as spotifyUri from 'spotify-uri';
+import SpotifyWebApi from 'spotify-web-api-node';
 
-const symbols = require('../symbols');
+import symbols from '../symbols.js';
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
-class Spotify {
+export default class Spotify {
   static [symbols.meta] = {
     ID: 'spotify',
     DESC: 'Spotify',
@@ -119,7 +119,7 @@ class Spotify {
   }
 
   validateType(uri) {
-    const {type} = spotifyUri(uri);
+    const {type} = spotifyUri.parse(uri);
     if (!['local', ...validUriTypes].includes(type)) throw new Error(`Spotify URI type [${type}] is invalid.`);
     return uri;
   }
@@ -129,7 +129,7 @@ class Spotify {
   }
 
   parseURI(uri) {
-    const parsed = spotifyUri(this.validateType(uri));
+    const parsed = spotifyUri.parse(this.validateType(uri));
     parsed.url = spotifyUri.formatOpenURL(parsed);
     return parsed;
   }
@@ -337,5 +337,3 @@ class Spotify {
     return body[sel];
   }
 }
-
-module.exports = Spotify;

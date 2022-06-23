@@ -1,10 +1,10 @@
-const {mapSeries} = require('bluebird');
+import Promise from 'bluebird';
 
-module.exports = async function flattener(array) {
+export default async function flattener(array) {
   array = await array;
   return (
-    await mapSeries(Array.isArray(array) ? array : [], async item =>
+    await Promise.mapSeries(Array.isArray(array) ? array : [], async item =>
       !Array.isArray(item) ? item : flattener(item.flat(Infinity)),
     )
   ).flat(Infinity);
-};
+}

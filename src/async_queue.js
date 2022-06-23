@@ -1,12 +1,12 @@
 /* eslint-disable func-names, prefer-spread */
-const async = require('async');
+import async from 'async';
 
 function insulate(items) {
   Promise.allSettled(Array.isArray(items) ? items : [items]);
   return items;
 }
 
-class AsyncQueue {
+export default class AsyncQueue {
   static debugStack = Symbol('AsyncQueueStack');
 
   #store = {
@@ -202,5 +202,3 @@ class AsyncQueue {
     return this.#store.queue.idle();
   }
 }
-
-module.exports = AsyncQueue;

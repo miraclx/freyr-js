@@ -1,4 +1,4 @@
-FROM alpine:3.15.0
+FROM alpine:3.16.0
 LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>" \
   name="freyrcli" \
   version="latest" \
@@ -34,7 +34,9 @@ RUN addgroup -g 1000 freyr \
 
 # Stage and install freyr
 COPY . /freyr
-RUN npm install --global --unsafe-perm /freyr \
+WORKDIR /freyr
+RUN npm ci \
+  && npm link \
   && npm cache clean --force \
   && mkdir /data \
   && chown -R freyr:freyr /freyr /data

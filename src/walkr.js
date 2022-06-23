@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 
-function walk(object, ...keys) {
+export default function walk(object, ...keys) {
   return keys.flat().reduce((base, key) => {
     if (Array.isArray(base) && typeof key !== 'number') {
       for (const obj of base) {
@@ -17,5 +17,3 @@ function walk(object, ...keys) {
     return null;
   }, object);
 }
-
-module.exports = walk;

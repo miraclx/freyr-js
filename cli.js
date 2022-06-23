@@ -1,44 +1,46 @@
 #!/usr/bin/env node
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
-const fs = require('fs');
-const xurl = require('url');
-const xpath = require('path');
-const crypto = require('crypto');
-const {spawn, spawnSync} = require('child_process');
+import fs from 'fs';
+import xurl from 'url';
+import xpath from 'path';
+import crypto from 'crypto';
+import {spawn, spawnSync} from 'child_process';
 
-const Conf = require('conf');
-const open = require('open');
-const xget = require('libxget');
-const ffmpeg = require('fluent-ffmpeg');
-const lodash = require('lodash');
-const merge2 = require('merge2');
-const mkdirp = require('mkdirp');
-const xbytes = require('xbytes');
-const Promise = require('bluebird');
-const cStringd = require('stringd-colors');
-const isOnline = require('is-online');
-const prettyMs = require('pretty-ms');
-const commander = require('commander');
-const minimatch = require('minimatch');
-const filenamify = require('filenamify');
-const TimeFormat = require('hh-mm-ss');
-const ProgressBar = require('xprogress');
-const countryData = require('country-data');
-const {bootstrap} = require('global-agent');
-const {isBinaryFile} = require('isbinaryfile');
-const {decode: entityDecode} = require('html-entities');
+import Conf from 'conf';
+import open from 'open';
+import xget from 'libxget';
+import ffmpeg from 'fluent-ffmpeg';
+import lodash from 'lodash';
+import merge2 from 'merge2';
+import mkdirp from 'mkdirp';
+import xbytes from 'xbytes';
+import Promise from 'bluebird';
+import cStringd from 'stringd-colors';
+import isOnline from 'is-online';
+import prettyMs from 'pretty-ms';
+import minimatch from 'minimatch';
+import filenamify from 'filenamify';
+import TimeFormat from 'hh-mm-ss';
+import ProgressBar from 'xprogress';
+import countryData from 'country-data';
+import {bootstrap} from 'global-agent';
+import {isBinaryFile} from 'isbinaryfile';
+import {program as commander} from 'commander';
+import {decode as entityDecode} from 'html-entities';
 
-const symbols = require('./src/symbols');
-const fileMgr = require('./src/file_mgr');
-const pFlatten = require('./src/p_flatten');
-const FreyrCore = require('./src/freyr');
-const AuthServer = require('./src/cli_server');
-const AsyncQueue = require('./src/async_queue');
-const parseRange = require('./src/parse_range');
-const StackLogger = require('./src/stack_logger');
-const packageJson = require('./package.json');
-const streamUtils = require('./src/stream_utils');
-const parseSearchFilter = require('./src/filter_parser');
+
+import symbols from './src/symbols.js';
+import fileMgr from './src/file_mgr.js';
+import pFlatten from './src/p_flatten.js';
+import FreyrCore from './src/freyr.js';
+import AuthServer from './src/cli_server.js';
+import AsyncQueue from './src/async_queue.js';
+import parseRange from './src/parse_range.js';
+import StackLogger from './src/stack_logger.js';
+import streamUtils from './src/stream_utils.js';
+import parseSearchFilter from './src/filter_parser.js';
+
+const __dirname = xurl.fileURLToPath(new URL('.', import.meta.url));
 
 function parseMeta(params) {
   return Object.entries(params || {})
@@ -393,7 +395,7 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
   return handler;
 }
 
-async function init(queries, options) {
+async function init(packageJson, queries, options) {
   const initTimeStamp = Date.now();
 
   process.env['GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE'] = '';
@@ -1362,233 +1364,234 @@ async function init(queries, options) {
   setTimeout(process.exit, 1000);
 }
 
-const program = commander
-  .addHelpCommand(true)
-  .storeOptionsAsProperties(true)
-  .name('freyr')
-  .description(packageJson.description)
-  .option('--no-logo', 'hide startup logo')
-  .option('--no-header', 'hide startup header')
-  .version(`v${packageJson.version}`, '-v, --version')
-  .helpOption('-h, --help', 'show this help information')
-  .addHelpCommand('help [command]', 'show this help information or for any subcommand')
-  .on('--help', () => {
-    console.log('');
-    console.log('Info:');
-    console.log('  The `get` subcommand is implicit and default');
-    console.log('   $ freyr spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
-    console.log('     # is equivalent to');
-    console.log('   $ freyr get spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
-  });
+function prepCli(packageJson) {
+  const program = commander
+    .addHelpCommand(true)
+    .storeOptionsAsProperties(true)
+    .name('freyr')
+    .description(packageJson.description)
+    .option('--no-logo', 'hide startup logo')
+    .option('--no-header', 'hide startup header')
+    .version(`v${packageJson.version}`, '-v, --version')
+    .helpOption('-h, --help', 'show this help information')
+    .addHelpCommand('help [command]', 'show this help information or for any subcommand')
+    .on('--help', () => {
+      console.log('');
+      console.log('Info:');
+      console.log('  The `get` subcommand is implicit and default');
+      console.log('   $ freyr spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
+      console.log('     # is equivalent to');
+      console.log('   $ freyr get spotify:artist:6M2wZ9GZgrQXHCFfjv46we');
+    });
 
-program
-  .command('get', {isDefault: true})
-  .arguments('[query...]')
-  .description('Download music tracks from queries')
-  .option(
-    '-i, --input <FILE>',
-    [
-      'use URIs found in the specified FILE as queries (file size limit: 1 MiB)',
-      "(each query on a new line, use '#' for comments, whitespaces ignored)",
-      '(example: `-i queue.txt`)',
-    ].join('\n'),
-  )
-  .option(
-    '-b, --bitrate <N>',
-    ['set audio quality / bitrate for audio encoding', `(valid: ${VALIDS.bitrates})`].join('\n'),
-    '320k',
-  )
-  .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
-  .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
-  .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
-  .option('-d, --directory <DIR>', 'save tracks to DIR/..')
-  .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
-  .option(
-    '--cover-size <SIZE>',
-    ['preferred cover art dimensions', '(format: <width>x<height> or <size> as <size>x<size>)'].join('\n'),
-    '640x640',
-  )
-  .option('-C, --no-cover', 'skip saving a cover art')
-  .option(
-    '-x, --format <FORMAT>',
-    ['preferred audio output format (to export) (unimplemented)', '(valid: mp3,m4a,flac)'].join('\n'),
-    'm4a',
-  )
-  .option(
-    '-D, --downloader <SERVICE>',
-    ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
-    'yt_music',
-  )
-  .option(
-    '-l, --filter <MATCH>',
-    [
-      'filter matches off patterns (repeatable and optionally `,`-separated)',
-      '(value omission implies `true` if applicable)',
-      '(format: <key=value>) (example: title="when we all fall asleep*",type=album)',
-      'See `freyr help filter` for more information',
-    ].join('\n'),
-    (spec, stack) => (stack || []).concat(spec),
-  )
-  .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters')
-  .option(
-    '-z, --concurrency <SPEC>',
-    [
-      'key-value concurrency pairs (repeatable and optionally `,`-separated)',
-      '(format: <[key=]value>) (key omission implies track concurrency)',
-      `(valid(key): ${VALIDS.concurrency})`,
-      '(example: `queries=2,downloader=4` processes 2 CLI queries, downloads at most 4 tracks concurrently)',
-    ].join('\n'),
-    (spec, stack) => (stack || []).concat(spec.split(',')),
-  )
-  .option('--gapless', 'set the gapless playback flag for all tracks')
-  .option('-f, --force', 'force overwrite of existing files')
-  .option('-o, --config <FILE>', 'specify alternative configuration file')
-  .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
-  .option('-P, --no-playlist', 'skip creating a playlist file for collections')
-  .option('--playlist-dir <DIR>', 'directory to save playlist file to, if any, (default: tracks base directory)')
-  .option('--playlist-noappend', 'do not append to the playlist file, if any exists')
-  .option('--playlist-noescape', 'do not escape invalid characters within playlist entries')
-  .option(
-    '--playlist-namespace <SPEC>',
-    [
-      'namespace to prefix on each track entry, relative to tracks base directory',
-      'useful for, but not limited to custom (file:// or http://) entries',
-      '(example, you can prefix with a HTTP domain path: `http://webpage.com/music`)',
-    ].join('\n'),
-  )
-  .option('--playlist-force-append', 'force append collection tracks to the playlist file')
-  .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
-  .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
-  .option(
-    '--tags',
-    [
-      'tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)',
-      '(format: <key=value>) (reserved keys: [exclude, account])',
-    ].join('\n'),
-    (spec, stack) => (stack || []).concat(spec.split(',')),
-  )
-  .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
-  .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
-  .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
-  .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
-  .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
-  .option('--no-auth', 'skip authentication procedure')
-  .option('--no-browser', 'disable auto-launching of user browser')
-  .option('--no-net-check', 'disable internet connection check')
-  .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
-  .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
-  .option('--no-stats', "don't show the stats on completion")
-  .option('--pulsate-bar', 'show a pulsating bar')
-  .option(
-    '--single-bar',
-    [
-      'show a single bar for the download, hide chunk-view',
-      '(default when number of chunks/segments exceed printable space)',
-    ].join('\n'),
-  )
-  .action(init)
-  .on('--help', () => {
-    console.log('');
-    console.log('Environment Variables:');
-    console.log('  SHOW_DEBUG_STACK             show extended debug information');
-    console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
-    console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
-    console.log('');
-    console.log('Info:');
-    console.log('  When downloading playlists, the tracks are downloaded individually into');
-    console.log('  their respective folders. However, a m3u8 playlist file is generated in');
-    console.log('  the base directory with the name of the playlist that lists the tracks');
-  });
+  program
+    .command('get', {isDefault: true})
+    .arguments('[query...]')
+    .description('Download music tracks from queries')
+    .option(
+      '-i, --input <FILE>',
+      [
+        'use URIs found in the specified FILE as queries (file size limit: 1 MiB)',
+        "(each query on a new line, use '#' for comments, whitespaces ignored)",
+        '(example: `-i queue.txt`)',
+      ].join('\n'),
+    )
+    .option(
+      '-b, --bitrate <N>',
+      ['set audio quality / bitrate for audio encoding', `(valid: ${VALIDS.bitrates})`].join('\n'),
+      '320k',
+    )
+    .option('-n, --chunks <N>', 'number of concurrent chunk streams with which to download', 7)
+    .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
+    .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
+    .option('-d, --directory <DIR>', 'save tracks to DIR/..')
+    .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
+    .option(
+      '--cover-size <SIZE>',
+      ['preferred cover art dimensions', '(format: <width>x<height> or <size> as <size>x<size>)'].join('\n'),
+      '640x640',
+    )
+    .option('-C, --no-cover', 'skip saving a cover art')
+    .option(
+      '-x, --format <FORMAT>',
+      ['preferred audio output format (to export) (unimplemented)', '(valid: mp3,m4a,flac)'].join('\n'),
+      'm4a',
+    )
+    .option(
+      '-D, --downloader <SERVICE>',
+      ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
+      'yt_music',
+    )
+    .option(
+      '-l, --filter <MATCH>',
+      [
+        'filter matches off patterns (repeatable and optionally `,`-separated)',
+        '(value omission implies `true` if applicable)',
+        '(format: <key=value>) (example: title="when we all fall asleep*",type=album)',
+        'See `freyr help filter` for more information',
+      ].join('\n'),
+      (spec, stack) => (stack || []).concat(spec),
+    )
+    .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters')
+    .option(
+      '-z, --concurrency <SPEC>',
+      [
+        'key-value concurrency pairs (repeatable and optionally `,`-separated)',
+        '(format: <[key=]value>) (key omission implies track concurrency)',
+        `(valid(key): ${VALIDS.concurrency})`,
+        '(example: `queries=2,downloader=4` processes 2 CLI queries, downloads at most 4 tracks concurrently)',
+      ].join('\n'),
+      (spec, stack) => (stack || []).concat(spec.split(',')),
+    )
+    .option('--gapless', 'set the gapless playback flag for all tracks')
+    .option('-f, --force', 'force overwrite of existing files')
+    .option('-o, --config <FILE>', 'specify alternative configuration file')
+    .option('-p, --playlist <FILENAME>', 'create playlist for all successfully collated tracks')
+    .option('-P, --no-playlist', 'skip creating a playlist file for collections')
+    .option('--playlist-dir <DIR>', 'directory to save playlist file to, if any, (default: tracks base directory)')
+    .option('--playlist-noappend', 'do not append to the playlist file, if any exists')
+    .option('--playlist-noescape', 'do not escape invalid characters within playlist entries')
+    .option(
+      '--playlist-namespace <SPEC>',
+      [
+        'namespace to prefix on each track entry, relative to tracks base directory',
+        'useful for, but not limited to custom (file:// or http://) entries',
+        '(example, you can prefix with a HTTP domain path: `http://webpage.com/music`)',
+      ].join('\n'),
+    )
+    .option('--playlist-force-append', 'force append collection tracks to the playlist file')
+    .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
+    .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
+    .option(
+      '--tags',
+      [
+        'tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)',
+        '(format: <key=value>) (reserved keys: [exclude, account])',
+      ].join('\n'),
+      (spec, stack) => (stack || []).concat(spec.split(',')),
+    )
+    .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
+    .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
+    .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
+    .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
+    .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
+    .option('--no-auth', 'skip authentication procedure')
+    .option('--no-browser', 'disable auto-launching of user browser')
+    .option('--no-net-check', 'disable internet connection check')
+    .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
+    .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
+    .option('--no-stats', "don't show the stats on completion")
+    .option('--pulsate-bar', 'show a pulsating bar')
+    .option(
+      '--single-bar',
+      [
+        'show a single bar for the download, hide chunk-view',
+        '(default when number of chunks/segments exceed printable space)',
+      ].join('\n'),
+    )
+    .action((...args) => init(packageJson, ...args))
+    .on('--help', () => {
+      console.log('');
+      console.log('Environment Variables:');
+      console.log('  SHOW_DEBUG_STACK             show extended debug information');
+      console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
+      console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
+      console.log('');
+      console.log('Info:');
+      console.log('  When downloading playlists, the tracks are downloaded individually into');
+      console.log('  their respective folders. However, a m3u8 playlist file is generated in');
+      console.log('  the base directory with the name of the playlist that lists the tracks');
+    });
 
-program
-  .command('serve', {hidden: true})
-  .arguments('[port]')
-  .description('Launch freyr server on an HTTP interface (unimplemented)', {
-    port: 'specify alternative port [default: 3797]',
-  })
-  .option('-b, --bind <ADDRESS>', 'address to bind to')
-  .option('-d, --directory <DIR>', 'working directory')
-  .option('-c, --config <FILE>', 'configuration file')
-  .option('-t, --tmp <DIR>', 'temporary directory for unprocessed artifacts', '<tmp>')
-  .option('-a, --archive <WHEN>', 'when to pack file(s) in an archive (valid: auto,always,never))', 'auto')
-  .option('-z, --compression [algorithm]', 'compression algorithm to use (valid: gzip,lz4)', 'gzip')
-  .option('-Z, --no-compression', 'disable compression altogether')
-  .option('--no-cache', 'disable file caching')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:serve]');
-  });
+  program
+    .command('serve', {hidden: true})
+    .arguments('[port]')
+    .description('Launch freyr server on an HTTP interface (unimplemented)', {
+      port: 'specify alternative port [default: 3797]',
+    })
+    .option('-b, --bind <ADDRESS>', 'address to bind to')
+    .option('-d, --directory <DIR>', 'working directory')
+    .option('-c, --config <FILE>', 'configuration file')
+    .option('-t, --tmp <DIR>', 'temporary directory for unprocessed artifacts', '<tmp>')
+    .option('-a, --archive <WHEN>', 'when to pack file(s) in an archive (valid: auto,always,never))', 'auto')
+    .option('-z, --compression [algorithm]', 'compression algorithm to use (valid: gzip,lz4)', 'gzip')
+    .option('-Z, --no-compression', 'disable compression altogether')
+    .option('--no-cache', 'disable file caching')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:serve]');
+    });
 
-const program_context = program
-  .command('context', {hidden: true})
-  .description('Create and manage music contexts (unimplemented)')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:context]');
-  });
+  const program_context = program
+    .command('context', {hidden: true})
+    .description('Create and manage music contexts (unimplemented)')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:context]');
+    });
 
-program_context
-  .command('new')
-  .arguments('<name>')
-  .description('create a new music context (unimplemented)')
-  .option('-k, --pass <KEY>', 'encrypted password for the context, if any')
-  .option('--no-pass', 'do not ask for a key to encrypt the context')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:context new]');
-  });
+  program_context
+    .command('new')
+    .arguments('<name>')
+    .description('create a new music context (unimplemented)')
+    .option('-k, --pass <KEY>', 'encrypted password for the context, if any')
+    .option('--no-pass', 'do not ask for a key to encrypt the context')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:context new]');
+    });
 
-program
-  .command('search', {hidden: true})
-  .description('Search for and optionally download music interactively (unimplemented)')
-  .option('-q, --query <PATTERN>', 'non-interactive search filter pattern to be matched')
-  .option('-n, --max <MAX>', 'return a maximum of MAX match results')
-  .option('-o, --output <FILE>', 'save search results in a batch file for later instead of autodownload')
-  .option('-p, --pretty', 'include whitespaces and commented metadata in search result output')
-  .option(
-    '-l, --filter <PATTERN>',
-    'key-value constraints that all search results must match (repeatable and optionally `,`-separated)',
-    (spec, stack) => (stack || []).concat(spec),
-  )
-  .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters (unimplemented)')
-  .option('--profile <PROFILE>', 'configuration context with which to process the search and download')
-  .action((_args, _cmd) => {
-    throw Error('Unimplemented: [CLI:search]');
-  })
-  .on('--help', () => {
-    console.log('');
-    console.log('Info:');
-    console.log('  See `freyr help filter` for more information on constructing filter PATTERNs');
-    console.log('');
-    console.log('  Optionally, args and options provided after `--` are passed as options to the freyr download interface');
-    console.log('  Options like `--profile` share its value with the downloader');
-    console.log('');
-    console.log('Examples:');
-    console.log('  # search interactively and download afterwards with custom download flags');
-    console.log('  $ freyr search -- -d ~/Music');
-    console.log('');
-    console.log('  # search non-interactively and download afterwards');
-    console.log("  $ freyr search --query 'billie eilish @ type=album, title=*was older, duration=3s.., explicit=false'");
-    console.log('');
-    console.log('  # search interactively, save a maximum of 5 results to file and download later');
-    console.log('  $ freyr search -n 5 -o queue.txt');
-    console.log('  $ freyr -i queue.txt');
-  });
+  program
+    .command('search', {hidden: true})
+    .description('Search for and optionally download music interactively (unimplemented)')
+    .option('-q, --query <PATTERN>', 'non-interactive search filter pattern to be matched')
+    .option('-n, --max <MAX>', 'return a maximum of MAX match results')
+    .option('-o, --output <FILE>', 'save search results in a batch file for later instead of autodownload')
+    .option('-p, --pretty', 'include whitespaces and commented metadata in search result output')
+    .option(
+      '-l, --filter <PATTERN>',
+      'key-value constraints that all search results must match (repeatable and optionally `,`-separated)',
+      (spec, stack) => (stack || []).concat(spec),
+    )
+    .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters (unimplemented)')
+    .option('--profile <PROFILE>', 'configuration context with which to process the search and download')
+    .action((_args, _cmd) => {
+      throw Error('Unimplemented: [CLI:search]');
+    })
+    .on('--help', () => {
+      console.log('');
+      console.log('Info:');
+      console.log('  See `freyr help filter` for more information on constructing filter PATTERNs');
+      console.log('');
+      console.log('  Optionally, args and options provided after `--` are passed as options to the freyr download interface');
+      console.log('  Options like `--profile` share its value with the downloader');
+      console.log('');
+      console.log('Examples:');
+      console.log('  # search interactively and download afterwards with custom download flags');
+      console.log('  $ freyr search -- -d ~/Music');
+      console.log('');
+      console.log('  # search non-interactively and download afterwards');
+      console.log("  $ freyr search --query 'billie eilish @ type=album, title=*was older, duration=3s.., explicit=false'");
+      console.log('');
+      console.log('  # search interactively, save a maximum of 5 results to file and download later');
+      console.log('  $ freyr search -n 5 -o queue.txt');
+      console.log('  $ freyr -i queue.txt');
+    });
 
-const program_filter = program
-  .command('filter')
-  .arguments('[pattern...]')
-  .description('Process filter patterns to preview JSON representation')
-  .option('-c, --condensed', 'condense JSON output', false)
-  .action((patterns, args) => {
-    if (!patterns.length) return program_filter.outputHelp();
-    console.log(JSON.stringify(patterns.map(parseSearchFilter), null, args.condensed ? 0 : 2));
-  })
-  .on('--help', () => {
-    console.log('');
-    console.log('Format:');
-    console.log('  [query@]key1=value,key2=value');
-    console.log('');
-    console.log('  > testquery@key1=value1,key2 = some value2, key3=" some value3 "');
-    console.log('  is equivalent to');
-    console.log(`  > {
+  const program_filter = program
+    .command('filter')
+    .arguments('[pattern...]')
+    .description('Process filter patterns to preview JSON representation')
+    .option('-c, --condensed', 'condense JSON output', false)
+    .action((patterns, args) => {
+      if (!patterns.length) return program_filter.outputHelp();
+      console.log(JSON.stringify(patterns.map(parseSearchFilter), null, args.condensed ? 0 : 2));
+    })
+    .on('--help', () => {
+      console.log('');
+      console.log('Format:');
+      console.log('  [query@]key1=value,key2=value');
+      console.log('');
+      console.log('  > testquery@key1=value1,key2 = some value2, key3=" some value3 "');
+      console.log('  is equivalent to');
+      console.log(`  > {
   >   "query": "testquery",
   >   "filters": {
   >     "key1": "value1",
@@ -1596,191 +1599,201 @@ const program_filter = program
   >     "key3": " some value3 "
   >   }
   > }`);
-    console.log('');
-    console.log('  A pattern is a query-filter pair separated by `@`');
-    console.log('  Wherever the query is absent, `*` is implied, matching all (although discouraged)');
-    console.log('  The filter is a string of key-value constraints separated by `,`');
-    console.log('  The key and value constraints themselves are separated by `=`');
-    console.log('  Filter values can also be wildcard matches');
-    console.log('  Whitespacing is optional as well as using (" or \') for strings');
-    console.log('');
-    console.log('  Use {} to escape either of these reserved delimiters');
-    console.log('  ({@} for @) ({,} for ,) ({=} for =) ({{}} for {}) ({"} for ") etc.');
-    console.log('');
-    console.log('Examples:');
-    console.log("  # match anything starting with 'Justi' and ending with 'ber'");
-    console.log("  $ freyr filter 'Justi*ber'");
-    console.log('');
-    console.log("  # filter artists matching the name 'Dua Lipa' and any album with 9 or more tracks from 'Billie Eilish'");
-    console.log('  $ freyr filter artist="Dua Lipa" \'artist = Billie Eilish, type = album, ntracks = 9..\'');
-    console.log('');
-    console.log("  # filter non-explicit tracks from 'Billie Eilish' ending with 'To Die'");
-    console.log('  # whose duration is between 1:30 and 3:00 minutes');
-    console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = 1:30..3:00, explicit = false'");
-  });
+      console.log('');
+      console.log('  A pattern is a query-filter pair separated by `@`');
+      console.log('  Wherever the query is absent, `*` is implied, matching all (although discouraged)');
+      console.log('  The filter is a string of key-value constraints separated by `,`');
+      console.log('  The key and value constraints themselves are separated by `=`');
+      console.log('  Filter values can also be wildcard matches');
+      console.log('  Whitespacing is optional as well as using (" or \') for strings');
+      console.log('');
+      console.log('  Use {} to escape either of these reserved delimiters');
+      console.log('  ({@} for @) ({,} for ,) ({=} for =) ({{}} for {}) ({"} for ") etc.');
+      console.log('');
+      console.log('Examples:');
+      console.log("  # match anything starting with 'Justi' and ending with 'ber'");
+      console.log("  $ freyr filter 'Justi*ber'");
+      console.log('');
+      console.log("  # filter artists matching the name 'Dua Lipa' and any album with 9 or more tracks from 'Billie Eilish'");
+      console.log('  $ freyr filter artist="Dua Lipa" \'artist = Billie Eilish, type = album, ntracks = 9..\'');
+      console.log('');
+      console.log("  # filter non-explicit tracks from 'Billie Eilish' ending with 'To Die'");
+      console.log('  # whose duration is between 1:30 and 3:00 minutes');
+      console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = 1:30..3:00, explicit = false'");
+    });
 
-const config = program
-  .command('profile', {hidden: true})
-  .description('Manage profile configuration contexts storing persistent user configs and auth keys (unimplemented)')
-  .on('--help', () => {
-    console.log('');
-    console.log('Examples:');
-    console.log('  $ freyr -q profile new test');
-    console.log('    ? Enter an encryption key: **********');
-    console.log('  /home/miraclx/.config/FreyrCLI/test.x4p');
-    console.log('');
-    console.log('  # unless unencrypted, will ask to decrypt profile');
-    console.log('  $ freyr -q --profile test deezer:playlist:1963962142');
-    console.log('    ? Enter an encryption key: **********');
-    console.log('  [...]');
-  });
-config
-  .command('new')
-  .arguments('<name>')
-  .description('create a new profile context (unimplemented)')
-  .option('-k, --pass <KEY>', 'encrypted password for the new profile')
-  .option('--no-pass', 'do not ask for a key to encrypt the config')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:profiles new]');
-  });
-config
-  .command('get')
-  .arguments('<name>')
-  .description('return the raw configuration content for the profile, decrypts if necessary (unimplemented)')
-  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-  .option(
-    '-p, --pretty [SPEC]',
-    'pretty print the JSON output. (key omission implies space indentation)\n(format(SPEC): <[key=]value>) (valid(key): space,tab)',
-    'space=2',
-  )
-  .action(() => {
-    throw Error('Unimplemented: [CLI:profiles get]');
-  });
-config
-  .command('remove')
-  .alias('rm')
-  .arguments('<name>')
-  .description('deletes the profile context, decrypts if necessary (unimplemented)')
-  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:profiles reset]');
-  });
-config
-  .command('reset')
-  .alias('rs')
-  .arguments('<name>')
-  .description('resets the profile context, decrypts if necessary (unimplemented)')
-  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:profiles reset]');
-  });
-config
-  .command('unset')
-  .alias('un')
-  .arguments('<name> <field>')
-  .description('unsets a field within the profile context, decrypts if necessary (unimplemented)')
-  .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:profiles unset]');
-  });
-config
-  .command('list')
-  .alias('ls')
-  .description('list all available profiles (unimplemented)')
-  .option('--raw', 'return raw JSON output')
-  .action(() => {
-    throw Error('Unimplemented: [CLI:profiles list]');
-  });
+  const config = program
+    .command('profile', {hidden: true})
+    .description('Manage profile configuration contexts storing persistent user configs and auth keys (unimplemented)')
+    .on('--help', () => {
+      console.log('');
+      console.log('Examples:');
+      console.log('  $ freyr -q profile new test');
+      console.log('    ? Enter an encryption key: **********');
+      console.log('  /home/miraclx/.config/FreyrCLI/test.x4p');
+      console.log('');
+      console.log('  # unless unencrypted, will ask to decrypt profile');
+      console.log('  $ freyr -q --profile test deezer:playlist:1963962142');
+      console.log('    ? Enter an encryption key: **********');
+      console.log('  [...]');
+    });
+  config
+    .command('new')
+    .arguments('<name>')
+    .description('create a new profile context (unimplemented)')
+    .option('-k, --pass <KEY>', 'encrypted password for the new profile')
+    .option('--no-pass', 'do not ask for a key to encrypt the config')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:profiles new]');
+    });
+  config
+    .command('get')
+    .arguments('<name>')
+    .description('return the raw configuration content for the profile, decrypts if necessary (unimplemented)')
+    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+    .option(
+      '-p, --pretty [SPEC]',
+      'pretty print the JSON output. (key omission implies space indentation)\n(format(SPEC): <[key=]value>) (valid(key): space,tab)',
+      'space=2',
+    )
+    .action(() => {
+      throw Error('Unimplemented: [CLI:profiles get]');
+    });
+  config
+    .command('remove')
+    .alias('rm')
+    .arguments('<name>')
+    .description('deletes the profile context, decrypts if necessary (unimplemented)')
+    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:profiles reset]');
+    });
+  config
+    .command('reset')
+    .alias('rs')
+    .arguments('<name>')
+    .description('resets the profile context, decrypts if necessary (unimplemented)')
+    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:profiles reset]');
+    });
+  config
+    .command('unset')
+    .alias('un')
+    .arguments('<name> <field>')
+    .description('unsets a field within the profile context, decrypts if necessary (unimplemented)')
+    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:profiles unset]');
+    });
+  config
+    .command('list')
+    .alias('ls')
+    .description('list all available profiles (unimplemented)')
+    .option('--raw', 'return raw JSON output')
+    .action(() => {
+      throw Error('Unimplemented: [CLI:profiles list]');
+    });
 
-program
-  .command('urify')
-  .arguments('[urls...]')
-  .description('Convert service URLs to uniform freyr compatible URIs')
-  .option('-u, --url', 'unify output in service-specific URL representations')
-  .option(
-    '-i, --input <FILE>',
-    [
-      'get URLs from a batch file, comments with `#` are expunged',
-      '`-` reads from stdin, if unpiped, drops to interactive (Ctrl+D to exit)',
-      'if piped, stdin has preference over FILE',
-    ].join('\n'),
-  )
-  .option('-o, --output <FILE>', 'write to file as opposed to stdout')
-  .option('-t, --no-tag', 'skip comments with info or meta for each entry')
-  .action(async (urls, args) => {
-    const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
-    // eslint-disable-next-line no-shadow
-    async function urify(urls) {
-      urls.forEach(url => {
-        const parsed = FreyrCore.parseURI(url);
-        const uri = parsed && parsed[args.url ? 'url' : 'uri'];
-        if (args.tag) !uri ? output.write(`# invalid: ${url}\n`) : output.write(`# ${url}\n`);
-        if (!uri) return;
-        output.write(`${uri}\n`);
-      });
-    }
-    if (urls.length === 0 && process.stdin.isTTY && !args.input) args.input = '-';
-    await urify(urls)
-      .then(async () => {
-        if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
-          await urify(await PROCESS_INPUT_ARG(!process.stdin.isTTY ? '-' : args.input));
-        else if (process.stdin.isTTY && args.input === '-') {
-          console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
-          await new Promise((res, rej) =>
-            process.stdin
-              .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
-              .on('error', rej)
-              .on('close', res),
-          );
-        }
-      })
-      .then(() => {
-        console.log('\x1b[32m[+]\x1b[0m Urify complete');
-        if (args.output) console.log(`Successfully written to [${args.output}]`);
-        if (output !== process.stdout) output.end();
-      });
-  })
-  .on('--help', () => {
-    console.log('');
-    console.log('Examples:');
-    console.log('  $ freyr -q urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
-    console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
-    console.log('');
-    console.log('  $ freyr -q urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
-    console.log('  apple_music:track:1510821685');
-    console.log('');
-    console.log(
+  program
+    .command('urify')
+    .arguments('[urls...]')
+    .description('Convert service URLs to uniform freyr compatible URIs')
+    .option('-u, --url', 'unify output in service-specific URL representations')
+    .option(
+      '-i, --input <FILE>',
       [
-        '  $ echo https://www.deezer.com/en/artist/5340439 \\',
-        '         https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb \\',
-        '      | freyr -q urify -t',
+        'get URLs from a batch file, comments with `#` are expunged',
+        '`-` reads from stdin, if unpiped, drops to interactive (Ctrl+D to exit)',
+        'if piped, stdin has preference over FILE',
       ].join('\n'),
-    );
-    console.log('  deezer:artist:5340439');
-    console.log('  apple_music:playlist:pl.f4d106fed2bd41149aaacabb233eb5eb');
-  });
+    )
+    .option('-o, --output <FILE>', 'write to file as opposed to stdout')
+    .option('-t, --no-tag', 'skip comments with info or meta for each entry')
+    .action(async (urls, args) => {
+      const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
+      // eslint-disable-next-line no-shadow
+      async function urify(urls) {
+        urls.forEach(url => {
+          const parsed = FreyrCore.parseURI(url);
+          const uri = parsed && parsed[args.url ? 'url' : 'uri'];
+          if (args.tag) !uri ? output.write(`# invalid: ${url}\n`) : output.write(`# ${url}\n`);
+          if (!uri) return;
+          output.write(`${uri}\n`);
+        });
+      }
+      if (urls.length === 0 && process.stdin.isTTY && !args.input) args.input = '-';
+      await urify(urls)
+        .then(async () => {
+          if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
+            await urify(await PROCESS_INPUT_ARG(!process.stdin.isTTY ? '-' : args.input));
+          else if (process.stdin.isTTY && args.input === '-') {
+            console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
+            await new Promise((res, rej) =>
+              process.stdin
+                .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
+                .on('error', rej)
+                .on('close', res),
+            );
+          }
+        })
+        .then(() => {
+          console.log('\x1b[32m[+]\x1b[0m Urify complete');
+          if (args.output) console.log(`Successfully written to [${args.output}]`);
+          if (output !== process.stdout) output.end();
+        });
+    })
+    .on('--help', () => {
+      console.log('');
+      console.log('Examples:');
+      console.log('  $ freyr -q urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
+      console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
+      console.log('');
+      console.log('  $ freyr -q urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
+      console.log('  apple_music:track:1510821685');
+      console.log('');
+      console.log(
+        [
+          '  $ echo https://www.deezer.com/en/artist/5340439 \\',
+          '         https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb \\',
+          '      | freyr -q urify -t',
+        ].join('\n'),
+      );
+      console.log('  deezer:artist:5340439');
+      console.log('  apple_music:playlist:pl.f4d106fed2bd41149aaacabb233eb5eb');
+    });
 
-function main(argv) {
-  const showBanner = !argv.includes('--no-logo');
-  const showHeader = !argv.includes('--no-header');
-  if (showBanner) {
-    // eslint-disable-next-line global-require
-    const banner = require('./banner'); // require banner only when needed
-    console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+  return program;
+}
+
+async function main(argv) {
+  let packageJson = JSON.parse(fs.readFileSync(xpath.join(__dirname, 'package.json')).toString());
+
+  let {program} = prepCli(packageJson);
+
+  if (!(argv.includes('-v') || argv.includes('--version'))) {
+    const showBanner = !argv.includes('--no-logo');
+    const showHeader = !argv.includes('--no-header');
+    if (showBanner) {
+      // eslint-disable-next-line global-require
+      const {default: banner} = await import('./banner.js'); // require banner only when needed
+      console.log(banner.join('\n').concat(` v${packageJson.version}\n`));
+    }
+    if (showHeader) {
+      const credits = `freyr - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
+      console.log([credits, '-'.repeat(credits.length)].join('\n'));
+    }
+    if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
   }
-  if (showHeader) {
-    const credits = `freyr v${packageJson.version} - (c) ${packageJson.author.name} <${packageJson.author.email}>`;
-    console.log(credits);
-    console.log('-'.repeat(credits.length));
-  }
-  if (argv.length === 2 + (!showHeader ? 1 : 0) + (!showBanner ? 1 : 0)) return program.outputHelp();
-  (async () => program.parseAsync(argv))().catch(er => {
+  try {
+    await program.parseAsync(argv);
+  } catch (err) {
     console.error(
       `\x1b[31m[!] Fatal Error\x1b[0m: ${
-        typeof er === 'undefined' ? '[uncaught]' : er ? er['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] : er
+        typeof err === 'undefined' ? '[uncaught]' : err ? err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] : err
       }`,
     );
-  });
+  }
 }
 
 main(process.argv);

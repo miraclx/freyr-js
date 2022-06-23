@@ -1,10 +1,11 @@
-const fs = require('fs');
-const {join} = require('path');
-const {tmpdir} = require('os');
-const {promisify} = require('util');
+import fs from 'fs';
+import {join} from 'path';
+import {tmpdir} from 'os';
+import {promisify} from 'util';
 
-const tmp = require('tmp');
-const mkdirp = require('mkdirp');
+import tmp from 'tmp';
+import mkdirp from 'mkdirp';
+import esMain from 'es-main';
 
 const removeCallbacks = [];
 
@@ -26,7 +27,7 @@ function hookupListeners() {
   }
 }
 
-async function genFile(opts) {
+export default async function genFile(opts) {
   opts = opts || {};
   if (opts.filename) {
     opts.tmpdir = opts.tmpdir || tmpdir();
@@ -77,5 +78,4 @@ async function test() {
   await testTmp();
 }
 
-module.exports = genFile;
-if (require.main === module) test().catch(err => console.error('cli>', err));
+if (esMain(import.meta)) test().catch(err => console.error('cli>', err));

@@ -10,19 +10,32 @@ on:
     - cron: '0 0 * * WED,SAT' # 00:00 on Wednesdays and Saturdays, weekly.
 
 jobs:
+  fmt:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run ESLint Check
+      run: npx eslint --max-warnings 0 .
+
   spotify:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -88,14 +101,14 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -161,14 +174,14 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg ripgrep atomicparsley
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -235,7 +248,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Test Docker Build
       run: docker build -t freyrcli/freyrjs .
@@ -245,7 +258,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         # Full git history is needed to get a proper list of changed files within `super-linter`
         fetch-depth: 0

@@ -1,5 +1,5 @@
-const stream = require('stream');
-const {isBinaryFileSync} = require('isbinaryfile');
+import stream from 'stream';
+import {isBinaryFileSync} from 'isbinaryfile';
 
 /**
  * Generate a stream transformer splitting at match locations
@@ -79,7 +79,7 @@ function collectBuffers(input, opts) {
   });
 }
 
-module.exports = {
+export default {
   buildSplitter,
   collectBuffers,
 };

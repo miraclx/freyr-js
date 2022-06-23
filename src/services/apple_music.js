@@ -1,16 +1,16 @@
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
-const xurl = require('url');
-const path = require('path');
+import xurl from 'url';
+import path from 'path';
 
-const Promise = require('bluebird');
-const NodeCache = require('node-cache');
-const {Client} = require('@yujinakayama/apple-music');
+import Promise from 'bluebird';
+import NodeCache from 'node-cache';
+import {Client} from '@yujinakayama/apple-music';
 
-const symbols = require('../symbols');
+import symbols from '../symbols.js';
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
-class AppleMusic {
+export default class AppleMusic {
   static [symbols.meta] = {
     ID: 'apple_music',
     DESC: 'Apple Music',
@@ -40,6 +40,11 @@ class AppleMusic {
     if (!config.developerToken)
       throw new Error(`[AppleMusic] Please define [developerToken] as a property within the configuration`);
     this.#store.core = new Client({developerToken: config.developerToken});
+    let custom_head = {headers: {origin: 'https://music.apple.com'}};
+    this.#store.core.albums.axiosInstance = this.#store.core.albums.axiosInstance.create(custom_head);
+    this.#store.core.artists.axiosInstance = this.#store.core.artists.axiosInstance.create(custom_head);
+    this.#store.core.playlists.axiosInstance = this.#store.core.playlists.axiosInstance.create(custom_head);
+    this.#store.core.songs.axiosInstance = this.#store.core.songs.axiosInstance.create(custom_head);
     this.#store.defaultStorefront = config.storefront || 'us';
     this.#store.isAuthenticated = !!config.developerToken;
   }
@@ -298,5 +303,3 @@ class AppleMusic {
     );
   }
 }
-
-module.exports = AppleMusic;
