@@ -1761,7 +1761,7 @@ function prepCli(packageJson) {
 }
 
 async function main(argv) {
-  let packageJson = JSON.parse(fs.readFileSync('./package.json').toString());
+  let packageJson = JSON.parse(fs.readFileSync(xpath.join(__dirname, 'package.json')).toString());
 
   let {program} = prepCli(packageJson);
 
