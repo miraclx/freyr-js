@@ -21,7 +21,7 @@ jobs:
       run: npm ci
 
     - name: Run ESLint Check
-      run: eslint --max-warnings 0 .
+      run: npx eslint --max-warnings 0 .
 
   spotify:
     runs-on: ubuntu-latest
