@@ -68,7 +68,7 @@
     "got": "^11.8.1",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.0.6",
-    "is-online": "^9.0.0",
+    "is-online": "^10.0.0",
     "isbinaryfile": "^5.0.0",
     "libxget": "^0.9.2",
     "lodash": "^4.17.20",
