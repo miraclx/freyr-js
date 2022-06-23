@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Upgraded to ES6 Modules. <https://github.com/miraclx/freyr-js/pull/202>
+- Introduced CI checks for syntax. <https://github.com/miraclx/freyr-js/commit/3792d25125f770713f817d45bd66770a8db1d2c4>
+- Updated dependencies.
+
 ## [0.7.0] - 2022-06-09
 
 - Updated Apple Music access key. <https://github.com/miraclx/freyr-js/pull/191>
