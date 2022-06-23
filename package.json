@@ -77,7 +77,7 @@
     "mkdirp": "^1.0.4",
     "node-cache": "^5.1.2",
     "open": "^8.0.0",
-    "pretty-ms": "^7.0.1",
+    "pretty-ms": "^8.0.0",
     "spotify-uri": "^3.0.0",
     "spotify-web-api-node": "^5.0.0",
     "stringd": "^2.1.0",
