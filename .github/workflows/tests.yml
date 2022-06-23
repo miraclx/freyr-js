@@ -10,6 +10,19 @@ on:
     - cron: '0 0 * * WED,SAT' # 00:00 on Wednesdays and Saturdays, weekly.
 
 jobs:
+  fmt:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run ESLint Check
+      run: eslint --max-warnings 0 .
+
   spotify:
     runs-on: ubuntu-latest
 
