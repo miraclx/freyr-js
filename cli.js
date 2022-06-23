@@ -28,7 +28,6 @@ import {isBinaryFile} from 'isbinaryfile';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
 
-
 import symbols from './src/symbols.js';
 import fileMgr from './src/file_mgr.js';
 import pFlatten from './src/p_flatten.js';
