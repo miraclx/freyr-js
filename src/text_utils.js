@@ -1,4 +1,4 @@
-const {StripChar} = require('stripchar');
+import {StripChar} from 'stripchar';
 
 /**
  * Stripout invalid characters, symbols and unnecessary spaces
@@ -60,4 +60,4 @@ function getWeight(a, b) {
   );
 }
 
-module.exports = {stripText, getWeight};
+export default {stripText, getWeight};

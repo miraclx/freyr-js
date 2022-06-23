@@ -19,19 +19,5 @@
         "ffurrer2/extract-release-notes"
       ]
     },
-    {
-      // got >=v12 is an ESM package
-      "matchPackageNames": [
-        "got"
-      ],
-      "allowedVersions": "<12"
-    },
-    {
-      // filenamify >=v5 is an ESM package
-      "matchPackageNames": [
-        "filenamify"
-      ],
-      "allowedVersions": "<5"
-    }
   ]
 }

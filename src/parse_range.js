@@ -1,3 +1,5 @@
+import esMain from 'es-main';
+
 class ParseError extends Error {}
 
 /**
@@ -12,7 +14,7 @@ class ParseError extends Error {}
  * - `inclusive`: Whether or not the maximum is a part of the range. E.g `true` in `5..=10`
  * - `strict`: Whether or not the spec was not a range. E.g `true` in `7`
  */
-function parseRange(spec) {
+export default function parseRange(spec) {
   let [min, max] = [];
   const sepIndex = spec.indexOf('..');
   [min, max] = (~sepIndex ? [spec.slice(0, sepIndex), spec.slice(sepIndex + 2)] : [spec]).map(part => part.trim());
@@ -99,5 +101,4 @@ function initTest() {
   test_time('20..50s    ', [19999, 20000, 49999, 50000, 50001]);
 }
 
-module.exports = parseRange;
-if (require.main === module) initTest();
+if (esMain(import.meta)) initTest();

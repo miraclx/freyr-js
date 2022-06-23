@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-const fs = require('fs');
-const tty = require('tty');
-const util = require('util');
+import fs from 'fs';
+import tty from 'tty';
+import util from 'util';
 
 function isActivelyWritable(stream) {
   return (
@@ -43,7 +43,7 @@ function getPersistentStream(store, prop = null, isTTY = false) {
   return device;
 }
 
-class StackLogger {
+export default class StackLogger {
   #store = {
     output: null, // custom stream to write to. stdout, stderr or forced tty
     isTTY: null, // whether or not the specified custom stream should be an actual TTY
@@ -213,5 +213,3 @@ class StackLogger {
     return util.formatWithOptions({colors: true}, ...msgs);
   }
 }
-
-module.exports = StackLogger;

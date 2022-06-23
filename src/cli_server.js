@@ -1,10 +1,10 @@
-const crypto = require('crypto');
-const events = require('events');
+import crypto from 'crypto';
+import events from 'events';
 
-const cors = require('cors');
-const express = require('express');
-const stringd = require('stringd');
-const cookieParser = require('cookie-parser');
+import cors from 'cors';
+import express from 'express';
+import stringd from 'stringd';
+import cookieParser from 'cookie-parser';
 
 function wrapHTML(opts) {
   return stringd(
@@ -41,7 +41,7 @@ function wrapHTML(opts) {
   );
 }
 
-class AuthServer extends events.EventEmitter {
+export default class AuthServer extends events.EventEmitter {
   #store = {
     port: null,
     hostname: null,
@@ -96,5 +96,3 @@ class AuthServer extends events.EventEmitter {
     return code;
   }
 }
-
-module.exports = AuthServer;

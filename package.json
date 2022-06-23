@@ -2,12 +2,13 @@
   "name": "freyr",
   "version": "0.7.0",
   "description": "A versatile, service-agnostic music downloader and manager",
-  "main": "src/freyr.js",
+  "exports": "./src/freyr.js",
+  "type": "module",
   "scripts": {
     "push": "git push github master"
   },
   "bin": {
-    "freyr": "cli.js"
+    "freyr": "./cli.js"
   },
   "engines": {
     "node": ">=12"
@@ -60,6 +61,7 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "country-data": "0.0.31",
+    "es-main": "^1.0.2",
     "express": "^4.17.1",
     "filenamify": "^4.3.0",
     "fluent-ffmpeg": "^2.1.2",

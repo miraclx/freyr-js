@@ -1,16 +1,16 @@
 /* eslint-disable camelcase, no-underscore-dangle, class-methods-use-this */
-const xurl = require('url');
-const path = require('path');
+import xurl from 'url';
+import path from 'path';
 
-const Promise = require('bluebird');
-const NodeCache = require('node-cache');
-const {Client} = require('@yujinakayama/apple-music');
+import Promise from 'bluebird';
+import NodeCache from 'node-cache';
+import {Client} from '@yujinakayama/apple-music';
 
-const symbols = require('../symbols');
+import symbols from '../symbols.js';
 
 const validUriTypes = ['track', 'album', 'artist', 'playlist'];
 
-class AppleMusic {
+export default class AppleMusic {
   static [symbols.meta] = {
     ID: 'apple_music',
     DESC: 'Apple Music',
@@ -303,5 +303,3 @@ class AppleMusic {
     );
   }
 }
-
-module.exports = AppleMusic;
