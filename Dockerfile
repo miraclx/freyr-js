@@ -16,14 +16,28 @@ RUN apk add \
   ffmpeg \
   bash \
   which \
+  cmake \
+  gcc \
+  g++ \
+  make \
+  linux-headers \
   && ln /usr/bin/python3 /usr/bin/python \
   && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+
 
 # install atomicparsley
+# clones and checkouts to latest stable tag...
+# ... then compiles and moves the binary to bins directory
 RUN mkdir /bins \
-  && wget -nv https://github.com/wez/atomicparsley/releases/download/20210715.151551.e7ad03a/AtomicParsleyAlpine.zip \
-  && unzip -j AtomicParsleyAlpine.zip AtomicParsley -d /bins \
-  && rm -v AtomicParsleyAlpine.zip
+  && git clone https://github.com/wez/atomicparsley \
+  && cd atomicparsley \
+  && git fetch --tags \
+  && latestTag=$(git describe --tags `git rev-list --tags --max-count=1`) \
+  && git checkout $latestTag \
+  && cmake . \
+  && cmake --build . --config Release \
+  && mv AtomicParsley /bins \
+  && cd .. \
+  && rm -r atomicparsley
 ENV PATH "/bins:$PATH"
 
 # Create freyr user and group
