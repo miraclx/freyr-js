@@ -276,10 +276,10 @@ jobs:
       id: meta
       uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
       with:
-        images: freyrcli/freyrjs-pr
+        images: freyrcli/freyrjs-git
         tags: |
+          type=ref,event=pr
           type=ref,event=branch
-          type=ref,event=pr,prefix=
 
     - name: Build and push Docker image
       uses: docker/build-push-action@7f9d37fa544684fb73bfe4835ed7214c255ce02b
