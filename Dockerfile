@@ -28,15 +28,10 @@ RUN apk add \
 # clones and checkouts to latest stable tag...
 # ... then compiles and moves the binary to bins directory
 RUN mkdir /bins \
-  && git clone https://github.com/wez/atomicparsley \
-  && cd atomicparsley \
-  && git fetch --tags \
-  && latestTag=$(git describe --tags `git rev-list --tags --max-count=1`) \
-  && git checkout $latestTag \
-  && cmake . \
-  && cmake --build . --config Release \
-  && mv AtomicParsley /bins \
-  && cd .. \
+  && git clone --branch 20210715.151551.e7ad03a --depth 1 https://github.com/wez/atomicparsley \
+  && cmake -S atomicparsley -B atomicparsley \
+  && cmake --build atomicparsley --config Release \
+  && mv atomicparsley/AtomicParsley /bins \
   && rm -r atomicparsley
 ENV PATH "/bins:$PATH"
 
