@@ -40,7 +40,8 @@
     "no-unused-vars": [
       1,
       {
-        "argsIgnorePattern": "^_"
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
       }
     ]
   }
