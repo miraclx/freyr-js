@@ -54,7 +54,6 @@
   "dependencies": {
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.4",
-    "axios": "^0.27.2",
     "bluebird": "^3.7.2",
     "commander": "^9.3.0",
     "conf": "^10.1.2",
@@ -84,7 +83,6 @@
     "stringd-colors": "^1.9.0",
     "stripchar": "^1.2.1",
     "tmp": "^0.2.1",
-    "tough-cookie": "^4.0.0",
     "xbytes": "^1.8.0",
     "xprogress": "^0.18.0",
     "youtube-dl-exec": "^2.0.12",
