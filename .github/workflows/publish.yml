@@ -33,10 +33,10 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
 
     - name: Log in to Docker Hub
       uses: docker/login-action@42d299face0c5c43a0487c477f595ac9cf22f1a7
