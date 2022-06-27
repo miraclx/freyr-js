@@ -54,7 +54,6 @@
   "dependencies": {
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.4",
-    "axios": "^0.27.2",
     "bluebird": "^3.7.2",
     "commander": "^9.3.0",
     "conf": "^10.1.2",
@@ -68,7 +67,6 @@
     "got": "^12.1.0",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.3.3",
-    "is-online": "^10.0.0",
     "isbinaryfile": "^5.0.0",
     "libxget": "^0.9.2",
     "lodash": "^4.17.21",
@@ -78,13 +76,13 @@
     "node-cache": "^5.1.2",
     "open": "^8.4.0",
     "pretty-ms": "^8.0.0",
+    "public-ip": "^6.0.1",
     "spotify-uri": "^3.0.2",
     "spotify-web-api-node": "^5.0.2",
     "stringd": "^2.1.0",
     "stringd-colors": "^1.9.0",
     "stripchar": "^1.2.1",
     "tmp": "^0.2.1",
-    "tough-cookie": "^4.0.0",
     "xbytes": "^1.8.0",
     "xprogress": "^0.18.0",
     "youtube-dl-exec": "^2.0.12",
@@ -107,5 +105,11 @@
     "@yujinakayama/apple-music": {
       "axios": "0.27.2"
     }
+  },
+  "resolutions": {
+    "@yujinakayama/apple-music/axios": "0.27.2",
+    "yt-search/node-fzf": "0.11.0",
+    "yt-search/node-fzf/cli-color": "2.0.2",
+    "yt-search/node-fzf/string-width": "5.1.2"
   }
 }
