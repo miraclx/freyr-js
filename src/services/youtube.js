@@ -128,7 +128,7 @@ export class YouTubeMusic {
     if (typeof queryObject !== 'object') throw new Error('<queryObject> must be an object');
     if (params && typeof params !== 'object') throw new Error('<params>, if defined must be an object');
     const response = await this.#request('https://music.youtube.com/youtubei/v1/search', {
-      timeout: 10000,
+      timeout: {request: 10000},
       method: 'post',
       searchParams: {alt: 'json', key: await this.#getApiKey(), ...params},
       responseType: 'json',
