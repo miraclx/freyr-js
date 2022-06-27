@@ -278,6 +278,7 @@ jobs:
       with:
         images: freyrcli/freyrjs-pr
         tags: |
+          type=ref,event=branch
           type=ref,event=pr,prefix=
 
     - name: Build and push Docker image
