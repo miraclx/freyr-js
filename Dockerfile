@@ -25,8 +25,6 @@ RUN apk add \
   && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+
 
 # install atomicparsley
-# clones and checkouts to latest stable tag...
-# ... then compiles and moves the binary to bins directory
 RUN mkdir /bins \
   && git clone --branch 20210715.151551.e7ad03a --depth 1 https://github.com/wez/atomicparsley \
   && cmake -S atomicparsley -B atomicparsley \
