@@ -86,7 +86,7 @@
     "tmp": "^0.2.1",
     "tough-cookie": "^4.0.0",
     "xbytes": "^1.8.0",
-    "xprogress": "^0.17.3",
+    "xprogress": "^0.18.0",
     "youtube-dl-exec": "^2.0.12",
     "yt-search": "^2.10.3"
   },
