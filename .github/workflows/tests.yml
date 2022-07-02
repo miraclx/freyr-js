@@ -260,18 +260,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@42d299face0c5c43a0487c477f595ac9cf22f1a7
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
@@ -281,6 +269,149 @@ jobs:
           type=ref,event=pr
           type=ref,event=branch
 
+    - name: Extract Tag
+      id: meta2
+      if: github.event_name == 'pull_request'
+      run: |
+        TAG=$( echo "${{ steps.meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
+        echo "::set-output name=tag::$TAG"
+
+    - name: Report Docker Image Build Status
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        message: |
+          <div align=center>
+
+          ---
+
+          🐋 🤖
+
+          🔃
+
+          **A docker image for this PR is being built! (1/5)**
+
+          ```console
+          docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
+          ```
+
+          ---
+
+          <details>
+          <summary>What's this?</summary>
+
+          This docker image is a self-contained sandbox that includes all the patches made in this PR. Allowing others to easily use your patches without waiting for it to get merged and released officially.
+
+          For more context, see https://github.com/miraclx/freyr-js#docker-development.
+
+          </details>
+          </div>
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8
+
+    - name: Report Docker Image Build Status
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        message: |
+          <div align=center>
+
+          ---
+
+          🐋 🤖
+
+          🔃
+
+          **A docker image for this PR is being built! (2/5)**
+
+          ```console
+          docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
+          ```
+
+          ---
+
+          <details>
+          <summary>What's this?</summary>
+
+          This docker image is a self-contained sandbox that includes all the patches made in this PR. Allowing others to easily use your patches without waiting for it to get merged and released officially.
+
+          For more context, see https://github.com/miraclx/freyr-js#docker-development.
+
+          </details>
+          </div>
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
+
+    - name: Report Docker Image Build Status
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        message: |
+          <div align=center>
+
+          ---
+
+          🐋 🤖
+
+          🔃
+
+          **A docker image for this PR is being built! (3/5)**
+
+          ```console
+          docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
+          ```
+
+          ---
+
+          <details>
+          <summary>What's this?</summary>
+
+          This docker image is a self-contained sandbox that includes all the patches made in this PR. Allowing others to easily use your patches without waiting for it to get merged and released officially.
+
+          For more context, see https://github.com/miraclx/freyr-js#docker-development.
+
+          </details>
+          </div>
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@42d299face0c5c43a0487c477f595ac9cf22f1a7
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Report Docker Image Build Status
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        message: |
+          <div align=center>
+
+          ---
+
+          🐋 🤖
+
+          🔃
+
+          **A docker image for this PR is being built! (4/5)**
+
+          ```console
+          docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
+          ```
+
+          ---
+
+          <details>
+          <summary>What's this?</summary>
+
+          This docker image is a self-contained sandbox that includes all the patches made in this PR. Allowing others to easily use your patches without waiting for it to get merged and released officially.
+
+          For more context, see https://github.com/miraclx/freyr-js#docker-development.
+
+          </details>
+          </div>
+
     - name: Build and push Docker image
       uses: docker/build-push-action@7f9d37fa544684fb73bfe4835ed7214c255ce02b
       with:
@@ -289,6 +420,35 @@ jobs:
         platforms: linux/amd64,linux/arm64,linux/arm/v7
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Report Docker Image Build Status
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        message: |
+          <div align=center>
+
+          ---
+
+          🐋 🤖
+
+          **A docker image for this PR has been built!**
+
+          ```console
+          docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
+          ```
+
+          ---
+
+          <details>
+          <summary>What's this?</summary>
+
+          This docker image is a self-contained sandbox that includes all the patches made in this PR. Allowing others to easily use your patches without waiting for it to get merged and released officially.
+
+          For more context, see https://github.com/miraclx/freyr-js#docker-development.
+
+          </details>
+          </div>
 
   linter:
     runs-on: ubuntu-latest
