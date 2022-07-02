@@ -10,6 +10,7 @@
     {
       "enabled": false,
       "matchFiles": [
+        ".github/workflows/tests.yml",
         ".github/workflows/publish.yml"
       ],
       "matchPackageNames": [
