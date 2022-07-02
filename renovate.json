@@ -21,6 +21,6 @@
         "docker/setup-buildx-action",
         "ffurrer2/extract-release-notes"
       ]
-    },
+    }
   ]
 }
