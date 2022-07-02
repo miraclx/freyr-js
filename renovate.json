@@ -10,6 +10,7 @@
     {
       "enabled": false,
       "matchFiles": [
+        ".github/workflows/tests.yml",
         ".github/workflows/publish.yml"
       ],
       "matchPackageNames": [
@@ -20,6 +21,6 @@
         "docker/setup-buildx-action",
         "ffurrer2/extract-release-notes"
       ]
-    },
+    }
   ]
 }
