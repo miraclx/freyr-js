@@ -399,15 +399,6 @@ jobs:
           </details>
           </div>
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
-      with:
-        images: freyrcli/freyrjs-git
-        tags: |
-          type=ref,event=pr
-          type=ref,event=branch
-
     - name: Report Docker Image Build Status
       uses: marocchino/sticky-pull-request-comment@v2
       with:
