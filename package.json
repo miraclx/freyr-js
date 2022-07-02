@@ -15,7 +15,6 @@
   },
   "files": [
     "src",
-    "typings",
     "conf.json",
     "banner.js"
   ],
