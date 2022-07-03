@@ -1083,6 +1083,12 @@ cd freyr
 
 ### Docker Development
 
+With docker, you can chroot into a sandbox that has all the dependencies you need. Without needing to mess around with your host system or install any weird dependencies.
+
+First you need to either build a local docker image or submit a PR and use the corresponding auto-generated image.
+
+#### Building A Local Image
+
 The default provided [Dockerfile](https://github.com/miraclx/freyr-js/raw/master/Dockerfile) builds minimal alpine images. Average build network usage is ~ 80 MB and disk usage is ~ 180 MB.
 
 ```bash
@@ -1091,7 +1097,21 @@ cd freyr
 docker build -t freyr-dev .
 ```
 
-Afterwards, you can drop into the container by explicitly defining the entrypoint
+#### Working With Remote Images
+
+An alternative to building the docker image locally is to use a remote image. By default, all PRs submitted to this repo get an equivalently tagged docker image for testing.
+
+For example, the PR #214 has a docker image called `freyrcli/freyrjs-git:pr-214`. And it stays updated with the current state of the branch.
+
+You can then pull the development image for use locally.
+
+```bash
+docker pull freyrcli/freyrjs-git:pr-214
+```
+
+---
+
+Once you have a built development image locally, you're ready to go. You can drop into the container by explicitly defining the entrypoint
 
 ```bash
 docker run -it --entrypoint bash freyr-dev
@@ -1099,6 +1119,8 @@ docker run -it --entrypoint bash freyr-dev
 # Alternatively, create a handy alias
 alias freyrsh='docker run -it --entrypoint bash freyr-dev'
 ```
+
+*: don't forget to replace `freyr-dev` with the appropriate image name if you pulled one of the auto-generated remote images.
 
 Optionally, you can use these interesting flags to customize the experience.
 
