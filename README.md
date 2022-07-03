@@ -1083,9 +1083,9 @@ cd freyr
 
 ### Docker Development
 
-With docker, you can chroot into a sandbox that has all the dependencies you need. Without needing to mess around with your host system or install any weird dependencies.
+With docker, you can drop into a sandbox that has all the dependencies you need. Without needing to mess around with your host system or install any weird dependencies.
 
-First you need to either build a local docker image or submit a PR and use the corresponding auto-generated image.
+First, you need to either build a local docker image or submit a PR and use the corresponding auto-generated image.
 
 #### Building A Local Image
 
@@ -1099,7 +1099,7 @@ docker build -t freyr-dev .
 
 #### Working With Remote Images
 
-An alternative to building the docker image locally is to use a remote image. By default, all PRs submitted to this repo get an equivalently tagged docker image for testing.
+An alternative to building the docker image locally is to use a remote image. By default, all PRs submitted to this repository get an equivalently tagged docker image for testing.
 
 For example, the PR #214 has a docker image called `freyrcli/freyrjs-git:pr-214`. And it stays updated with the current state of the branch.
 
