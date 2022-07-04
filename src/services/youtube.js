@@ -54,12 +54,13 @@ function _getSearchArgs(artists, track, duration) {
 function genAsyncGetFeedsFn(url) {
   let ytdl;
   if (process.env.YOUTUBE_DL_BIN_PATH) {
-    ytdl = youtubedl.create(process.env.YOUTUBE_DL_BIN_PATH).exec;
+    ytdl = youtubedl.create(process.env.YOUTUBE_DL_BIN_PATH);
   } else {
-    ytdl = youtubedl.exec;
+    ytdl = youtubedl.default;
   }
   return () =>
-    ytdl(url, {
+    ytdl(null, {
+      "--": [url],
       socketTimeout: 20,
       cacheDir: false,
       dumpSingleJson: true,
