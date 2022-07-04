@@ -297,7 +297,6 @@ jobs:
 
           | **Last Master** | ![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/master?color=gray&label=%20&logo=docker) |
           | - | - |
-          | **This Patch** | ![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.tag}}?color=gray&label=%20&logo=docker) |
 
           ---
 
