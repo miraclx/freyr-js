@@ -4,7 +4,7 @@ import util from "util";
 import got from "got";
 import Promise from "bluebird";
 import ytSearch from "yt-search";
-import * as youtubedl from "youtube-dl-exec";
+import youtubedl from "youtube-dl-exec";
 
 import walk from "../walkr.js";
 import symbols from "../symbols.js";
@@ -52,14 +52,8 @@ function _getSearchArgs(artists, track, duration) {
  */
 
 function genAsyncGetFeedsFn(url) {
-  let ytdl;
-  if (process.env.YOUTUBE_DL_BIN_PATH) {
-    ytdl = youtubedl.create(process.env.YOUTUBE_DL_BIN_PATH);
-  } else {
-    ytdl = youtubedl.default;
-  }
   return () =>
-    ytdl(null, {
+    youtubedl(null, {
       "--": [url],
       socketTimeout: 20,
       cacheDir: false,
