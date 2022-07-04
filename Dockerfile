@@ -26,13 +26,14 @@ RUN rm -rf /freyr/node_modules
 COPY --from=prep /freyr/node_modules /freyr/node_modules
 COPY --from=prep /atomicparsley/AtomicParsley /bin/AtomicParsley
 
-WORKDIR /freyr
+# hadolint ignore=DL4006
 RUN addgroup -g 1001 freyr \
   && adduser -DG freyr freyr \
   && echo freyr:freyr | chpasswd \
   && ln -s /freyr/cli.js /bin/freyr \
   && mkdir /data \
   && chown -R freyr:freyr /freyr /data
+WORKDIR /freyr
 USER freyr
 
 WORKDIR /data
