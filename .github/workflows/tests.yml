@@ -277,12 +277,14 @@ jobs:
           type=ref,event=branch
           ${{ steps.is_pr.outputs.sha }}
 
-    - name: Extract Tag
+    - name: Extract Tags
       id: meta2
       if: github.event_name == 'pull_request'
       run: |
-        TAG=$( echo "${{ steps.meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
-        echo "::set-output name=tag::$TAG"
+        PR_TAG=$( echo "${{ steps.meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
+        echo "::set-output name=tag::$PR_TAG"
+        SHA=$( echo ${{ github.event.pull_request.base.sha }} | head -c7 )
+        echo "::set-output name=sha::$SHA"
 
     - name: Report Docker Image Build Status
       uses: marocchino/sticky-pull-request-comment@v2
@@ -303,7 +305,7 @@ jobs:
           docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
           ```
 
-          | [**Latest Master**][master-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/master?color=gray&label=%20&logo=docker)][master-url] |
+          | [**Last Master**][master-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.sha}}?color=gray&label=%20&logo=docker)][master-url] |
           | - | - |
 
           ---
@@ -318,7 +320,7 @@ jobs:
           </details>
           </div>
 
-          [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=master
+          [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{steps.meta2.outputs.sha}}
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8
@@ -358,7 +360,7 @@ jobs:
           docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
           ```
 
-          | [**Latest Master**][master-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/master?color=gray&label=%20&logo=docker)][master-url] |
+          | [**Last Master**][master-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.sha}}?color=gray&label=%20&logo=docker)][master-url] |
           | - | - |
           | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.tag}}?color=gray&label=%20&logo=docker)][pr-url] |
 
@@ -374,7 +376,7 @@ jobs:
           </details>
           </div>
 
-          [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=master
+          [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{steps.meta2.outputs.sha}}
           [pr-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{steps.meta2.outputs.tag}}
 
   linter:
