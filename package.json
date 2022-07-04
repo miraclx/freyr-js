@@ -101,13 +101,9 @@
         "cli-color": "2.0.2",
         "string-width": "5.1.2"
       }
-    },
-    "@yujinakayama/apple-music": {
-      "axios": "0.27.2"
     }
   },
   "resolutions": {
-    "@yujinakayama/apple-music/axios": "0.27.2",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.2",
     "yt-search/node-fzf/string-width": "5.1.2"

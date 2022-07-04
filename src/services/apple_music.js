@@ -39,12 +39,21 @@ export default class AppleMusic {
     if (typeof config !== 'object') throw new Error(`[AppleMusic] Please define a configuration as an object`);
     if (!config.developerToken)
       throw new Error(`[AppleMusic] Please define [developerToken] as a property within the configuration`);
-    this.#store.core = new Client({developerToken: config.developerToken});
-    let custom_head = {headers: {origin: 'https://music.apple.com'}};
-    this.#store.core.albums.axiosInstance = this.#store.core.albums.axiosInstance.create(custom_head);
-    this.#store.core.artists.axiosInstance = this.#store.core.artists.axiosInstance.create(custom_head);
-    this.#store.core.playlists.axiosInstance = this.#store.core.playlists.axiosInstance.create(custom_head);
-    this.#store.core.songs.axiosInstance = this.#store.core.songs.axiosInstance.create(custom_head);
+      
+    this.#store.core = new Client({ developerToken: config.developerToken });
+
+    function augmentAxiosInstance(instance) {
+      instance.interceptors.request.use((conf) => {
+        conf.headers.origin = 'https://music.apple.com';
+        return conf;
+      });
+    }
+
+    augmentAxiosInstance(this.#store.core.albums.axiosInstance);
+    augmentAxiosInstance(this.#store.core.artists.axiosInstance);
+    augmentAxiosInstance(this.#store.core.playlists.axiosInstance);
+    augmentAxiosInstance(this.#store.core.songs.axiosInstance);
+
     this.#store.defaultStorefront = config.storefront || 'us';
     this.#store.isAuthenticated = !!config.developerToken;
   }
@@ -80,7 +89,7 @@ export default class AppleMusic {
   }
 
   validateType(uri) {
-    const {type} = this.identifyType(uri);
+    const { type } = this.identifyType(uri);
     return type in validUriTypes;
   }
 
@@ -94,9 +103,18 @@ export default class AppleMusic {
     const isURI = !!match[4];
     const parsedURL = xurl.parse(uri, true);
     const collection_type = match[isURI ? 4 : 2];
-    const id = (isURI && match[4] === 'track' ? match[5] : parsedURL.query.i) || null;
-    const type = isURI ? match[4] : collection_type === 'album' && id ? 'track' : collection_type;
-    const refID = isURI ? (type !== 'track' ? match[5] : null) : path.basename(parsedURL.pathname);
+    const id =
+      (isURI && match[4] === 'track' ? match[5] : parsedURL.query.i) || null;
+    const type = isURI
+      ? match[4]
+      : collection_type === 'album' && id
+      ? 'track'
+      : collection_type;
+    const refID = isURI
+      ? type !== 'track'
+        ? match[5]
+        : null
+      : path.basename(parsedURL.pathname);
     return {
       id,
       type,
@@ -116,7 +134,9 @@ export default class AppleMusic {
       name: trackInfo.attributes.name,
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
-      album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
+      album_uri: `apple_music:album:${
+        albumInfo.id || this.parseURI(trackInfo.attributes.url).refID
+      }`,
       album_type: albumInfo.type,
       images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
@@ -143,16 +163,17 @@ export default class AppleMusic {
       name: albumObject.attributes.name.replace(/\s-\s(Single|EP)$/, ''),
       artists: [albumObject.attributes.artistName],
       type:
-        albumObject.attributes.artistName === 'Various Artists' && albumObject.relationships.artists.data.length === 0
+        albumObject.attributes.artistName === 'Various Artists' &&
+        albumObject.relationships.artists.data.length === 0
           ? 'compilation'
           : albumObject.attributes.isSingle
           ? 'single'
           : 'album',
       genres: albumObject.attributes.genreNames,
-      copyrights: [{type: 'P', text: albumObject.attributes.copyright}],
+      copyrights: [{ type: 'P', text: albumObject.attributes.copyright }],
       images: albumObject.attributes.artwork,
       label: albumObject.attributes.recordLabel,
-      release_date: (date =>
+      release_date: ((date) =>
         typeof date === 'string'
           ? date
           : [
@@ -167,7 +188,10 @@ export default class AppleMusic {
       getImage(width, height) {
         const min = (val, max) => Math.min(max, val) || max;
         const images = albumObject.attributes.artwork;
-        return images.url.replace('{w}x{h}', `${min(width, images.width)}x${min(height, images.height)}`);
+        return images.url.replace(
+          '{w}x{h}',
+          `${min(width, images.width)}x${min(height, images.height)}`
+        );
       },
     };
   }
@@ -178,7 +202,7 @@ export default class AppleMusic {
       uri: artistObject.attributes.url,
       name: artistObject.attributes.name,
       genres: artistObject.attributes.genreNames,
-      albums: artistObject.relationships.albums.data.map(album => album.id),
+      albums: artistObject.relationships.albums.data.map((album) => album.id),
       nalbums: null,
     };
   }
@@ -189,10 +213,13 @@ export default class AppleMusic {
       uri: playlistObject.attributes.url,
       name: playlistObject.attributes.name,
       followers: null,
-      description: (playlistObject.attributes.description || {short: null}).short,
+      description: (playlistObject.attributes.description || { short: null })
+        .short,
       owner_id: null,
       owner_name: playlistObject.attributes.curatorName,
-      type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
+      type: playlistObject.attributes.playlistType
+        .split('-')
+        .map((word) => `${word[0].toUpperCase()}${word.slice(1)}`),
       ntracks: playlistObject.relationships.tracks.data.length,
       tracks: playlistObject.relationships.tracks.data,
     };
@@ -200,12 +227,14 @@ export default class AppleMusic {
 
   async processData(uris, max, store, coreFn) {
     const wasArr = Array.isArray(uris);
-    uris = (wasArr ? uris : [uris]).map(_uri => {
+    uris = (wasArr ? uris : [uris]).map((_uri) => {
       const parsed = this.parseURI(_uri, store);
       parsed.value = this.#store.cache.get(parsed.uri);
       return [parsed.id || parsed.refID, parsed];
     });
-    const packs = uris.filter(([, {value}]) => !value).map(([, parsed]) => parsed);
+    const packs = uris
+      .filter(([, { value }]) => !value)
+      .map(([, parsed]) => parsed);
     uris = Object.fromEntries(uris);
     if (packs.length)
       (
@@ -213,38 +242,58 @@ export default class AppleMusic {
           Object.entries(
             // organise by storefront
             packs.reduce(
-              (all, item) => (((all[item.storefront] = all[item.storefront] || []), all[item.storefront].push(item)), all),
-              {},
-            ),
+              (all, item) => (
+                ((all[item.storefront] = all[item.storefront] || []),
+                all[item.storefront].push(item)),
+                all
+              ),
+              {}
+            )
           ),
           async ([storefront, _items]) =>
             Promise.mapSeries(
               // cut to maximum query length
               ((f, c) => (
-                (c = Math.min(c, f.length)), [...Array(Math.ceil(f.length / c))].map((_, i) => f.slice(i * c, i * c + c))
+                (c = Math.min(c, f.length)),
+                [...Array(Math.ceil(f.length / c))].map((_, i) =>
+                  f.slice(i * c, i * c + c)
+                )
               ))(_items, max || Infinity),
-              async items => coreFn(items, storefront), // request select collection
-            ),
+              async (items) => coreFn(items, storefront) // request select collection
+            )
         )
       )
         .flat(2)
-        .forEach(item => (item ? this.#store.cache.set(uris[item.id].uri, (uris[item.id].value = item)) : null));
-    const ret = Object.values(uris).map(item => item.value);
+        .forEach((item) =>
+          item
+            ? this.#store.cache.set(
+                uris[item.id].uri,
+                (uris[item.id].value = item)
+              )
+            : null
+        );
+    const ret = Object.values(uris).map((item) => item.value);
     return !wasArr ? ret[0] : ret;
   }
 
   async getTrack(uris, store) {
     return this.processData(uris, 300, store, async (items, storefront) => {
-      const {data: tracks} = await this.#store.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront});
-      await this.getAlbum(
-        items.map(item => `apple_music:album:${item.refID}`),
-        storefront,
+      const { data: tracks } = await this.#store.core.songs.get(
+        `?ids=${items.map((item) => item.id).join(',')}`,
+        { storefront }
       );
-      return Promise.mapSeries(tracks, async track =>
+      await this.getAlbum(
+        items.map((item) => `apple_music:album:${item.refID}`),
+        storefront
+      );
+      return Promise.mapSeries(tracks, async (track) =>
         this.wrapTrackMeta(
           track,
-          await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`, storefront),
-        ),
+          await this.getAlbum(
+            `apple_music:album:${this.parseURI(track.attributes.url).refID}`,
+            storefront
+          )
+        )
       );
     });
   }
@@ -252,54 +301,75 @@ export default class AppleMusic {
   async getAlbum(uris, store) {
     return this.processData(uris, 100, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.#store.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-        album => this.wrapAlbumData(album),
-      ),
+        (
+          await this.#store.core.albums.get(
+            `?ids=${items.map((item) => item.refID).join(',')}`,
+            { storefront }
+          )
+        ).data,
+        (album) => this.wrapAlbumData(album)
+      )
     );
   }
 
   async getAlbumTracks(url, store) {
     return this.getTrack(
-      (await this.getAlbum(url, store)).tracks.map(track => track.attributes.url),
-      store,
+      (await this.getAlbum(url, store)).tracks.map(
+        (track) => track.attributes.url
+      ),
+      store
     );
   }
 
   async getArtist(uris, store) {
     return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.#store.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-        artist => this.wrapArtistData(artist),
-      ),
+        (
+          await this.#store.core.artists.get(
+            `?ids=${items.map((item) => item.refID).join(',')}`,
+            { storefront }
+          )
+        ).data,
+        (artist) => this.wrapArtistData(artist)
+      )
     );
   }
 
   async getPlaylist(uris, store) {
     return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.#store.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-        playlist => this.wrapPlaylistData(playlist),
-      ),
+        (
+          await this.#store.core.playlists.get(
+            `?ids=${items.map((item) => item.refID).join(',')}`,
+            { storefront }
+          )
+        ).data,
+        (playlist) => this.wrapPlaylistData(playlist)
+      )
     );
   }
 
   async getPlaylistTracks(uris, store) {
     return this.getTrack(
-      (await this.getPlaylist(uris, store)).tracks.map(track => track.attributes.url),
-      store,
+      (await this.getPlaylist(uris, store)).tracks.map(
+        (track) => track.attributes.url
+      ),
+      store
     );
   }
 
   async getArtistAlbums(uris, store) {
     return this.processData(
-      (await this.getArtist(uris)).albums.map(album => `apple_music:album:${album}`),
+      (await this.getArtist(uris)).albums.map(
+        (album) => `apple_music:album:${album}`
+      ),
       100,
       store,
       (items, storefront) =>
         this.getAlbum(
-          items.map(item => item.uri),
-          storefront,
-        ),
+          items.map((item) => item.uri),
+          storefront
+        )
     );
   }
 }
