@@ -15,6 +15,7 @@
   },
   "files": [
     "src",
+    "cli.js",
     "conf.json",
     "banner.js"
   ],
