@@ -1,6 +1,6 @@
 FROM node:alpine as installer
 
-RUN echo "$(printf '#!/usr/bin/env sh\necho "Python 3.0.0"')" > /usr/bin/python && chmod +x /usr/bin/python
+RUN printf '#!/usr/bin/env sh\necho "Python 3.0.0"\n' > /usr/bin/python && chmod +x /usr/bin/python
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY . /freyr
 RUN cd /freyr && npm ci --only=production
