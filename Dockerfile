@@ -17,10 +17,10 @@ RUN go install github.com/tj/node-prune@1159d4c \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
-FROM node:alpine as base
+FROM alpine as base
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache ffmpeg python3 libstdc++
+RUN apk add --no-cache nodejs ffmpeg python3 libstdc++
 COPY --from=installer /freyr /freyr
 RUN rm -rf /freyr/node_modules
 COPY --from=prep /freyr/node_modules /freyr/node_modules
@@ -30,7 +30,7 @@ WORKDIR /freyr
 RUN addgroup -g 1001 freyr \
   && adduser -DG freyr freyr \
   && echo freyr:freyr | chpasswd \
-  && npm link \
+  && ln -s /freyr/cli.js /bin/freyr \
   && mkdir /data \
   && chown -R freyr:freyr /freyr /data
 USER freyr
