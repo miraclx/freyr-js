@@ -59,8 +59,7 @@ function genAsyncGetFeedsFn(url) {
     ytdl = youtubedl.exec;
   }
   return () =>
-    ytdl(null, {
-      "--": [url],
+    ytdl(url, {
       socketTimeout: 20,
       cacheDir: false,
       dumpSingleJson: true,
