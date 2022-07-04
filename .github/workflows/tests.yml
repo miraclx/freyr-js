@@ -295,6 +295,9 @@ jobs:
           docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
           ```
 
+          | [**Latest Master**][master-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/master?color=gray&label=%20&logo=docker)][master-url] |
+          | - | - |
+
           ---
 
           <details>
@@ -306,6 +309,8 @@ jobs:
 
           </details>
           </div>
+
+          [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=master
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8
@@ -345,6 +350,10 @@ jobs:
           docker pull freyrcli/freyrjs-git:${{steps.meta2.outputs.tag}}
           ```
 
+          | [**Latest Master**][master-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/master?color=gray&label=%20&logo=docker)][master-url] |
+          | - | - |
+          | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.tag}}?color=gray&label=%20&logo=docker)][pr-url] |
+
           ---
 
           <details>
@@ -356,6 +365,9 @@ jobs:
 
           </details>
           </div>
+
+          [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=master
+          [pr-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{steps.meta2.outputs.tag}}
 
   linter:
     runs-on: ubuntu-latest
