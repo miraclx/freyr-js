@@ -10,6 +10,23 @@ on:
     - cron: '0 0 * * WED,SAT' # 00:00 on Wednesdays and Saturdays, weekly.
 
 jobs:
+  up-to-date:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies via Yarn
+      run: |
+        rm -rf node_modules
+        yarn install --frozen-lockfile
+
+    - name: Install Dependencies via NPM
+      run: |
+        rm -rf node_modules
+        npm ci
+
   fmt:
     runs-on: ubuntu-latest
 
