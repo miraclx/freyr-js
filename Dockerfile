@@ -4,7 +4,7 @@ RUN printf '#!/usr/bin/env sh\necho "Python 3.0.0"\n' > /usr/bin/python && chmod
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY . /freyr
 WORKDIR /freyr
-RUN npm ci --only=production
+RUN yarn install --prod --frozen-lockfile
 
 FROM golang:alpine as prep
 
