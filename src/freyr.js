@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-import _ from 'lodash';
+import _sortBy from 'lodash.sortby';
 
 import symbols from './symbols.js';
 import {YouTube, YouTubeMusic} from './services/youtube.js';
@@ -32,7 +32,7 @@ export default class FreyrCore {
 
   static sortSources(order) {
     order = order ? (Array.isArray(order) ? order : [order]) : [];
-    return _.sortBy(this.collateSources(), source =>
+    return _sortBy(this.collateSources(), source =>
       (index => (index < 0 ? Infinity : index))(order.indexOf(source[symbols.meta].ID)),
     );
   }
