@@ -4,9 +4,6 @@
   "description": "A versatile, service-agnostic music downloader and manager",
   "exports": "./src/freyr.js",
   "type": "module",
-  "scripts": {
-    "push": "git push github master"
-  },
   "bin": {
     "freyr": "./cli.js"
   },
