@@ -18,6 +18,9 @@
   "plugins": [
     "prettier"
   ],
+  "ignorePatterns": [
+    "**/*.json"
+  ],
   "rules": {
     "prettier/prettier": [
       1,
