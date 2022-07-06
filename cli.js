@@ -11,7 +11,6 @@ import Conf from 'conf';
 import open from 'open';
 import xget from 'libxget';
 import ffmpeg from 'fluent-ffmpeg';
-import lodash from 'lodash';
 import merge2 from 'merge2';
 import mkdirp from 'mkdirp';
 import xbytes from 'xbytes';
@@ -27,6 +26,9 @@ import {publicIpv4} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
+
+import _merge from 'lodash.merge';
+import _mergeWith from 'lodash.mergewith';
 
 import symbols from './src/symbols.js';
 import fileMgr from './src/file_mgr.js';
@@ -529,7 +531,7 @@ async function init(packageJson, queries, options) {
   };
   try {
     if (fs.existsSync(options.config)) {
-      Config = lodash.mergeWith(Config, JSON.parse(fs.readFileSync(options.config)), (a, b, k) =>
+      Config = _mergeWith(Config, JSON.parse(fs.readFileSync(options.config)), (a, b, k) =>
         k === 'order' && [a, b].every(Array.isArray) ? b.concat(a) : undefined,
       );
     } else {
@@ -549,18 +551,18 @@ async function init(packageJson, queries, options) {
     process.exit(3);
   }
 
-  Config.image = lodash.merge(Config.image, options.coverSize);
-  Config.concurrency = lodash.merge(Config.concurrency, options.concurrency);
-  Config.dirs = lodash.merge(Config.dirs, {
+  Config.image = _merge(Config.image, options.coverSize);
+  Config.concurrency = _merge(Config.concurrency, options.concurrency);
+  Config.dirs = _merge(Config.dirs, {
     output: options.directory,
     cache: options.cacheDir,
   });
-  Config.opts = lodash.merge(Config.opts, {
+  Config.opts = _merge(Config.opts, {
     netCheck: options.netCheck,
     attemptAuth: options.auth,
     autoOpenBrowser: options.browser,
   });
-  Config.playlist = lodash.merge(Config.playlist, {
+  Config.playlist = _merge(Config.playlist, {
     always: !!options.playlist,
     append: !options.playlistNoappend,
     escape: !options.playlistNoescape,
@@ -568,7 +570,7 @@ async function init(packageJson, queries, options) {
     dir: options.playlistDir,
     namespace: options.playlistNamespace,
   });
-  Config.downloader = lodash.mergeWith(
+  Config.downloader = _mergeWith(
     Config.downloader,
     {
       memCache: options.memCache !== undefined ? !!options.memCache : undefined,
@@ -838,7 +840,7 @@ async function init(packageJson, queries, options) {
         keep: true,
       });
       const audioBytesWritten = await downloadToStream(
-        lodash.merge(
+        _merge(
           {
             outputFile: rawAudio.name,
             logger: trackLogger,
