@@ -67,7 +67,7 @@
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.3.3",
     "isbinaryfile": "^5.0.0",
-    "libxget": "^0.9.2",
+    "libxget": "^0.10.0",
     "lodash": "^4.17.21",
     "merge2": "^1.4.1",
     "minimatch": "^5.1.0",
@@ -83,7 +83,7 @@
     "stripchar": "^1.2.1",
     "tmp": "^0.2.1",
     "xbytes": "^1.8.0",
-    "xprogress": "^0.18.0",
+    "xprogress": "^0.19.1",
     "youtube-dl-exec": "^2.0.12",
     "yt-search": "^2.10.3"
   },
