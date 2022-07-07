@@ -4,7 +4,8 @@ RUN printf '#!/usr/bin/env sh\necho "Python 3.0.0"\n' > /usr/bin/python && chmod
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY . /freyr
 WORKDIR /freyr
-RUN yarn install --prod --frozen-lockfile
+RUN yarn install --prod --frozen-lockfile \
+  && rm -r media
 
 FROM golang:alpine as prep
 
@@ -12,6 +13,7 @@ FROM golang:alpine as prep
 RUN apk add --no-cache git g++ make cmake linux-headers
 COPY --from=installer /freyr/node_modules /freyr/node_modules
 RUN go install github.com/tj/node-prune@1159d4c \
+  && node-prune --include '*.map' /freyr/node_modules \
   && node-prune /freyr/node_modules \
   && git clone --branch 20210715.151551.e7ad03a --depth 1 https://github.com/wez/atomicparsley /atomicparsley \
   && cmake -S /atomicparsley -B /atomicparsley \
