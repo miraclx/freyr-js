@@ -19,10 +19,16 @@ RUN go install github.com/tj/node-prune@1159d4c \
 
 FROM alpine:3.16.0 as base
 
+LABEL maintainer="Miraculous Owonubi <omiraculous@gmail.com>"
+
 # hadolint ignore=DL3018
 RUN apk add --no-cache nodejs ffmpeg python3 libstdc++ \
   && ln /usr/bin/python3 /usr/bin/python \
-  && find /usr/lib/python3* -type d -name __pycache__ -exec rm -r {} \+
+  && find /usr/lib/python3* \
+      \( -type d -name __pycache__ \) \
+     -o \
+      \( -type f -name '*.whl' \) \
+     -exec rm -r {} \+
 COPY --from=installer /freyr /freyr
 RUN rm -rf /freyr/node_modules
 COPY --from=prep /freyr/node_modules /freyr/node_modules
