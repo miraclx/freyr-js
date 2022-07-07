@@ -25,8 +25,7 @@ FROM alpine:3.16.0 as base
 RUN apk add --no-cache nodejs ffmpeg python3 libstdc++ \
   && ln /usr/bin/python3 /usr/bin/python \
   && find /usr/lib/python3* \
-      \( -type d -name __pycache__ \) -o \
-      \( -type f -name '*.whl' \) \
+      \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
       -exec rm -r {} \+
 COPY --from=installer /freyr /freyr
 RUN rm -rf /freyr/node_modules
