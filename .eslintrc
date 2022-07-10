@@ -1,5 +1,4 @@
 {
-  "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
     "es6": true,
@@ -20,8 +19,7 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "**/*.json",
-    "**/*.json5"
+    "**/*.json"
   ],
   "rules": {
     "prettier/prettier": [
@@ -40,7 +38,8 @@
     "no-unused-vars": [
       1,
       {
-        "argsIgnorePattern": "^_"
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
       }
     ]
   }
