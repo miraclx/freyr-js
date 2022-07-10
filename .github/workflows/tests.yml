@@ -21,14 +21,14 @@ jobs:
       run: |
         rm -rf node_modules
         git restore yarn.lock
-        yarn install --frozen-lockfile
+        yarn install
         git diff --no-ext-diff --quiet yarn.lock
 
     - name: Install Dependencies via NPM
       run: |
         rm -rf node_modules
         git restore package-lock.json
-        npm ci
+        npm install
         git diff --no-ext-diff --quiet package-lock.json
 
   fmt:
