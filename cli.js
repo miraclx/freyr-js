@@ -22,6 +22,7 @@ import filenamify from 'filenamify';
 import TimeFormat from 'hh-mm-ss';
 import ProgressBar from 'xprogress';
 import countryData from 'country-data';
+import {bootstrap} from 'global-agent';
 import {publicIpv4} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
 import {program as commander} from 'commander';
@@ -435,6 +436,10 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
 
 async function init(packageJson, queries, options) {
   const initTimeStamp = Date.now();
+
+  process.env['GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE'] = '';
+  bootstrap();
+
   const stackLogger = new StackLogger({indentSize: 1, autoTick: false});
   if (!((Array.isArray(queries) && queries.length > 0) || options.input))
     stackLogger.error('\x1b[31m[i]\x1b[0m Please enter a valid query'), process.exit(1);

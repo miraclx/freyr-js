@@ -60,6 +60,7 @@
     "express": "^4.18.1",
     "filenamify": "^5.1.1",
     "fluent-ffmpeg": "^2.1.2",
+    "global-agent": "^3.0.0",
     "got": "^12.1.0",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.3.3",
