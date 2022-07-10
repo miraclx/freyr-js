@@ -21,11 +21,13 @@ jobs:
       run: |
         rm -rf node_modules
         yarn install --frozen-lockfile
+        git diff --no-ext-diff --quiet
 
     - name: Install Dependencies via NPM
       run: |
         rm -rf node_modules
         npm ci
+        git diff --no-ext-diff --quiet
 
   fmt:
     runs-on: ubuntu-latest
