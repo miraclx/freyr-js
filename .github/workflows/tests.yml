@@ -20,14 +20,16 @@ jobs:
     - name: Install Dependencies via Yarn
       run: |
         rm -rf node_modules
+        git restore yarn.lock
         yarn install --frozen-lockfile
-        git diff --no-ext-diff --quiet
+        git diff --no-ext-diff --quiet yarn.lock
 
     - name: Install Dependencies via NPM
       run: |
         rm -rf node_modules
+        git restore package-lock.json
         npm ci
-        git diff --no-ext-diff --quiet
+        git diff --no-ext-diff --quiet package-lock.json
 
   fmt:
     runs-on: ubuntu-latest
