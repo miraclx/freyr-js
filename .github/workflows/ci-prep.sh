@@ -13,7 +13,7 @@ rg() {
 
 freyr() {
   echo "::group::[$attempts/3] Downloading..."
-  script -qfc "freyr $*" /dev/null | tee .freyr_log
+  script -qfc "freyr --no-bar $*" /dev/null | tee .freyr_log
   echo "::endgroup::"
   i=$($RG_SRC -n '.' .freyr_log | $RG_SRC --fixed-strings '[•] Embedding Metadata' | cut -d':' -f1)
   if [[ $i ]]; then

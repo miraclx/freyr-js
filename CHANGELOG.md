@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manually compile `AtomicParsley` during docker build to allow for maximum platform support. <https://github.com/miraclx/freyr-js/pull/212>
 - Add Mac M1 support to the docker image. <https://github.com/miraclx/freyr-js/pull/214>
 - Fix `yarn install` not ahering to dependency overrides. <https://github.com/miraclx/freyr-js/pull/215>
+- Add ability to disable the progressbar. <https://github.com/miraclx/freyr-js/pull/263>
 - Remove persistent `tty` writing for normal logs. Allowing `stdout` piping for everything except the progressbar. <https://github.com/miraclx/freyr-js/pull/231>
 - Fix long standing issue with freyr seeming frozen on exit. <https://github.com/miraclx/freyr-js/pull/216>
 - Upgraded to ES6 Modules. <https://github.com/miraclx/freyr-js/pull/202>

@@ -652,8 +652,6 @@ async function init(packageJson, queries, options) {
     process.exit(7);
   }
 
-  const progressGen = prepProgressGen(options);
-
   function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
       const validStats = stats.filter(stat => (stat.code === 0 ? stat.complete : !stat.code));
@@ -702,14 +700,18 @@ async function init(packageJson, queries, options) {
     } else logger.log(`[\u2022] Skipped playlist creation`);
   }
 
+  let progressGen;
+  if (options.bar) progressGen = prepProgressGen(options);
+
   function downloadToStream({urlOrFragments, outputFile, logger, opts}) {
     opts = {tag: '', successMessage: '', failureMessage: '', retryMessage: '', ...opts};
-    [opts.tag, opts.errorHandler, opts.retryMessage, opts.failureMessage, opts.successMessage] = [
+    [opts.tag, opts.errorHandler, opts.retryMessage, opts.failureMessage, opts.successMessage, opts.altMessage] = [
       opts.tag,
       opts.errorHandler,
       opts.retryMessage,
       opts.failureMessage,
       opts.successMessage,
+      opts.altMessage,
     ].map(val => (typeof val === 'function' || val === false ? val : () => val));
     return new Promise((res, rej) => {
       let completed = false;
@@ -722,35 +724,49 @@ async function init(packageJson, queries, options) {
           timeout: options.timeout,
           cacheSize: Config.downloader.cacheSize,
         })
-          .with('progressBar', urlMeta =>
-            progressGen(
-              urlMeta.size,
-              urlMeta.chunkStack.map(chunk => chunk.size),
-              {tag: opts.tag(urlMeta)},
-              logger.indentation(),
-              false,
-            ),
-          )
-          .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.next))
           .on('end', () => {
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.successMessage(), '\n');
-            else logger.write(opts.successMessage(), '\n');
+            else {
+              if (!options.bar) logger.write('\x1b[G\x1b[K');
+              logger.write(opts.successMessage(), '\n');
+            }
           })
           .on('retry', data => {
             if (opts.retryMessage !== false) {
               if (feed.store.has('progressBar'))
                 data.store.get('progressBar').print(opts.retryMessage({ref: data.index + 1, ...data}));
-              else logger.write(opts.retryMessage(data), '\n');
+              else {
+                if (!options.bar) logger.write('\x1b[G\x1b[K');
+                logger.write(opts.retryMessage(data), '\n');
+              }
             }
           })
           .once('error', err => {
             if (completed) return;
             err = Object(err);
             if (feed.store.has('progressBar')) feed.store.get('progressBar').end(opts.failureMessage(err), '\n');
-            else logger.write(opts.failureMessage(err), '\n');
+            else {
+              if (!options.bar) logger.write('\x1b[G\x1b[K');
+              logger.write(opts.failureMessage(err), '\n');
+            }
             opts.errorHandler(err);
             rej(err);
           });
+
+        if (options.bar) {
+          feed
+            .with('progressBar', urlMeta =>
+              progressGen(
+                urlMeta.size,
+                urlMeta.chunkStack.map(chunk => chunk.size),
+                {tag: opts.tag(urlMeta)},
+                logger.indentation(),
+                false,
+              ),
+            )
+            .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.next));
+        } else feed.on('loaded', () => logger.write(opts.altMessage()));
+
         feed.setHeadHandler(({acceptsRanges}) => {
           let [offset, writeStream] = [];
           if (acceptsRanges && fs.existsSync(outputFile)) ({size: offset} = fs.statSync(outputFile));
@@ -763,13 +779,16 @@ async function init(packageJson, queries, options) {
         });
         feed.start();
       } else {
-        const barGen = progressGen(
-          urlOrFragments.reduce((total, fragment) => total + fragment.size, 0),
-          urlOrFragments.map(fragment => fragment.size),
-          {tag: opts.tag()},
-          logger.indentation(),
-          true,
-        );
+        let barGen;
+        if (options.bar) {
+          barGen = progressGen(
+            urlOrFragments.reduce((total, fragment) => total + fragment.size, 0),
+            urlOrFragments.map(fragment => fragment.size),
+            {tag: opts.tag()},
+            logger.indentation(),
+            true,
+          );
+        } else logger.write(opts.altMessage());
 
         let has_erred = false;
         const writeStream = fs.createWriteStream(outputFile);
@@ -784,7 +803,14 @@ async function init(packageJson, queries, options) {
               cacheSize: Config.downloader.cacheSize,
             })
               .on('retry', data => {
-                if (opts.retryMessage !== false) barGen.print(opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data}));
+                if (opts.retryMessage !== false) {
+                  data = opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data});
+                  if (options.bar) barGen.print(data);
+                  else {
+                    logger.write('\x1b[G\x1b[K');
+                    logger.write(data, '\n');
+                  }
+                }
               })
               .once('error', err => {
                 if (completed) return;
@@ -792,14 +818,24 @@ async function init(packageJson, queries, options) {
                 err = Object(err);
                 has_erred = true;
                 err.segment_index = i;
-                barGen.end(opts.failureMessage(err), '\n');
+                if (options.bar) barGen.end(opts.failureMessage(err), '\n');
+                else {
+                  logger.write('\x1b[G\x1b[K');
+                  logger.write(opts.failureMessage(err), '\n');
+                }
                 opts.errorHandler(err);
                 rej(err);
               });
-            return feed.pipe(barGen.next(frag.size));
+            return !options.bar ? feed : feed.pipe(barGen.next(frag.size));
           }),
         )
-          .once('end', () => barGen.end(opts.successMessage(), '\n'))
+          .once('end', () => {
+            if (options.bar) barGen.end(opts.successMessage(), '\n');
+            else {
+              logger.write('\x1b[G\x1b[K');
+              logger.write(opts.successMessage(), '\n');
+            }
+          })
           .pipe(writeStream)
           .on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
         // TODO: support resumption of segmented resources
@@ -831,6 +867,7 @@ async function init(packageJson, queries, options) {
           failureMessage: err =>
             trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
           successMessage: trackLogger.getText(`| [\u2713] Got album art`),
+          altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
         },
       }).catch(err => Promise.reject({err, code: 3}));
       const rawAudio = await fileMgr({
@@ -850,6 +887,7 @@ async function init(packageJson, queries, options) {
               resumeHandler: offset =>
                 trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
               successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
+              altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
             },
           },
           feedMeta.protocol !== 'http_dash_segments'
@@ -1511,6 +1549,7 @@ function prepCli(packageJson) {
     .option('--no-auth', 'skip authentication procedure')
     .option('--no-browser', 'disable auto-launching of user browser')
     .option('--no-net-check', 'disable internet connection check')
+    .option('--no-bar', 'disable the progress bar')
     .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
     .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
     .option('--no-stats', "don't show the stats on completion")
