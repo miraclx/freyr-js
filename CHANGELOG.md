@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Refactored the Dockerfile, and reduced the docker image size by 16%. <https://github.com/miraclx/freyr-js/issues/257>
+- Manually compile `AtomicParsley` during docker build to allow for maximum platform support. <https://github.com/miraclx/freyr-js/pull/212>
+- Add Mac M1 support to the docker image. <https://github.com/miraclx/freyr-js/pull/214>
+- Fix `yarn install` not ahering to dependency overrides. <https://github.com/miraclx/freyr-js/pull/215>
+- Remove persistent `tty` writing for normal logs. Allowing `stdout` piping for everything except the progressbar. <https://github.com/miraclx/freyr-js/pull/231>
+- Fix long standing issue with freyr seeming frozen on exit. <https://github.com/miraclx/freyr-js/pull/216>
 - Upgraded to ES6 Modules. <https://github.com/miraclx/freyr-js/pull/202>
-- Introduced CI checks for syntax. <https://github.com/miraclx/freyr-js/commit/3792d25125f770713f817d45bd66770a8db1d2c4>
+- Introduced the pushing of docker images for each PR. <https://github.com/miraclx/freyr-js/pull/218>, <https://github.com/miraclx/freyr-js/pull/228>
+- Introduced CI checks for formatting.
 - Updated dependencies.
+- Removed some unused dependencies. <https://github.com/miraclx/freyr-js/pull/217>, <https://github.com/miraclx/freyr-js/pull/245>
 
 ## [0.7.0] - 2022-06-09
 
