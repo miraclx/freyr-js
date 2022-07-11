@@ -33,7 +33,7 @@ COPY --from=prep /freyr/node_modules /freyr/node_modules
 COPY --from=prep /atomicparsley/AtomicParsley /bin/AtomicParsley
 
 # hadolint ignore=DL4006
-RUN addgroup -g 1001 freyr \
+RUN addgroup -g 1000 freyr \
   && adduser -DG freyr freyr \
   && echo freyr:freyr | chpasswd \
   && ln -s /freyr/cli.js /bin/freyr \
