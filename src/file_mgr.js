@@ -35,7 +35,7 @@ export default async function genFile(opts) {
     const dir = join(opts.tmpdir, opts.dirname || '.');
     await mkdirp(dir);
     const name = join(dir, opts.filename);
-    const fd = await open(name, fs.constants.O_CREAT);
+    const fd = await open(name, fs.constants.O_CREAT | opts.mode);
     hookupListeners();
     let closed = false;
     const garbageHandler = () => {

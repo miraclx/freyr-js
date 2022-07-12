@@ -1081,6 +1081,10 @@ cd freyr
   yarn link
   ```
 
+### Testing
+
+Freyr comes bundled with a lightweight test suite. See [TEST.md](https://github.com/miraclx/freyr-js/blob/master/TEST.md) for instructions on how to run it.
+
 ### Docker Development
 
 With docker, you can drop into a sandbox that has all the dependencies you need. Without needing to mess around with your host system or install any weird dependencies.
