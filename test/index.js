@@ -53,9 +53,10 @@ async function pRetry(tries, fn) {
 }
 
 async function run_tests(stage, args) {
-  let is_gha, docker_image, i;
+  let docker_image, i;
   if ((docker_image = !!~(i = args.indexOf('--docker'))) && !(docker_image = args.splice(i, 2)[1]))
     throw new Error('`--docker` requires an image name');
+
   let is_gha = 'GITHUB_ACTIONS' in process.env && process.env['GITHUB_ACTIONS'] === 'true';
   if (~(i = args.indexOf('--all'))) args = Object.keys(stage);
   let invalidArg;
@@ -201,7 +202,20 @@ let errorCauses = Symbol('ErrorCauses');
 
 function main() {
   let args = process.argv.slice(2);
-  if (!args.length || args.includes('--help') || args.includes('-h')) {
+
+  let stage, test_suite, i;
+
+  if ((test_suite = !!~(i = args.indexOf('--suite'))) && !(test_suite = args.splice(i, 2)[1]))
+    throw new Error('`--suite` requires a file path');
+
+  try {
+    stage = JSON.parse(fs.readFileSync(test_suite || path.join(__dirname, 'default.json')));
+  } catch (e) {
+    (i = ''), (stage = JSON.parse(fs.readFileSync(path.join(__dirname, 'default.json'))));
+    console.error("\x1b[33mCouldn't read test suite file\x1b[0m\n", e.message, '\n');
+  }
+
+  if (!args.length || i === '' || args.includes('--help') || args.includes('-h')) {
     console.log('freyr-test');
     console.log('----------');
     console.log('Usage: freyr-test [options] [<SERVICE>[.<TYPE>]...]');
@@ -210,10 +224,11 @@ function main() {
     console.log();
     console.log('Options:');
     console.log();
-    console.log('  SERVICE                 spotify / apple_music / deezer');
-    console.log('  TYPE                    track / album / artist / playlist');
+    console.log(`  SERVICE                 ${Object.keys(stage).join(' / ')}`);
+    console.log(`  TYPE                    ${[...new Set(Object.values(stage).flatMap(s => Object.keys(s)))].join(' / ')}`);
     console.log();
     console.log('  --all                   run all tests');
+    console.log('  --suite <SUITE>         use a specific test suite (json)');
     console.log('  --docker <IMAGE>        run tests in a docker container');
     console.log('  --help                  show this help message');
     console.log();
@@ -236,8 +251,6 @@ function main() {
     console.log('      tests downloading a Spotify track and Deezer artist');
     return;
   }
-
-  let stage = JSON.parse(fs.readFileSync(path.join(__dirname, 'cases.json')));
 
   run_tests(stage, args).catch(err => {
     console.error('An error occurred!');
