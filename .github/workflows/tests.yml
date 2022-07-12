@@ -93,7 +93,7 @@ jobs:
         docker image ls -a
 
     - name: Spotify Track
-      run: npm run test -- --all --docker freyr-dev spotify.track
+      run: npm run test -- --docker freyr-dev spotify.track
 
 
   spotify:
