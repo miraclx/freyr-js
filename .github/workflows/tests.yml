@@ -86,7 +86,7 @@ jobs:
       with:
         name: freyr-dev
         path: /tmp
-    
+
     - name: Load Docker Image
       run: |
         docker load --input /tmp/freyr-dev.tar
