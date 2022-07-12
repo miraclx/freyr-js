@@ -99,7 +99,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Track
-      run: npm run test -- --docker freyr-dev spotify.track
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev spotify.track
 
   spotify-album:
     runs-on: ubuntu-latest
@@ -127,7 +129,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: npm run test -- --docker freyr-dev spotify.album
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev spotify.album
 
   spotify-artist:
     runs-on: ubuntu-latest
@@ -155,7 +159,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: npm run test -- --docker freyr-dev spotify.artist
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev spotify.artist
 
   spotify-playlist:
     runs-on: ubuntu-latest
@@ -183,7 +189,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Playlist
-      run: npm run test -- --docker freyr-dev spotify.playlist
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev spotify.playlist
 
   apple-music:
     runs-on: ubuntu-latest
@@ -217,7 +225,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Track
-      run: npm run test -- --docker freyr-dev apple_music.track
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev apple_music.track
 
   apple-music-album:
     runs-on: ubuntu-latest
@@ -245,7 +255,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Album
-      run: npm run test -- --docker freyr-dev apple_music.album
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev apple_music.album
 
   apple-music-artist:
     runs-on: ubuntu-latest
@@ -273,7 +285,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Artist
-      run: npm run test -- --docker freyr-dev apple_music.artist
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev apple_music.artist
 
   apple-music-playlist:
     runs-on: ubuntu-latest
@@ -301,7 +315,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Playlist
-      run: npm run test -- --docker freyr-dev apple_music.playlist
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev apple_music.playlist
 
   deezer:
     runs-on: ubuntu-latest
@@ -335,7 +351,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Track
-      run: npm run test -- --docker freyr-dev deezer.track
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev deezer.track
 
   deezer-album:
     runs-on: ubuntu-latest
@@ -363,7 +381,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Album
-      run: npm run test -- --docker freyr-dev deezer.album
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev deezer.album
 
   deezer-artist:
     runs-on: ubuntu-latest
@@ -391,7 +411,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Artist
-      run: npm run test -- --docker freyr-dev deezer.artist
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev deezer.artist
 
   deezer-playlist:
     runs-on: ubuntu-latest
@@ -419,7 +441,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Playlist
-      run: npm run test -- --docker freyr-dev deezer.playlist
+      run: |
+        export DOCKER_ARGS="-v $(pwd)/stage:/data"
+        npm run test -- --docker freyr-dev deezer.playlist
 
 
   docker-publish:
