@@ -3,7 +3,7 @@ name: tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, revamp-ci-tests1 ]
   pull_request:
     branches: [ master ]
   schedule:
@@ -40,7 +40,7 @@ jobs:
     - name: Run ESLint Check
       run: npx eslint --max-warnings 0 .
 
-  spotify:
+  spotify-track:
     runs-on: ubuntu-latest
 
     steps:
@@ -62,26 +62,93 @@ jobs:
     - name: Install Freyr
       run: npm ci && npm link
 
-    - name: Prep Testing Stage
-      run: mkdir -p ./CI/spotify/{track,album,artist,playlist}
-
     - name: Spotify - Download Track
       run: |
+        mkdir -p ./CI/spotify/track
         cd ./CI/spotify/track
         npm run test -- spotify.track
 
+  spotify-album:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
     - name: Spotify - Download Album
       run: |
+        mkdir -p ./CI/spotify/album
         cd ./CI/spotify/album
         npm run test -- spotify.album
 
+  spotify-artist:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
     - name: Spotify - Download Artist
       run: |
+        mkdir -p ./CI/spotify/artist
         cd ./CI/spotify/artist
         npm run test -- spotify.artist
 
+  spotify-playlist:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
     - name: Spotify - Download Playlist
       run: |
+        mkdir -p ./CI/spotify/playlist
         cd ./CI/spotify/playlist
         npm run test -- spotify.playlist
 
