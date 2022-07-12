@@ -10,6 +10,9 @@
   "engines": {
     "node": ">=12"
   },
+  "scripts": {
+    "test": "node test/index.js"
+  },
   "files": [
     "src",
     "conf.json",
