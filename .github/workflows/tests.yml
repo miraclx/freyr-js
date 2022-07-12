@@ -100,7 +100,7 @@ jobs:
 
     - name: Spotify - Download Track
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev spotify.track
 
   spotify-album:
@@ -130,7 +130,7 @@ jobs:
 
     - name: Spotify - Download Album
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev spotify.album
 
   spotify-artist:
@@ -160,7 +160,7 @@ jobs:
 
     - name: Spotify - Download Album
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev spotify.artist
 
   spotify-playlist:
@@ -190,7 +190,7 @@ jobs:
 
     - name: Spotify - Download Playlist
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev spotify.playlist
 
   apple-music:
@@ -226,7 +226,7 @@ jobs:
 
     - name: Apple Music - Download Track
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev apple_music.track
 
   apple-music-album:
@@ -256,7 +256,7 @@ jobs:
 
     - name: Apple Music - Download Album
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev apple_music.album
 
   apple-music-artist:
@@ -286,7 +286,7 @@ jobs:
 
     - name: Apple Music - Download Artist
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev apple_music.artist
 
   apple-music-playlist:
@@ -316,7 +316,7 @@ jobs:
 
     - name: Apple Music - Download Playlist
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev apple_music.playlist
 
   deezer:
@@ -352,7 +352,7 @@ jobs:
 
     - name: Deezer - Download Track
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev deezer.track
 
   deezer-album:
@@ -382,7 +382,7 @@ jobs:
 
     - name: Deezer - Download Album
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev deezer.album
 
   deezer-artist:
@@ -412,7 +412,7 @@ jobs:
 
     - name: Deezer - Download Artist
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev deezer.artist
 
   deezer-playlist:
@@ -442,7 +442,7 @@ jobs:
 
     - name: Deezer - Download Playlist
       run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data" \
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
           npm run test -- --docker freyr-dev deezer.playlist
 
 
