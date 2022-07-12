@@ -107,7 +107,7 @@ async function run_tests(stage, args) {
         else console.log(`\x1b[33m[${attempt}/3] Download failed, retrying..\x1b[0m`);
       console.log(`Log File: ${logFile.name}`);
 
-      let top_bar = `┌────────────────── [${attempt} / 3] ${service} ${type} ───────────────────┐`;
+      let top_bar = `┌──> ${`[${attempt} / 3] ${service} ${type} `.padEnd(56, '─')}┐`;
       if (is_gha) console.log(`::group::${top_bar}`);
       else raw_stdout.write(`${top_bar}\n`);
 
@@ -166,7 +166,7 @@ async function run_tests(stage, args) {
       });
 
       if (is_gha && (i = logs.findIndex(line => line.includes('[•] Embedding Metadata')))) {
-        console.log(`::group::├───────── [${attempt} / 3] View Download Status ─────────`);
+        console.log(`::group::├──> ${`[${attempt} / 3] View Download Status `.padEnd(56, '─')}┤`);
         for (let line of logs
           .slice(i)
           .join('')
@@ -177,8 +177,8 @@ async function run_tests(stage, args) {
       }
 
       let ml = expect.reduce((a, v) => Math.max(a, v.length), 0);
-      if (is_gha) console.log('::group::├────────────── Verifying ───────────────');
-      else raw_stdout.write('├────────────── Verifying ───────────────\n');
+      if (is_gha) console.log(`::group::├──> ${`[${attempt} / 3] Verifying... `.padEnd(56, '─')}┤`);
+      else raw_stdout.write(`├──> ${`[${attempt} / 3] Verifying... `.padEnd(56, '─')}┤\n`);
       let as_expected = true;
       for (let expected of expect) {
         stdout.write(`• \x1b[33m${expected.padEnd(ml + 2, ' ')}\x1b[0m `);
@@ -189,7 +189,8 @@ async function run_tests(stage, args) {
         as_expected &&= this_passed;
       }
       if (is_gha) console.log('::endgroup::');
-      raw_stdout.write(`└${'─'.repeat(top_bar.length - 2)}┘\n`);
+      if (is_gha) console.log(`::group::└${'─'.repeat(top_bar.length - 2)}┘\n::endgroup::`);
+      else raw_stdout.write(`└${'─'.repeat(top_bar.length - 2)}┘\n`);
 
       if (!as_expected) throw unmetExpectations;
     });
