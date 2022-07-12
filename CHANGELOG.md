@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix long standing issue with freyr seeming frozen on exit. <https://github.com/miraclx/freyr-js/pull/216>
 - Upgraded to ES6 Modules. <https://github.com/miraclx/freyr-js/pull/202>
 - Introduced the pushing of docker images for each PR. <https://github.com/miraclx/freyr-js/pull/218>, <https://github.com/miraclx/freyr-js/pull/228>
+- Introduced a test runner, with local reproducible builds. <https://github.com/miraclx/freyr-js/pull/264>
 - Introduced CI checks for formatting.
 - Updated dependencies.
 - Removed some unused dependencies. <https://github.com/miraclx/freyr-js/pull/217>, <https://github.com/miraclx/freyr-js/pull/245>
