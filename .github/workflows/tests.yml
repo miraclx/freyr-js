@@ -3,7 +3,7 @@ name: tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, revamp-ci-tests2 ]
   pull_request:
     branches: [ master ]
   schedule:
@@ -39,6 +39,20 @@ jobs:
 
     - name: Run ESLint Check
       run: npx eslint --max-warnings 0 .
+
+  docker-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Test Docker Build
+      run: docker build -t freyrcli/freyrjs .
+
+    - name: All Tests
+      run: npm run test -- --gha --all --docker freyrcli/freyrjs
+
 
   spotify:
     runs-on: ubuntu-latest
