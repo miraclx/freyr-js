@@ -47,6 +47,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
+
     - name: Test Docker Build
       run: docker build -t freyrcli/freyrjs .
 
@@ -70,6 +73,9 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
 
     - name: Install Dependencies
       run: npm ci
