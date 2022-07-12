@@ -40,6 +40,30 @@ jobs:
     - name: Run ESLint Check
       run: npx eslint --max-warnings 0 .
 
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Test Docker Build
+      run: docker build -t freyrcli/freyrjs .
+
+    - name: Build And Push
+      uses: docker/build-push-action@7f9d37fa544684fb73bfe4835ed7214c255ce02b
+      with:
+        context: .
+        file: ./Dockerfile
+        tags: freyr-dev:latest
+        outputs: type=docker,dest=/tmp/freyr-dev.tar
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: freyr-dev
+        path: /tmp/freyr-dev.tar
+
   docker-test:
     runs-on: ubuntu-latest
 
@@ -50,11 +74,19 @@ jobs:
     - name: Install Dependencies
       run: npm ci
 
-    - name: Test Docker Build
-      run: docker build -t freyrcli/freyrjs .
+    - name: Download Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: freyr-dev
+        path: /tmp
+    
+    - name: Load Docker Image
+      run: |
+        docker load --input /tmp/freyr-dev.tar
+        docker image ls -a
 
-    - name: All Tests
-      run: npm run test -- --gha --all --docker freyrcli/freyrjs
+    - name: Spotify Track
+      run: npm run test -- --all --docker freyr-dev spotify.track
 
 
   spotify:
@@ -423,16 +455,6 @@ jobs:
         cd ./CI/deezer/playlist
         npm run test -- deezer.playlist
 
-
-  docker-build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Test Docker Build
-      run: docker build -t freyrcli/freyrjs .
 
   docker-publish:
     runs-on: ubuntu-latest
