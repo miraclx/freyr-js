@@ -47,6 +47,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
+    - name: Install Dependencies
+      run: npm ci
+
     - name: Test Docker Build
       run: docker build -t freyrcli/freyrjs .
 
