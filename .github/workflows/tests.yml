@@ -152,7 +152,7 @@ jobs:
         cd ./CI/spotify/playlist
         npm run test -- spotify.playlist
 
-  apple_music:
+  apple-music-track:
     runs-on: ubuntu-latest
 
     steps:
@@ -173,31 +173,14 @@ jobs:
 
     - name: Install Freyr
       run: npm ci && npm link
-
-    - name: Prep Testing Stage
-      run: mkdir -p ./CI/apple_music/{track,album,artist,playlist}
 
     - name: Apple Music - Download Track
       run: |
+        mkdir -p ./CI/apple_music/track
         cd ./CI/apple_music/track
         npm run test -- apple_music.track
 
-    - name: Apple Music - Download Album
-      run: |
-        cd ./CI/apple_music/album
-        npm run test -- apple_music.album
-
-    - name: Apple Music - Download Artist
-      run: |
-        cd ./CI/apple_music/artist
-        npm run test -- apple_music.artist
-
-    - name: Apple Music - Download Playlist
-      run: |
-        cd ./CI/apple_music/playlist
-        npm run test -- apple_music.playlist
-
-  deezer:
+  apple-music-album:
     runs-on: ubuntu-latest
 
     steps:
@@ -219,28 +202,180 @@ jobs:
     - name: Install Freyr
       run: npm ci && npm link
 
-    - name: Prep Testing Stage
-      run: mkdir -p ./CI/deezer/{track,album,artist,playlist}
+    - name: Apple Music - Download Album
+      run: |
+        mkdir -p ./CI/apple_music/album
+        cd ./CI/apple_music/album
+        npm run test -- apple_music.album
+
+  apple-music-artist:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
+    - name: Apple Music - Download Artist
+      run: |
+        mkdir -p ./CI/apple_music/artist
+        cd ./CI/apple_music/artist
+        npm run test -- apple_music.artist
+
+  apple-music-playlist:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
+    - name: Apple Music - Download Playlist
+      run: |
+        mkdir -p ./CI/apple_music/playlist
+        cd ./CI/apple_music/playlist
+        npm run test -- apple_music.playlist
+
+  deezer-track:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
 
     - name: Deezer - Download Track
       run: |
+        mkdir -p ./CI/deezer/track
         cd ./CI/deezer/track
         npm run test -- deezer.track
 
+  deezer-album:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
     - name: Deezer - Download Album
       run: |
+        mkdir -p ./CI/deezer/album
         cd ./CI/deezer/album
         npm run test -- deezer.album
 
+  deezer-artist:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
     - name: Deezer - Download Artist
       run: |
+        mkdir -p ./CI/deezer/artist
         cd ./CI/deezer/artist
         npm run test -- deezer.artist
 
+  deezer-playlist:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg atomicparsley
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Freyr
+      run: npm ci && npm link
+
     - name: Deezer - Download Playlist
       run: |
+        mkdir -p ./CI/deezer/playlist
         cd ./CI/deezer/playlist
         npm run test -- deezer.playlist
+
 
 
   docker-build:
