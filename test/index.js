@@ -56,7 +56,7 @@ async function run_tests(stage, args) {
   let is_gha, docker_image, i;
   if ((docker_image = !!~(i = args.indexOf('--docker'))) && !(docker_image = args.splice(i, 2)[1]))
     throw new Error('`--docker` requires an image name');
-  if ((is_gha = !!~(i = args.indexOf('--gha')))) args.splice(i, 1);
+  let is_gha = 'GITHUB_ACTIONS' in process.env && process.env['GITHUB_ACTIONS'] === 'true';
   if (~(i = args.indexOf('--all'))) args = Object.keys(stage);
   let invalidArg;
   if ((invalidArg = args.find(arg => arg.startsWith('-')))) throw new Error(`Invalid argument: ${invalidArg}`);
@@ -215,7 +215,6 @@ function main() {
     console.log();
     console.log('  --all                   run all tests');
     console.log('  --docker <IMAGE>        run tests in a docker container');
-    console.log('  --gha                   run in GitHub Actions environment');
     console.log('  --help                  show this help message');
     console.log();
     console.log('Enviroment Variables:');

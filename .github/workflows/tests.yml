@@ -68,22 +68,22 @@ jobs:
     - name: Spotify - Download Track
       run: |
         cd ./CI/spotify/track
-        npm run test -- --gha spotify.track
+        npm run test -- spotify.track
 
     - name: Spotify - Download Album
       run: |
         cd ./CI/spotify/album
-        npm run test -- --gha spotify.album
+        npm run test -- spotify.album
 
     - name: Spotify - Download Artist
       run: |
         cd ./CI/spotify/artist
-        npm run test -- --gha spotify.artist
+        npm run test -- spotify.artist
 
     - name: Spotify - Download Playlist
       run: |
         cd ./CI/spotify/playlist
-        npm run test -- --gha spotify.playlist
+        npm run test -- spotify.playlist
 
   apple_music:
     runs-on: ubuntu-latest
@@ -113,22 +113,22 @@ jobs:
     - name: Apple Music - Download Track
       run: |
         cd ./CI/apple_music/track
-        npm run test -- --gha apple_music.track
+        npm run test -- apple_music.track
 
     - name: Apple Music - Download Album
       run: |
         cd ./CI/apple_music/album
-        npm run test -- --gha apple_music.album
+        npm run test -- apple_music.album
 
     - name: Apple Music - Download Artist
       run: |
         cd ./CI/apple_music/artist
-        npm run test -- --gha apple_music.artist
+        npm run test -- apple_music.artist
 
     - name: Apple Music - Download Playlist
       run: |
         cd ./CI/apple_music/playlist
-        npm run test -- --gha apple_music.playlist
+        npm run test -- apple_music.playlist
 
   deezer:
     runs-on: ubuntu-latest
@@ -158,22 +158,22 @@ jobs:
     - name: Deezer - Download Track
       run: |
         cd ./CI/deezer/track
-        npm run test -- --gha deezer.track
+        npm run test -- deezer.track
 
     - name: Deezer - Download Album
       run: |
         cd ./CI/deezer/album
-        npm run test -- --gha deezer.album
+        npm run test -- deezer.album
 
     - name: Deezer - Download Artist
       run: |
         cd ./CI/deezer/artist
-        npm run test -- --gha deezer.artist
+        npm run test -- deezer.artist
 
     - name: Deezer - Download Playlist
       run: |
         cd ./CI/deezer/playlist
-        npm run test -- --gha deezer.playlist
+        npm run test -- deezer.playlist
 
 
   docker-build:
