@@ -101,9 +101,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Track
-      run: npm run test -- --docker freyr-dev spotify.track
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev spotify.track
 
   spotify-album:
     if: ${{ always() }}
@@ -132,9 +132,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: npm run test -- --docker freyr-dev spotify.album
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev spotify.album
 
   spotify-artist:
     if: ${{ always() }}
@@ -163,9 +163,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: npm run test -- --docker freyr-dev spotify.artist
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev spotify.artist
 
   spotify-playlist:
     if: ${{ always() }}
@@ -194,9 +194,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Playlist
-      run: npm run test -- --docker freyr-dev spotify.playlist
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev spotify.playlist
 
   apple-music:
     if: false
@@ -231,9 +231,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Track
-      run: npm run test -- --docker freyr-dev apple_music.track
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev apple_music.track
 
   apple-music-album:
     if: ${{ always() }}
@@ -262,9 +262,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Album
-      run: npm run test -- --docker freyr-dev apple_music.album
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev apple_music.album
 
   apple-music-artist:
     if: ${{ always() }}
@@ -293,9 +293,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Artist
-      run: npm run test -- --docker freyr-dev apple_music.artist
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev apple_music.artist
 
   apple-music-playlist:
     if: ${{ always() }}
@@ -324,9 +324,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Playlist
-      run: npm run test -- --docker freyr-dev apple_music.playlist
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev apple_music.playlist
 
   deezer:
     if: false
@@ -361,9 +361,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Track
-      run: npm run test -- --docker freyr-dev deezer.track
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev deezer.track
 
   deezer-album:
     if: ${{ always() }}
@@ -392,9 +392,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Album
-      run: npm run test -- --docker freyr-dev deezer.album
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev deezer.album
 
   deezer-artist:
     if: ${{ always() }}
@@ -423,9 +423,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Artist
-      run: npm run test -- --docker freyr-dev deezer.artist
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev deezer.artist
 
   deezer-playlist:
     if: ${{ always() }}
@@ -454,9 +454,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Playlist
-      run: npm run test -- --docker freyr-dev deezer.playlist
-      env:
-        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
+      run: |
+        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
+          npm run test -- --docker freyr-dev deezer.playlist
 
 
   docker-publish:
