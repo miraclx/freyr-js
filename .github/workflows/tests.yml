@@ -414,8 +414,13 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Test Docker Build
-      run: docker build -t freyrcli/freyrjs .
+    - name: Build and push Docker image
+      uses: docker/build-push-action@7f9d37fa544684fb73bfe4835ed7214c255ce02b
+      with:
+        context: .
+        tags: freyrcli/freyrjs
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
   docker-publish:
     runs-on: ubuntu-latest
