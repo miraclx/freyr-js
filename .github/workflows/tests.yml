@@ -41,12 +41,13 @@ jobs:
       run: npx eslint --max-warnings 0 .
 
   spotify:
+    if: false
     runs-on: ubuntu-latest
-
     steps:
     - run: true
 
   spotify-track:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ spotify ]
 
@@ -76,6 +77,7 @@ jobs:
         npm run test -- spotify.track
 
   spotify-album:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ spotify ]
 
@@ -105,6 +107,7 @@ jobs:
         npm run test -- spotify.album
 
   spotify-artist:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ spotify ]
 
@@ -134,6 +137,7 @@ jobs:
         npm run test -- spotify.artist
 
   spotify-playlist:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ spotify ]
 
@@ -163,12 +167,13 @@ jobs:
         npm run test -- spotify.playlist
 
   apple-music:
+    if: false
     runs-on: ubuntu-latest
-
     steps:
     - run: true
 
   apple-music-track:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ apple-music ]
 
@@ -198,6 +203,7 @@ jobs:
         npm run test -- apple_music.track
 
   apple-music-album:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ apple-music ]
 
@@ -227,6 +233,7 @@ jobs:
         npm run test -- apple_music.album
 
   apple-music-artist:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ apple-music ]
 
@@ -256,6 +263,7 @@ jobs:
         npm run test -- apple_music.artist
 
   apple-music-playlist:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ apple-music ]
 
@@ -285,12 +293,13 @@ jobs:
         npm run test -- apple_music.playlist
 
   deezer:
+    if: false
     runs-on: ubuntu-latest
-
     steps:
     - run: true
 
   deezer-track:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ deezer ]
 
@@ -320,6 +329,7 @@ jobs:
         npm run test -- deezer.track
 
   deezer-album:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ deezer ]
 
@@ -349,6 +359,7 @@ jobs:
         npm run test -- deezer.album
 
   deezer-artist:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ deezer ]
 
@@ -378,6 +389,7 @@ jobs:
         npm run test -- deezer.artist
 
   deezer-playlist:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [ deezer ]
 
