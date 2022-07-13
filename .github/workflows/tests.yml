@@ -101,7 +101,7 @@ jobs:
     - name: Spotify - Download Track
       run: npm run test -- --docker freyr-dev spotify.track
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   spotify-album:
     runs-on: ubuntu-latest
@@ -131,7 +131,7 @@ jobs:
     - name: Spotify - Download Album
       run: npm run test -- --docker freyr-dev spotify.album
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   spotify-artist:
     runs-on: ubuntu-latest
@@ -161,7 +161,7 @@ jobs:
     - name: Spotify - Download Album
       run: npm run test -- --docker freyr-dev spotify.artist
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   spotify-playlist:
     runs-on: ubuntu-latest
@@ -191,7 +191,7 @@ jobs:
     - name: Spotify - Download Playlist
       run: npm run test -- --docker freyr-dev spotify.playlist
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   apple-music:
     runs-on: ubuntu-latest
@@ -227,7 +227,7 @@ jobs:
     - name: Apple Music - Download Track
       run: npm run test -- --docker freyr-dev apple_music.track
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   apple-music-album:
     runs-on: ubuntu-latest
@@ -257,7 +257,7 @@ jobs:
     - name: Apple Music - Download Album
       run: npm run test -- --docker freyr-dev apple_music.album
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   apple-music-artist:
     runs-on: ubuntu-latest
@@ -287,7 +287,7 @@ jobs:
     - name: Apple Music - Download Artist
       run: npm run test -- --docker freyr-dev apple_music.artist
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   apple-music-playlist:
     runs-on: ubuntu-latest
@@ -317,7 +317,7 @@ jobs:
     - name: Apple Music - Download Playlist
       run: npm run test -- --docker freyr-dev apple_music.playlist
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   deezer:
     runs-on: ubuntu-latest
@@ -353,7 +353,7 @@ jobs:
     - name: Deezer - Download Track
       run: npm run test -- --docker freyr-dev deezer.track
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   deezer-album:
     runs-on: ubuntu-latest
@@ -383,7 +383,7 @@ jobs:
     - name: Deezer - Download Album
       run: npm run test -- --docker freyr-dev deezer.album
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   deezer-artist:
     runs-on: ubuntu-latest
@@ -413,7 +413,7 @@ jobs:
     - name: Deezer - Download Artist
       run: npm run test -- --docker freyr-dev deezer.artist
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
   deezer-playlist:
     runs-on: ubuntu-latest
@@ -443,7 +443,7 @@ jobs:
     - name: Deezer - Download Playlist
       run: npm run test -- --docker freyr-dev deezer.playlist
       env:
-        DOCKER_ARGS: -v $(pwd)/stage:/data --user root
+        DOCKER_ARGS: -v $GITHUB_WORKSPACE/stage:/data --user root
 
 
   docker-publish:
