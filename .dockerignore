@@ -2,3 +2,4 @@
 .gitignore
 
 node_modules/
+media/
