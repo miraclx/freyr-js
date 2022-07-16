@@ -44,5 +44,5 @@ USER freyr
 WORKDIR /data
 VOLUME /data
 
-ENTRYPOINT ["freyr"]
+ENTRYPOINT ["/freyr/freyr.sh"]
 CMD ["--help"]
