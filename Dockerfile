@@ -1,4 +1,4 @@
-FROM node:18.5.0-alpine3.16 as installer
+FROM node:18.6.0-alpine3.16 as installer
 
 RUN printf '#!/usr/bin/env sh\necho "Python 3.0.0"\n' > /usr/bin/python && chmod +x /usr/bin/python
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
@@ -6,7 +6,7 @@ COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
 RUN yarn install --prod --frozen-lockfile
 
-FROM golang:1.18.3-alpine3.16 as prep
+FROM golang:1.18.4-alpine3.16 as prep
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache git g++ make cmake linux-headers
