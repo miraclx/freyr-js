@@ -7,7 +7,7 @@ WORKDIR /freyr
 RUN yarn install --prod --frozen-lockfile \
   && rm -r media
 
-FROM golang:1.18.3-alpine3.16 as prep
+FROM golang:1.18.4-alpine3.16 as prep
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache git g++ make cmake linux-headers
