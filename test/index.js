@@ -117,14 +117,14 @@ async function run_tests(stage, args) {
       let child, handler;
 
       if (!docker_image) {
-        child = spawn('node', [path.join(__dirname, '..', 'cli.js'), ...child_args]);
+        child = spawn('node', [path.relative(process.cwd(), path.join(__dirname, '..', 'cli.js')), ...child_args]);
       } else {
         let extra_docker_args = process.env['DOCKER_ARGS'] ? process.env['DOCKER_ARGS'].split(' ') : [];
         child = spawn('docker', [
           'run',
           ...extra_docker_args,
           '--rm',
-          '-i',
+          '--interactive',
           '--log-driver=none',
           '--name',
           child_id,
@@ -133,6 +133,8 @@ async function run_tests(stage, args) {
         ]);
         process.on('SIGINT', (handler = () => (spawn('docker', ['kill', child_id]), process.off('SIGINT', handler))));
       }
+
+      stdout.log(`\n$ ${child.spawnargs.join(' ')}\n`);
 
       let childErrors = [];
       child.on('error', err => childErrors.push(err));
