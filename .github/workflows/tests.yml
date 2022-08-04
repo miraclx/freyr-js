@@ -598,7 +598,9 @@ jobs:
         fetch-depth: 0
 
     - name: Install Dependencies
-      run: npm ci
+      run: |
+        npm i -g eslint
+        npm ci
 
     - name: Lint Code Base
       uses: github/super-linter@v4
