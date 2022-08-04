@@ -22,7 +22,7 @@ import filenamify from 'filenamify';
 import TimeFormat from 'hh-mm-ss';
 import ProgressBar from 'xprogress';
 import countryData from 'country-data';
-import {publicIpv4} from 'public-ip';
+import {publicIp} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
@@ -70,7 +70,7 @@ async function isOnline() {
   try {
     let _publicIp = await pRetry(2, () =>
       pTimeout(2000, async ip => {
-        if ((ip = await publicIpv4()) == undefined) throw new Error('unable to get public ip');
+        if ((ip = await publicIp({onlyHttps: true})) == undefined) throw new Error('unable to get public ip');
         return ip;
       }),
     );
