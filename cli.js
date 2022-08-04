@@ -4,7 +4,6 @@ import fs from 'fs';
 import xurl from 'url';
 import xpath from 'path';
 import crypto from 'crypto';
-import {setTimeout} from 'timers/promises';
 import {spawn, spawnSync} from 'child_process';
 
 import Conf from 'conf';
@@ -46,7 +45,7 @@ const __dirname = xurl.fileURLToPath(new URL('.', import.meta.url));
 async function pTimeout(timeout, fn) {
   let timeoutSignal = Symbol('TimedOutSignal');
   let f = fn();
-  let result = await Promise.race([f, setTimeout(timeout, timeoutSignal)]);
+  let result = await Promise.race([f, Promise.delay(timeout, timeoutSignal)]);
   if (result == timeoutSignal) {
     if (typeof f.cancel == 'function') f.cancel();
     throw new Error('Promise timed out');
