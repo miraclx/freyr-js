@@ -40,11 +40,8 @@ export default class AppleMusic {
     if (!config.developerToken)
       throw new Error(`[AppleMusic] Please define [developerToken] as a property within the configuration`);
     this.#store.core = new Client({developerToken: config.developerToken});
-    let custom_head = {headers: {origin: 'https://music.apple.com'}};
-    this.#store.core.albums.axiosInstance = this.#store.core.albums.axiosInstance.create(custom_head);
-    this.#store.core.artists.axiosInstance = this.#store.core.artists.axiosInstance.create(custom_head);
-    this.#store.core.playlists.axiosInstance = this.#store.core.playlists.axiosInstance.create(custom_head);
-    this.#store.core.songs.axiosInstance = this.#store.core.songs.axiosInstance.create(custom_head);
+    for (let instance of [this.#store.core.albums, this.#store.core.artists, this.#store.core.playlists, this.#store.core.songs])
+      instance.axiosInstance.interceptors.request.use(conf => ((conf.headers.origin = 'https://music.apple.com'), conf));
     this.#store.defaultStorefront = config.storefront || 'us';
     this.#store.isAuthenticated = !!config.developerToken;
   }
