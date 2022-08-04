@@ -126,6 +126,8 @@ async function run_tests(stage, args) {
           '--log-driver=none',
           '--name',
           child_id,
+          '--network',
+          'host',
           docker_image,
           ...child_args,
         ]);
