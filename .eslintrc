@@ -19,7 +19,8 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "**/*.json"
+    "**/*.json",
+    "**/cli_server.js" // todo: #290, remove this when super-linter upgrades their eslint version
   ],
   "rules": {
     "prettier/prettier": [
