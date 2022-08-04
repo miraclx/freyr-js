@@ -72,7 +72,9 @@ async function run_tests(stage, args) {
 
     let {uri, filter = [], expect} = stage[service][type];
 
-    let child_args = ['--no-logo', '--no-header', '--no-bar', uri, ...filter.map(f => `--filter=${f}`)];
+    let preargs = ['--no-logo', '--no-header', '--no-bar'];
+    if (is_gha) preargs.push('--no-auth');
+    let child_args = [...preargs, uri, ...filter.map(f => `--filter=${f}`)];
 
     let unmetExpectations = new Error('One or more expectations failed');
 
