@@ -44,7 +44,7 @@ function wrapHTML(opts) {
     </head>
 
     <body>
-      <div class="box center-v center-h">
+      <div class="box center-v">
         <h1>FreyrCLI</h1>
         <hr width="45%" />
         <b>:{service}</b>

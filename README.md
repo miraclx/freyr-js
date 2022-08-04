@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD001 MD007 MD023 MD041 -->
+<!-- markdownlint-disable MD001 MD007 MD023 MD041 MD051 -->
 
 <div align="center">
   <a href="https://github.com/miraclx/freyr-js">
@@ -254,7 +254,7 @@ Usage: freyr [options] [query...]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.7.0
+              /____/ v0.8.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
@@ -349,7 +349,7 @@ Info:
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.7.0
+              /____/ v0.8.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
@@ -410,7 +410,7 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.7.0
+              /____/ v0.8.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
@@ -495,7 +495,7 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.7.0
+              /____/ v0.8.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------

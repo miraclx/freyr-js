@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Refactored the Dockerfile, and reduced the docker image size by 16%. <https://github.com/miraclx/freyr-js/issues/257>
+## [0.8.0] - 2022-08-04
+
+- Refactored the Dockerfile, and reduced the docker image size by 23%. <https://github.com/miraclx/freyr-js/issues/257>
 - Manually compile `AtomicParsley` during docker build to allow for maximum platform support. <https://github.com/miraclx/freyr-js/pull/212>
 - Add Mac M1 support to the docker image. <https://github.com/miraclx/freyr-js/pull/214>
+- Made docker build faster by caching and unbinding nondependent layers. <https://github.com/miraclx/freyr-js/pull/273>, <https://github.com/miraclx/freyr-js/pull/268>
 - Fix `yarn install` not ahering to dependency overrides. <https://github.com/miraclx/freyr-js/pull/215>
 - Add ability to disable the progressbar. <https://github.com/miraclx/freyr-js/pull/263>
 - Remove persistent `tty` writing for normal logs. Allowing `stdout` piping for everything except the progressbar. <https://github.com/miraclx/freyr-js/pull/231>
@@ -17,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to ES6 Modules. <https://github.com/miraclx/freyr-js/pull/202>
 - Introduced the pushing of docker images for each PR. <https://github.com/miraclx/freyr-js/pull/218>, <https://github.com/miraclx/freyr-js/pull/228>
 - Introduced a test runner, with local reproducible builds. <https://github.com/miraclx/freyr-js/pull/264>
+- Redesigned the auth page a bit. <https://github.com/miraclx/freyr-js/pull/286>
 - Introduced CI checks for formatting.
 - Updated dependencies.
 - Removed some unused dependencies. <https://github.com/miraclx/freyr-js/pull/217>, <https://github.com/miraclx/freyr-js/pull/245>
@@ -48,7 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/miraclx/freyr-js/releases/tag/v0.5.0
