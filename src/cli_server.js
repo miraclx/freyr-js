@@ -8,35 +8,52 @@ import cookieParser from 'cookie-parser';
 
 function wrapHTML(opts) {
   return stringd(
-    `<style>
-    .box {
-      border: none;
-      box-shadow: 0px 0px 60px 10px grey;
-      height: 200px;
-      width: 40vh;
-      padding: 10px;
-      background-color: rgba(94, 91, 121, 0.8);
-      border-radius: 14px;
-      text-align: center;
-    }
+    `<!DOCTYPE html>
+    <html>
+    <head>
+      <title> FreyrCLI </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .center-v {
-      margin: 0;
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  </style>
+      <style>
+        body {
+          color: #fff;
+          font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
 
-  <div class="box center-v center-h">
-    <h1>FreyrCLI</h1>
-    <hr width="45%" />
-    <b>:{service}</b>
-    <hr width="80%" />
-    <h3 style="color::{color};">:{msg}</h3>
-    You can close this tab
-  </div>`,
+        h1 {
+          margin: 0.8rem;
+        }
+
+        .box {
+          box-shadow: 0px 0px 90px 10px #858181;
+          width: 40vh;
+          padding: 10px;
+          background-image: linear-gradient(120deg, #155799, #159957);
+          border-radius: 14px;
+          text-align: center;
+        }
+
+        .center-v {
+          margin: 0;
+          position: absolute;
+          top: 45%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      </style>
+    </head>
+
+    <body>
+      <div class="box center-v center-h">
+        <h1>FreyrCLI</h1>
+        <hr width="45%" />
+        <b>:{service}</b>
+        <hr width="80%" />
+        <h3 style="color::{color};">:{msg}</h3>
+        You can close this tab
+      </div>
+    </body>
+    </html>`,
     opts,
   );
 }
