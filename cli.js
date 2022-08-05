@@ -1020,22 +1020,22 @@ async function init(packageJson, queries, options) {
                     fs.promises
                       .writeFile(meta.outFilePath, _ffmpeg.FS('readFile', 'output.m4a'))
                       .then(_ => {
-                        _ffmpeg.exit();
                         res();
                       })
                       .catch(err => {
-                        _ffmpeg.exit();
+                        console.log(err);
+                        //_ffmpeg.exit();
                         rej(err);
                       });
                   })
                   .catch(err => {
-                    _ffmpeg.exit();
+                    //_ffmpeg.exit();
                     console.log(err);
                     rej(err);
                   });
               })
               .catch(err => {
-                _ffmpeg.exit();
+                //_ffmpeg.exit();
                 console.log(err);
                 rej(err);
               });
