@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-wasm-threads
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 import fs from 'fs';
 import xurl from 'url';
@@ -10,7 +10,9 @@ import {spawn, spawnSync} from 'child_process';
 import Conf from 'conf';
 import open from 'open';
 import xget from 'libxget';
-import ffmpeg from 'fluent-ffmpeg';
+
+import {createFFmpeg, fetchFile} from 'ffmpeg-node-patch';
+
 import merge2 from 'merge2';
 import mkdirp from 'mkdirp';
 import xbytes from 'xbytes';
@@ -633,13 +635,14 @@ async function init(packageJson, queries, options) {
   let atomicParsley;
 
   try {
+    /* No longer needed
     if (options.ffmpeg) {
       if (!fs.existsSync(options.ffmpeg)) throw new Error(`\x1b[31mffmpeg\x1b[0m: Binary not found [${options.ffmpeg}]`);
       if (!(await isBinaryFile(options.ffmpeg)))
         stackLogger.warn('\x1b[33mffmpeg\x1b[0m: Detected non-binary file, trying anyways...');
       ffmpeg.setFfmpegPath(options.ffmpeg);
     }
-
+    */
     if (options.atomicParsley) {
       if (!fs.existsSync(options.atomicParsley))
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
@@ -979,12 +982,71 @@ async function init(packageJson, queries, options) {
     },
   );
 
+  const getFF = async () => {
+    var ff = createFFmpeg({log: false});
+    await ff.load();
+    return ff;
+  };
+
   const encodeQueue = new AsyncQueue(
     'cli:postprocessor:encodeQueue',
     Config.concurrency.encoder,
     async ({track, meta, files}) => {
-      return new Promise((res, rej) =>
-        ffmpeg()
+      return new Promise((res, rej) => {
+        getFF()
+          .then(_ffmpeg => {
+            fetchFile(files.audio.file.name)
+              .then(data => {
+                _ffmpeg.FS('writeFile', 'file.x4a', data);
+                _ffmpeg
+                  .run(
+                    '-i',
+                    'file.x4a',
+                    '-y',
+                    '-acodec',
+                    'aac',
+                    '-b:a',
+                    options.bitrate,
+                    '-ar',
+                    '44100',
+                    '-vn',
+                    '-t',
+                    TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
+                    '-f',
+                    'ipod',
+                    'output.m4a',
+                  )
+                  .then(_ => {
+                    fs.promises
+                      .writeFile(meta.outFilePath, _ffmpeg.FS('readFile', 'output.m4a'))
+                      .then(_ => {
+                        _ffmpeg.exit();
+                        res();
+                      })
+                      .catch(err => {
+                        _ffmpeg.exit();
+                        rej(err);
+                      });
+                  })
+                  .catch(err => {
+                    _ffmpeg.exit();
+                    console.log(err);
+                    rej(err);
+                  });
+              })
+              .catch(err => {
+                _ffmpeg.exit();
+                console.log(err);
+                rej(err);
+              });
+          })
+          .catch(err => {
+            console.log(err);
+            rej(err);
+          });
+
+        /*
+        let ff = ffmpeg()
           .addInput(files.audio.file.name)
           .audioCodec('aac')
           .audioBitrate(options.bitrate)
@@ -994,8 +1056,10 @@ async function init(packageJson, queries, options) {
           .toFormat('ipod')
           .saveToFile(meta.outFilePath)
           .on('error', err => rej({err, code: 7}))
-          .on('end', res),
-      ).finally(() => files.audio.file.removeCallback());
+          .on('end', res)
+        console.log(ff._getArguments())
+        */
+      }).finally(() => files.audio.file.removeCallback());
     },
   );
 
