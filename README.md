@@ -1,5 +1,7 @@
 <!-- markdownlint-disable MD001 MD007 MD023 MD041 MD051 -->
 
+NOTE: This fork uses WASM to remove ffmpeg (AtomicParsley soon hopefully). This will be as close to the upstream as posible.
+
 <div align="center">
   <a href="https://github.com/miraclx/freyr-js">
     <img src="https://github.com/miraclx/freyr-js/raw/master/media/logo.gif" alt="FreyrJS - connoisseur of music">
