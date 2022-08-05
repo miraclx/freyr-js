@@ -62,7 +62,7 @@
     "es-main": "^1.0.2",
     "express": "^4.18.1",
     "ffmpeg-core-node": "^0.10.0",
-    "ffmpeg-node-patch": "^0.10.1",
+    "ffmpeg-node-patch": "^0.10.1-fix",
     "filenamify": "^5.1.1",
     "got": "^12.1.0",
     "hh-mm-ss": "^1.2.0",
