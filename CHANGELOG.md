@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.2] - 2022-08-07
 
-- Fix youtube feed sourcing logic after dependency update. <https://github.com/miraclx/freyr-js/pull/299>
-- Update minimum node version to `v14`. <https://github.com/miraclx/freyr-js/pull/293>
+- Fix YouTube feed sourcing logic after dependency update. <https://github.com/miraclx/freyr-js/pull/299>
+- Update minimum Node.js version to `v14`. <https://github.com/miraclx/freyr-js/pull/293>
 - Remove the temporary image downloaded when an error is detected. <https://github.com/miraclx/freyr-js/commit/5e7f5513bad9fd7366cd5bf562a516584308c74f>
 
 ## [0.8.1] - 2022-08-04
