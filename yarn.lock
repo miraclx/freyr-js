@@ -2711,10 +2711,10 @@ yocto-queue@^0.1.0:
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-youtube-dl-exec@^2.0.12:
-  version "2.0.12"
-  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.0.12.tgz"
-  integrity sha512-fpaxeNzAeqihkNNtFi9vNeOS68E7tEvOm3JRp2X/1yMfrV29Rr7GViSKpt6mHSbqIuZrp1EBzzJsPuDPAGbKGg==
+youtube-dl-exec@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.1.4.tgz"
+  integrity sha512-Kg8FCI1ITJ2G1TDDgQ5IKvvqgSp1Dfv81d+eweV8rw9uZzll5SruW2OHt6oYNE9xEWnBWgi9xBoMkmw9I3LfVg==
   dependencies:
     dargs "~7.0.0"
     execa "~5.1.0"
