@@ -608,6 +608,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
         LINTER_RULES_PATH: /
-        # JAVASCRIPT_ES_CONFIG_FILE: .eslintrc
         JSCPD_CONFIG_FILE: .github/linters/.jscpd.json
+        VALIDATE_JAVASCRIPT_ES: false
         VALIDATE_JAVASCRIPT_STANDARD: false
