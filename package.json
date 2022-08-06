@@ -86,7 +86,7 @@
     "tmp": "^0.2.1",
     "xbytes": "^1.8.0",
     "xprogress": "^0.19.1",
-    "youtube-dl-exec": "^2.0.12",
+    "youtube-dl-exec": "^2.1.4",
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
