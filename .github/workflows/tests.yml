@@ -572,6 +572,8 @@ jobs:
           | - | - |
           | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.tag}}?color=gray&label=%20&logo=docker)][pr-url] |
 
+          [![][compare-img]][compare-url]
+
           ---
 
           <details>
@@ -586,6 +588,8 @@ jobs:
 
           [master-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{steps.meta2.outputs.sha}}
           [pr-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{steps.meta2.outputs.tag}}
+          [compare-img]: https://img.shields.io/badge/%20-compare-gray?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgIDxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik0zLDFDMS44OSwxIDEsMS44OSAxLDNWMTRDMSwxNS4xMSAxLjg5LDE2IDMsMTZINVYxNEgzVjNIMTRWNUgxNlYzQzE2LDEuODkgMTUuMTEsMSAxNCwxSDNNOSw3QzcuODksNyA3LDcuODkgNyw5VjExSDlWOUgxMVY3SDlNMTMsN1Y5SDE0VjEwSDE2VjdIMTNNMTgsN1Y5SDIwVjIwSDlWMThIN1YyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3SDE4TTE0LDEyVjE0SDEyVjE2SDE0QzE1LjExLDE2IDE2LDE1LjExIDE2LDE0VjEySDE0TTcsMTNWMTZIMTBWMTRIOVYxM0g3WiIgLz4KPC9zdmc+
+          [compare-url]: https://portal.slim.dev/home/diff/dockerhub%3A%2F%2Fdockerhub.public%2Ffreyrcli%2Ffreyrjs-git%3A${{steps.meta2.outputs.tag}}#file-system
 
   linter:
     runs-on: ubuntu-latest
