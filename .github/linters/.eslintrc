@@ -21,7 +21,7 @@
   "ignorePatterns": [
     "**/*.json",
     // todo: #290, remove these when super-linter upgrades their eslint version
-    "**/cli.js",
+    "cli.js",
     "**/cli_server.js",
     "**/apple_music.js"
   ],
