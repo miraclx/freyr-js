@@ -1089,7 +1089,10 @@ async function init(packageJson, queries, options) {
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
-    const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
+    const [feedMeta] = audioFeeds.formats
+      .filter(meta => 'abr' in meta && !('vbr' in meta))
+      .sort((meta1, meta2) => meta2.abr - meta1.abr)[0];
+
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
