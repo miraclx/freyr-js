@@ -4,7 +4,6 @@ import fs from 'fs';
 import xurl from 'url';
 import xpath from 'path';
 import crypto from 'crypto';
-import {setTimeout} from 'timers/promises';
 import {spawn, spawnSync} from 'child_process';
 
 import Conf from 'conf';
@@ -48,7 +47,7 @@ const __dirname = xurl.fileURLToPath(new URL('.', import.meta.url));
 async function pTimeout(timeout, fn) {
   let timeoutSignal = Symbol('TimedOutSignal');
   let f = fn();
-  let result = await Promise.race([f, setTimeout(timeout, timeoutSignal)]);
+  let result = await Promise.race([f, Promise.delay(timeout, timeoutSignal)]);
   if (result == timeoutSignal) {
     if (typeof f.cancel == 'function') f.cancel();
     throw new Error('Promise timed out');
@@ -864,7 +863,7 @@ async function init(packageJson, queries, options) {
         logger: trackLogger,
         opts: {
           tag: '[Retrieving album art]...',
-          // errorHandler: () => imageFile.removeCallback(),
+          errorHandler: () => imageFile.removeCallback(),
           retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
           resumeHandler: offset => trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
           failureMessage: err =>
@@ -1153,7 +1152,10 @@ async function init(packageJson, queries, options) {
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
 
-    const feedMeta = audioFeeds.formats.sort((meta1, meta2) => (meta1.abr > meta2.abr ? -1 : meta1.abr < meta2.abr ? 1 : 0))[0];
+    const [feedMeta] = audioFeeds.formats
+      .filter(meta => 'abr' in meta && !('vbr' in meta))
+      .sort((meta1, meta2) => meta2.abr - meta1.abr);
+
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})

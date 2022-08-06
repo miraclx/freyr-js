@@ -1,6 +1,6 @@
 FROM node:18.7.0-alpine3.16 as installer
 
-RUN printf '#!/usr/bin/env sh\necho "Python 3.0.0"\n' > /usr/bin/python && chmod +x /usr/bin/python
+RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmod +x /usr/bin/python3
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
@@ -22,7 +22,6 @@ FROM alpine:3.16.1 as base
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache nodejs ffmpeg python3 libstdc++ \
-  && ln /usr/bin/python3 /usr/bin/python \
   && find /usr/lib/python3* \
       \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
       -exec rm -r {} \+
