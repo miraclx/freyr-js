@@ -861,7 +861,7 @@ async function init(packageJson, queries, options) {
         logger: trackLogger,
         opts: {
           tag: '[Retrieving album art]...',
-          // errorHandler: () => imageFile.removeCallback(),
+          errorHandler: () => imageFile.removeCallback(),
           retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
           resumeHandler: offset => trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
           failureMessage: err =>
