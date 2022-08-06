@@ -1091,7 +1091,7 @@ async function init(packageJson, queries, options) {
 
     const [feedMeta] = audioFeeds.formats
       .filter(meta => 'abr' in meta && !('vbr' in meta))
-      .sort((meta1, meta2) => meta2.abr - meta1.abr)[0];
+      .sort((meta1, meta2) => meta2.abr - meta1.abr);
 
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue
