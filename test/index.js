@@ -108,7 +108,7 @@ async function run_tests(stage, args) {
       if (attempt > 1)
         if (is_gha) console.log(`::warning::[${attempt}/3] Download failed, retrying..`);
         else console.log(`\x1b[33m[${attempt}/3] Download failed, retrying..\x1b[0m`);
-      console.log(`Log File: ${logFile.name}`);
+      console.log(`Log File: ${logFile.path}`);
 
       let top_bar = `┌──> ${`[${attempt}/3] ${service} ${type} `.padEnd(56, '─')}┐`;
       if (is_gha) console.log(`::group::${top_bar}`);

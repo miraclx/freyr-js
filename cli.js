@@ -856,7 +856,7 @@ async function init(packageJson, queries, options) {
       });
       const imageBytesWritten = await downloadToStream({
         urlOrFragments: track.getImage(Config.image.width, Config.image.height),
-        outputFile: imageFile.name,
+        outputFile: imageFile.path,
         logger: trackLogger,
         opts: {
           tag: '[Retrieving album art]...',
@@ -878,7 +878,7 @@ async function init(packageJson, queries, options) {
       const audioBytesWritten = await downloadToStream(
         _merge(
           {
-            outputFile: rawAudio.name,
+            outputFile: rawAudio.path,
             logger: trackLogger,
             opts: {
               tag: `[‘${meta.trackName}’]`,
@@ -965,7 +965,7 @@ async function init(packageJson, queries, options) {
         copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
         encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
         encodedBy: 'd3vc0dr', // ©enc
-        artwork: files.image.file.name, // covr
+        artwork: files.image.file.path, // covr
         // sortOrder: [
         //   ['name', 'NAME'], // sonm
         //   ['album', 'NAME'], // soal
@@ -984,7 +984,7 @@ async function init(packageJson, queries, options) {
     async ({track, meta, files}) => {
       return new Promise((res, rej) =>
         ffmpeg()
-          .addInput(files.audio.file.name)
+          .addInput(files.audio.file.path)
           .audioCodec('aac')
           .audioBitrate(options.bitrate)
           .audioFrequency(44100)
@@ -1004,7 +1004,7 @@ async function init(packageJson, queries, options) {
       !!options.cover &&
       (outArtPath =>
         !(fs.existsSync(outArtPath) && !fs.statSync(outArtPath).isFile()) &&
-        (fs.copyFileSync(files.image.file.name, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
+        (fs.copyFileSync(files.image.file.path, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
     await encodeQueue.push({track, meta, files});
     await embedQueue.push({track, meta, files, audioSource});
     return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
