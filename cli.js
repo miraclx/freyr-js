@@ -736,7 +736,7 @@ async function init(packageJson, queries, options) {
                 data.store.get('progressBar').print(opts.retryMessage({ref: data.index + 1, ...data}));
               else {
                 if (!options.bar) logger.write('\x1b[G\x1b[K');
-                logger.write(opts.retryMessage(data), '\n');
+                logger.write(opts.retryMessage({ref: data.index + 1, ...data}), '\n');
               }
             }
           })
@@ -807,7 +807,7 @@ async function init(packageJson, queries, options) {
                   if (options.bar) barGen.print(data);
                   else {
                     logger.write('\x1b[G\x1b[K');
-                    logger.write(data, '\n');
+                    logger.write({ref: `${i}[${data.index + 1}]`, ...data}, '\n');
                   }
                 }
               })
