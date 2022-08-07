@@ -32,25 +32,25 @@ export default async function genFile(opts) {
     opts.tmpdir = opts.tmpdir || tmpdir();
     const dir = join(opts.tmpdir, opts.dirname || '.');
     await mkdirp(dir);
-    const name = join(dir, opts.filename);
-    const fd = await open(name, fs.constants.O_CREAT | opts.mode);
+    const path = join(dir, opts.filename);
+    const fd = await open(path, fs.constants.O_CREAT | opts.mode);
     hookupListeners();
     let closed = false;
     const garbageHandler = () => {
       if (closed) return;
       fs.closeSync(fd);
       closed = true;
-      if (!opts.keep) fs.unlinkSync(name);
+      if (!opts.keep) fs.unlinkSync(path);
     };
     removeCallbacks.unshift(garbageHandler);
     return {
       fd,
-      name,
+      path,
       removeCallback: async () => {
         if (closed) return;
         await close(fd);
         closed = true;
-        await unlink(name);
+        await unlink(path);
         removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
       },
     };
