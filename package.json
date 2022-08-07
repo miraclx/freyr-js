@@ -51,6 +51,8 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@ffmpeg/core": "^0.10.0",
+    "@ffmpeg/ffmpeg": "^0.10.1",
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.4",
     "bluebird": "^3.7.2",
