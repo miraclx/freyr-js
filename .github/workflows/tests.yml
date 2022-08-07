@@ -104,7 +104,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Track
-      run: npm test -- --docker freyr-dev spotify.track --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev spotify.track --stage ./stage
 
   spotify-album:
     if: ${{ always() }}
@@ -133,7 +135,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: npm test -- --docker freyr-dev spotify.album --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev spotify.album --stage ./stage
 
   spotify-artist:
     if: ${{ always() }}
@@ -162,7 +166,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: npm test -- --docker freyr-dev spotify.artist --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev spotify.artist --stage ./stage
 
   spotify-playlist:
     if: ${{ always() }}
@@ -191,7 +197,9 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Playlist
-      run: npm test -- --docker freyr-dev spotify.playlist --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev spotify.playlist --stage ./stage
 
   apple-music:
     if: false
@@ -226,7 +234,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Track
-      run: npm test -- --docker freyr-dev apple_music.track --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev apple_music.track --stage ./stage
 
   apple-music-album:
     if: ${{ always() }}
@@ -255,7 +265,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Album
-      run: npm test -- --docker freyr-dev apple_music.album --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev apple_music.album --stage ./stage
 
   apple-music-artist:
     if: ${{ always() }}
@@ -284,7 +296,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Artist
-      run: npm test -- --docker freyr-dev apple_music.artist --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev apple_music.artist --stage ./stage
 
   apple-music-playlist:
     if: ${{ always() }}
@@ -313,7 +327,9 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Playlist
-      run: npm test -- --docker freyr-dev apple_music.playlist --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev apple_music.playlist --stage ./stage
 
   deezer:
     if: false
@@ -348,7 +364,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Track
-      run: npm test -- --docker freyr-dev deezer.track --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev deezer.track --stage ./stage
 
   deezer-album:
     if: ${{ always() }}
@@ -377,7 +395,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Album
-      run: npm test -- --docker freyr-dev deezer.album --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev deezer.album --stage ./stage
 
   deezer-artist:
     if: ${{ always() }}
@@ -406,7 +426,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Artist
-      run: npm test -- --docker freyr-dev deezer.artist --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev deezer.artist --stage ./stage
 
   deezer-playlist:
     if: ${{ always() }}
@@ -435,7 +457,9 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Playlist
-      run: npm test -- --docker freyr-dev deezer.playlist --stage ./stage
+      run: |
+        mkdir stage
+        npm test -- --docker freyr-dev deezer.playlist --stage ./stage
 
 
   docker-publish:
