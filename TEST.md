@@ -6,34 +6,40 @@ freyr is bundled with its own flexibly customizable test runner.
 - To run all tests
 
   ```console
-  npm run test -- --all
+  npm test -- --all
   ```
 
 - To run just Spotify tests
 
   ```console
-  npm run test -- spotify
+  npm test -- spotify
   ```
 
 - To run just Apple Music artist tests
 
   ```console
-  npm run test -- apple_music.artist
+  npm test -- apple_music.artist
   ```
 
 - You can use a custom test suite (see the [default suite](https://github.com/miraclx/freyr-js/blob/master/test/default.json) for an example)
 
   ```console
-  npm run test -- --all --suite ./special_cases.json
+  npm test -- --all --suite ./special_cases.json
   ```
 
 - And optionally, you can run the tests inside a freyr docker container
 
   ```console
-  npm run test -- deezer --docker freyr-dev:latest
+  npm test -- deezer --docker freyr-dev:latest
   ```
 
-## `npm run test -- --help`
+- You can customize the working directory for storing the tracks and logs
+
+  ```console
+  npm test -- spotify.track --name run-1 --stage ./test-runs
+  ```
+
+## `npm test -- --help`
 
 ```console
 freyr-test

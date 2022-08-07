@@ -1,12 +1,15 @@
 import fs from 'fs';
 import url from 'url';
-import path from 'path';
 import util from 'util';
-import {randomUUID} from 'crypto';
+import {tmpdir} from 'os';
+import {randomBytes} from 'crypto';
 import {PassThrough} from 'stream';
 import {spawn} from 'child_process';
+import {relative, join, resolve} from 'path';
 
 import fileMgr from '../src/file_mgr.js';
+
+const exists = util.promisify(fs.exists);
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -52,40 +55,65 @@ async function pRetry(tries, fn) {
   return result;
 }
 
-async function run_tests(stage, args) {
-  let docker_image, i;
-  if ((docker_image = !!~(i = args.indexOf('--docker'))) && !(docker_image = args.splice(i, 2)[1]))
+function short_path(path) {
+  let a = resolve(path);
+  let b = relative(process.cwd(), path);
+  if (!['..', '/'].some(c => b.startsWith(c))) b = `./${b}`;
+  return a.length < b.length ? a : b;
+}
+
+const default_stage = join(tmpdir(), 'freyr-test');
+
+async function run_tests(suite, args, i) {
+  let docker_image;
+  if (~(i = args.indexOf('--docker')) && !(docker_image = args.splice(i, 2)[1]))
     throw new Error('`--docker` requires an image name');
+  let stage_name = randomBytes(6).toString('hex');
+  if (~(i = args.indexOf('--name')) && !(stage_name = args.splice(i, 2)[1])) throw new Error('`--name` requires a stage name');
+  let stage_path = default_stage;
+  if (~(i = args.indexOf('--stage')) && !(stage_path = args.splice(i, 2)[1])) throw new Error('`--stage` requires a path');
+  stage_path = resolve(join(stage_path, stage_name));
+  let force, clean;
+  if ((force = !!~(i = args.indexOf('--force')))) args.splice(i, 1);
+  if ((clean = !!~(i = args.indexOf('--clean')))) args.splice(i, 1);
+  if (await exists(stage_path))
+    if (!force) throw new Error(`stage path [${stage_path}] already exists`);
+    else if (clean) fs.rmdirSync(stage_path);
 
   let is_gha = 'GITHUB_ACTIONS' in process.env && process.env['GITHUB_ACTIONS'] === 'true';
-  if (~(i = args.indexOf('--all'))) args = Object.keys(stage);
+
+  let tests = args;
+  if (~(i = args.indexOf('--all'))) args.splice(i, 1), (tests = Object.keys(suite));
   let invalidArg;
   if ((invalidArg = args.find(arg => arg.startsWith('-')))) throw new Error(`Invalid argument: ${invalidArg}`);
 
-  for (let [i, arg] of args.entries()) {
-    let [service, type] = arg.split('.');
-    if (!(service in stage)) throw new Error(`Invalid service: ${service}`);
+  if (!tests.length) return noService;
+
+  for (let [i, test] of tests.entries()) {
+    let [service, type] = test.split('.');
+    if (!(service in suite)) throw new Error(`Invalid service: ${service}`);
     if (!type) {
-      args.splice(i + 1, 0, ...Object.keys(stage[service]).map(type => `${arg}.${type}`));
+      tests.splice(i + 1, 0, ...Object.keys(suite[service]).map(type => `${test}.${type}`));
       continue;
     }
 
-    let {uri, filter = [], expect} = stage[service][type];
+    let {uri, filter = [], expect} = suite[service][type];
+
+    let test_stage_path = join(stage_path, test);
 
     let preargs = ['--no-logo', '--no-header', '--no-bar'];
     if (is_gha) preargs.push('--no-auth');
-    let child_args = [...preargs, uri, ...filter.map(f => `--filter=${f}`)];
+    if (force) preargs.push('--force');
+    let child_args = [...preargs, ...filter.map(f => `--filter=${f}`)];
 
     let unmetExpectations = new Error('One or more expectations failed');
-
-    let child_id = randomUUID();
 
     await pRetry(3, async (attempt, lastErr, abort) => {
       if (attempt > 1 && lastErr !== unmetExpectations) abort();
 
       let logFile = await fileMgr({
         filename: `${service}-${type}-${attempt}.log`,
-        dirname: path.join('freyr-test', child_id),
+        tmpdir: test_stage_path,
         keep: true,
         mode: fs.constants.W_OK,
       });
@@ -117,8 +145,15 @@ async function run_tests(stage, args) {
       let child, handler;
 
       if (!docker_image) {
-        child = spawn('node', [path.relative(process.cwd(), path.join(__dirname, '..', 'cli.js')), ...child_args]);
+        child = spawn('node', [
+          short_path(join(__dirname, '..', 'cli.js')),
+          ...child_args,
+          '--directory',
+          short_path(test_stage_path),
+          uri,
+        ]);
       } else {
+        let child_id = `${test}.${stage_name}`;
         let extra_docker_args = process.env['DOCKER_ARGS'] ? process.env['DOCKER_ARGS'].split(' ') : [];
         child = spawn('docker', [
           'run',
@@ -130,8 +165,11 @@ async function run_tests(stage, args) {
           child_id,
           '--network',
           'host',
+          '--volume',
+          `${test_stage_path}:/data`,
           docker_image,
           ...child_args,
+          uri,
         ]);
         process.on('SIGINT', (handler = () => (spawn('docker', ['kill', child_id]), process.off('SIGINT', handler))));
       }
@@ -205,69 +243,74 @@ async function run_tests(stage, args) {
 }
 
 let errorCauses = Symbol('ErrorCauses');
+let noService = Symbol('noService');
 
-function main() {
-  let args = process.argv.slice(2);
+async function main(args) {
+  let suite, test_suite, i;
 
-  let stage, test_suite, i;
+  if (~(i = args.indexOf('--suite')) && !(test_suite = args.splice(i, 2)[1])) throw new Error('`--suite` requires a file path');
 
-  if ((test_suite = !!~(i = args.indexOf('--suite'))) && !(test_suite = args.splice(i, 2)[1]))
-    throw new Error('`--suite` requires a file path');
+  suite = JSON.parse(fs.readFileSync(test_suite || join(__dirname, 'default.json')));
 
-  try {
-    stage = JSON.parse(fs.readFileSync(test_suite || path.join(__dirname, 'default.json')));
-  } catch (e) {
-    (i = ''), (stage = JSON.parse(fs.readFileSync(path.join(__dirname, 'default.json'))));
-    console.error("\x1b[33mCouldn't read test suite file\x1b[0m\n", e.message, '\n');
+  if (!['-h', '--help'].some(args.includes.bind(args))) {
+    try {
+      if (noService !== (await run_tests(suite, args))) return;
+    } catch (err) {
+      console.error('An error occurred!');
+      if (errorCauses in err) {
+        let causes = err[errorCauses];
+        delete err[errorCauses];
+        console.error('', err);
+        for (let cause of causes) console.error('', cause);
+      } else console.error('', err);
+      process.exit(1);
+    }
   }
 
-  if (!args.length || i === '' || args.includes('--help') || args.includes('-h')) {
-    console.log('freyr-test');
-    console.log('----------');
-    console.log('Usage: freyr-test [options] [<SERVICE>[.<TYPE>]...]');
-    console.log();
-    console.log('Utility for testing the Freyr CLI');
-    console.log();
-    console.log('Options:');
-    console.log();
-    console.log(`  SERVICE                 ${Object.keys(stage).join(' / ')}`);
-    console.log(`  TYPE                    ${[...new Set(Object.values(stage).flatMap(s => Object.keys(s)))].join(' / ')}`);
-    console.log();
-    console.log('  --all                   run all tests');
-    console.log('  --suite <SUITE>         use a specific test suite (json)');
-    console.log('  --docker <IMAGE>        run tests in a docker container');
-    console.log('  --help                  show this help message');
-    console.log();
-    console.log('Enviroment Variables:');
-    console.log();
-    console.log('  DOCKER_ARGS             arguments to pass to `docker run`');
-    console.log();
-    console.log('Example:');
-    console.log();
-    console.log('  $ freyr-test --all');
-    console.log('      runs all tests');
-    console.log();
-    console.log('  $ freyr-test spotify');
-    console.log('      runs all Spotify tests');
-    console.log();
-    console.log('  $ freyr-test apple_music.album');
-    console.log('      tests downloading an Apple Music album');
-    console.log();
-    console.log('  $ freyr-test spotify.track deezer.artist');
-    console.log('      tests downloading a Spotify track and Deezer artist');
-    return;
-  }
-
-  run_tests(stage, args).catch(err => {
-    console.error('An error occurred!');
-    if (errorCauses in err) {
-      let causes = err[errorCauses];
-      delete err[errorCauses];
-      console.error('', err);
-      for (let cause of causes) console.error('', cause);
-    } else console.error('', err);
-    process.exit(1);
-  });
+  console.log('freyr-test');
+  console.log('----------');
+  console.log('Usage: freyr-test [options] [<SERVICE>[.<TYPE>]...]');
+  console.log();
+  console.log('Utility for testing the Freyr CLI');
+  console.log();
+  console.log('Options:');
+  console.log();
+  console.log(`  SERVICE                 ${Object.keys(suite).join(' / ')}`);
+  console.log(`  TYPE                    ${[...new Set(Object.values(suite).flatMap(s => Object.keys(s)))].join(' / ')}`);
+  console.log();
+  console.log('  --all                   run all tests');
+  console.log('  --suite <SUITE>         use a specific test suite (json)');
+  console.log('  --docker <IMAGE>        run tests in a docker container');
+  console.log('  --name <NAME>           name for this test run (defaults to a random hex string)');
+  console.log(`  --stage <PATH>          directory to stage this test (default: ${default_stage})`);
+  console.log('  --force                 force overwriting of existing staged files');
+  console.log('  --clean                 (when --force is used) clean existing stage before reusing it');
+  console.log('  --help                  show this help message');
+  console.log();
+  console.log('Enviroment Variables:');
+  console.log();
+  console.log('  DOCKER_ARGS             arguments to pass to `docker run`');
+  console.log();
+  console.log('Example:');
+  console.log();
+  console.log('  $ freyr-test --all');
+  console.log('      runs all tests');
+  console.log();
+  console.log('  $ freyr-test spotify');
+  console.log('      runs all Spotify tests');
+  console.log();
+  console.log('  $ freyr-test apple_music.album');
+  console.log('      tests downloading an Apple Music album');
+  console.log();
+  console.log('  $ freyr-test spotify.track deezer.artist');
+  console.log('      tests downloading a Spotify track and Deezer artist');
+  console.log();
+  console.log('  $ freyr-test spotify.track --stage ./stage --name test-run');
+  console.log('      downloads the Spotify test track in ./stage/test-run/spotify.track with logs');
 }
 
-main();
+function _start() {
+  main(process.argv.slice(2));
+}
+
+_start();

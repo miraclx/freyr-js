@@ -9,6 +9,9 @@ on:
   schedule:
     - cron: '0 0 * * WED,SAT' # 00:00 on Wednesdays and Saturdays, weekly.
 
+env:
+  DOCKER_ARGS: "--user root"
+
 jobs:
   up-to-date:
     runs-on: ubuntu-latest
@@ -101,9 +104,7 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Track
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev spotify.track
+      run: npm test -- --docker freyr-dev spotify.track
 
   spotify-album:
     if: ${{ always() }}
@@ -132,9 +133,7 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev spotify.album
+      run: npm test -- --docker freyr-dev spotify.album
 
   spotify-artist:
     if: ${{ always() }}
@@ -163,9 +162,7 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Album
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev spotify.artist
+      run: npm test -- --docker freyr-dev spotify.artist
 
   spotify-playlist:
     if: ${{ always() }}
@@ -194,9 +191,7 @@ jobs:
         docker image ls -a
 
     - name: Spotify - Download Playlist
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev spotify.playlist
+      run: npm test -- --docker freyr-dev spotify.playlist
 
   apple-music:
     if: false
@@ -231,9 +226,7 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Track
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev apple_music.track
+      run: npm test -- --docker freyr-dev apple_music.track
 
   apple-music-album:
     if: ${{ always() }}
@@ -262,9 +255,7 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Album
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev apple_music.album
+      run: npm test -- --docker freyr-dev apple_music.album
 
   apple-music-artist:
     if: ${{ always() }}
@@ -293,9 +284,7 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Artist
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev apple_music.artist
+      run: npm test -- --docker freyr-dev apple_music.artist
 
   apple-music-playlist:
     if: ${{ always() }}
@@ -324,9 +313,7 @@ jobs:
         docker image ls -a
 
     - name: Apple Music - Download Playlist
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev apple_music.playlist
+      run: npm test -- --docker freyr-dev apple_music.playlist
 
   deezer:
     if: false
@@ -361,9 +348,7 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Track
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev deezer.track
+      run: npm test -- --docker freyr-dev deezer.track
 
   deezer-album:
     if: ${{ always() }}
@@ -392,9 +377,7 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Album
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev deezer.album
+      run: npm test -- --docker freyr-dev deezer.album
 
   deezer-artist:
     if: ${{ always() }}
@@ -423,9 +406,7 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Artist
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev deezer.artist
+      run: npm test -- --docker freyr-dev deezer.artist
 
   deezer-playlist:
     if: ${{ always() }}
@@ -454,9 +435,7 @@ jobs:
         docker image ls -a
 
     - name: Deezer - Download Playlist
-      run: |
-        DOCKER_ARGS="-v $(pwd)/stage:/data --user root" \
-          npm run test -- --docker freyr-dev deezer.playlist
+      run: npm test -- --docker freyr-dev deezer.playlist
 
 
   docker-publish:
