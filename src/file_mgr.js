@@ -11,7 +11,6 @@ const removeCallbacks = [];
 
 const open = promisify(fs.open);
 const close = promisify(fs.close);
-const exists = promisify(fs.exists);
 const unlink = promisify(fs.unlink);
 
 function garbageCollector() {
@@ -31,7 +30,6 @@ export default async function genFile(opts) {
   opts = opts || {};
   if (opts.filename) {
     opts.tmpdir = opts.tmpdir || tmpdir();
-    if (!(await exists(opts.tmpdir))) throw new Error('tmpdir does not exist');
     const dir = join(opts.tmpdir, opts.dirname || '.');
     await mkdirp(dir);
     const path = join(dir, opts.filename);
