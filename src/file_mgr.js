@@ -45,7 +45,7 @@ export default async function genFile(opts) {
     removeCallbacks.unshift(garbageHandler);
     return {
       fd,
-      name: path,
+      path,
       removeCallback: async () => {
         if (closed) return;
         await close(fd);
