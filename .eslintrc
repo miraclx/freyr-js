@@ -1,4 +1,3 @@
-// todo: #290, remove the duplicate in .github/linters/.eslintrc
 {
   "env": {
     "browser": true,
