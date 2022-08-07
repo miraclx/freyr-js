@@ -167,6 +167,8 @@ async function run_tests(suite, args, i) {
           'host',
           '--volume',
           `${test_stage_path}:/data`,
+          '--env',
+          `SHOW_DEBUG_STACK=${process.env['SHOW_DEBUG_STACK']}`,
           docker_image,
           ...child_args,
           uri,
