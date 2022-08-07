@@ -1,11 +1,11 @@
 import fs from 'fs';
 import url from 'url';
-import path from 'path';
 import util from 'util';
 import {tmpdir} from 'os';
 import {randomBytes} from 'crypto';
 import {PassThrough} from 'stream';
 import {spawn} from 'child_process';
+import {relative, join, resolve} from 'path';
 
 import fileMgr from '../src/file_mgr.js';
 
@@ -55,7 +55,14 @@ async function pRetry(tries, fn) {
   return result;
 }
 
-const default_stage = path.join(tmpdir(), 'freyr-test');
+function short_path(path) {
+  let a = resolve(path);
+  let b = relative(process.cwd(), path);
+  if (!['..', '/'].some(c => b.startsWith(c))) b = `./${b}`;
+  return a.length < b.length ? a : b;
+}
+
+const default_stage = join(tmpdir(), 'freyr-test');
 
 async function run_tests(suite, args, i) {
   let docker_image;
@@ -64,8 +71,8 @@ async function run_tests(suite, args, i) {
   let stage_name = randomBytes(6).toString('hex');
   if (~(i = args.indexOf('--name')) && !(stage_name = args.splice(i, 2)[1])) throw new Error('`--name` requires a stage name');
   let stage_path = default_stage;
-  if (~(i = args.indexOf('--output')) && !(stage_path = args.splice(i, 2)[1])) throw new Error('`--output` requires a path');
-  stage_path = path.resolve(path.join(stage_path, stage_name));
+  if (~(i = args.indexOf('--stage')) && !(stage_path = args.splice(i, 2)[1])) throw new Error('`--stage` requires a path');
+  stage_path = resolve(join(stage_path, stage_name));
   let force, clean;
   if ((force = !!~(i = args.indexOf('--force')))) args.splice(i, 1);
   if ((clean = !!~(i = args.indexOf('--clean')))) args.splice(i, 1);
@@ -92,7 +99,7 @@ async function run_tests(suite, args, i) {
 
     let {uri, filter = [], expect} = suite[service][type];
 
-    let test_stage_path = path.join(stage_path, test);
+    let test_stage_path = join(stage_path, test);
 
     let preargs = ['--no-logo', '--no-header', '--no-bar'];
     if (is_gha) preargs.push('--no-auth');
@@ -139,10 +146,10 @@ async function run_tests(suite, args, i) {
 
       if (!docker_image) {
         child = spawn('node', [
-          path.relative(process.cwd(), path.join(__dirname, '..', 'cli.js')),
+          short_path(join(__dirname, '..', 'cli.js')),
           ...child_args,
           '--directory',
-          test_stage_path,
+          short_path(test_stage_path),
           uri,
         ]);
       } else {
@@ -243,7 +250,7 @@ async function main(args) {
 
   if (~(i = args.indexOf('--suite')) && !(test_suite = args.splice(i, 2)[1])) throw new Error('`--suite` requires a file path');
 
-  suite = JSON.parse(fs.readFileSync(test_suite || path.join(__dirname, 'default.json')));
+  suite = JSON.parse(fs.readFileSync(test_suite || join(__dirname, 'default.json')));
 
   if (!['-h', '--help'].some(args.includes.bind(args))) {
     try {
@@ -275,7 +282,7 @@ async function main(args) {
   console.log('  --suite <SUITE>         use a specific test suite (json)');
   console.log('  --docker <IMAGE>        run tests in a docker container');
   console.log('  --name <NAME>           name for this test run (defaults to a random hex string)');
-  console.log(`  --output <PATH>         directory to stage this test (default: ${default_stage})`);
+  console.log(`  --stage <PATH>          directory to stage this test (default: ${default_stage})`);
   console.log('  --force                 force overwriting of existing staged files');
   console.log('  --clean                 (when --force is used) clean existing stage before reusing it');
   console.log('  --help                  show this help message');
@@ -298,8 +305,8 @@ async function main(args) {
   console.log('  $ freyr-test spotify.track deezer.artist');
   console.log('      tests downloading a Spotify track and Deezer artist');
   console.log();
-  console.log('  $ freyr-test spotify.track --output ./stage --name spotify_track_test_1');
-  console.log('      downloads the Spotify test track in ./stage/spotify_track_test_1');
+  console.log('  $ freyr-test spotify.track --stage ./stage --name test-run');
+  console.log('      downloads the Spotify test track in ./stage/test-run/spotify.track with logs');
 }
 
 function _start() {
