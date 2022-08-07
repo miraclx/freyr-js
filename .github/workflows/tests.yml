@@ -9,6 +9,9 @@ on:
   schedule:
     - cron: '0 0 * * WED,SAT' # 00:00 on Wednesdays and Saturdays, weekly.
 
+env:
+  DOCKER_ARGS: "--user 1001"
+
 jobs:
   up-to-date:
     runs-on: ubuntu-latest
