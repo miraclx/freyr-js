@@ -1013,17 +1013,21 @@ async function init(packageJson, queries, options) {
     ),
   );
 
-  const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, audioSource}) => {
-    await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
-    const wroteImage =
-      !!options.cover &&
-      (outArtPath =>
-        !(fs.existsSync(outArtPath) && !fs.statSync(outArtPath).isFile()) &&
-        (fs.copyFileSync(files.image.file.path, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
-    await encodeQueue.push({track, meta, files});
-    await embedQueue.push({track, meta, files, audioSource});
-    return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
-  });
+  const postProcessor = new AsyncQueue(
+    'cli:postProcessor',
+    Math.max(Config.concurrency.encoder, Config.concurrency.embedder),
+    async ({track, meta, files, audioSource}) => {
+      await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
+      const wroteImage =
+        !!options.cover &&
+        (outArtPath =>
+          !(fs.existsSync(outArtPath) && !fs.statSync(outArtPath).isFile()) &&
+          (fs.copyFileSync(files.image.file.path, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
+      await encodeQueue.push({track, meta, files});
+      await embedQueue.push({track, meta, files, audioSource});
+      return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
+    },
+  );
 
   function buildSourceCollectorFor(track, selector) {
     async function handleSource(iterator, lastErr) {
