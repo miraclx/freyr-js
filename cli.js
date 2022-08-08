@@ -800,7 +800,7 @@ async function init(packageJson, queries, options) {
                   if (options.bar) barGen.print(data);
                   else {
                     logger.write('\x1b[G\x1b[K');
-                    logger.write({ref: `${i}[${data.index + 1}]`, ...data}, '\n');
+                    logger.write(data, '\n');
                   }
                 }
               })
