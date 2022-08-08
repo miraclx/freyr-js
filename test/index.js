@@ -103,7 +103,6 @@ async function run_tests(suite, args, i) {
 
     let preargs = ['--no-logo', '--no-header', '--no-bar'];
     if (is_gha) preargs.push('--no-auth');
-    if (force) preargs.push('--force');
     let child_args = [...preargs, ...filter.map(f => `--filter=${f}`)];
 
     let unmetExpectations = new Error('One or more expectations failed');
@@ -283,7 +282,7 @@ async function main(args) {
   console.log('  --docker <IMAGE>        run tests in a docker container');
   console.log('  --name <NAME>           name for this test run (defaults to a random hex string)');
   console.log(`  --stage <PATH>          directory to stage this test (default: ${default_stage})`);
-  console.log('  --force                 force overwriting of existing staged files');
+  console.log('  --force                 allow reusing existing stages');
   console.log('  --clean                 (when --force is used) clean existing stage before reusing it');
   console.log('  --help                  show this help message');
   console.log();
