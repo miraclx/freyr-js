@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-wasm-threads
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 import fs from 'fs';
 import xurl from 'url';
@@ -9,7 +9,6 @@ import {spawn, spawnSync} from 'child_process';
 import Conf from 'conf';
 import open from 'open';
 import xget from 'libxget';
-import ffmpeg from 'fluent-ffmpeg';
 import merge2 from 'merge2';
 import mkdirp from 'mkdirp';
 import xbytes from 'xbytes';
@@ -25,6 +24,7 @@ import {publicIp} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
+import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg';
 
 import _merge from 'lodash.merge';
 import _mergeWith from 'lodash.mergewith';
@@ -632,13 +632,6 @@ async function init(packageJson, queries, options) {
   let atomicParsley;
 
   try {
-    if (options.ffmpeg) {
-      if (!fs.existsSync(options.ffmpeg)) throw new Error(`\x1b[31mffmpeg\x1b[0m: Binary not found [${options.ffmpeg}]`);
-      if (!(await isBinaryFile(options.ffmpeg)))
-        stackLogger.warn('\x1b[33mffmpeg\x1b[0m: Detected non-binary file, trying anyways...');
-      ffmpeg.setFfmpegPath(options.ffmpeg);
-    }
-
     if (options.atomicParsley) {
       if (!fs.existsSync(options.atomicParsley))
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
@@ -978,23 +971,40 @@ async function init(packageJson, queries, options) {
     },
   );
 
+  delete globalThis.fetch;
+  let ffmpeg = createFFmpeg({log: false});
+
   const encodeQueue = new AsyncQueue(
     'cli:postprocessor:encodeQueue',
     Config.concurrency.encoder,
     async ({track, meta, files}) => {
-      return new Promise((res, rej) =>
-        ffmpeg()
-          .addInput(files.audio.file.path)
-          .audioCodec('aac')
-          .audioBitrate(options.bitrate)
-          .audioFrequency(44100)
-          .noVideo()
-          .setDuration(TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'))
-          .toFormat('ipod')
-          .saveToFile(meta.outFilePath)
-          .on('error', err => rej({err, code: 7}))
-          .on('end', res),
-      ).finally(() => files.audio.file.removeCallback());
+      let infile = xpath.basename(files.audio.file.path);
+      let outfile = xpath.basename(files.audio.file.path.replace(/\.x4a$/, '.m4a'));
+      try {
+        if (!ffmpeg.isLoaded()) await ffmpeg.load();
+        ffmpeg.FS('writeFile', infile, await fetchFile(files.audio.file.path));
+        await ffmpeg.run(
+          '-i',
+          infile,
+          '-acodec',
+          'aac',
+          '-b:a',
+          options.bitrate,
+          '-ar',
+          '44100',
+          '-vn',
+          '-t',
+          TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
+          '-f',
+          'ipod',
+          outfile,
+        );
+        await fs.promises.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
+      } catch (err) {
+        throw {err, code: 7};
+      } finally {
+        files.audio.file.removeCallback();
+      }
     },
   );
 
@@ -1552,7 +1562,6 @@ function prepCli(packageJson) {
     .option('--no-browser', 'disable auto-launching of user browser')
     .option('--no-net-check', 'disable internet connection check')
     .option('--no-bar', 'disable the progress bar')
-    .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
     .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
     .option('--no-stats', "don't show the stats on completion")
     .option('--pulsate-bar', 'show a pulsating bar')
@@ -1568,7 +1577,6 @@ function prepCli(packageJson) {
       console.log('');
       console.log('Environment Variables:');
       console.log('  SHOW_DEBUG_STACK             show extended debug information');
-      console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
       console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
       console.log('');
       console.log('Info:');

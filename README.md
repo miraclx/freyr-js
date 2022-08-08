@@ -315,7 +315,6 @@ Options:
   --no-auth                    skip authentication procedure
   --no-browser                 disable auto-launching of user browser
   --no-net-check               disable internet connection check
-  --ffmpeg <PATH>              explicit path to the ffmpeg binary
   --atomic-parsley <PATH>      explicit path to the atomic-parsley binary
   --no-stats                   don't show the stats on completion
   --pulsate-bar                show a pulsating bar
@@ -325,7 +324,6 @@ Options:
 
 Environment Variables:
   SHOW_DEBUG_STACK             show extended debug information
-  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`
   ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
 
 Info:
