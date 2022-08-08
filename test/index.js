@@ -145,13 +145,11 @@ async function run_tests(suite, args, i) {
       let child, handler;
 
       if (!docker_image) {
-        child = spawn('node', [
-          short_path(join(__dirname, '..', 'cli.js')),
-          ...child_args,
-          '--directory',
-          short_path(test_stage_path),
-          uri,
-        ]);
+        child = spawn(
+          'node',
+          [short_path(join(__dirname, '..', 'cli.js')), ...child_args, '--directory', short_path(test_stage_path), uri],
+          {...process.env, SHOW_DEBUG_STACK: 1},
+        );
       } else {
         let child_id = `${test}.${stage_name}`;
         let extra_docker_args = process.env['DOCKER_ARGS'] ? process.env['DOCKER_ARGS'].split(' ') : [];
@@ -168,7 +166,7 @@ async function run_tests(suite, args, i) {
           '--volume',
           `${test_stage_path}:/data`,
           '--env',
-          `SHOW_DEBUG_STACK=${process.env['SHOW_DEBUG_STACK']}`,
+          'SHOW_DEBUG_STACK=1',
           docker_image,
           ...child_args,
           uri,
