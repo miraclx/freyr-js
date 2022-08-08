@@ -65,6 +65,18 @@ export default class AsyncQueue {
     }, concurrency || 1);
   }
 
+  static provision(genFn, worker) {
+    let resources = [];
+    return async (...args) => {
+      let resource = resources.shift() || (await genFn());
+      try {
+        return await worker(resource, ...args);
+      } finally {
+        resources.push(resource);
+      }
+    };
+  }
+
   #_register = (objects, meta, handler) => {
     const promises = (Array.isArray(objects) ? objects : [[objects, meta]]).map(objectBlocks => {
       const [data, args] = Array.isArray(objectBlocks) ? objectBlocks : [objectBlocks, meta];

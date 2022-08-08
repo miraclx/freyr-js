@@ -972,40 +972,45 @@ async function init(packageJson, queries, options) {
   );
 
   delete globalThis.fetch;
-  let ffmpeg = createFFmpeg({log: false});
 
   const encodeQueue = new AsyncQueue(
     'cli:postprocessor:encodeQueue',
     Config.concurrency.encoder,
-    async ({track, meta, files}) => {
-      let infile = xpath.basename(files.audio.file.path);
-      let outfile = xpath.basename(files.audio.file.path.replace(/\.x4a$/, '.m4a'));
-      try {
-        if (!ffmpeg.isLoaded()) await ffmpeg.load();
-        ffmpeg.FS('writeFile', infile, await fetchFile(files.audio.file.path));
-        await ffmpeg.run(
-          '-i',
-          infile,
-          '-acodec',
-          'aac',
-          '-b:a',
-          options.bitrate,
-          '-ar',
-          '44100',
-          '-vn',
-          '-t',
-          TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
-          '-f',
-          'ipod',
-          outfile,
-        );
-        await fs.promises.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
-      } catch (err) {
-        throw {err, code: 7};
-      } finally {
-        files.audio.file.removeCallback();
-      }
-    },
+    AsyncQueue.provision(
+      async () => {
+        let ffmpeg = createFFmpeg({log: false});
+        await ffmpeg.load();
+        return ffmpeg;
+      },
+      async (ffmpeg, {track, meta, files}) => {
+        let infile = xpath.basename(files.audio.file.path);
+        let outfile = xpath.basename(files.audio.file.path.replace(/\.x4a$/, '.m4a'));
+        try {
+          ffmpeg.FS('writeFile', infile, await fetchFile(files.audio.file.path));
+          await ffmpeg.run(
+            '-i',
+            infile,
+            '-acodec',
+            'aac',
+            '-b:a',
+            options.bitrate,
+            '-ar',
+            '44100',
+            '-vn',
+            '-t',
+            TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
+            '-f',
+            'ipod',
+            outfile,
+          );
+          await fs.promises.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
+        } catch (err) {
+          throw {err, code: 7};
+        } finally {
+          files.audio.file.removeCallback();
+        }
+      },
+    ),
   );
 
   const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, audioSource}) => {
