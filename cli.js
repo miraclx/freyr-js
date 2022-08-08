@@ -1,4 +1,4 @@
-#!/usr/bin/env node --experimental-wasm-threads
+#!/usr/bin/env node
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 import fs from 'fs';
 import xurl from 'url';
