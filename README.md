@@ -131,25 +131,6 @@ Here's a list of the metadata that freyr can extract from each streaming service
   </details>
 
   <details>
-  <summary>ffmpeg >= v0.9</summary>
-
-  <!-- textlint-disable -->
-  Download for your individual platforms here <https://ffmpeg.org/download.html>
-  <!-- textlint-enable -->
-
-  - Windows + macOS:
-    - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
-    - make sure it's available in your `PATH`
-    - otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
-  - Linux: _(check individual package managers)_
-    - Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
-    - Arch Linux: `sudo pacman -S ffmpeg`
-    - Android (Termux): `apt install ffmpeg`
-    - Alpine Linux: `sudo apk add ffmpeg`
-
-  </details>
-
-  <details>
   <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
 
   First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
