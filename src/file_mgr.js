@@ -1,7 +1,6 @@
 import {join} from 'path';
 import {tmpdir} from 'os';
-import {promisify} from 'util';
-import {promises as fs, constants as fs_constants, close} from 'fs';
+import {promises as fs, constants as fs_constants} from 'fs';
 
 import tmp from 'tmp';
 import mkdirp from 'mkdirp';
