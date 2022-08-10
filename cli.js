@@ -4,7 +4,7 @@ import xurl from 'url';
 import xpath from 'path';
 import crypto from 'crypto';
 import {spawn, spawnSync} from 'child_process';
-import {promises as fs, createReadStream, createWriteStream} from 'fs';
+import {promises as fs, constants as fs_constants, createReadStream, createWriteStream} from 'fs';
 
 import Conf from 'conf';
 import open from 'open';
@@ -588,7 +588,7 @@ async function init(packageJson, queries, options) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] doesn't exist`), process.exit(5);
 
   if (
-    (await processPromise(fs.access(BASE_DIRECTORY, fs.constants.W_OK), stackLogger, {
+    (await processPromise(fs.access(BASE_DIRECTORY, fs_constants.W_OK), stackLogger, {
       onInit: 'Checking directory permissions...',
     })) === null
   )
