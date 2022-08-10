@@ -44,7 +44,7 @@ async function pRetry(tries, fn) {
     abortSymbol = Symbol('RetryAbort');
   for (let [i] of Array.apply(null, {length: tries}).entries()) {
     try {
-      result = await fn(i + 1, rawErr, () => {
+      return await fn(i + 1, rawErr, () => {
         throw abortSymbol;
       });
     } catch (err) {
