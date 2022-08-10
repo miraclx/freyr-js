@@ -1,4 +1,3 @@
-import fs from 'fs';
 import url from 'url';
 import util from 'util';
 import {tmpdir} from 'os';
@@ -6,17 +5,18 @@ import {randomBytes} from 'crypto';
 import {PassThrough} from 'stream';
 import {spawn} from 'child_process';
 import {relative, join, resolve} from 'path';
+import {promises as fs, constants as fs_constants, createWriteStream} from 'fs';
 
 import fileMgr from '../src/file_mgr.js';
 
-const exists = util.promisify(fs.exists);
+const maybeStat = path => fs.stat(path).catch(() => false);
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 function sed(fn) {
   return new PassThrough({
     write(chunk, _, cb) {
-      this.buf = Buffer.concat([(this.buf ||= Buffer.alloc(0)), chunk]);
+      this.buf = Buffer.concat([this.buf || Buffer.alloc(0), chunk]);
       let eol;
       while (~(eol = this.buf.indexOf(0x0a))) {
         this.push(fn(this.buf.slice(0, eol + 1)));
@@ -76,9 +76,9 @@ async function run_tests(suite, args, i) {
   let force, clean;
   if ((force = !!~(i = args.indexOf('--force')))) args.splice(i, 1);
   if ((clean = !!~(i = args.indexOf('--clean')))) args.splice(i, 1);
-  if (await exists(stage_path))
+  if (await maybeStat(stage_path))
     if (!force) throw new Error(`stage path [${stage_path}] already exists`);
-    else if (clean) fs.rmdirSync(stage_path);
+    else if (clean) await fs.rmdir(stage_path);
 
   let is_gha = 'GITHUB_ACTIONS' in process.env && process.env['GITHUB_ACTIONS'] === 'true';
 
@@ -114,10 +114,10 @@ async function run_tests(suite, args, i) {
         filename: `${service}-${type}-${attempt}.log`,
         tmpdir: test_stage_path,
         keep: true,
-        mode: fs.constants.W_OK,
+        mode: fs_constants.W_OK,
       });
 
-      logFile.stream = fs.createWriteStream(null, {fd: logFile.fd});
+      logFile.stream = createWriteStream(null, {fd: logFile.fd});
 
       let logline = line => `│ ${line}`;
 
@@ -249,7 +249,7 @@ async function main(args) {
 
   if (~(i = args.indexOf('--suite')) && !(test_suite = args.splice(i, 2)[1])) throw new Error('`--suite` requires a file path');
 
-  suite = JSON.parse(fs.readFileSync(test_suite || join(__dirname, 'default.json')));
+  suite = JSON.parse(await fs.readFile(test_suite || join(__dirname, 'default.json')));
 
   if (!['-h', '--help'].some(args.includes.bind(args))) {
     try {
