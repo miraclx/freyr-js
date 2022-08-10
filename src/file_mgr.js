@@ -1,7 +1,7 @@
-import fs from 'fs';
 import {join} from 'path';
 import {tmpdir} from 'os';
 import {promisify} from 'util';
+import {promises as fs, constants as fs_constants, close} from 'fs';
 
 import tmp from 'tmp';
 import mkdirp from 'mkdirp';
@@ -9,12 +9,8 @@ import esMain from 'es-main';
 
 const removeCallbacks = [];
 
-const open = promisify(fs.open);
-const close = promisify(fs.close);
-const unlink = promisify(fs.unlink);
-
 function garbageCollector() {
-  while (removeCallbacks.length) removeCallbacks.shift()();
+  while (removeCallbacks.length) removeCallbacks.pop()();
   process.removeListener('exit', garbageCollector);
 }
 
@@ -33,24 +29,21 @@ export default async function genFile(opts) {
     const dir = join(opts.tmpdir, opts.dirname || '.');
     await mkdirp(dir);
     const path = join(dir, opts.filename);
-    const fd = await open(path, fs.constants.O_CREAT | opts.mode);
+    const fd = await fs.open(path, fs_constants.O_CREAT | opts.mode);
     hookupListeners();
     let closed = false;
-    const garbageHandler = () => {
+    const garbageHandler = async keep => {
       if (closed) return;
-      fs.closeSync(fd);
+      await fd.close();
       closed = true;
-      if (!opts.keep) fs.unlinkSync(path);
+      if (!keep) await fs.unlink(path);
     };
-    removeCallbacks.unshift(garbageHandler);
+    removeCallbacks.push(garbageHandler.bind(opts.keep));
     return {
       fd,
       path,
       removeCallback: async () => {
-        if (closed) return;
-        await close(fd);
-        closed = true;
-        await unlink(path);
+        await garbageHandler(false);
         removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
       },
     };
