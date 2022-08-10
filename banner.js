@@ -17,8 +17,8 @@ if (esMain(import.meta)) console.log(banner.join('\n'));
 To generate the banner:
   $ unset COLORTERM
   $ figlet -fslant freyr \
-     | lolcat -p 0.5 -S 35 -f \
-     | sed 's/\\/\\\\/g;s/\x1b/\\x1b/g'
+    | lolcat -p 0.5 -S 35 -f \
+    | sed 's/\\/\\\\/g;s/\x1b/\\x1b/g'
 
 To record logo:
   $ GIFSICLE_OPTS=--lossy=80 asciicast2gif \
