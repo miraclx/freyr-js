@@ -23,6 +23,7 @@ import ProgressBar from 'xprogress';
 import countryData from 'country-data';
 import {publicIp} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
+import {fileTypeFromFile} from 'file-type';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
 
@@ -1003,7 +1004,9 @@ async function init(packageJson, queries, options) {
       !!options.cover &&
       (await (async outArtPath =>
         (await maybeStat(outArtPath).then(stat => stat && stat.isFile())) ||
-        (await fs.copyFile(files.image.file.path, outArtPath), true))(xpath.join(meta.outFileDir, options.cover)));
+        (await fs.copyFile(files.image.file.path, outArtPath), true))(
+        xpath.join(meta.outFileDir, `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
+      ));
     await encodeQueue.push({track, meta, files});
     await embedQueue.push({track, meta, files, audioSource});
     return {wroteImage, finalSize: (await fs.stat(meta.outFilePath)).size};
@@ -1426,7 +1429,6 @@ async function init(packageJson, queries, options) {
     );
     stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
-    stackLogger.log(` [\u2022] Cover Art: ${options.cover} (${Config.image.height}x${Config.image.width})`);
     stackLogger.log(` [\u2022] Total Output size: ${xbytes(finalStats.outSize)}`);
     stackLogger.log(` [\u2022] Total Network Usage: ${xbytes(finalStats.netSize)}`);
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
@@ -1477,7 +1479,7 @@ function prepCli(packageJson) {
     .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
     .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
     .option('-d, --directory <DIR>', 'save tracks to DIR/..')
-    .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
+    .option('-c, --cover <NAME>', 'custom name for the cover art, excluding the extension', 'cover')
     .option(
       '--cover-size <SIZE>',
       ['preferred cover art dimensions', '(format: <width>x<height> or <size> as <size>x<size>)'].join('\n'),
