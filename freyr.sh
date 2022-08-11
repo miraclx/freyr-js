@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$DOCKER_DESKTOP" == "true" ]; then
+if [ "$DOCKER_DESKTOP" = "true" ]; then
   COLS=$(stty size | cut -d" " -f2)
   (
     echo
@@ -12,8 +12,8 @@ if [ "$DOCKER_DESKTOP" == "true" ]; then
     echo "└────────────────────────────────────────────────────────────┘"
   ) | (
     while read -r line; do
-      printf "%*s" "$(((${COLS}-${#line})/2))" ""
-      echo "${line}"
+      printf "%*s" "$(((COLS-${#line})/2))" ""
+      echo "$line"
     done
   )
 
