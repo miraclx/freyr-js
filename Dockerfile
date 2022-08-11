@@ -6,7 +6,7 @@ COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache node \
+RUN apk add --no-cache nodejs \
   && yarn install --prod --frozen-lockfile
 
 FROM golang:1.19.0-alpine3.16 as prep
