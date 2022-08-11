@@ -12,7 +12,7 @@ if [ "$DOCKER_DESKTOP" = "true" ]; then
     echo "└────────────────────────────────────────────────────────────┘"
   ) | (
     while read -r line; do
-      printf "%*s" "$(((COLS-${#line})/2))" ""
+      printf "%*s" "$(((COLS - ${#line}) / 2))" ""
       echo "$line"
     done
   )
