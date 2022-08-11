@@ -4,6 +4,8 @@ RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmo
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
+
+# hadolint ignore=DL3018
 RUN apk add --no-cache binutils && strip /usr/local/bin/node \
   && yarn install --prod --frozen-lockfile
 
