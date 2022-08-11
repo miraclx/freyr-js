@@ -1,6 +1,7 @@
 #!/bin/sh
 
 if [ "$DOCKER_DESKTOP" == "true" ]; then
+  COLS=$(stty size | cut -d" " -f2)
   (
     echo
     echo
@@ -10,9 +11,8 @@ if [ "$DOCKER_DESKTOP" == "true" ]; then
     echo "│  Click on the CLI button at the top right to access a CLI  │"
     echo "└────────────────────────────────────────────────────────────┘"
   ) | (
-    COLS=$(tput cols)
     while read -r line; do
-      printf "%*s" "$(((${COLS}-${#line})/2))";
+      printf "%*s" "$(((${COLS}-${#line})/2))" ""
       echo "${line}"
     done
   )
