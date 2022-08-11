@@ -4,7 +4,10 @@ RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmo
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
-RUN yarn install --prod --frozen-lockfile
+
+# hadolint ignore=DL3018
+RUN apk add --no-cache node \
+  && yarn install --prod --frozen-lockfile
 
 FROM golang:1.19.0-alpine3.16 as prep
 
@@ -21,7 +24,7 @@ RUN go install github.com/tj/node-prune@1159d4c \
 FROM alpine:3.16.1 as base
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache nodejs ffmpeg python3 \
+RUN apk add --no-cache ffmpeg python3 \
   && find /usr/lib/python3* \
       \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
       -exec rm -r {} \+
@@ -29,6 +32,7 @@ COPY --from=prep /atomicparsley/AtomicParsley /bin/AtomicParsley
 
 COPY . /freyr
 COPY --from=prep /freyr/node_modules /freyr/node_modules
+COPY --from=installer /usr/bin/node /usr/bin/node
 
 # hadolint ignore=DL4006
 RUN addgroup -g 1000 freyr \
