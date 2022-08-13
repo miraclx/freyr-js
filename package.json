@@ -63,6 +63,7 @@
     "country-data": "0.0.31",
     "es-main": "^1.0.2",
     "express": "^4.18.1",
+    "file-type": "^17.1.6",
     "filenamify": "^5.1.1",
     "got": "^12.1.0",
     "hh-mm-ss": "^1.2.0",

@@ -161,7 +161,7 @@ jobs:
         docker load --input /tmp/freyr-dev.tar
         docker image ls -a
 
-    - name: Spotify - Download Album
+    - name: Spotify - Download Artist
       run: npm test -- --docker freyr-dev spotify.artist
 
   spotify-playlist:

@@ -254,7 +254,7 @@ Options:
                                (`infinite` for infinite) (default: 10)
   -t, --meta-retries <N>       set number of retries for collating track feeds (`infinite` for infinite) (default: 5)
   -d, --directory <DIR>        save tracks to DIR/..
-  -c, --cover <NAME>           custom name for the cover art (default: "cover.png")
+  -c, --cover <NAME>           custom name for the cover art, excluding the extension (default: "cover")
   --cover-size <SIZE>          preferred cover art dimensions
                                (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
   -C, --no-cover               skip saving a cover art

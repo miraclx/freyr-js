@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
-import fs from 'fs';
 import xurl from 'url';
 import xpath from 'path';
 import crypto from 'crypto';
 import {spawn, spawnSync} from 'child_process';
+import {promises as fs, constants as fs_constants, createReadStream, createWriteStream} from 'fs';
 
 import Conf from 'conf';
 import open from 'open';
@@ -22,6 +22,7 @@ import ProgressBar from 'xprogress';
 import countryData from 'country-data';
 import {publicIp} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
+import {fileTypeFromFile} from 'file-type';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
 import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg';
@@ -39,6 +40,8 @@ import parseRange from './src/parse_range.js';
 import StackLogger from './src/stack_logger.js';
 import streamUtils from './src/stream_utils.js';
 import parseSearchFilter from './src/filter_parser.js';
+
+const maybeStat = path => fs.stat(path).catch(() => false);
 
 const __dirname = xurl.fileURLToPath(new URL('.', import.meta.url));
 
@@ -285,9 +288,8 @@ function CHECK_BIT_RATE_VAL(bitrate_arg) {
   return `${bitrate}k`;
 }
 
-async function PROCESS_INPUT_FILE(input_arg, type, allowBinary = false) {
-  if (!fs.existsSync(input_arg)) throw new Error(`${type} file [${input_arg}] is inexistent`);
-  const stat = fs.statSync(input_arg);
+async function PROCESS_INPUT_FILE(input_arg, type, allowBinary = false, stat) {
+  if (!(stat = await maybeStat(input_arg))) throw new Error(`${type} file [${input_arg}] is inexistent`);
   if (stat.size > 1048576) throw new Error(`${type} file [${input_arg}] is beyond the maximum 1 MiB size limit`);
   if (!stat.isFile()) throw new Error(`${type} file [${input_arg}] is not a file`);
   if (!allowBinary && (await isBinaryFile(input_arg, stat.size)))
@@ -305,8 +307,7 @@ function PARSE_INPUT_LINES(lines) {
 
 async function PROCESS_INPUT_ARG(input_arg) {
   if (!input_arg) return [];
-  const inputSource =
-    input_arg === '-' ? process.stdin : fs.createReadStream(await PROCESS_INPUT_FILE(input_arg, 'Input', false));
+  const inputSource = input_arg === '-' ? process.stdin : createReadStream(await PROCESS_INPUT_FILE(input_arg, 'Input', false));
   const lines = await streamUtils
     .collectBuffers(inputSource.pipe(streamUtils.buildSplitter(['\n', '\r\n'])), {
       max: 1048576, // 1 MiB size limit
@@ -529,8 +530,8 @@ async function init(packageJson, queries, options) {
     },
   };
   try {
-    if (fs.existsSync(options.config)) {
-      Config = _mergeWith(Config, JSON.parse(fs.readFileSync(options.config)), (a, b, k) =>
+    if (await maybeStat(options.config)) {
+      Config = _mergeWith(Config, JSON.parse(await fs.readFile(options.config)), (a, b, k) =>
         k === 'order' && [a, b].every(Array.isArray) ? b.concat(a) : undefined,
       );
     } else {
@@ -584,11 +585,11 @@ async function init(packageJson, queries, options) {
 
   const BASE_DIRECTORY = (path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))(Config.dirs.output);
 
-  if (!fs.existsSync(BASE_DIRECTORY))
+  if (!(await maybeStat(BASE_DIRECTORY)))
     stackLogger.error(`\x1b[31m[!]\x1b[0m Working directory [${BASE_DIRECTORY}] doesn't exist`), process.exit(5);
 
   if (
-    (await processPromise(Promise.promisify(fs.access)(BASE_DIRECTORY, fs.constants.W_OK), stackLogger, {
+    (await processPromise(fs.access(BASE_DIRECTORY, fs_constants.W_OK), stackLogger, {
       onInit: 'Checking directory permissions...',
     })) === null
   )
@@ -633,7 +634,7 @@ async function init(packageJson, queries, options) {
 
   try {
     if (options.atomicParsley) {
-      if (!fs.existsSync(options.atomicParsley))
+      if (!(await maybeStat(options.atomicParsley)))
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
       if (!(await isBinaryFile(options.atomicParsley)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
@@ -644,7 +645,7 @@ async function init(packageJson, queries, options) {
     process.exit(7);
   }
 
-  function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
+  async function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
       const validStats = stats.filter(stat => (stat.code === 0 ? stat.complete : !stat.code));
       if (validStats.length) {
@@ -653,9 +654,8 @@ async function init(packageJson, queries, options) {
           Config.playlist.dir || BASE_DIRECTORY,
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
-        const isNew =
-          !(fs.existsSync(playlistFile) && fs.statSync(playlistFile).size) || !(!options.playlistNoappend || shouldAppend);
-        const plStream = fs.createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
+        const isNew = !(await maybeStat(playlistFile).then(({size}) => size)) || !(!options.playlistNoappend || shouldAppend);
+        const plStream = createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
         if (isNew) {
           plStream.write('#EXTM3U\n');
           if (playlistTitle) plStream.write(`#${playlistTitle.replace(/\n/gm, '\n# ')}\n`);
@@ -759,13 +759,13 @@ async function init(packageJson, queries, options) {
             .use('progressBar', (dataSlice, store) => store.get('progressBar').next(dataSlice.next));
         } else feed.on('loaded', () => logger.write(opts.altMessage()));
 
-        feed.setHeadHandler(({acceptsRanges}) => {
+        feed.setHeadHandler(async ({acceptsRanges}) => {
           let [offset, writeStream] = [];
-          if (acceptsRanges && fs.existsSync(outputFile)) ({size: offset} = fs.statSync(outputFile));
+          if (acceptsRanges) await maybeStat(outputFile).then(({size}) => (offset = size));
           if (offset) {
             opts.resumeHandler(offset);
-            writeStream = fs.createWriteStream(outputFile, {flags: 'a'});
-          } else writeStream = fs.createWriteStream(outputFile, {flags: 'w'});
+            writeStream = createWriteStream(outputFile, {flags: 'a'});
+          } else writeStream = createWriteStream(outputFile, {flags: 'w'});
           feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
           return offset;
         });
@@ -783,7 +783,7 @@ async function init(packageJson, queries, options) {
         } else logger.write(opts.altMessage());
 
         let has_erred = false;
-        const writeStream = fs.createWriteStream(outputFile);
+        const writeStream = createWriteStream(outputFile);
 
         merge2(
           ...urlOrFragments.map((frag, i) => {
@@ -1003,7 +1003,7 @@ async function init(packageJson, queries, options) {
             'ipod',
             outfile,
           );
-          await fs.promises.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
+          await fs.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
         } catch (err) {
           throw {err, code: 7};
         } finally {
@@ -1020,12 +1020,14 @@ async function init(packageJson, queries, options) {
       await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
       const wroteImage =
         !!options.cover &&
-        (outArtPath =>
-          !(fs.existsSync(outArtPath) && !fs.statSync(outArtPath).isFile()) &&
-          (fs.copyFileSync(files.image.file.path, outArtPath), true))(xpath.join(meta.outFileDir, options.cover));
+        (await (async outArtPath =>
+          (await maybeStat(outArtPath).then(stat => stat && stat.isFile())) ||
+          (await fs.copyFile(files.image.file.path, outArtPath), true))(
+          xpath.join(meta.outFileDir, `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
+        ));
       await encodeQueue.push({track, meta, files});
       await embedQueue.push({track, meta, files, audioSource});
-      return {wroteImage, finalSize: fs.statSync(meta.outFilePath).size};
+      return {wroteImage, finalSize: (await fs.stat(meta.outFilePath)).size};
     },
   );
 
@@ -1149,7 +1151,7 @@ async function init(packageJson, queries, options) {
       );
       const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.m4a`;
       const outFilePath = xpath.join(outFileDir, outFileName);
-      const fileExists = fs.existsSync(outFilePath);
+      const fileExists = !!(await maybeStat(outFilePath));
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
@@ -1387,7 +1389,7 @@ async function init(packageJson, queries, options) {
           );
       });
       if (queryStat.isCollection)
-        createPlaylist(
+        await createPlaylist(
           `Collection URI: ${source.uri}`,
           trackStats,
           queryLogger,
@@ -1404,7 +1406,7 @@ async function init(packageJson, queries, options) {
   const totalQueries = [...options.input, ...queries];
   const trackStats = (await pFlatten(queryQueue.push(totalQueries))).filter(Boolean);
   if ((options.playlist && typeof options.playlist === 'string') || Config.playlist.always)
-    createPlaylist(
+    await createPlaylist(
       null,
       trackStats,
       stackLogger,
@@ -1446,7 +1448,6 @@ async function init(packageJson, queries, options) {
     );
     stackLogger.log(`     \u2715 Failed:  [${prePadNum(finalStats.failed, 10)}]`);
     stackLogger.log(` [\u2022] Output directory: [${BASE_DIRECTORY}]`);
-    stackLogger.log(` [\u2022] Cover Art: ${options.cover} (${Config.image.height}x${Config.image.width})`);
     stackLogger.log(` [\u2022] Total Output size: ${xbytes(finalStats.outSize)}`);
     stackLogger.log(` [\u2022] Total Network Usage: ${xbytes(finalStats.netSize)}`);
     stackLogger.log(`     \u266b Media: ${xbytes(finalStats.mediaSize)}`);
@@ -1497,7 +1498,7 @@ function prepCli(packageJson) {
     .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
     .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
     .option('-d, --directory <DIR>', 'save tracks to DIR/..')
-    .option('-c, --cover <NAME>', 'custom name for the cover art', 'cover.png')
+    .option('-c, --cover <NAME>', 'custom name for the cover art, excluding the extension', 'cover')
     .option(
       '--cover-size <SIZE>',
       ['preferred cover art dimensions', '(format: <width>x<height> or <size> as <size>x<size>)'].join('\n'),
@@ -1802,7 +1803,7 @@ function prepCli(packageJson) {
     .option('-o, --output <FILE>', 'write to file as opposed to stdout')
     .option('-t, --no-tag', 'skip comments with info or meta for each entry')
     .action(async (urls, args) => {
-      const output = args.output ? fs.createWriteStream(args.output) : process.stdout;
+      const output = args.output ? createWriteStream(args.output) : process.stdout;
       // eslint-disable-next-line no-shadow
       async function urify(urls) {
         urls.forEach(url => {
@@ -1858,7 +1859,7 @@ function prepCli(packageJson) {
 }
 
 async function main(argv) {
-  let packageJson = JSON.parse(fs.readFileSync(xpath.join(__dirname, 'package.json')).toString());
+  let packageJson = JSON.parse((await fs.readFile(xpath.join(__dirname, 'package.json'))).toString());
 
   let {program} = prepCli(packageJson);
 

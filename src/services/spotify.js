@@ -131,6 +131,7 @@ export default class Spotify {
   parseURI(uri) {
     const parsed = spotifyUri.parse(this.validateType(uri));
     parsed.url = spotifyUri.formatOpenURL(parsed);
+    parsed.uri = spotifyUri.formatURI(parsed);
     return parsed;
   }
 
