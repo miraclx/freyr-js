@@ -78,7 +78,7 @@ async function run_tests(suite, args, i) {
   if ((clean = !!~(i = args.indexOf('--clean')))) args.splice(i, 1);
   if (await maybeStat(stage_path))
     if (!force) throw new Error(`stage path [${stage_path}] already exists`);
-    else if (clean) await fs.rmdir(stage_path);
+    else if (clean) await fs.rm(stage_path, { recursive: true });
 
   let is_gha = 'GITHUB_ACTIONS' in process.env && process.env['GITHUB_ACTIONS'] === 'true';
 
