@@ -18,7 +18,7 @@ RUN go install github.com/tj/node-prune@1159d4c \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
-FROM alpine:3.16.1 as base
+FROM alpine:3.16.2 as base
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache nodejs ffmpeg python3 \
