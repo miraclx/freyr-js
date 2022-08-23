@@ -7,13 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fix YouTube feed sourcing logic after dependency update. <https://github.com/miraclx/freyr-js/pull/299>
+- Update minimum Node.js version to `v14`. <https://github.com/miraclx/freyr-js/pull/293>
+- Remove the temporary image downloaded when an error is detected. <https://github.com/miraclx/freyr-js/commit/5e7f5513bad9fd7366cd5bf562a516584308c74f>
+- Revamp the test runner. <https://github.com/miraclx/freyr-js/pull/303>, <https://github.com/miraclx/freyr-js/pull/304>
+
+## [0.8.1] - 2022-08-04
+
+- Ensure maximum compatibility with axios when npm fails to install an expected version. <https://github.com/miraclx/freyr-js/pull/291>
+
+## [0.8.0] - 2022-08-04
+
+- Refactored the Dockerfile, and reduced the docker image size by 23%. <https://github.com/miraclx/freyr-js/issues/257>
+- Manually compile `AtomicParsley` during docker build to allow for maximum platform support. <https://github.com/miraclx/freyr-js/pull/212>
+- Add Mac M1 support to the docker image. <https://github.com/miraclx/freyr-js/pull/214>
+- Made docker build faster by caching and unbinding nondependent layers. <https://github.com/miraclx/freyr-js/pull/273>, <https://github.com/miraclx/freyr-js/pull/268>
+- Fix `yarn install` not ahering to dependency overrides. <https://github.com/miraclx/freyr-js/pull/215>
+- Add ability to disable the progressbar. <https://github.com/miraclx/freyr-js/pull/263>
+- Remove persistent `tty` writing for normal logs. Allowing `stdout` piping for everything except the progressbar. <https://github.com/miraclx/freyr-js/pull/231>
+- Fix long standing issue with freyr seeming frozen on exit. <https://github.com/miraclx/freyr-js/pull/216>
+- Upgraded to ES6 Modules. <https://github.com/miraclx/freyr-js/pull/202>
+- Introduced the pushing of docker images for each PR. <https://github.com/miraclx/freyr-js/pull/218>, <https://github.com/miraclx/freyr-js/pull/228>
+- Introduced a test runner, with local reproducible builds. <https://github.com/miraclx/freyr-js/pull/264>
+- Redesigned the auth page a bit. <https://github.com/miraclx/freyr-js/pull/286>
+- Introduced CI checks for formatting.
+- Updated dependencies.
+- Removed some unused dependencies. <https://github.com/miraclx/freyr-js/pull/217>, <https://github.com/miraclx/freyr-js/pull/245>
+
+## [0.7.0] - 2022-06-09
+
+- Updated Apple Music access key. <https://github.com/miraclx/freyr-js/pull/191>
 - Simplified the output of using the `-v, --version`. <https://github.com/miraclx/freyr-js/pull/152>
 - Dropped extra version in the header. <https://github.com/miraclx/freyr-js/pull/153>
 - Fixed issue with docker build not bundling dependencies. <https://github.com/miraclx/freyr-js/pull/165>
 - Update dependencies.
-  - `eslint`: `8.9.0` -> `8.11.0`. <https://github.com/miraclx/freyr-js/pull/154> <https://github.com/miraclx/freyr-js/pull/161>
-  - `actions/setup-node`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/155>
-  - `actions/checkout`: `v2` -> `v3`. <https://github.com/miraclx/freyr-js/pull/156>
 
 ## [0.6.0] - 2022-02-21
 
@@ -34,6 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/miraclx/freyr-js/releases/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/miraclx/freyr-js/releases/tag/v0.5.0

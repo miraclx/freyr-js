@@ -1,15 +1,15 @@
 /* eslint-disable max-classes-per-file, no-underscore-dangle */
-const util = require('util');
+import util from 'util';
 
-const got = require('got').default;
-const Promise = require('bluebird');
-const ytSearch = require('yt-search');
-const youtubedl = require('youtube-dl-exec');
+import got from 'got';
+import Promise from 'bluebird';
+import ytSearch from 'yt-search';
+import youtubedl from 'youtube-dl-exec';
 
-const walk = require('../walkr');
-const symbols = require('../symbols');
-const textUtils = require('../text_utils');
-const AsyncQueue = require('../async_queue');
+import walk from '../walkr.js';
+import symbols from '../symbols.js';
+import textUtils from '../text_utils.js';
+import AsyncQueue from '../async_queue.js';
 
 class YouTubeSearchError extends Error {
   constructor(message, statusCode, status, body) {
@@ -59,7 +59,7 @@ function genAsyncGetFeedsFn(url) {
     });
 }
 
-class YouTubeMusic {
+export class YouTubeMusic {
   static [symbols.meta] = {
     ID: 'yt_music',
     DESC: 'YouTube Music',
@@ -128,7 +128,7 @@ class YouTubeMusic {
     if (typeof queryObject !== 'object') throw new Error('<queryObject> must be an object');
     if (params && typeof params !== 'object') throw new Error('<params>, if defined must be an object');
     const response = await this.#request('https://music.youtube.com/youtubei/v1/search', {
-      timeout: 10000,
+      timeout: {request: 10000},
       method: 'post',
       searchParams: {alt: 'json', key: await this.#getApiKey(), ...params},
       responseType: 'json',
@@ -338,7 +338,7 @@ class YouTubeMusic {
   }
 }
 
-class YouTube {
+export class YouTube {
   static [symbols.meta] = {
     ID: 'youtube',
     DESC: 'YouTube',
@@ -444,5 +444,3 @@ class YouTube {
     return Object.values(final).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
   }
 }
-
-module.exports = {YouTube, YouTubeMusic};

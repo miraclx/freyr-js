@@ -1,0 +1,122 @@
+{
+  "spotify": {
+    "track": {
+      "uri": "https://open.spotify.com/track/5FNS5Vj69AhRGJWjhrAd01",
+      "expect": [
+        "[•] Collation Complete",
+        "[•] Total tracks: [01]",
+        "✓ Passed:  [01]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "album": {
+      "uri": "https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B",
+      "expect": [
+        "[•] Collation Complete",
+        "[•] Total tracks: [04]",
+        "✓ Passed:  [04]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "artist": {
+      "uri": "https://open.spotify.com/artist/4adSXA1GDOxNG7Zw89YHyz",
+      "filter": [
+        "album=\"the rainbow cassette\"",
+        "album=\"make believe\""
+      ],
+      "expect": [
+        "[•] Collation Complete",
+        "✓ Passed:  [10]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "playlist": {
+      "uri": "https://open.spotify.com/playlist/5KcCGEx7fFqXYNiJkSQ5KT",
+      "expect": [
+        "[•] Collation Complete",
+        "✓ Passed:  [05]",
+        "✕ Failed:  [00]"
+      ]
+    }
+  },
+  "apple_music": {
+    "track": {
+      "uri": "https://music.apple.com/us/album/elio-irl/1547735824?i=1547736100",
+      "expect": [
+        "[•] Collation Complete",
+        "[•] Total tracks: [01]",
+        "✓ Passed:  [01]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "album": {
+      "uri": "https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443",
+      "expect": [
+        "[•] Collation Complete",
+        "[•] Total tracks: [04]",
+        "✓ Passed:  [04]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "artist": {
+      "uri": "https://music.apple.com/us/artist/mazie/1508029053",
+      "filter": [
+        "album=\"the rainbow cassette\"",
+        "album=\"make believe\""
+      ],
+      "expect": [
+        "[•] Collation Complete",
+        "✓ Passed:  [10]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "playlist": {
+      "uri": "https://music.apple.com/us/playlist/songs-from-up-next-bazzi/pl.56c4bdf909954beca0cf69379a48144f",
+      "expect": [
+        "[•] Collation Complete",
+        "✓ Passed:  [06]",
+        "✕ Failed:  [00]"
+      ]
+    }
+  },
+  "deezer": {
+    "track": {
+      "uri": "https://www.deezer.com/en/track/1189202982",
+      "expect": [
+        "[•] Collation Complete",
+        "[•] Total tracks: [01]",
+        "✓ Passed:  [01]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "album": {
+      "uri": "https://www.deezer.com/en/album/123330212",
+      "expect": [
+        "[•] Collation Complete",
+        "[•] Total tracks: [04]",
+        "✓ Passed:  [04]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "artist": {
+      "uri": "https://www.deezer.com/en/artist/14808825",
+      "filter": [
+        "album=\"the rainbow cassette\"",
+        "album=\"make believe\""
+      ],
+      "expect": [
+        "[•] Collation Complete",
+        "✓ Passed:  [10]",
+        "✕ Failed:  [00]"
+      ]
+    },
+    "playlist": {
+      "uri": "https://www.deezer.com/en/playlist/10004168842",
+      "expect": [
+        "[•] Collation Complete",
+        "✓ Passed:  [05]",
+        "✕ Failed:  [00]"
+      ]
+    }
+  }
+}

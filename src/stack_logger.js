@@ -1,53 +1,8 @@
 /* eslint-disable no-underscore-dangle */
-const fs = require('fs');
-const tty = require('tty');
-const util = require('util');
+import util from 'util';
 
-function isActivelyWritable(stream) {
-  return (
-    stream &&
-    [stream.on, stream.once, stream.pipe, stream.write].every(slot => typeof slot === 'function') &&
-    !(
-      stream._writableState.ended ||
-      stream._writableState.closed ||
-      (typeof stream.destroyed === 'function' ? stream.destroyed() : stream.destroyed)
-    )
-  );
-}
-
-function getPersistentStream(store, prop = null, isTTY = false) {
-  // if persistence is allowed and one active stream exists, return that
-  // else, if stored stream is active, return that
-  // else, if prop is active, return that
-  // else, test stdout and stderr for activity
-  // else, create forced tty. Store if persistence is allowed
-  const devices = [
-    [store.cache ? getPersistentStream.persist : null, true], // if you want persistence, forward any created device
-    [store.output, store.isTTY],
-    [prop, isTTY],
-    [process.stdout, true],
-    [process.stderr, true],
-  ];
-  let [device] =
-    devices.find(
-      ([output, shouldBeTTY]) =>
-        output && isActivelyWritable(output) && (!shouldBeTTY || (output instanceof tty.WriteStream && output.isTTY)),
-    ) || [];
-  if (!device) {
-    // create persistent tty if neither options are writable or valid TTYs
-    device = new tty.WriteStream(fs.openSync('/dev/tty', 'w'));
-    store.output = device;
-    store.isTTY = true;
-    if (store.cache) getPersistentStream.persist = device;
-  }
-  return device;
-}
-
-class StackLogger {
+export default class StackLogger {
   #store = {
-    output: null, // custom stream to write to. stdout, stderr or forced tty
-    isTTY: null, // whether or not the specified custom stream should be an actual TTY
-    cache: false, // whether or not to cache custom-created persisted tty, if any
     indent: 0, // indentation for this instance
     indentSize: 0, // indentation for next instance from ours
     indentor: ' ', // indentation character
@@ -57,9 +12,6 @@ class StackLogger {
   /**
    * Create stacking loggers by means of indentation
    * @param {{}} [opts] Options
-   * @param {NodeJS.WritableStream} [opts.output] Optional output stream to write to.
-   * @param {boolean} [opts.isTTY] Whether or not the output stream can be expected to be a TTY
-   * @param {boolean} [opts.cache] Whether or not to cache custom-created TTYs.
    * @param {number} [opts.indent] Indentation from 0 for this instance.
    * @param {any} [opts.indentor] Indentation fill for indentation range.
    * @param {number} [opts.indentSize] Size for subsequent instances created from self.
@@ -67,9 +19,6 @@ class StackLogger {
    */
   constructor(opts) {
     opts = opts || {};
-    this.#store.isTTY = opts.isTTY || false;
-    this.#store.persist = opts.persist || false;
-    this.#store.output = opts.output;
     this.#store.indent = opts.indent && typeof opts.indent === 'number' ? opts.indent : 0;
     this.#store.indentor = opts.indentor || ' ';
     this.#store.indentSize = opts.indentSize && typeof opts.indentSize === 'number' ? opts.indentSize : 2;
@@ -106,9 +55,6 @@ class StackLogger {
   /**
    * Opts to extend self with
    * @param {{}} [opts] Options
-   * @param {NodeJS.WritableStream} [opts.isTTY] Optional output stream to write to.
-   * @param {boolean} [opts.isTTY] Whether or not the output stream can be expected to be a TTY
-   * @param {boolean} [opts.cache] Whether or not to cache custom-created TTYs.
    * @param {number} [opts.indent] Indentation from 0 for this instance.
    * @param {any} [opts.indentor] Indentation fill for indentation range.
    * @param {number} [opts.indentSize] Size for subsequent instances created from self.
@@ -132,46 +78,35 @@ class StackLogger {
   }
 
   /**
-   * Write messages. Optionally to the specified stream.
-   * @param {any[]} content Messages to be written
-   * @param {NodeJS.ReadableStream} [stream] Fallback stream to be written to
-   * @param {boolean} [isTTY] Whether or not fallback stream is expected to be a TTY (default: `false`)
-   */
-  _write(content, stream, isTTY = false) {
-    const out = getPersistentStream(this.#store, stream, isTTY);
-    out.write(content);
-  }
-
-  /**
-   * Write raw text to the output device
+   * Write raw text to stdout
    * * Adds no indentation and no EOL
    * * Returns self without extending indentation
    * @param {...any} msgs Messages to write out
    */
   write(...msgs) {
-    this._write(this.getText(0, msgs), process.stdout, true);
+    process.stdout.write(this.getText(0, msgs));
     return this;
   }
 
   /**
-   * Write raw text to the output device
+   * Write indented text to stdout
    * * Adds indentation but no EOL
    * * Returns a stacklogger with extended indentation if `opts.autoTick` else `this`
    * @param {...any} msgs Messages to write out
    */
   print(...msgs) {
-    this._write(this.getText(this.#store.indent, msgs), process.stdout, true);
+    process.stdout.write(this.getText(this.#store.indent, msgs));
     return this.#store.autoTick ? this.tick(this.#store.indentSize) : this;
   }
 
   /**
-   * Write primarily to stdout with an EOL
+   * Write indented line to stdout
    * * Adds indentation and EOL
    * * Returns a stacklogger with extended indentation if `opts.autoTick` else `this`
    * @param {...any} msgs Messages to write out
    */
   log(...msgs) {
-    this._write(this.getText(this.#store.indent, msgs).concat('\n'), process.stdout, true);
+    process.stdout.write(this.getText(this.#store.indent, msgs).concat('\n'));
     return this.#store.autoTick ? this.tick(this.#store.indentSize) : this;
   }
 
@@ -192,7 +127,7 @@ class StackLogger {
    * @param {...any} msgs Messages to write out
    */
   warn(...msgs) {
-    this._write(this.getText(this.#store.indent, msgs).concat('\n'), process.stderr, true);
+    process.stderr.write(this.getText(this.#store.indent, msgs).concat('\n'));
     return this.#store.autoTick ? this.tick(this.#store.indentSize) : this;
   }
 
@@ -213,5 +148,3 @@ class StackLogger {
     return util.formatWithOptions({colors: true}, ...msgs);
   }
 }
-
-module.exports = StackLogger;

@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD001 MD007 MD023 MD041 -->
+<!-- markdownlint-disable MD001 MD007 MD023 MD041 MD051 -->
 
 <div align="center">
   <a href="https://github.com/miraclx/freyr-js">
@@ -254,9 +254,9 @@ Usage: freyr [options] [query...]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.8.1
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Usage: freyr get [options] [query...]
 
@@ -273,7 +273,7 @@ Options:
                                (`infinite` for infinite) (default: 10)
   -t, --meta-retries <N>       set number of retries for collating track feeds (`infinite` for infinite) (default: 5)
   -d, --directory <DIR>        save tracks to DIR/..
-  -c, --cover <NAME>           custom name for the cover art (default: "cover.png")
+  -c, --cover <NAME>           custom name for the cover art, excluding the extension (default: "cover")
   --cover-size <SIZE>          preferred cover art dimensions
                                (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
   -C, --no-cover               skip saving a cover art
@@ -349,9 +349,9 @@ Info:
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.8.1
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [spotify:track:5FNS5Vj69AhRGJWjhrAd01]
@@ -410,9 +410,9 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.8.1
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443]
@@ -495,9 +495,9 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.1.0
+              /____/ v0.8.1
 
-freyr v0.1.0 - (c) Miraculous Owonubi <omiraculous@gmail.com>
+freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
 Checking directory permissions...[done]
 [https://www.deezer.com/us/artist/14808825]
@@ -1081,7 +1081,17 @@ cd freyr
   yarn link
   ```
 
+### Testing
+
+Freyr comes bundled with a lightweight test suite. See [TEST.md](https://github.com/miraclx/freyr-js/blob/master/TEST.md) for instructions on how to run it.
+
 ### Docker Development
+
+With docker, you can drop into a sandbox that has all the dependencies you need. Without needing to mess around with your host system or install any weird dependencies.
+
+First, you need to either build a local docker image or submit a PR and use the corresponding auto-generated image.
+
+#### Building A Local Image
 
 The default provided [Dockerfile](https://github.com/miraclx/freyr-js/raw/master/Dockerfile) builds minimal alpine images. Average build network usage is ~ 80 MB and disk usage is ~ 180 MB.
 
@@ -1091,7 +1101,21 @@ cd freyr
 docker build -t freyr-dev .
 ```
 
-Afterwards, you can drop into the container by explicitly defining the entrypoint
+#### Working With Remote Images
+
+An alternative to building the docker image locally is to use a remote image. By default, all PRs submitted to this repository get an equivalently tagged docker image for testing.
+
+For example, the PR #214 has a docker image called `freyrcli/freyrjs-git:pr-214`. And it stays updated with the current state of the branch.
+
+You can then pull the development image for use locally.
+
+```bash
+docker pull freyrcli/freyrjs-git:pr-214
+```
+
+---
+
+Once you have a built development image locally, you're ready to go. You can drop into the container by explicitly defining the entrypoint
 
 ```bash
 docker run -it --entrypoint bash freyr-dev
@@ -1099,6 +1123,8 @@ docker run -it --entrypoint bash freyr-dev
 # Alternatively, create a handy alias
 alias freyrsh='docker run -it --entrypoint bash freyr-dev'
 ```
+
+*: don't forget to replace `freyr-dev` with the appropriate image name if you pulled one of the auto-generated remote images.
 
 Optionally, you can use these interesting flags to customize the experience.
 

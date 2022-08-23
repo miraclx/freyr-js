@@ -1,13 +1,13 @@
 /* eslint-disable consistent-return */
-const {sortBy} = require('lodash');
+import _sortBy from 'lodash.sortby';
 
-const symbols = require('./symbols');
-const {YouTube, YouTubeMusic} = require('./services/youtube');
-const Deezer = require('./services/deezer');
-const Spotify = require('./services/spotify');
-const AppleMusic = require('./services/apple_music');
+import symbols from './symbols.js';
+import {YouTube, YouTubeMusic} from './services/youtube.js';
+import Deezer from './services/deezer.js';
+import Spotify from './services/spotify.js';
+import AppleMusic from './services/apple_music.js';
 
-class FreyrCore {
+export default class FreyrCore {
   static ENGINES = [Deezer, Spotify, AppleMusic, YouTube, YouTubeMusic];
 
   static getBitrates() {
@@ -32,7 +32,7 @@ class FreyrCore {
 
   static sortSources(order) {
     order = order ? (Array.isArray(order) ? order : [order]) : [];
-    return sortBy(this.collateSources(), source =>
+    return _sortBy(this.collateSources(), source =>
       (index => (index < 0 ? Infinity : index))(order.indexOf(source[symbols.meta].ID)),
     );
   }
@@ -54,5 +54,3 @@ class FreyrCore {
 
   sortSources = FreyrCore.sortSources;
 }
-
-module.exports = FreyrCore;

@@ -1,20 +1,20 @@
 {
   "name": "freyr",
-  "version": "0.6.0",
+  "version": "0.8.1",
   "description": "A versatile, service-agnostic music downloader and manager",
-  "main": "src/freyr.js",
-  "scripts": {
-    "push": "git push github master"
-  },
+  "exports": "./src/freyr.js",
+  "type": "module",
   "bin": {
-    "freyr": "cli.js"
+    "freyr": "./cli.js"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
+  },
+  "scripts": {
+    "test": "node test/index.js"
   },
   "files": [
     "src",
-    "typings",
     "conf.json",
     "banner.js"
   ],
@@ -52,59 +52,66 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@yujinakayama/apple-music": "^0.4.1",
-    "async": "^3.2.0",
-    "axios": "^0.26.0",
+    "async": "^3.2.4",
     "bluebird": "^3.7.2",
-    "commander": "^9.0.0",
-    "conf": "^10.0.0",
-    "cookie-parser": "^1.4.5",
+    "commander": "^9.3.0",
+    "conf": "^10.1.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "country-data": "0.0.31",
-    "express": "^4.17.1",
-    "filenamify": "^4.3.0",
+    "es-main": "^1.0.2",
+    "express": "^4.18.1",
+    "file-type": "^17.1.6",
+    "filenamify": "^5.1.1",
     "fluent-ffmpeg": "^2.1.2",
-    "got": "^11.8.1",
+    "got": "^12.1.0",
     "hh-mm-ss": "^1.2.0",
-    "html-entities": "^2.0.6",
-    "is-online": "^9.0.0",
+    "html-entities": "^2.3.3",
     "isbinaryfile": "^5.0.0",
-    "libxget": "^0.9.2",
-    "lodash": "^4.17.20",
+    "libxget": "^0.10.0",
+    "lodash.merge": "^4.6.2",
+    "lodash.mergewith": "^4.6.2",
+    "lodash.sortby": "^4.7.0",
     "merge2": "^1.4.1",
-    "minimatch": "^5.0.0",
+    "minimatch": "^5.1.0",
     "mkdirp": "^1.0.4",
     "node-cache": "^5.1.2",
-    "open": "^8.0.0",
-    "pretty-ms": "^7.0.1",
-    "spotify-uri": "^3.0.0",
-    "spotify-web-api-node": "^5.0.0",
-    "stringd": "^2.1.0",
-    "stringd-colors": "^1.9.0",
+    "open": "^8.4.0",
+    "pretty-ms": "^8.0.0",
+    "public-ip": "^6.0.1",
+    "spotify-uri": "^3.0.2",
+    "spotify-web-api-node": "^5.0.2",
+    "stringd": "^2.2.0",
+    "stringd-colors": "^1.10.0",
     "stripchar": "^1.2.1",
     "tmp": "^0.2.1",
-    "tough-cookie": "^4.0.0",
-    "xbytes": "^1.6.2",
+    "xbytes": "^1.8.0",
     "xml2js": "^0.4.23",
-    "xprogress": "^0.17.3",
-    "youtube-dl-exec": "^2.0.0",
+    "xprogress": "^0.19.1",
+    "youtube-dl-exec": "^2.1.4",
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.17.0",
-    "eslint": "8.13.0",
-    "eslint-plugin-prettier": "4.0.0",
-    "prettier": "2.6.2"
+    "eslint": "8.22.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "prettier": "2.7.1"
   },
   "overrides": {
     "yt-search": {
       "node-fzf": {
         ".": "0.11.0",
-        "cli-color": "2.0.0",
-        "string-width": "5.1.0"
+        "cli-color": "2.0.3",
+        "string-width": "5.1.2"
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "0.26.0"
+      "axios": "0.27.2"
     }
+  },
+  "resolutions": {
+    "@yujinakayama/apple-music/axios": "0.27.2",
+    "yt-search/node-fzf": "0.11.0",
+    "yt-search/node-fzf/cli-color": "2.0.3",
+    "yt-search/node-fzf/string-width": "5.1.2"
   }
 }

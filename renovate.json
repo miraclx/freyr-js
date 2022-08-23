@@ -10,28 +10,17 @@
     {
       "enabled": false,
       "matchFiles": [
+        ".github/workflows/tests.yml",
         ".github/workflows/publish.yml"
       ],
       "matchPackageNames": [
         "docker/login-action",
         "docker/metadata-action",
         "docker/build-push-action",
+        "docker/setup-qemu-action",
+        "docker/setup-buildx-action",
         "ffurrer2/extract-release-notes"
       ]
-    },
-    {
-      // got >=v12 is an ESM package
-      "matchPackageNames": [
-        "got"
-      ],
-      "allowedVersions": "<12"
-    },
-    {
-      // filenamify >=v5 is an ESM package
-      "matchPackageNames": [
-        "filenamify"
-      ],
-      "allowedVersions": "<5"
     }
   ]
 }
