@@ -1527,6 +1527,7 @@ function prepCli(packageJson) {
       ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
       'yt_music',
     )
+    .option('-m, --musicbrainz', 'attempt to source and embed extra metadata from MusicBrainz')
     .option(
       '-l, --filter <MATCH>',
       [
@@ -1577,7 +1578,7 @@ function prepCli(packageJson) {
     )
     .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
     .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
-    .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
+    .option('-M, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
     .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
     .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
     .option('--no-auth', 'skip authentication procedure')

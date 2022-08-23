@@ -1,6 +1,6 @@
-const got = require('got');
-const NodeCache = require('node-cache');
-const {parseStringPromise: xml2js} = require('xml2js');
+import got from 'got';
+import NodeCache from 'node-cache';
+import xml2js from 'xml2js';
 
 class MusicBrainzError extends Error {
   constructor(message, statusCode) {
@@ -21,7 +21,7 @@ async function query(entity_type, entity, args) {
     let body;
     try {
       body = response.body.startsWith('<?xml')
-        ? await xml2js(response.body, {trim: true, mergeAttrs: true, explicitRoot: false, explicitArray: false})
+        ? await xml2js.parseStringPromise(response.body, {trim: true, mergeAttrs: true, explicitRoot: false, explicitArray: false})
         : JSON.parse(response.body);
     } catch {
       throw new MusicBrainzError('Invalid Server Response');
@@ -66,4 +66,4 @@ async function lookupISRC(isrc, storefront) {
   };
 }
 
-module.exports = {lookupISRC};
+export default {lookupISRC};
