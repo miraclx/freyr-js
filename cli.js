@@ -1230,7 +1230,7 @@ async function init(packageJson, queries, options) {
     if (!playlist) return Promise.reject();
     logger.log(`\u27a4 Playlist Name: ${playlist.name}`);
     logger.log(`\u27a4 By: ${playlist.owner_name}`);
-    if (playlist.description) logger.log(`\u27a4 Description: ${entityDecode(playlist.description)}`);
++ if (playlist.description) logger.log(`\u27a4 Description: ${entityDecode(playlist.description.replace(/(<([^>]+)>)/gi, ""))}`);
     logger.log(`\u27a4 Type: ${playlist.type}`);
     if (playlist.followers) logger.log(`\u27a4 Followers: ${`${playlist.followers}`.replace(/(\d)(?=(\d{3})+$)/g, '$1,')}`);
     logger.log(`\u27a4 Tracks: ${playlist.ntracks}`);
