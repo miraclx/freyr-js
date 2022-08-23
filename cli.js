@@ -37,6 +37,7 @@ import FreyrCore from './src/freyr.js';
 import AuthServer from './src/cli_server.js';
 import AsyncQueue from './src/async_queue.js';
 import parseRange from './src/parse_range.js';
+import musicBrainz from './src/musicbrainz.js';
 import StackLogger from './src/stack_logger.js';
 import streamUtils from './src/stream_utils.js';
 import parseSearchFilter from './src/filter_parser.js';
