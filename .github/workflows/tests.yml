@@ -440,6 +440,8 @@ jobs:
 
   docker-publish:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
     - name: Checkout Repository
@@ -472,7 +474,7 @@ jobs:
         echo "::set-output name=sha::$SHA"
 
     - name: Report Docker Image Build Status
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
         message: |
@@ -531,7 +533,7 @@ jobs:
         cache-to: type=gha,mode=max
 
     - name: Report Docker Image Build Status
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
         message: |
