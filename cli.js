@@ -1031,8 +1031,8 @@ async function init(packageJson, queries, options) {
         encodedBy: 'd3vc0dr', // ©enc
         artwork: files.image.file.path, // covr
         // sortOrder: [
-        //   // ['name', 'NAME'], // sonm
-        //   // ['album', 'NAME'], // soal
+        //   ['name', 'NAME'], // sonm
+        //   ['album', 'NAME'], // soal
         //   ['artist', track.musicBrainz.artistSortOrder], // soar
         //   ['albumartist', track.musicBrainz.artistSortOrder], // soaa
         // ],
