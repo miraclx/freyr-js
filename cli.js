@@ -991,19 +991,21 @@ async function init(packageJson, queries, options) {
         gapless: options.gapless, // pgap
         rDNSatom: [
           // ----
+          ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
           [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
           [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
           [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.trackId, 'name="MusicBrainz Track Id"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.artistId, 'name="MusicBrainz Artist Id"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.artistId, 'name="MusicBrainz Album Artist Id"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.releaseId, 'name="MusicBrainz Album Id"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.releaseCountry, 'name="MusicBrainz Album Release Country"', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
-          [track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
+          // There is a bug in Atomic Parsley currently preventing MusicBrainz tagging
+          //[track.musicBrainz.trackId, 'name="MusicBrainz Track Id"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.artistId, 'name="MusicBrainz Artist Id"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.artistId, 'name="MusicBrainz Album Artist Id"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.releaseId, 'name="MusicBrainz Album Id"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.releaseCountry, 'name="MusicBrainz Album Release Country"', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
+          //[track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
           [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
           [
             `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
@@ -1028,12 +1030,12 @@ async function init(packageJson, queries, options) {
         encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
         encodedBy: 'd3vc0dr', // ©enc
         artwork: files.image.file.path, // covr
-        sortOrder: [
-          // ['name', 'NAME'], // sonm
-          // ['album', 'NAME'], // soal
-          ['artist', track.musicBrainz.artistSortOrder], // soar
-          ['albumartist', track.musicBrainz.artistSortOrder], // soaa
-        ],
+        // sortOrder: [
+        //   // ['name', 'NAME'], // sonm
+        //   // ['album', 'NAME'], // soal
+        //   ['artist', track.musicBrainz.artistSortOrder], // soar
+        //   ['albumartist', track.musicBrainz.artistSortOrder], // soaa
+        // ],
       })
         .finally(() => files.image.file.removeCallback())
         .catch(err => Promise.reject({err, code: 8}));
