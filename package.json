@@ -76,6 +76,7 @@
     "minimatch": "^5.1.0",
     "mkdirp": "^1.0.4",
     "node-cache": "^5.1.2",
+    "node-taglib-sharp": "^5.0.0",
     "open": "^8.4.0",
     "pretty-ms": "^8.0.0",
     "public-ip": "^6.0.1",

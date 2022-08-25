@@ -18,6 +18,7 @@ import cStringd from 'stringd-colors';
 import prettyMs from 'pretty-ms';
 import minimatch from 'minimatch';
 import filenamify from 'filenamify';
+import TagLib from "node-taglib-sharp";
 import TimeFormat from 'hh-mm-ss';
 import ProgressBar from 'xprogress';
 import countryData from 'country-data';
@@ -134,6 +135,19 @@ function wrapCliInterface(binaryNames, binaryPath) {
   return (file, args, cb) => {
     if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
   };
+}
+
+function embedTagLib(file, meta, cb) {
+  let myfile = TagLib.File.createFromPath(file)
+
+  meta.forEach((value, key) => {
+    if (value)
+      myfile.tag[key] = value
+  })
+
+  myfile.save()
+  myfile.dispose()
+  cb()
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -932,6 +946,36 @@ async function init(packageJson, queries, options) {
     'cli:postprocessor:embedQueue',
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
+      if (options.format == 'flac') {
+        return Promise.promisify(embedTagLib)(meta.outFilePath, new Map([
+          ['album', track.album],
+          ['albumArtists', track.artists],
+          ['albumArtistsSort', track.musicBrainz?.artistSortOrder],
+          ['composers', track.composers],
+          ['copyright', track.copyrights.sort(({ type }) => (type === 'P' ? -1 : 1))[0].text],
+          ['description', `${meta.service[symbols.meta].DESC}: ${track.uri} , ${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`],
+          ['disc', track.disc_number],
+          ['discCount', track.disc_number],
+          ['genres', track.genres],
+          ['isrc', track.isrc],
+          ['musicBrainzArtistId', track.musicBrainz?.artistId],
+          ['musicBrainzReleaseArtistId', track.musicBrainz?.artistId],
+          ['musicBrainzReleaseCountry', track.musicBrainz?.releaseCountry],
+          ['musicBrainzReleaseGroupId', track.musicBrainz?.releaseGroupId],
+          ['musicBrainzReleaseId', track.musicBrainz?.releaseId],
+          ['musicBrainzReleaseStatus', track.musicBrainz?.releaseStatus],
+          ['musicBrainzReleaseType', track.musicBrainz?.releaseType],
+          ['musicBrainzTrackId', track.musicBrainz?.trackId],
+          ['performers', track.artists],
+          ['title', track.name],
+          ['track', track.track_number],
+          ['trackCount', track.total_tracks],
+          ['year', new Date(track.release_date).getFullYear()],
+        ]))
+          .finally(() => files.image.file.removeCallback())
+          .catch(err => Promise.reject({ err, code: 8 }));
+      }
+      else {
       return Promise.promisify(atomicParsley)(meta.outFilePath, {
         overWrite: '', // overwrite the file
 
@@ -993,6 +1037,7 @@ async function init(packageJson, queries, options) {
       })
         .finally(() => files.image.file.removeCallback())
         .catch(err => Promise.reject({err, code: 8}));
+      }
     },
   );
 
@@ -1003,12 +1048,12 @@ async function init(packageJson, queries, options) {
       return new Promise((res, rej) =>
         ffmpeg()
           .addInput(files.audio.file.path)
-          .audioCodec('aac')
+          .audioCodec(options.format == 'flac' ? 'flac' : 'aac')
           .audioBitrate(options.bitrate)
           .audioFrequency(44100)
           .noVideo()
           .setDuration(TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'))
-          .toFormat('ipod')
+          .toFormat(options.format == 'flac' ? 'flac' : 'ipod')
           .saveToFile(meta.outFilePath)
           .on('error', err => rej({err, code: 7}))
           .on('end', res),
@@ -1154,7 +1199,8 @@ async function init(packageJson, queries, options) {
           ? ` \u2012 ${track.artists.join(', ')}`
           : '',
       );
-      const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.m4a`;
+      const fileExtension = options.format == 'flac' ? 'flac' : 'm4a';
+      const outFileName = `${filenamify(trackBaseName, { replacement: '_' })}.${fileExtension}`;
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = !!(await maybeStat(outFilePath));
       const processTrack = !fileExists || options.force;
