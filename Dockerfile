@@ -1,4 +1,4 @@
-FROM node:18.7.0-alpine3.16 as installer
+FROM node:18.8.0-alpine3.16 as installer
 
 RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmod +x /usr/bin/python3
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
