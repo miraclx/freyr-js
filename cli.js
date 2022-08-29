@@ -18,7 +18,7 @@ import cStringd from 'stringd-colors';
 import prettyMs from 'pretty-ms';
 import minimatch from 'minimatch';
 import filenamify from 'filenamify';
-import TagLib from "node-taglib-sharp";
+import TagLib from 'node-taglib-sharp';
 import TimeFormat from 'hh-mm-ss';
 import ProgressBar from 'xprogress';
 import countryData from 'country-data';
