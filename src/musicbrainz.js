@@ -21,7 +21,12 @@ async function query(entity_type, entity, args) {
     let body;
     try {
       body = response.body.startsWith('<?xml')
-        ? await xml2js.parseStringPromise(response.body, {trim: true, mergeAttrs: true, explicitRoot: false, explicitArray: false})
+        ? await xml2js.parseStringPromise(response.body, {
+            trim: true,
+            mergeAttrs: true,
+            explicitRoot: false,
+            explicitArray: false,
+          })
         : JSON.parse(response.body);
     } catch {
       throw new MusicBrainzError('Invalid Server Response');

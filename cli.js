@@ -138,16 +138,15 @@ function wrapCliInterface(binaryNames, binaryPath) {
 }
 
 function embedTagLib(file, meta, cb) {
-  let myfile = TagLib.File.createFromPath(file)
+  let myfile = TagLib.File.createFromPath(file);
 
   meta.forEach((value, key) => {
-    if (value)
-      myfile.tag[key] = value
-  })
+    if (value) myfile.tag[key] = value;
+  });
 
-  myfile.save()
-  myfile.dispose()
-  cb()
+  myfile.save();
+  myfile.dispose();
+  cb();
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -947,98 +946,105 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       if (options.format == 'flac') {
-        return Promise.promisify(embedTagLib)(meta.outFilePath, new Map([
-          ['album', track.album],
-          ['albumArtists', track.artists],
-          ['albumArtistsSort', track.musicBrainz?.artistSortOrder],
-          ['composers', track.composers],
-          ['copyright', track.copyrights.sort(({ type }) => (type === 'P' ? -1 : 1))[0].text],
-          ['description', `${meta.service[symbols.meta].DESC}: ${track.uri} , ${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`],
-          ['disc', track.disc_number],
-          ['discCount', track.disc_number],
-          ['genres', track.genres],
-          ['isrc', track.isrc],
-          ['musicBrainzArtistId', track.musicBrainz?.artistId],
-          ['musicBrainzReleaseArtistId', track.musicBrainz?.artistId],
-          ['musicBrainzReleaseCountry', track.musicBrainz?.releaseCountry],
-          ['musicBrainzReleaseGroupId', track.musicBrainz?.releaseGroupId],
-          ['musicBrainzReleaseId', track.musicBrainz?.releaseId],
-          ['musicBrainzReleaseStatus', track.musicBrainz?.releaseStatus],
-          ['musicBrainzReleaseType', track.musicBrainz?.releaseType],
-          ['musicBrainzTrackId', track.musicBrainz?.trackId],
-          ['performers', track.artists],
-          ['title', track.name],
-          ['track', track.track_number],
-          ['trackCount', track.total_tracks],
-          ['year', new Date(track.release_date).getFullYear()],
-        ]))
+        return Promise.promisify(embedTagLib)(
+          meta.outFilePath,
+          new Map([
+            ['album', track.album],
+            ['albumArtists', track.artists],
+            ['albumArtistsSort', track.musicBrainz?.artistSortOrder],
+            ['composers', track.composers],
+            ['copyright', track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text],
+            [
+              'description',
+              `${meta.service[symbols.meta].DESC}: ${track.uri} , ${audioSource.service[symbols.meta].DESC}: ${
+                audioSource.source.videoId
+              }`,
+            ],
+            ['disc', track.disc_number],
+            ['discCount', track.disc_number],
+            ['genres', track.genres],
+            ['isrc', track.isrc],
+            ['musicBrainzArtistId', track.musicBrainz?.artistId],
+            ['musicBrainzReleaseArtistId', track.musicBrainz?.artistId],
+            ['musicBrainzReleaseCountry', track.musicBrainz?.releaseCountry],
+            ['musicBrainzReleaseGroupId', track.musicBrainz?.releaseGroupId],
+            ['musicBrainzReleaseId', track.musicBrainz?.releaseId],
+            ['musicBrainzReleaseStatus', track.musicBrainz?.releaseStatus],
+            ['musicBrainzReleaseType', track.musicBrainz?.releaseType],
+            ['musicBrainzTrackId', track.musicBrainz?.trackId],
+            ['performers', track.artists],
+            ['title', track.name],
+            ['track', track.track_number],
+            ['trackCount', track.total_tracks],
+            ['year', new Date(track.release_date).getFullYear()],
+          ]),
+        )
           .finally(() => files.image.file.removeCallback())
-          .catch(err => Promise.reject({ err, code: 8 }));
-      }
-      else {
-      return Promise.promisify(atomicParsley)(meta.outFilePath, {
-        overWrite: '', // overwrite the file
+          .catch(err => Promise.reject({err, code: 8}));
+      } else {
+        return Promise.promisify(atomicParsley)(meta.outFilePath, {
+          overWrite: '', // overwrite the file
 
-        title: track.name, // ©nam
-        artist: track.artists[0], // ©ART
-        composer: track.composers, // ©wrt
-        album: track.album, // ©alb
-        genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
-        tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
-        disk: `${track.disc_number}/${track.disc_number}`, // disk
-        year: new Date(track.release_date).toISOString().split('T')[0], // ©day
-        compilation: track.compilation, // ©cpil
-        gapless: options.gapless, // pgap
-        rDNSatom: [
-          // ----
-          ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
-          [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-          [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
-          [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-          // There is a bug in Atomic Parsley currently preventing MusicBrainz tagging
-          //[track.musicBrainz.trackId, 'name="MusicBrainz Track Id"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.artistId, 'name="MusicBrainz Artist Id"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.artistId, 'name="MusicBrainz Album Artist Id"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.releaseId, 'name="MusicBrainz Album Id"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.releaseCountry, 'name="MusicBrainz Album Release Country"', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
-          //[track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
-          [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
-          [
-            `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
-            'name=PROVIDER',
-            'domain=com.apple.iTunes',
+          title: track.name, // ©nam
+          artist: track.artists[0], // ©ART
+          composer: track.composers, // ©wrt
+          album: track.album, // ©alb
+          genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
+          tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
+          disk: `${track.disc_number}/${track.disc_number}`, // disk
+          year: new Date(track.release_date).toISOString().split('T')[0], // ©day
+          compilation: track.compilation, // ©cpil
+          gapless: options.gapless, // pgap
+          rDNSatom: [
+            // ----
+            ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
+            [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
+            [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
+            [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
+            // There is a bug in Atomic Parsley currently preventing MusicBrainz tagging
+            //[track.musicBrainz.trackId, 'name="MusicBrainz Track Id"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.artistId, 'name="MusicBrainz Artist Id"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.artistId, 'name="MusicBrainz Album Artist Id"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.releaseId, 'name="MusicBrainz Album Id"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.releaseCountry, 'name="MusicBrainz Album Release Country"', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
+            //[track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
+            [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
+            [
+              `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
+              'name=PROVIDER',
+              'domain=com.apple.iTunes',
+            ],
           ],
-        ],
-        advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
-          ? track.contentRating
-          : track.contentRating === true
-          ? 'explicit'
-          : 'Inoffensive',
-        stik: 'Normal', // stik
-        // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
-        // sfID: 0, // ~~~~: store front ID
-        // cnID: 0, // cnID: catalog ID
-        albumArtist: track.album_artist, // aART
-        // ownr? <owner>
-        purchaseDate: 'timestamp', // purd
-        apID: 'cli@freyr.git', // apID
-        copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
-        encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
-        encodedBy: 'd3vc0dr', // ©enc
-        artwork: files.image.file.path, // covr
-        // sortOrder: [
-        //   ['name', 'NAME'], // sonm
-        //   ['album', 'NAME'], // soal
-        //   ['artist', track.musicBrainz.artistSortOrder], // soar
-        //   ['albumartist', track.musicBrainz.artistSortOrder], // soaa
-        // ],
-      })
-        .finally(() => files.image.file.removeCallback())
-        .catch(err => Promise.reject({err, code: 8}));
+          advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+            ? track.contentRating
+            : track.contentRating === true
+            ? 'explicit'
+            : 'Inoffensive',
+          stik: 'Normal', // stik
+          // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
+          // sfID: 0, // ~~~~: store front ID
+          // cnID: 0, // cnID: catalog ID
+          albumArtist: track.album_artist, // aART
+          // ownr? <owner>
+          purchaseDate: 'timestamp', // purd
+          apID: 'cli@freyr.git', // apID
+          copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
+          encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
+          encodedBy: 'd3vc0dr', // ©enc
+          artwork: files.image.file.path, // covr
+          // sortOrder: [
+          //   ['name', 'NAME'], // sonm
+          //   ['album', 'NAME'], // soal
+          //   ['artist', track.musicBrainz.artistSortOrder], // soar
+          //   ['albumartist', track.musicBrainz.artistSortOrder], // soaa
+          // ],
+        })
+          .finally(() => files.image.file.removeCallback())
+          .catch(err => Promise.reject({err, code: 8}));
       }
     },
   );
@@ -1202,7 +1208,7 @@ async function init(packageJson, queries, options) {
           : '',
       );
       const fileExtension = options.format == 'flac' ? 'flac' : 'm4a';
-      const outFileName = `${filenamify(trackBaseName, { replacement: '_' })}.${fileExtension}`;
+      const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.${fileExtension}`;
       const outFilePath = xpath.join(outFileDir, outFileName);
       const fileExists = !!(await maybeStat(outFilePath));
       const processTrack = !fileExists || options.force;
