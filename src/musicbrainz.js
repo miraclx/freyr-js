@@ -45,7 +45,7 @@ async function lookupISRC(isrc, storefront) {
 
   // find one whose storefront matches and is probably digital media, otherwise take the first one
   let {id: releaseId} =
-    releases.find(release => release.country.toLowerCase() === storefront && release.packaging?._.toLowerCase() === 'none') ||
+    releases.find(release => release.country?.toLowerCase() === storefront && release.packaging?._.toLowerCase() === 'none') ||
     releases[0];
 
   let release = await query('release', releaseId, {inc: ['artists', 'release-groups', 'media'], json: true});
