@@ -474,7 +474,7 @@ jobs:
         echo "::set-output name=sha::$SHA"
 
     - name: Report Docker Image Build Status
-      uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
+      uses: marocchino/sticky-pull-request-comment@e3c0353c9ad3f0cad0fbab901e5bcd7d04c6e97b
       if: github.event_name == 'pull_request'
       with:
         message: |
@@ -533,7 +533,7 @@ jobs:
         cache-to: type=gha,mode=max
 
     - name: Report Docker Image Build Status
-      uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
+      uses: marocchino/sticky-pull-request-comment@e3c0353c9ad3f0cad0fbab901e5bcd7d04c6e97b
       if: github.event_name == 'pull_request'
       with:
         message: |
