@@ -19,7 +19,8 @@
         "docker/build-push-action",
         "docker/setup-qemu-action",
         "docker/setup-buildx-action",
-        "ffurrer2/extract-release-notes"
+        "ffurrer2/extract-release-notes",
+        "marocchino/sticky-pull-request-comment"
       ]
     }
   ]

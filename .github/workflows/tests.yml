@@ -9,9 +9,6 @@ on:
   schedule:
     - cron: '0 0 * * WED,SAT' # 00:00 on Wednesdays and Saturdays, weekly.
 
-env:
-  DOCKER_ARGS: "--user root"
-
 jobs:
   up-to-date:
     runs-on: ubuntu-latest
@@ -71,17 +68,23 @@ jobs:
         name: freyr-dev
         path: /tmp/freyr-dev.tar
 
-  spotify:
-    if: false
-    runs-on: ubuntu-latest
-    steps:
-    - run: true
-
-  spotify-track:
+  service-test:
     if: ${{ always() }}
     runs-on: ubuntu-latest
-    needs: [ spotify, docker-build ]
+    strategy:
+      matrix:
+        service:
+          - { id: spotify, name: Spotify }
+          - { id: apple-music, name: "Apple Music", slug: apple_music }
+          - { id: deezer, name: Spotify }
+        test:
+          - { type: track, name: Track }
+          - { type: album, name: Album }
+          - { type: artist, name: Artist }
+          - { type: playlist, name: Playlist }
 
+    name: ${{ matrix.service.id }}-${{ matrix.test.type }}
+    needs: docker-build
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -103,343 +106,15 @@ jobs:
         docker load --input /tmp/freyr-dev.tar
         docker image ls -a
 
-    - name: Spotify - Download Track
-      run: npm test -- --docker freyr-dev spotify.track
-
-  spotify-album:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ spotify, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Spotify - Download Album
-      run: npm test -- --docker freyr-dev spotify.album
-
-  spotify-artist:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ spotify, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Spotify - Download Artist
-      run: npm test -- --docker freyr-dev spotify.artist
-
-  spotify-playlist:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ spotify, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Spotify - Download Playlist
-      run: npm test -- --docker freyr-dev spotify.playlist
-
-  apple-music:
-    if: false
-    runs-on: ubuntu-latest
-    steps:
-    - run: true
-
-  apple-music-track:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ apple-music, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Apple Music - Download Track
-      run: npm test -- --docker freyr-dev apple_music.track
-
-  apple-music-album:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ apple-music, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Apple Music - Download Album
-      run: npm test -- --docker freyr-dev apple_music.album
-
-  apple-music-artist:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ apple-music, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Apple Music - Download Artist
-      run: npm test -- --docker freyr-dev apple_music.artist
-
-  apple-music-playlist:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ apple-music, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Apple Music - Download Playlist
-      run: npm test -- --docker freyr-dev apple_music.playlist
-
-  deezer:
-    if: false
-    runs-on: ubuntu-latest
-    steps:
-    - run: true
-
-  deezer-track:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ deezer, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Deezer - Download Track
-      run: npm test -- --docker freyr-dev deezer.track
-
-  deezer-album:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ deezer, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Deezer - Download Album
-      run: npm test -- --docker freyr-dev deezer.album
-
-  deezer-artist:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ deezer, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Deezer - Download Artist
-      run: npm test -- --docker freyr-dev deezer.artist
-
-  deezer-playlist:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [ deezer, docker-build ]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: freyr-dev
-        path: /tmp
-
-    - name: Load Docker Image
-      run: |
-        docker load --input /tmp/freyr-dev.tar
-        docker image ls -a
-
-    - name: Deezer - Download Playlist
-      run: npm test -- --docker freyr-dev deezer.playlist
-
+    - name: ${{ matrix.service.name }} - Download ${{ matrix.test.name }}
+      env:
+        DOCKER_ARGS: "--user root"
+      run: npm test -- --docker freyr-dev ${{ matrix.service.slug || matrix.service.id }}.${{ matrix.test.type }}
 
   docker-publish:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
     - name: Checkout Repository
@@ -472,7 +147,7 @@ jobs:
         echo "::set-output name=sha::$SHA"
 
     - name: Report Docker Image Build Status
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
         message: |
@@ -531,7 +206,7 @@ jobs:
         cache-to: type=gha,mode=max
 
     - name: Report Docker Image Build Status
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
         message: |
