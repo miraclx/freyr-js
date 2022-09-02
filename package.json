@@ -11,7 +11,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "test": "node test/index.js"
+    "test": "$NODE test/index.js"
   },
   "files": [
     "src",
