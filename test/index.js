@@ -117,7 +117,7 @@ async function run_tests(suite, args, i) {
         mode: fs_constants.W_OK,
       });
 
-      logFile.stream = createWriteStream(null, {fd: logFile.fd});
+      logFile.stream = createWriteStream(null, {fd: logFile.handle});
 
       let logline = line => `│ ${line}`;
 
