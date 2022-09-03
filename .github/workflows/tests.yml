@@ -119,16 +119,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
-      with:
-        images: freyrcli/freyrjs-git
-        tags: |
-          type=ref,event=pr
-          type=ref,event=branch
-          type=sha,format=short,prefix=
-
     - name: Extract Tags
       id: meta2
       if: github.event_name == 'pull_request'
@@ -137,6 +127,16 @@ jobs:
         echo "::set-output name=tag::$PR_TAG"
         SHA=$( echo ${{ github.event.pull_request.base.sha }} | head -c7 )
         echo "::set-output name=sha::$SHA"
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+      with:
+        images: freyrcli/freyrjs-git
+        tags: |
+          type=ref,event=pr
+          type=ref,event=branch
+          type=raw,value=${{steps.meta2.outputs.sha}}
 
     - name: Report Docker Image Build Status
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
