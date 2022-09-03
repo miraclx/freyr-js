@@ -1,11 +1,12 @@
-import {join} from 'path';
+import {join, resolve, dirname} from 'path';
 import {tmpdir} from 'os';
+import {createHash} from 'crypto';
 import {promises as fs, constants as fs_constants} from 'fs';
 
-import tmp from 'tmp';
 import mkdirp from 'mkdirp';
 import esMain from 'es-main';
 
+const openfiles = {};
 const removeCallbacks = [];
 
 function garbageCollector() {
@@ -23,49 +24,56 @@ function hookupListeners() {
 
 export default async function genFile(opts) {
   opts = opts || {};
-  if (opts.filename) {
-    opts.tmpdir = opts.tmpdir || tmpdir();
-    const dir = join(opts.tmpdir, opts.dirname || '.');
-    await mkdirp(dir);
-    const path = join(dir, opts.filename);
-    const fd = await fs.open(path, fs_constants.O_CREAT | opts.mode);
-    hookupListeners();
-    let closed = false;
-    const garbageHandler = async keep => {
-      if (closed) return;
-      await fd.close();
-      closed = true;
-      if (!keep) await fs.unlink(path);
-    };
-    removeCallbacks.push(garbageHandler.bind(opts.keep));
-    return {
-      fd,
+  let mode = fs_constants.O_CREAT | opts.mode;
+  const path = resolve(join('tmpdir' in opts ? opts['tmpdir'] : tmpdir(), opts.dirname || '.', opts.filename));
+  let id = createHash('md5').update(`Ξ${mode}${path}`).digest('hex');
+  let file = openfiles[id];
+  if (!file) {
+    await mkdirp(dirname(path));
+    file = openfiles[id] = {
       path,
-      removeCallback: async () => {
-        await garbageHandler(false);
-        removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
-      },
+      handle: await fs.open(path, mode),
+      refs: 1,
+      closed: false,
+      keep: false,
     };
-  }
-  return new Promise((res, rej) =>
-    tmp.file(opts, (err, name, fd, removeCallback) => (err ? rej(err) : res({fd, name, removeCallback}))),
-  );
+  } else file.refs += 1;
+  hookupListeners();
+  const garbageHandler = async keep => {
+    file.keep ||= keep !== undefined ? keep : opts.keep;
+    if ((file.refs = Math.max(0, file.refs - 1))) return;
+    if (file.closed) return;
+    file.closed = true;
+    delete openfiles[id];
+    await file.handle.close();
+    if (!file.keep) await fs.unlink(path);
+  };
+  removeCallbacks.push(garbageHandler);
+  return {
+    path,
+    handle: file.handle,
+    removeCallback: async () => {
+      await garbageHandler(false);
+      removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
+    },
+  };
 }
 
 async function test() {
   const filename = 'freyr_mgr_temp_file';
-  async function testMgr() {
-    const file = await genFile({filename});
+  async function testMgr(args) {
+    const file = await genFile({filename, ...args});
     console.log('mgr>', file);
-    file.removeCallback();
+    return file;
   }
-  async function testTmp() {
-    const file = await genFile({name: filename});
-    console.log('tmp>', file);
-    file.removeCallback();
-  }
-  await testMgr();
-  await testTmp();
+  let a = await testMgr();
+  let b = await testMgr();
+  await testMgr({keep: true});
+  let d = await testMgr();
+  a.removeCallback();
+  b.removeCallback();
+  // c.removeCallback(); // calling this would negate the keep directive
+  d.removeCallback();
 }
 
 if (esMain(import.meta)) test().catch(err => console.error('cli>', err));

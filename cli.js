@@ -647,7 +647,7 @@ async function init(packageJson, queries, options) {
 
   async function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
-      const validStats = stats.filter(stat => (stat.code === 0 ? stat.complete : !stat.code));
+      const validStats = stats.filter(stat => (stat[symbols.errorCode] === 0 ? stat.complete : !stat[symbols.errorCode]));
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
         const playlistFile = xpath.join(
@@ -697,9 +697,8 @@ async function init(packageJson, queries, options) {
 
   function downloadToStream({urlOrFragments, outputFile, logger, opts}) {
     opts = {tag: '', successMessage: '', failureMessage: '', retryMessage: '', ...opts};
-    [opts.tag, opts.errorHandler, opts.retryMessage, opts.failureMessage, opts.successMessage, opts.altMessage] = [
+    [opts.tag, opts.retryMessage, opts.failureMessage, opts.successMessage, opts.altMessage] = [
       opts.tag,
-      opts.errorHandler,
       opts.retryMessage,
       opts.failureMessage,
       opts.successMessage,
@@ -741,7 +740,6 @@ async function init(packageJson, queries, options) {
               if (!options.bar) logger.write('\x1b[G\x1b[K');
               logger.write(opts.failureMessage(err), '\n');
             }
-            opts.errorHandler(err);
             rej(err);
           });
 
@@ -815,7 +813,6 @@ async function init(packageJson, queries, options) {
                   logger.write('\x1b[G\x1b[K');
                   logger.write(opts.failureMessage(err), '\n');
                 }
-                opts.errorHandler(err);
                 rej(err);
               });
             return !options.bar ? feed : feed.pipe(barGen.next(frag.size));
@@ -841,70 +838,88 @@ async function init(packageJson, queries, options) {
     Config.concurrency.downloader,
     async ({track, meta, feedMeta, trackLogger}) => {
       const baseCacheDir = 'fr3yrcach3';
+
       const imageFile = await fileMgr({
         filename: `freyrcli-${meta.fingerprint}.x4i`,
         tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
         dirname: baseCacheDir,
         keep: true,
       });
-      const imageBytesWritten = await downloadToStream({
-        urlOrFragments: track.getImage(Config.image.width, Config.image.height),
-        outputFile: imageFile.path,
-        logger: trackLogger,
-        opts: {
-          tag: '[Retrieving album art]...',
-          errorHandler: () => imageFile.removeCallback(),
-          retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-          resumeHandler: offset => trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
-          failureMessage: err =>
-            trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
-          successMessage: trackLogger.getText(`| [\u2713] Got album art`),
-          altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
-        },
-      }).catch(err => Promise.reject({err, code: 3}));
+
+      let imageBytesWritten = 0;
+      try {
+        imageBytesWritten = await downloadToStream({
+          urlOrFragments: track.getImage(Config.image.width, Config.image.height),
+          outputFile: imageFile.path,
+          logger: trackLogger,
+          opts: {
+            tag: '[Retrieving album art]...',
+            retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+            resumeHandler: offset =>
+              trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
+            failureMessage: err =>
+              trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
+            successMessage: trackLogger.getText(`| [\u2713] Got album art`),
+            altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
+          },
+        });
+      } catch (err) {
+        await imageFile.removeCallback();
+        throw {err, [symbols.errorCode]: 3};
+      }
+
       const rawAudio = await fileMgr({
         filename: `freyrcli-${meta.fingerprint}.x4a`,
         tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
         dirname: baseCacheDir,
         keep: true,
       });
-      const audioBytesWritten = await downloadToStream(
-        _merge(
-          {
-            outputFile: rawAudio.path,
-            logger: trackLogger,
-            opts: {
-              tag: `[‘${meta.trackName}’]`,
-              retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-              resumeHandler: offset =>
-                trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
-              successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
-              altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
-            },
-          },
-          feedMeta.protocol !== 'http_dash_segments'
-            ? {
-                urlOrFragments: feedMeta.url,
-                opts: {
-                  errorHandler: () => rawAudio.removeCallback(),
-                  failureMessage: err =>
-                    trackLogger.getText(`| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`),
-                },
-              }
-            : {
-                urlOrFragments: feedMeta.fragments.map(({path}) => ({
-                  url: `${feedMeta.fragment_base_url}${path}`,
-                  ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
-                })),
-                opts: {
-                  failureMessage: err =>
-                    trackLogger.getText(
-                      `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
-                    ),
-                },
+
+      let audioBytesWritten = 0;
+      try {
+        audioBytesWritten = await downloadToStream(
+          _merge(
+            {
+              outputFile: rawAudio.path,
+              logger: trackLogger,
+              opts: {
+                tag: `[‘${meta.trackName}’]`,
+                retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+                resumeHandler: offset =>
+                  trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
+                successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
+                altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
               },
-        ),
-      ).catch(err => Promise.reject({err, code: 4}));
+            },
+            feedMeta.protocol !== 'http_dash_segments'
+              ? {
+                  urlOrFragments: feedMeta.url,
+                  opts: {
+                    failureMessage: err =>
+                      trackLogger.getText(
+                        `| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`,
+                      ),
+                  },
+                }
+              : {
+                  urlOrFragments: feedMeta.fragments.map(({path}) => ({
+                    url: `${feedMeta.fragment_base_url}${path}`,
+                    ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
+                  })),
+                  opts: {
+                    failureMessage: err =>
+                      trackLogger.getText(
+                        `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
+                      ),
+                  },
+                },
+          ),
+        );
+      } catch (err) {
+        await rawAudio.removeCallback();
+        throw {err, [symbols.errorCode]: 4};
+      }
+
       return {
         image: {file: imageFile, bytesWritten: imageBytesWritten},
         audio: {file: rawAudio, bytesWritten: audioBytesWritten},
@@ -916,58 +931,62 @@ async function init(packageJson, queries, options) {
     'cli:postprocessor:embedQueue',
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
-      return Promise.promisify(atomicParsley)(meta.outFilePath, {
-        overWrite: '', // overwrite the file
+      try {
+        await Promise.promisify(atomicParsley)(meta.outFilePath, {
+          overWrite: '', // overwrite the file
 
-        title: track.name, // ©nam
-        artist: track.artists[0], // ©ART
-        composer: track.composers, // ©wrt
-        album: track.album, // ©alb
-        genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
-        tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
-        disk: `${track.disc_number}/${track.disc_number}`, // disk
-        year: new Date(track.release_date).toISOString().split('T')[0], // ©day
-        compilation: track.compilation, // ©cpil
-        gapless: options.gapless, // pgap
-        rDNSatom: [
-          // ----
-          ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
-          [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-          [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
-          [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-          [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
-          [
-            `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
-            'name=PROVIDER',
-            'domain=com.apple.iTunes',
+          title: track.name, // ©nam
+          artist: track.artists[0], // ©ART
+          composer: track.composers, // ©wrt
+          album: track.album, // ©alb
+          genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
+          tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
+          disk: `${track.disc_number}/${track.disc_number}`, // disk
+          year: new Date(track.release_date).toISOString().split('T')[0], // ©day
+          compilation: track.compilation, // ©cpil
+          gapless: options.gapless, // pgap
+          rDNSatom: [
+            // ----
+            ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
+            [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
+            [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
+            [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
+            [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
+            [
+              `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
+              'name=PROVIDER',
+              'domain=com.apple.iTunes',
+            ],
           ],
-        ],
-        advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
-          ? track.contentRating
-          : track.contentRating === true
-          ? 'explicit'
-          : 'Inoffensive',
-        stik: 'Normal', // stik
-        // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
-        // sfID: 0, // ~~~~: store front ID
-        // cnID: 0, // cnID: catalog ID
-        albumArtist: track.album_artist, // aART
-        // ownr? <owner>
-        purchaseDate: 'timestamp', // purd
-        apID: 'cli@freyr.git', // apID
-        copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
-        encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
-        encodedBy: 'd3vc0dr', // ©enc
-        artwork: files.image.file.path, // covr
-        // sortOrder: [
-        //   ['name', 'NAME'], // sonm
-        //   ['album', 'NAME'], // soal
-        //   ['artist', 'NAME'], // soar
-        //   ['albumartist', 'NAME'], // soaa
-        // ],
-      })
-        .finally(() => files.image.file.removeCallback())
-        .catch(err => Promise.reject({err, code: 8}));
+          advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+            ? track.contentRating
+            : track.contentRating === true
+            ? 'explicit'
+            : 'Inoffensive',
+          stik: 'Normal', // stik
+          // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
+          // sfID: 0, // ~~~~: store front ID
+          // cnID: 0, // cnID: catalog ID
+          albumArtist: track.album_artist, // aART
+          // ownr? <owner>
+          purchaseDate: 'timestamp', // purd
+          apID: 'cli@freyr.git', // apID
+          copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
+          encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
+          encodedBy: 'd3vc0dr', // ©enc
+          artwork: files.image.file.path, // covr
+          // sortOrder: [
+          //   ['name', 'NAME'], // sonm
+          //   ['album', 'NAME'], // soal
+          //   ['artist', 'NAME'], // soar
+          //   ['albumartist', 'NAME'], // soaa
+          // ],
+        });
+      } catch (err) {
+        throw {err, [symbols.errorCode]: 8};
+      } finally {
+        await files.image.file.removeCallback();
+      }
     },
   );
 
@@ -1005,9 +1024,9 @@ async function init(packageJson, queries, options) {
           );
           await fs.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
         } catch (err) {
-          throw {err, code: 7};
+          throw {err, [symbols.errorCode]: 7};
         } finally {
-          files.audio.file.removeCallback();
+          await files.audio.file.removeCallback();
         }
       },
     ),
@@ -1017,7 +1036,7 @@ async function init(packageJson, queries, options) {
     'cli:postProcessor',
     Math.max(Config.concurrency.encoder, Config.concurrency.embedder),
     async ({track, meta, files, audioSource}) => {
-      await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
+      await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, [symbols.errorCode]: 6}));
       const wroteImage =
         !!options.cover &&
         (await (async outArtPath =>
@@ -1084,13 +1103,13 @@ async function init(packageJson, queries, options) {
     const filterStat = options.filter(track, false);
     if (!filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
-      return {meta, code: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
+      return {meta, [symbols.errorCode]: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
     }
 
     if (props.fileExists) {
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, code: 0, skip_reason: 'exists', complete: true};
+        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: true};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
     }
@@ -1102,12 +1121,12 @@ async function init(packageJson, queries, options) {
         onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]\n`,
       }),
     );
-    if ('err' in audioSource) return {meta, code: 1, err: audioSource.err}; // zero sources found
+    if ('err' in audioSource) return {meta, [symbols.errorCode]: 1, err: audioSource.err}; // zero sources found
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
       onInit: '| \u27a4 Awaiting audiofeeds...',
       noVal: () => '[Unable to collect source feeds]\n',
     });
-    if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
+    if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, [symbols.errorCode]: 2};
 
     const [feedMeta] = audioFeeds.formats
       .filter(meta => 'abr' in meta && !('vbr' in meta))
@@ -1116,11 +1135,15 @@ async function init(packageJson, queries, options) {
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
-      .catch(errObject => Promise.reject({meta, code: 5, ...(errObject.code ? errObject : {err: errObject})}));
+      .catch(errObject =>
+        Promise.reject({meta, [symbols.errorCode]: 5, ...(symbols.errorCode in errObject ? errObject : {err: errObject})}),
+      );
     trackLogger.log(`| [\u2022] Post Processing...`);
     return {
       files,
-      postprocess: postProcessor.push({track, meta, files, audioSource}).catch(errObject => ({code: 9, ...errObject})),
+      postprocess: postProcessor
+        .push({track, meta, files, audioSource})
+        .catch(errObject => ({[symbols.errorCode]: 9, ...(symbols.errorCode in errObject ? errObject : {err: errObject})})),
     };
   });
 
@@ -1131,11 +1154,11 @@ async function init(packageJson, queries, options) {
       try {
         if (!(track = await track)) throw new Error('no data recieved from track');
       } catch (err) {
-        return {code: -1, err};
+        return {[symbols.errorCode]: -1, err};
       }
       if ((track[symbols.errorStack] || {}).code === 1)
         return {
-          code: -1,
+          [symbols.errorCode]: -1,
           err: new Error("local-typed tracks aren't supported"),
           meta: {track: {uri: track[symbols.errorStack].uri}},
         };
@@ -1159,7 +1182,7 @@ async function init(packageJson, queries, options) {
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
-        .catch(errObject => ({meta, code: 10, ...errObject}));
+        .catch(errObject => ({meta, [symbols.errorCode]: 10, ...errObject}));
     },
   );
 
@@ -1345,34 +1368,34 @@ async function init(packageJson, queries, options) {
       await Promise.mapSeries(trackStats, async trackStat => {
         if (trackStat.postprocess) {
           trackStat.postprocess = await trackStat.postprocess;
-          if ('code' in trackStat.postprocess) {
-            trackStat.code = trackStat.postprocess.code;
+          if (symbols.errorCode in trackStat.postprocess) {
+            trackStat[symbols.errorCode] = trackStat.postprocess[symbols.errorCode];
             trackStat.err = trackStat.postprocess.err;
           }
         }
-        if (trackStat.code) {
+        if (trackStat[symbols.errorCode]) {
           const reason =
-            trackStat.code === -1
+            trackStat[symbols.errorCode] === -1
               ? 'Failed getting track data'
-              : trackStat.code === 1
+              : trackStat[symbols.errorCode] === 1
               ? 'Failed collecting sources'
-              : trackStat.code === 2
+              : trackStat[symbols.errorCode] === 2
               ? 'Error while collecting sources feeds'
-              : trackStat.code === 3
+              : trackStat[symbols.errorCode] === 3
               ? 'Error downloading album art'
-              : trackStat.code === 4
+              : trackStat[symbols.errorCode] === 4
               ? 'Error downloading raw audio'
-              : trackStat.code === 5
+              : trackStat[symbols.errorCode] === 5
               ? 'Unknown Download Error'
-              : trackStat.code === 6
+              : trackStat[symbols.errorCode] === 6
               ? 'Error ensuring directory integrity'
-              : trackStat.code === 7
+              : trackStat[symbols.errorCode] === 7
               ? 'Error while encoding audio'
-              : trackStat.code === 8
+              : trackStat[symbols.errorCode] === 8
               ? 'Failed while embedding metadata'
-              : trackStat.code === 9
-              ? 'Unknown postprocessing error'
-              : 'Unknown track processing error';
+              : trackStat[symbols.errorCode] === 9
+              ? 'Unexpected postprocessing error'
+              : 'Unexpected track processing error';
           embedLogger.error(
             `\u2022 [\u2715] ${trackStat.meta && trackStat.meta.trackName ? `${trackStat.meta.trackName}` : '<unknown track>'}${
               trackStat.meta && trackStat.meta.track.uri ? ` [${trackStat.meta.track.uri}]` : ''
@@ -1380,7 +1403,7 @@ async function init(packageJson, queries, options) {
               trackStat.err ? ` [${trackStat.err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || trackStat.err}]` : ''
             })`,
           );
-        } else if (trackStat.code === 0)
+        } else if (trackStat[symbols.errorCode] === 0)
           embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: ${trackStat.skip_reason})`);
         else
           embedLogger.log(
@@ -1427,10 +1450,10 @@ async function init(packageJson, queries, options) {
         total.mediaSize += audio;
         total.imageSize += image;
       }
-      if (current.code === 0)
+      if (current[symbols.errorCode] === 0)
         if (current.complete) total.passed += 1;
         else total.skipped += 1;
-      else if (!('code' in current)) (total.new += 1), (total.passed += 1);
+      else if (!(symbols.errorCode in current)) (total.new += 1), (total.passed += 1);
       else total.failed += 1;
       return total;
     },

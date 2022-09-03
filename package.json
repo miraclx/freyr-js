@@ -85,7 +85,6 @@
     "stringd": "^2.2.0",
     "stringd-colors": "^1.10.0",
     "stripchar": "^1.2.1",
-    "tmp": "^0.2.1",
     "xbytes": "^1.8.0",
     "xprogress": "^0.19.1",
     "youtube-dl-exec": "^2.1.4",
