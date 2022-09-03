@@ -166,7 +166,7 @@ jobs:
           ```
 
           | [**Base Branch (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.sha}}?color=gray&label=%20&logo=docker)][base-url] |
-          | - | - |
+          | :-: | - |
 
           ---
 
@@ -223,7 +223,7 @@ jobs:
           ```
 
           | [**Base Branch (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.sha}}?color=gray&label=%20&logo=docker)][base-url] |
-          | - | - |
+          | :-: | - |
           | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{steps.meta2.outputs.tag}}?color=gray&label=%20&logo=docker)][pr-url] |
 
           [![][compare-img]][compare-url]
