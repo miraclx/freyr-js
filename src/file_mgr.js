@@ -9,17 +9,21 @@ import esMain from 'es-main';
 const openfiles = {};
 const removeCallbacks = [];
 
-function garbageCollector() {
-  while (removeCallbacks.length) removeCallbacks.pop()();
-  process.removeListener('exit', garbageCollector);
+function garbageCollector(args) {
+  while (removeCallbacks.length) removeCallbacks.pop()(args);
 }
 
 let hookedUpListeners = false;
 function hookupListeners() {
   if (!hookedUpListeners) {
     hookedUpListeners = true;
-    process.addListener('exit', garbageCollector);
+    let fn = () => (garbageCollector(), process.removeListener('exit', fn));
+    process.addListener('exit', fn);
   }
+}
+
+export function forgetAll() {
+  garbageCollector({forget: true});
 }
 
 export default async function genFile(opts) {
@@ -34,13 +38,14 @@ export default async function genFile(opts) {
   } else file.refs += 1;
   if (file.closed) file.handle = await fs.open(path, mode);
   hookupListeners();
-  const garbageHandler = async ({keep} = {}) => {
+  const garbageHandler = async ({keep, forget = false} = {}) => {
     file.keep ||= keep !== undefined ? keep : opts.keep;
     if ((file.refs = Math.max(0, file.refs - 1))) return;
     if (file.closed) return;
     let handle = file.handle;
     delete file.handle;
     file.closed = true;
+    if (forget) delete openfiles[id];
     await handle.close();
     if (!file.keep) await fs.unlink(path);
   };
@@ -48,9 +53,8 @@ export default async function genFile(opts) {
   return {
     path,
     handle: file.handle,
-    removeCallback: async ({forget = false}) => {
-      if (forget) delete openfiles[id];
-      await garbageHandler({keep: false});
+    removeCallback: async args => {
+      await garbageHandler({...args, keep: false});
       removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
     },
   };
