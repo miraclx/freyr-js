@@ -30,30 +30,27 @@ export default async function genFile(opts) {
   let file = openfiles[id];
   if (!file) {
     await mkdirp(dirname(path));
-    file = openfiles[id] = {
-      path,
-      handle: await fs.open(path, mode),
-      refs: 1,
-      closed: false,
-      keep: false,
-    };
+    file = openfiles[id] = {path, handle: null, refs: 1, closed: true, keep: false};
   } else file.refs += 1;
+  if (file.closed) file.handle = await fs.open(path, mode);
   hookupListeners();
-  const garbageHandler = async keep => {
+  const garbageHandler = async ({keep} = {}) => {
     file.keep ||= keep !== undefined ? keep : opts.keep;
     if ((file.refs = Math.max(0, file.refs - 1))) return;
     if (file.closed) return;
+    let handle = file.handle;
+    delete file.handle;
     file.closed = true;
-    delete openfiles[id];
-    await file.handle.close();
+    await handle.close();
     if (!file.keep) await fs.unlink(path);
   };
   removeCallbacks.push(garbageHandler);
   return {
     path,
     handle: file.handle,
-    removeCallback: async () => {
-      await garbageHandler(false);
+    removeCallback: async ({forget = false}) => {
+      if (forget) delete openfiles[id];
+      await garbageHandler({keep: false});
       removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
     },
   };
