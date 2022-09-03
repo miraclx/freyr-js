@@ -119,13 +119,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Check If Is PR
-      id: is_pr
-      run: |
-        if [[ "${{ github.event_name }}" != 'pull_request' ]]; then
-          echo "::set-output name=sha::type=sha,format=short,prefix="
-        fi
-
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
@@ -134,7 +127,7 @@ jobs:
         tags: |
           type=ref,event=pr
           type=ref,event=branch
-          ${{ steps.is_pr.outputs.sha }}
+          type=sha,format=short,prefix=
 
     - name: Extract Tags
       id: meta2
