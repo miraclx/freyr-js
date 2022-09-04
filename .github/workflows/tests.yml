@@ -75,7 +75,7 @@ jobs:
         service:
           - { id: spotify, name: Spotify }
           - { id: apple-music, name: "Apple Music", slug: apple_music }
-          - { id: deezer, name: Spotify }
+          - { id: deezer, name: Deezer }
         test:
           - { type: track, name: Track }
           - { type: album, name: Album }
@@ -127,14 +127,21 @@ jobs:
         HEAD_SHA=$( echo ${{ github.event.pull_request.head.sha || github.sha }} | head -c7 )
         echo "::set-output name=head_sha::$HEAD_SHA"
 
-    - name: Extract metadata (tags, labels) for Docker
+    - name: Should Push Docker Branch?
+      id: push-branch
+      run: |
+        if [[ "${{ github.event_name }}" == 'push' ]]; then
+          echo "::set-output name=branch::type=ref,event=branch"
+        fi
+
+    - name: Extract Metadata (tags, labels) For Docker
       id: docker-meta
       uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
       with:
         images: freyrcli/freyrjs-git
         tags: |
           type=ref,event=pr
-          type=ref,event=branch
+          ${{ steps.push-branch.outputs.branch }}
           type=raw,value=${{ steps.get-shas.outputs.head_sha }}
 
     - name: Extract Tags
