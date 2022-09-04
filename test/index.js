@@ -139,7 +139,8 @@ async function run_tests(suite, args, i) {
       if (is_gha) console.log(`::group::${top_bar}`);
       else raw_stdout.write(`${top_bar}\n`);
 
-      let child, handler;
+      let child,
+        handler = () => {};
 
       if (!docker_image) {
         child = spawn(
@@ -168,8 +169,14 @@ async function run_tests(suite, args, i) {
           ...child_args,
           uri,
         ]);
-        process.on('exit', (handler = () => (spawn('docker', ['kill', child_id]), process.off('exit', handler))));
+        handler = () => spawn('docker', ['kill', child_id]);
       }
+
+      let sigint_handler, sigterm_handler, sighup_handler;
+      process
+        .on('SIGINT', (sigint_handler = () => (handler(), close_handler(130))))
+        .on('SIGTERM', (sigterm_handler = () => (handler(), close_handler(143))))
+        .on('SIGHUP', (sighup_handler = () => (handler(), close_handler(129))));
 
       stdout.log(`\n$ ${child.spawnargs.join(' ')}\n`);
 
@@ -190,21 +197,32 @@ async function run_tests(suite, args, i) {
           o.write(line);
         });
 
+      let closed, close_handler;
       await new Promise((res, rej) => {
-        child.on('close', (code, err) => {
-          if (docker_image) {
-            process.off('SIGINT', handler);
-            if (code === 137) process.exit(130);
-          }
-          if (code !== 0) err = new Error(`child process exited with code ${code}`);
-          else if (childErrors.length) err = childErrors.shift();
-          if (!err) res();
-          else {
-            err.code = code;
-            if (childErrors.length) err[errorCauses] = childErrors;
-            rej(err);
-          }
-        });
+        child.on(
+          'close',
+          (close_handler = (code, err) => {
+            if (closed) return;
+            closed = true;
+            child.off('close', close_handler);
+            process.off('SIGINT', sigint_handler).off('SIGTERM', sigterm_handler).off('SIGHUP', sighup_handler);
+            if (docker_image && code === 137) process.exit(130);
+            for (let [signal, signame] of [
+              [130, 'SIGINT'],
+              [143, 'SIGTERM'],
+              [129, 'SIGHUP'],
+            ])
+              if (code === signal) process.kill(process.pid, signame);
+            if (code !== 0) err = new Error(`child process exited with code ${code}`);
+            else if (childErrors.length) err = childErrors.shift();
+            if (!err) res();
+            else {
+              err.code = code;
+              if (childErrors.length) err[errorCauses] = childErrors;
+              rej(err);
+            }
+          }),
+        );
       });
 
       if (is_gha && (i = logs.findIndex(line => line.includes('[•] Embedding Metadata')))) {
