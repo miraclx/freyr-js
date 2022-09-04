@@ -127,11 +127,13 @@ jobs:
         HEAD_SHA=$( echo ${{ github.event.pull_request.head.sha || github.sha }} | head -c7 )
         echo "::set-output name=head_sha::$HEAD_SHA"
 
-    - name: Should Push Docker Branch?
-      id: push-branch
+    - name: Get Docker Tag
+      id: get-docker-tag-spec
       run: |
         if [[ "${{ github.event_name }}" == 'push' ]]; then
-          echo "::set-output name=branch::type=ref,event=branch"
+          echo "::set-output name=spec::type=ref,event=branch"
+        else if [[ "${{ github.event_name }}" == 'pull_request' ]]; then
+          echo "::set-output name=spec::type=ref,event=pr"
         fi
 
     - name: Extract Metadata (tags, labels) For Docker
@@ -140,12 +142,12 @@ jobs:
       with:
         images: freyrcli/freyrjs-git
         tags: |
-          type=ref,event=pr
-          ${{ steps.push-branch.outputs.branch }}
+          ${{ steps.get-docker-tag-spec.outputs.spec }}
           type=raw,value=${{ steps.get-shas.outputs.head_sha }}
 
     - name: Extract Tags
       id: get-docker-tag
+      if: github.event_name == 'pull_request'
       run: |
         PR_TAG=$( echo "${{ steps.docker-meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
         echo "::set-output name=tag::$PR_TAG"
