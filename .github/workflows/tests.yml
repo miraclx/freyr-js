@@ -132,7 +132,7 @@ jobs:
       run: |
         if [[ "${{ github.event_name }}" == 'push' ]]; then
           echo "::set-output name=spec::type=ref,event=branch"
-        else if [[ "${{ github.event_name }}" == 'pull_request' ]]; then
+        elif [[ "${{ github.event_name }}" == 'pull_request' ]]; then
           echo "::set-output name=spec::type=ref,event=pr"
         fi
 
