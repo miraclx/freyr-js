@@ -33,7 +33,7 @@ export default function genFile(opts) {
     if ('tmpdir' in opts && opts.path) throw new Error('Cannot specify path and tmpdir');
     opts = Object.assign({path: null, filename: null, dirname: null, tmpdir: true, keep: false}, opts);
     if (opts.path && (opts.filename || opts.dirname)) throw new Error('Cannot specify path and either filename or dirname');
-    if (!(opts.path || opts.filename)) opts.filename = crypto.randomBytes(8).toString('hex');
+    if (!(opts.path || opts.filename)) opts.filename = randomBytes(8).toString('hex');
     if (opts.tmpdir)
       if (opts.dirname) opts.dirname = join(tmpdir(), opts.dirname);
       else opts.dirname = tmpdir();

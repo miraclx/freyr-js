@@ -668,7 +668,7 @@ async function init(packageJson, queries, options) {
             meta: {
               track: {uri, name, artists, duration},
               service,
-              outFilePath,
+              outFile,
             },
           }) =>
             plStream.write(
@@ -678,7 +678,7 @@ async function init(packageJson, queries, options) {
                 `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
                 `${namespace.concat(
                   (entry => (!Config.playlist.escape ? entry : encodeURI(entry).replace(/#/g, '%23')))(
-                    xpath.relative(BASE_DIRECTORY, outFilePath),
+                    xpath.relative(BASE_DIRECTORY, outFile.path),
                   ),
                 )}`,
                 '',
@@ -942,7 +942,7 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
-        await Promise.promisify(atomicParsley)(meta.outFilePath, {
+        await Promise.promisify(atomicParsley)(meta.outFile.path, {
           overWrite: '', // overwrite the file
 
           title: track.name, // ©nam
@@ -1032,7 +1032,7 @@ async function init(packageJson, queries, options) {
             'ipod',
             outfile,
           );
-          await fs.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
+          await fs.writeFile(meta.outFile.handle, ffmpeg.FS('readFile', outfile));
         } catch (err) {
           throw {err, [symbols.errorCode]: 7};
         } finally {
@@ -1046,17 +1046,27 @@ async function init(packageJson, queries, options) {
     'cli:postProcessor',
     Math.max(Config.concurrency.encoder, Config.concurrency.embedder),
     async ({track, meta, files, audioSource}) => {
-      await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, [symbols.errorCode]: 6}));
+      await mkdirp(xpath.dirname(meta.outFile.path)).catch(err => Promise.reject({err, [symbols.errorCode]: 6}));
       const wroteImage =
         !!options.cover &&
         (await (async outArtPath =>
           (await maybeStat(outArtPath).then(stat => stat && stat.isFile())) ||
           (await fs.copyFile(files.image.file.path, outArtPath), true))(
-          xpath.join(meta.outFileDir, `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
+          xpath.join(xpath.dirname(meta.outFile.path), `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
         ));
-      await encodeQueue.push({track, meta, files});
-      await embedQueue.push({track, meta, files, audioSource});
-      return {wroteImage, finalSize: (await fs.stat(meta.outFilePath)).size};
+      await fileMgr({
+        path: meta.outFile.path,
+      }).writeOnce(async audioFile => {
+        meta.outFile = audioFile;
+        try {
+          await encodeQueue.push({track, meta, files});
+          await embedQueue.push({track, meta, files, audioSource});
+        } catch (err) {
+          await audioFile.removeCallback();
+          throw err;
+        }
+      });
+      return {wroteImage, finalSize: (await fs.stat(meta.outFile.path)).size};
     },
   );
 
@@ -1188,7 +1198,7 @@ async function init(packageJson, queries, options) {
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
-      const meta = {trackName, outFileDir, outFilePath, track, service};
+      const meta = {trackName, outFile: {path: outFilePath}, track, service};
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
