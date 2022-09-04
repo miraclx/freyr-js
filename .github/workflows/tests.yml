@@ -128,7 +128,7 @@ jobs:
         echo "::set-output name=head_sha::$HEAD_SHA"
 
     - name: Get Docker Tag
-      id: get-docker-tag-spec
+      id: docker-tagger-spec
       run: |
         if [[ "${{ github.event_name }}" == 'push' ]]; then
           echo "::set-output name=spec::type=ref,event=branch"
@@ -142,11 +142,11 @@ jobs:
       with:
         images: freyrcli/freyrjs-git
         tags: |
-          ${{ steps.get-docker-tag-spec.outputs.spec }}
+          ${{ steps.docker-tagger-spec.outputs.spec }}
           type=raw,value=${{ steps.get-shas.outputs.head_sha }}
 
-    - name: Extract Tags
-      id: get-docker-tag
+    - name: Extract Tag For Report
+      id: tag-for-report
       if: github.event_name == 'pull_request'
       run: |
         PR_TAG=$( echo "${{ steps.docker-meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
@@ -168,7 +168,7 @@ jobs:
           **A docker image for this PR is being built!**
 
           ```console
-          docker pull freyrcli/freyrjs-git:${{ steps.get-docker-tag.outputs.tag }}
+          docker pull freyrcli/freyrjs-git:${{ steps.tag-for-report.outputs.tag }}
           ```
 
           | [**Base Branch (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-shas.outputs.base_sha }}?color=gray&label=%20&logo=docker)][base-url] |
@@ -225,12 +225,12 @@ jobs:
           **A docker image for this PR has been built!**
 
           ```console
-          docker pull freyrcli/freyrjs-git:${{ steps.get-docker-tag.outputs.tag }}
+          docker pull freyrcli/freyrjs-git:${{ steps.tag-for-report.outputs.tag }}
           ```
 
           | [**Base Branch (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-shas.outputs.base_sha }}?color=gray&label=%20&logo=docker)][base-url] |
           | :-: | - |
-          | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-docker-tag.outputs.tag }}?color=gray&label=%20&logo=docker)][pr-url] |
+          | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.tag-for-report.outputs.tag }}?color=gray&label=%20&logo=docker)][pr-url] |
 
           [![][compare-img]][compare-url]
 
@@ -247,9 +247,9 @@ jobs:
           </div>
 
           [base-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{ steps.get-shas.outputs.base_sha }}
-          [pr-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{ steps.get-docker-tag.outputs.tag }}
+          [pr-url]: https://hub.docker.com/r/freyrcli/freyrjs-git/tags?name=${{ steps.tag-for-report.outputs.tag }}
           [compare-img]: https://img.shields.io/badge/%20-compare-gray?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+CiAgIDxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik0zLDFDMS44OSwxIDEsMS44OSAxLDNWMTRDMSwxNS4xMSAxLjg5LDE2IDMsMTZINVYxNEgzVjNIMTRWNUgxNlYzQzE2LDEuODkgMTUuMTEsMSAxNCwxSDNNOSw3QzcuODksNyA3LDcuODkgNyw5VjExSDlWOUgxMVY3SDlNMTMsN1Y5SDE0VjEwSDE2VjdIMTNNMTgsN1Y5SDIwVjIwSDlWMThIN1YyMEM3LDIxLjExIDcuODksMjIgOSwyMkgyMEMyMS4xMSwyMiAyMiwyMS4xMSAyMiwyMFY5QzIyLDcuODkgMjEuMTEsNyAyMCw3SDE4TTE0LDEyVjE0SDEyVjE2SDE0QzE1LjExLDE2IDE2LDE1LjExIDE2LDE0VjEySDE0TTcsMTNWMTZIMTBWMTRIOVYxM0g3WiIgLz4KPC9zdmc+
-          [compare-url]: https://portal.slim.dev/home/diff/dockerhub%3A%2F%2Fdockerhub.public%2Ffreyrcli%2Ffreyrjs-git%3A${{ steps.get-docker-tag.outputs.tag }}#file-system
+          [compare-url]: https://portal.slim.dev/home/diff/dockerhub%3A%2F%2Fdockerhub.public%2Ffreyrcli%2Ffreyrjs-git%3A${{ steps.tag-for-report.outputs.tag }}#file-system
 
   linter:
     runs-on: ubuntu-latest
