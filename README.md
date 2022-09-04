@@ -19,7 +19,7 @@
 
   [![NPM Downloads](https://badgen.net/npm/dm/freyr)](https://www.npmjs.com/package/freyr)
   [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs)
-  [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v14-brightgreen)](https://github.com/miraclx/freyr-js)
+  [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v16-brightgreen)](https://github.com/miraclx/freyr-js)
   [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js)
 
   [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js?category=code)](https://github.com/miraclx/freyr-js)
@@ -113,7 +113,7 @@ Here's a list of the metadata that freyr can extract from each streaming service
   </details>
 
   <details>
-  <summary>nodejs >= v14.0.0</summary>
+  <summary>nodejs >= v16.0.0</summary>
 
   Download for your individual platforms here <https://nodejs.org/en/download/>
 
@@ -121,7 +121,7 @@ Here's a list of the metadata that freyr can extract from each streaming service
 
   ```bash
   # install node with this nvm command
-  # freyr works with a minimum of v14
+  # freyr works with a minimum of v16
   $ nvm install --lts
   ```
 
