@@ -131,25 +131,6 @@ Here's a list of the metadata that freyr can extract from each streaming service
   </details>
 
   <details>
-  <summary>ffmpeg >= v0.9</summary>
-
-  <!-- textlint-disable -->
-  Download for your individual platforms here <https://ffmpeg.org/download.html>
-  <!-- textlint-enable -->
-
-  - Windows + macOS:
-    - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
-    - make sure it's available in your `PATH`
-    - otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
-  - Linux: _(check individual package managers)_
-    - Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
-    - Arch Linux: `sudo pacman -S ffmpeg`
-    - Android (Termux): `apt install ffmpeg`
-    - Alpine Linux: `sudo apk add ffmpeg`
-
-  </details>
-
-  <details>
   <summary>AtomicParsley >= (v0.9.6 | 20200701)</summary>
 
   First, download the latest release for your individual platforms here <https://github.com/wez/atomicparsley/releases/latest>
@@ -315,7 +296,6 @@ Options:
   --no-auth                    skip authentication procedure
   --no-browser                 disable auto-launching of user browser
   --no-net-check               disable internet connection check
-  --ffmpeg <PATH>              explicit path to the ffmpeg binary
   --atomic-parsley <PATH>      explicit path to the atomic-parsley binary
   --no-stats                   don't show the stats on completion
   --pulsate-bar                show a pulsating bar
@@ -325,7 +305,6 @@ Options:
 
 Environment Variables:
   SHOW_DEBUG_STACK             show extended debug information
-  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`
   ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
 
 Info:
