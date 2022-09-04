@@ -1,6 +1,6 @@
 import {join, resolve, dirname} from 'path';
 import {tmpdir} from 'os';
-import {createHash} from 'crypto';
+import {createHash, randomBytes} from 'crypto';
 import {promises as fs, constants as fs_constants} from 'fs';
 
 import mkdirp from 'mkdirp';
@@ -30,9 +30,18 @@ export function forgetAll() {
 
 export default function genFile(opts) {
   let inner = async mode => {
-    opts = opts || {};
+    if ('tmpdir' in opts && opts.path) throw new Error('Cannot specify path and tmpdir');
+    opts = Object.assign({path: null, filename: null, dirname: null, tmpdir: true, keep: false}, opts);
+    if (opts.path && (opts.filename || opts.dirname)) throw new Error('Cannot specify path and either filename or dirname');
+    if (!(opts.path || opts.filename)) opts.filename = crypto.randomBytes(8).toString('hex');
+    if (opts.tmpdir)
+      if (opts.dirname) opts.dirname = join(tmpdir(), opts.dirname);
+      else opts.dirname = tmpdir();
+    if (!opts.path)
+      if (opts.filename && opts.dirname) opts.path = join(opts.dirname, opts.filename);
+      else throw new Error('Unable to determine file path');
     mode = fs_constants.O_CREAT | mode;
-    const path = resolve(join('tmpdir' in opts ? opts['tmpdir'] : tmpdir(), opts.dirname || '.', opts.filename));
+    const path = resolve(opts.path);
     let id = createHash('md5').update(`Ξ${mode}${path}`).digest('hex');
     let file = openfiles[id];
     if (!file) {

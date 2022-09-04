@@ -111,8 +111,7 @@ async function run_tests(suite, args, i) {
       if (attempt > 1 && lastErr !== unmetExpectations) abort();
 
       let logFile = await fileMgr({
-        filename: `${service}-${type}-${attempt}.log`,
-        tmpdir: test_stage_path,
+        path: join(test_stage_path, `${service}-${type}-${attempt}.log`),
         keep: true,
       }).open(fs_constants.W_OK);
 
