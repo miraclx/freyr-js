@@ -168,7 +168,7 @@ async function run_tests(suite, args, i) {
           ...child_args,
           uri,
         ]);
-        process.on('SIGINT', (handler = () => (spawn('docker', ['kill', child_id]), process.off('SIGINT', handler))));
+        process.on('exit', (handler = () => (spawn('docker', ['kill', child_id]), process.off('exit', handler))));
       }
 
       stdout.log(`\n$ ${child.spawnargs.join(' ')}\n`);
