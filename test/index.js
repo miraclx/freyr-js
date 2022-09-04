@@ -114,8 +114,7 @@ async function run_tests(suite, args, i) {
         filename: `${service}-${type}-${attempt}.log`,
         tmpdir: test_stage_path,
         keep: true,
-        mode: fs_constants.W_OK,
-      });
+      }).open(fs_constants.W_OK);
 
       logFile.stream = createWriteStream(null, {fd: logFile.handle});
 

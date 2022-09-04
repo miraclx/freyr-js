@@ -6,6 +6,8 @@ import {promises as fs, constants as fs_constants} from 'fs';
 import mkdirp from 'mkdirp';
 import esMain from 'es-main';
 
+import symbols from './symbols.js';
+
 const openfiles = {};
 const removeCallbacks = [];
 
@@ -26,54 +28,80 @@ export function forgetAll() {
   garbageCollector({forget: true});
 }
 
-export default async function genFile(opts) {
-  opts = opts || {};
-  let mode = fs_constants.O_CREAT | opts.mode;
-  const path = resolve(join('tmpdir' in opts ? opts['tmpdir'] : tmpdir(), opts.dirname || '.', opts.filename));
-  let id = createHash('md5').update(`Ξ${mode}${path}`).digest('hex');
-  let file = openfiles[id];
-  if (!file) {
-    await mkdirp(dirname(path));
-    file = openfiles[id] = {path, handle: null, refs: 1, closed: true, keep: false};
-  } else file.refs += 1;
-  if (file.closed) file.handle = await fs.open(path, mode);
-  hookupListeners();
-  const garbageHandler = async ({keep, forget = false} = {}) => {
-    file.keep ||= keep !== undefined ? keep : opts.keep;
-    if ((file.refs = Math.max(0, file.refs - 1))) return;
-    if (file.closed) return;
-    let handle = file.handle;
-    delete file.handle;
-    file.closed = true;
-    if (forget) delete openfiles[id];
-    await handle.close();
-    if (!file.keep) await fs.unlink(path);
+export default function genFile(opts) {
+  let inner = async mode => {
+    opts = opts || {};
+    mode = fs_constants.O_CREAT | mode;
+    const path = resolve(join('tmpdir' in opts ? opts['tmpdir'] : tmpdir(), opts.dirname || '.', opts.filename));
+    let id = createHash('md5').update(`Ξ${mode}${path}`).digest('hex');
+    let file = openfiles[id];
+    if (!file) {
+      await mkdirp(dirname(path));
+      file = openfiles[id] = {path, handle: null, refs: 1, closed: true, keep: false, writer: null};
+    } else file.refs += 1;
+    if (file.closed) [file.closed, file.handle] = [false, await fs.open(path, mode)];
+    hookupListeners();
+    const garbageHandler = async ({keep, forget = false} = {}) => {
+      file.keep ||= keep !== undefined ? keep : opts.keep;
+      if ((file.refs = Math.max(0, file.refs - 1))) return;
+      if (file.closed) return;
+      let handle = file.handle;
+      delete file.handle;
+      file.closed = true;
+      if (forget) delete openfiles[id];
+      await handle.close();
+      if (!file.keep) await fs.unlink(path);
+    };
+    removeCallbacks.push(garbageHandler);
+    return {
+      [symbols.fileId]: id,
+      path,
+      handle: file.handle,
+      removeCallback: async args => {
+        await garbageHandler({...args, keep: false});
+        removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
+      },
+    };
   };
-  removeCallbacks.push(garbageHandler);
-  return {
-    path,
-    handle: file.handle,
-    removeCallback: async args => {
-      await garbageHandler({...args, keep: false});
-      removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
+  let methods = {
+    read: () => inner(fs_constants.O_RDONLY),
+    /** File will be written to once, unless forcefully forgotten. */
+    writeOnce: async writerGen => {
+      let fileRef = await inner(fs_constants.O_WRONLY);
+      let file = openfiles[fileRef[symbols.fileId]];
+      await (file.writer ||= fileRef.writer = writerGen(fileRef));
+      return fileRef;
     },
+    open: inner,
+    write: () => Promise.reject(new Error('not yet implemented')),
   };
+  let used = false;
+  return Object.fromEntries(
+    Object.entries(methods).map(([name, fn]) => [
+      name,
+      async (...args) => {
+        if (used) throw new Error(`A FileReference can only be used once`);
+        used = true;
+        return await fn(...args);
+      },
+    ]),
+  );
 }
 
 async function test() {
   const filename = 'freyr_mgr_temp_file';
   async function testMgr(args) {
-    const file = await genFile({filename, ...args});
+    const file = await genFile({filename, ...args}).read();
     console.log('mgr>', file);
     return file;
   }
   let a = await testMgr();
   let b = await testMgr();
-  await testMgr({keep: true});
+  let _c = await testMgr({keep: true});
   let d = await testMgr();
   a.removeCallback();
   b.removeCallback();
-  // c.removeCallback(); // calling this would negate the keep directive
+  // _c.removeCallback(); // calling this would negate the keep directive
   d.removeCallback();
 }
 
