@@ -668,7 +668,7 @@ async function init(packageJson, queries, options) {
             meta: {
               track: {uri, name, artists, duration},
               service,
-              outFilePath,
+              outFile,
             },
           }) =>
             plStream.write(
@@ -678,7 +678,7 @@ async function init(packageJson, queries, options) {
                 `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
                 `${namespace.concat(
                   (entry => (!Config.playlist.escape ? entry : encodeURI(entry).replace(/#/g, '%23')))(
-                    xpath.relative(BASE_DIRECTORY, outFilePath),
+                    xpath.relative(BASE_DIRECTORY, outFile.path),
                   ),
                 )}`,
                 '',
@@ -759,11 +759,11 @@ async function init(packageJson, queries, options) {
 
         feed.setHeadHandler(async ({acceptsRanges}) => {
           let [offset, writeStream] = [];
-          if (acceptsRanges) await maybeStat(outputFile).then(({size}) => (offset = size));
+          if (acceptsRanges) await maybeStat(outputFile.path).then(({size}) => (offset = size));
           if (offset) {
             opts.resumeHandler(offset);
-            writeStream = createWriteStream(outputFile, {flags: 'a'});
-          } else writeStream = createWriteStream(outputFile, {flags: 'w'});
+            writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'a'});
+          } else writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'w'});
           feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
           return offset;
         });
@@ -781,7 +781,7 @@ async function init(packageJson, queries, options) {
         } else logger.write(opts.altMessage());
 
         let has_erred = false;
-        const writeStream = createWriteStream(outputFile);
+        const writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'w'});
 
         merge2(
           ...urlOrFragments.map((frag, i) => {
@@ -839,84 +839,94 @@ async function init(packageJson, queries, options) {
     async ({track, meta, feedMeta, trackLogger}) => {
       const baseCacheDir = 'fr3yrcach3';
 
-      const imageFile = await fileMgr({
-        filename: `freyrcli-${meta.fingerprint}.x4i`,
-        tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
-        dirname: baseCacheDir,
-        keep: true,
-      });
-
+      let imageFile;
       let imageBytesWritten = 0;
       try {
-        imageBytesWritten = await downloadToStream({
-          urlOrFragments: track.getImage(Config.image.width, Config.image.height),
-          outputFile: imageFile.path,
-          logger: trackLogger,
-          opts: {
-            tag: '[Retrieving album art]...',
-            retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-            resumeHandler: offset =>
-              trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
-            failureMessage: err =>
-              trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
-            successMessage: trackLogger.getText(`| [\u2713] Got album art`),
-            altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
-          },
-        });
-      } catch (err) {
-        await imageFile.removeCallback();
-        throw {err, [symbols.errorCode]: 3};
-      }
-
-      const rawAudio = await fileMgr({
-        filename: `freyrcli-${meta.fingerprint}.x4a`,
-        tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
-        dirname: baseCacheDir,
-        keep: true,
-      });
-
-      let audioBytesWritten = 0;
-      try {
-        audioBytesWritten = await downloadToStream(
-          _merge(
-            {
-              outputFile: rawAudio.path,
+        imageFile = await fileMgr({
+          filename: `freyrcli-${meta.fingerprint}.x4i`,
+          tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+          dirname: baseCacheDir,
+          keep: true,
+        }).writeOnce(async imageFile => {
+          try {
+            imageBytesWritten = await downloadToStream({
+              urlOrFragments: track.getImage(Config.image.width, Config.image.height),
+              outputFile: imageFile,
               logger: trackLogger,
               opts: {
-                tag: `[‘${meta.trackName}’]`,
+                tag: '[Retrieving album art]...',
                 retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
                 resumeHandler: offset =>
                   trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
-                successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
-                altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
+                failureMessage: err =>
+                  trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
+                successMessage: trackLogger.getText(`| [\u2713] Got album art`),
+                altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
               },
-            },
-            feedMeta.protocol !== 'http_dash_segments'
-              ? {
-                  urlOrFragments: feedMeta.url,
+            });
+          } catch (err) {
+            await imageFile.removeCallback();
+            throw err;
+          }
+        });
+      } catch (err) {
+        throw {err, [symbols.errorCode]: 3};
+      }
+
+      let rawAudio;
+      let audioBytesWritten = 0;
+      try {
+        rawAudio = await fileMgr({
+          filename: `freyrcli-${meta.fingerprint}.x4a`,
+          tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+          dirname: baseCacheDir,
+          keep: true,
+        }).writeOnce(async rawAudio => {
+          try {
+            audioBytesWritten = await downloadToStream(
+              _merge(
+                {
+                  outputFile: rawAudio,
+                  logger: trackLogger,
                   opts: {
-                    failureMessage: err =>
-                      trackLogger.getText(
-                        `| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`,
-                      ),
-                  },
-                }
-              : {
-                  urlOrFragments: feedMeta.fragments.map(({path}) => ({
-                    url: `${feedMeta.fragment_base_url}${path}`,
-                    ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
-                  })),
-                  opts: {
-                    failureMessage: err =>
-                      trackLogger.getText(
-                        `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
-                      ),
+                    tag: `[‘${meta.trackName}’]`,
+                    retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+                    resumeHandler: offset =>
+                      trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
+                    successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
+                    altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
                   },
                 },
-          ),
-        );
+                feedMeta.protocol !== 'http_dash_segments'
+                  ? {
+                      urlOrFragments: feedMeta.url,
+                      opts: {
+                        failureMessage: err =>
+                          trackLogger.getText(
+                            `| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`,
+                          ),
+                      },
+                    }
+                  : {
+                      urlOrFragments: feedMeta.fragments.map(({path}) => ({
+                        url: `${feedMeta.fragment_base_url}${path}`,
+                        ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
+                      })),
+                      opts: {
+                        failureMessage: err =>
+                          trackLogger.getText(
+                            `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
+                          ),
+                      },
+                    },
+              ),
+            );
+          } catch (err) {
+            await rawAudio.removeCallback();
+            throw err;
+          }
+        });
       } catch (err) {
-        await rawAudio.removeCallback();
         throw {err, [symbols.errorCode]: 4};
       }
 
@@ -932,7 +942,7 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
-        await Promise.promisify(atomicParsley)(meta.outFilePath, {
+        await Promise.promisify(atomicParsley)(meta.outFile.path, {
           overWrite: '', // overwrite the file
 
           title: track.name, // ©nam
@@ -1022,7 +1032,7 @@ async function init(packageJson, queries, options) {
             'ipod',
             outfile,
           );
-          await fs.writeFile(meta.outFilePath, ffmpeg.FS('readFile', outfile));
+          await fs.writeFile(meta.outFile.handle, ffmpeg.FS('readFile', outfile));
         } catch (err) {
           throw {err, [symbols.errorCode]: 7};
         } finally {
@@ -1036,17 +1046,27 @@ async function init(packageJson, queries, options) {
     'cli:postProcessor',
     Math.max(Config.concurrency.encoder, Config.concurrency.embedder),
     async ({track, meta, files, audioSource}) => {
-      await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, [symbols.errorCode]: 6}));
+      await mkdirp(xpath.dirname(meta.outFile.path)).catch(err => Promise.reject({err, [symbols.errorCode]: 6}));
       const wroteImage =
         !!options.cover &&
         (await (async outArtPath =>
           (await maybeStat(outArtPath).then(stat => stat && stat.isFile())) ||
           (await fs.copyFile(files.image.file.path, outArtPath), true))(
-          xpath.join(meta.outFileDir, `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
+          xpath.join(xpath.dirname(meta.outFile.path), `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
         ));
-      await encodeQueue.push({track, meta, files});
-      await embedQueue.push({track, meta, files, audioSource});
-      return {wroteImage, finalSize: (await fs.stat(meta.outFilePath)).size};
+      await fileMgr({
+        path: meta.outFile.path,
+      }).writeOnce(async audioFile => {
+        meta.outFile = audioFile;
+        try {
+          await encodeQueue.push({track, meta, files});
+          await embedQueue.push({track, meta, files, audioSource});
+        } catch (err) {
+          await audioFile.removeCallback();
+          throw err;
+        }
+      });
+      return {wroteImage, finalSize: (await fs.stat(meta.outFile.path)).size};
     },
   );
 
@@ -1178,7 +1198,7 @@ async function init(packageJson, queries, options) {
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
-      const meta = {trackName, outFileDir, outFilePath, track, service};
+      const meta = {trackName, outFile: {path: outFilePath}, track, service};
       return trackQueue
         .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
