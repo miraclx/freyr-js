@@ -15,7 +15,6 @@
   [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master)
   [![License](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
   [![CI checks](https://github.com/miraclx/freyr-js/actions/workflows/tests.yml/badge.svg)](https://github.com/miraclx/freyr-js/actions/workflows/tests.yml)
-  [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds)
 
   [![NPM Downloads](https://badgen.net/npm/dm/freyr)](https://www.npmjs.com/package/freyr)
   [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs)
