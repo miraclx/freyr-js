@@ -300,15 +300,9 @@ export default class AppleMusic {
   }
 
   async getArtistAlbums(uris, store) {
-    return this.processData(
+    return this.getAlbum(
       (await this.getArtist(uris)).albums.map(album => `apple_music:album:${album}`),
-      100,
       store,
-      (items, storefront) =>
-        this.getAlbum(
-          items.map(item => item.uri),
-          storefront,
-        ),
     );
   }
 }
