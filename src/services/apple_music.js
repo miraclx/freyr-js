@@ -198,11 +198,11 @@ export default class AppleMusic {
 
   async processData(uris, max, store, coreFn) {
     const wasArr = Array.isArray(uris);
-    uris = (wasArr ? uris : [uris]).map(_uri => {
+    uris = (wasArr ? uris : [uris]).flatMap(_uri => {
       const parsed = this.parseURI(_uri, store);
-      if (!parsed) return [, {}];
+      if (!parsed) return [];
       parsed.value = this.#store.cache.get(parsed.uri);
-      return [parsed.id || parsed.refID, parsed];
+      return [[parsed.id || parsed.refID, parsed]];
     });
     const packs = uris.filter(([, {value}]) => !value).map(([, parsed]) => parsed);
     uris = Object.fromEntries(uris);
