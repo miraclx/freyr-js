@@ -71,6 +71,7 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         service:
           - { id: spotify, name: Spotify }
