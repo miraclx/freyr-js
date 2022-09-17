@@ -6,6 +6,9 @@ function insulate(items) {
   return items;
 }
 
+const IsProvisionedProxy = Symbol('IsProvisionedProxy');
+const ResourceDropSignal = Symbol('ResourceDropSignal');
+
 export default class AsyncQueue {
   static debugStack = Symbol('AsyncQueueStack');
 
@@ -47,6 +50,7 @@ export default class AsyncQueue {
     if (worker !== undefined && typeof worker !== 'function')
       throw TypeError('the <worker> argument, if specified must be a `function`');
     this.#store.name = name || 'AsyncQueue';
+    this.#store.worker = worker;
     this.#store.queue = async.queue(({data, args}, cb) => {
       (async () => (worker ? worker(data, ...args) : typeof data === 'function' ? data.apply(null, args) : data))()
         .then(res => cb(null, res))
@@ -67,14 +71,17 @@ export default class AsyncQueue {
 
   static provision(genFn, worker) {
     let resources = [];
-    return async (...args) => {
+    let fn = async (...args) => {
       let resource = resources.shift() || (await genFn());
+      if (args[0] === ResourceDropSignal) return void (resources = []);
       try {
         return await worker(resource, ...args);
       } finally {
         resources.push(resource);
       }
     };
+    fn[IsProvisionedProxy] = true;
+    return fn;
   }
 
   #_register = (objects, meta, handler) => {
@@ -173,6 +180,7 @@ export default class AsyncQueue {
    */
   abort() {
     this.#store.queue.kill();
+    if (this.#store.worker && this.#store.worker[IsProvisionedProxy]) this.#store.worker(ResourceDropSignal);
   }
 
   /**
