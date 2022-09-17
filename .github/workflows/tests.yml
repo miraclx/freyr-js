@@ -172,7 +172,7 @@ jobs:
           docker pull freyrcli/freyrjs-git:${{ steps.tag-for-report.outputs.tag }}
           ```
 
-          | [**Base Branch (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-shas.outputs.base_sha }}?color=gray&label=%20&logo=docker)][base-url] |
+          | [**Base (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-shas.outputs.base_sha }}?color=gray&label=%20&logo=docker)][base-url] |
           | :-: | - |
 
           ---
@@ -229,7 +229,7 @@ jobs:
           docker pull freyrcli/freyrjs-git:${{ steps.tag-for-report.outputs.tag }}
           ```
 
-          | [**Base Branch (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-shas.outputs.base_sha }}?color=gray&label=%20&logo=docker)][base-url] |
+          | [**Base (${{ github.event.pull_request.base.ref }})**][base-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.get-shas.outputs.base_sha }}?color=gray&label=%20&logo=docker)][base-url] |
           | :-: | - |
           | [**This Patch**][pr-url] | [![](https://img.shields.io/docker/image-size/freyrcli/freyrjs-git/${{ steps.tag-for-report.outputs.tag }}?color=gray&label=%20&logo=docker)][pr-url] |
 
