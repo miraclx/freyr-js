@@ -192,6 +192,7 @@ export default class AppleMusic {
       type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
       ntracks: playlistObject.relationships.tracks.data.length,
       tracks: playlistObject.relationships.tracks.data,
+      // hasNonTrack: !!~playlistObject.attributes.trackTypes.findIndex(type => type !== 'songs'),
     };
   }
 
