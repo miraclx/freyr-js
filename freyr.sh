@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$DOCKER_DESKTOP" = "true" ]; then
-  COLS=$(stty size | cut -d" " -f2)
+  COLS=$(stty size 2>&- | cut -d" " -f2)
   (
     echo
     echo
