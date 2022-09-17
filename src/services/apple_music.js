@@ -190,8 +190,8 @@ export default class AppleMusic {
       owner_id: null,
       owner_name: playlistObject.attributes.curatorName,
       type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
-      ntracks: playlistObject.relationships.tracks.data.length,
-      tracks: playlistObject.relationships.tracks.data,
+      ntracks: playlistObject.tracks.length,
+      tracks: playlistObject.tracks,
     };
   }
 
@@ -199,6 +199,7 @@ export default class AppleMusic {
     const wasArr = Array.isArray(uris);
     uris = (wasArr ? uris : [uris]).map(_uri => {
       const parsed = this.parseURI(_uri, store);
+      if (!parsed) return [, {}];
       parsed.value = this.#store.cache.get(parsed.uri);
       return [parsed.id || parsed.refID, parsed];
     });
@@ -271,11 +272,22 @@ export default class AppleMusic {
     );
   }
 
+  async depaginate(paginatedObject, nextHandler) {
+    const {data, next} = await paginatedObject;
+    if (!next) return data;
+    return data.concat(await this.depaginate(await nextHandler(next), nextHandler));
+  }
+
   async getPlaylist(uris, store) {
     return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
         (await this.#store.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-        playlist => this.wrapPlaylistData(playlist),
+        async playlist => {
+          playlist.tracks = await this.depaginate(playlist.relationships.tracks, nextUrl =>
+            this.#store.core.playlists.get(`${playlist.id}/${nextUrl.split(playlist.href)[1]}`, {storefront}),
+          );
+          return this.wrapPlaylistData(playlist);
+        },
       ),
     );
   }
