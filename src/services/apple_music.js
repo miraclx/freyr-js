@@ -159,8 +159,8 @@ export default class AppleMusic {
             ]
               .map(([val, size]) => val.toString().padStart(size, '0'))
               .join('-'))(albumObject.attributes.releaseDate),
+      tracks: albumObject.tracks,
       ntracks: albumObject.attributes.trackCount,
-      tracks: albumObject.relationships.tracks.data,
       getImage(width, height) {
         const min = (val, max) => Math.min(max, val) || max;
         const images = albumObject.attributes.artwork;
@@ -175,8 +175,8 @@ export default class AppleMusic {
       uri: artistObject.attributes.url,
       name: artistObject.attributes.name,
       genres: artistObject.attributes.genreNames,
-      albums: artistObject.relationships.albums.data.map(album => album.id),
-      nalbums: null,
+      albums: artistObject.albums.map(album => album.id),
+      nalbums: artistObject.albums.length,
     };
   }
 
@@ -190,8 +190,8 @@ export default class AppleMusic {
       owner_id: null,
       owner_name: playlistObject.attributes.curatorName,
       type: playlistObject.attributes.playlistType.split('-').map(word => `${word[0].toUpperCase()}${word.slice(1)}`),
-      ntracks: playlistObject.tracks.length,
       tracks: playlistObject.tracks,
+      ntracks: playlistObject.tracks.length,
     };
   }
 
@@ -231,6 +231,12 @@ export default class AppleMusic {
     return !wasArr ? ret[0] : ret;
   }
 
+  async depaginate(paginatedObject, nextHandler) {
+    const {data, next} = await paginatedObject;
+    if (!next) return data;
+    return data.concat(await this.depaginate(await nextHandler(next), nextHandler));
+  }
+
   async getTrack(uris, store) {
     return this.processData(uris, 300, store, async (items, storefront) => {
       const {data: tracks} = await this.#store.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront});
@@ -238,12 +244,24 @@ export default class AppleMusic {
         items.map(item => `apple_music:album:${item.refID}`),
         storefront,
       );
-      return Promise.mapSeries(tracks, async track =>
-        this.wrapTrackMeta(
+      return Promise.mapSeries(tracks, async track => {
+        track.artist = await this.depaginate(track.relationships.artist, nextUrl => {
+          let err = new Error('Unimplemented: track artists pagination');
+          [err.trackId, err.trackHref, err.nextUrl] = [track.id, track.href, nextUrl];
+          throw err;
+          // this.#store.core.tracks.get(`${track.id}/${nextUrl.split(track.href)[1]}`, {storefront});
+        });
+        track.album = await this.depaginate(track.relationships.album, nextUrl => {
+          let err = new Error('Unimplemented: track albums pagination');
+          [err.trackId, err.trackHref, err.nextUrl] = [track.id, track.href, nextUrl];
+          throw err;
+          // this.#store.core.tracks.get(`${track.id}/${nextUrl.split(track.href)[1]}`, {storefront});
+        });
+        return this.wrapTrackMeta(
           track,
           await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`, storefront),
-        ),
-      );
+        );
+      });
     });
   }
 
@@ -251,7 +269,15 @@ export default class AppleMusic {
     return this.processData(uris, 100, store, async (items, storefront) =>
       Promise.mapSeries(
         (await this.#store.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-        album => this.wrapAlbumData(album),
+        async album => {
+          album.tracks = await this.depaginate(album.relationships.tracks, nextUrl => {
+            let err = new Error('Unimplemented: album tracks pagination');
+            [err.albumId, err.albumHref, err.nextUrl] = [album.id, album.href, nextUrl];
+            throw err;
+            // this.#store.core.albums.get(`${album.id}/${nextUrl.split(album.href)[1]}`, {storefront});
+          });
+          return this.wrapAlbumData(album);
+        },
       ),
     );
   }
@@ -267,15 +293,17 @@ export default class AppleMusic {
     return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
         (await this.#store.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
-        artist => this.wrapArtistData(artist),
+        async artist => {
+          artist.album = await this.depaginate(artist.relationships.album, nextUrl => {
+            let err = new Error('Unimplemented: artist albums pagination');
+            [err.artistId, err.artistHref, err.nextUrl] = [artist.id, artist.href, nextUrl];
+            throw err;
+            // this.#store.core.artists.get(`${artist.id}/${nextUrl.split(artist.href)[1]}`, {storefront});
+          });
+          return this.wrapArtistData(artist);
+        },
       ),
     );
-  }
-
-  async depaginate(paginatedObject, nextHandler) {
-    const {data, next} = await paginatedObject;
-    if (!next) return data;
-    return data.concat(await this.depaginate(await nextHandler(next), nextHandler));
   }
 
   async getPlaylist(uris, store) {
