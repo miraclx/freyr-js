@@ -245,13 +245,13 @@ export default class AppleMusic {
         storefront,
       );
       return Promise.mapSeries(tracks, async track => {
-        track.artist = await this.depaginate(track.relationships.artist, nextUrl => {
+        track.artist = await this.depaginate(track.relationships.artists, nextUrl => {
           let err = new Error('Unimplemented: track artists pagination');
           [err.trackId, err.trackHref, err.nextUrl] = [track.id, track.href, nextUrl];
           throw err;
           // this.#store.core.tracks.get(`${track.id}/${nextUrl.split(track.href)[1]}`, {storefront});
         });
-        track.album = await this.depaginate(track.relationships.album, nextUrl => {
+        track.album = await this.depaginate(track.relationships.albums, nextUrl => {
           let err = new Error('Unimplemented: track albums pagination');
           [err.trackId, err.trackHref, err.nextUrl] = [track.id, track.href, nextUrl];
           throw err;
@@ -294,7 +294,7 @@ export default class AppleMusic {
       Promise.mapSeries(
         (await this.#store.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
         async artist => {
-          artist.album = await this.depaginate(artist.relationships.album, nextUrl => {
+          artist.album = await this.depaginate(artist.relationships.albums, nextUrl => {
             let err = new Error('Unimplemented: artist albums pagination');
             [err.artistId, err.artistHref, err.nextUrl] = [artist.id, artist.href, nextUrl];
             throw err;
