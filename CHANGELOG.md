@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - BREAKING: replaced `-D, --downloader` with `-S, --source`, introduced the `-D, --check-dir` flag. <https://github.com/miraclx/freyr-js/pull/350>
+- BREAKING: replaced the `.downloader.order` entry in the config file with `.downloader.sources`. <https://github.com/miraclx/freyr-js/pull/350>
 - Implemented ability to check for track existence in other directories. <https://github.com/miraclx/freyr-js/pull/350>
 - Fix YouTube feed sourcing logic after dependency update. <https://github.com/miraclx/freyr-js/pull/299>
 - Update minimum Node.js version to `v14`. <https://github.com/miraclx/freyr-js/pull/293>
