@@ -9,10 +9,10 @@ import esMain from 'es-main';
 import symbols from './symbols.js';
 
 const openfiles = {};
-const removeCallbacks = [];
+const removeHandlers = [];
 
 function garbageCollector(args) {
-  while (removeCallbacks.length) removeCallbacks.pop()(args);
+  while (removeHandlers.length) removeHandlers.pop()(args);
 }
 
 let hookedUpListeners = false;
@@ -61,14 +61,14 @@ export default function genFile(opts) {
       await handle.close();
       if (!file.keep) await fs.unlink(path);
     };
-    removeCallbacks.push(garbageHandler);
+    removeHandlers.push(garbageHandler);
     return {
       [symbols.fileId]: id,
       path,
       handle: file.handle,
-      removeCallback: async args => {
+      remove: async args => {
         await garbageHandler({...args, keep: false});
-        removeCallbacks.splice(removeCallbacks.indexOf(garbageHandler), 1);
+        removeHandlers.splice(removeHandlers.indexOf(garbageHandler), 1);
       },
     };
   };
@@ -108,10 +108,10 @@ async function test() {
   let b = await testMgr();
   let _c = await testMgr({keep: true});
   let d = await testMgr();
-  a.removeCallback();
-  b.removeCallback();
-  // _c.removeCallback(); // calling this would negate the keep directive
-  d.removeCallback();
+  a.remove();
+  b.remove();
+  // _c.remove(); // calling this would negate the keep directive
+  d.remove();
 }
 
 if (esMain(import.meta)) test().catch(err => console.error('cli>', err));

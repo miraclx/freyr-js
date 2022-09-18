@@ -882,7 +882,7 @@ async function init(packageJson, queries, options) {
               },
             });
           } catch (err) {
-            await imageFile.removeCallback();
+            await imageFile.remove();
             throw err;
           }
         });
@@ -939,7 +939,7 @@ async function init(packageJson, queries, options) {
               ),
             );
           } catch (err) {
-            await rawAudio.removeCallback();
+            await rawAudio.remove();
             throw err;
           }
         });
@@ -1012,7 +1012,7 @@ async function init(packageJson, queries, options) {
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};
       } finally {
-        await files.image.file.removeCallback();
+        await files.image.file.remove();
       }
     },
   );
@@ -1053,7 +1053,7 @@ async function init(packageJson, queries, options) {
         } catch (err) {
           throw {err, [symbols.errorCode]: 7};
         } finally {
-          await files.audio.file.removeCallback();
+          await files.audio.file.remove();
         }
       },
     ),
@@ -1079,7 +1079,7 @@ async function init(packageJson, queries, options) {
           await encodeQueue.push({track, meta, files});
           await embedQueue.push({track, meta, files, audioSource});
         } catch (err) {
-          await audioFile.removeCallback();
+          await audioFile.remove();
           throw err;
         }
       });
