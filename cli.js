@@ -1145,7 +1145,8 @@ async function init(packageJson, queries, options) {
 
     if (props.fileExists) {
       let otherLocations = props.fileExistsIn.filter(path => path !== meta.outFile.path);
-      let prefix = props.fileExistsIn.includes(meta.outFile.path) ? 'Also ' : '';
+      let outputFilePathExists = props.fileExistsIn.includes(meta.outFile.path);
+      let prefix = outputFilePathExists ? 'Also ' : '';
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
         if (otherLocations.length === 1) trackLogger.log(`| [\u00bb] ${prefix}Found In: ${otherLocations[0]}`);
@@ -1153,9 +1154,9 @@ async function init(packageJson, queries, options) {
           trackLogger.log(`| [\u00bb] ${prefix}Found In:`);
           for (let path of otherLocations) trackLogger.log(`| [\u00bb]  - ${path}`);
         }
-        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: props.fileExistsIn.includes(meta.outFile.path)};
+        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: outputFilePathExists};
       }
-      trackLogger.log('| [\u2022] Track exists. Overwriting...');
+      trackLogger.log(`| [\u2022] Track exists. ${outputFilePathExists ? 'Overwriting' : 'Recreating'}...`);
       if (otherLocations.length === 1) trackLogger.log(`| [\u2022] ${prefix}Found In: ${otherLocations[0]}`);
       else if (otherLocations.length > 1) {
         trackLogger.log(`| [\u2022] ${prefix}Found In:`);
