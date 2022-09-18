@@ -1582,9 +1582,9 @@ function prepCli(packageJson) {
     .option(
       '-D, --check-dir <DIR>',
       [
-        'check if tracks already exist in another DIR (repeatable)',
+        'check if tracks already exist in another DIR (repeatable, optionally comma-separated)',
         '(useful if you maintain multiple libraries)',
-        '(example: `-D dir1 -D dir2`)',
+        '(example: `-D dir1 -D dir2 -D dir3,dir4`)',
       ].join('\n'),
       (spec, stack) => (stack || []).concat(spec.split(',')),
     )
