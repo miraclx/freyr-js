@@ -684,6 +684,7 @@ Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/
 - `filters`: \<[FilterRules](#filterrules)[]\> Filter rules each track must match to be downloaded.
 - `dirs`: \<object\>
   - `output`: \<string\> Default download directory. Default: `"."`
+  - `check`: \<string[]\> List of directories to check for existing files. Default: `["."]`
   - `cache`: \<string\> Default temp download directory. Default: `"<tmp>"`
 - `playlist`: \<object\>
   - `always`: \<boolean\> Always create playlists for collections and non-collections alike.
@@ -698,7 +699,7 @@ Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/
 - `downloader`: \<object\>
   - `memCache`: \<boolean\> Whether or not to use in-memory caching for download chunks.
   - `cacheSize`: \<number\> Maximum size of bytes to be cached per download.
-  - `order`: \<array\> Service download sources order.
+  - `sources`: \<array\> Service download sources order.
     - Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
     - supported: `youtube`, `yt_music`
     - default: `[ "yt_music", "youtube" ]`

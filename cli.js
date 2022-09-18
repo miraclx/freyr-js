@@ -263,10 +263,10 @@ async function processPromise(promise, logger, messageHandlers) {
 }
 
 const VALIDS = {
-  bitrates: FreyrCore.getBitrates(),
-  downloaders: FreyrCore.getEngineMetas()
+  sources: FreyrCore.getEngineMetas()
     .filter(meta => meta.PROPS.isSourceable)
     .map(meta => meta.ID),
+  bitrates: FreyrCore.getBitrates(),
   concurrency: ['queries', 'tracks', 'trackStage', 'downloader', 'encoder', 'embedder'],
 };
 
@@ -334,9 +334,9 @@ function PROCESS_IMAGE_SIZE(value) {
   return {width: parts[0], height: parts[1] || parts[0]};
 }
 
-function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
+function PROCESS_DOWNLOADER_SOURCES(value, throwEr) {
   if (!Array.isArray(value)) return throwEr();
-  return value.filter(Boolean).map(item => (!VALIDS.downloaders.includes(item) ? throwEr(item) : item));
+  return value.filter(Boolean).map(item => (!VALIDS.sources.includes(item) ? throwEr(item) : item));
 }
 
 const [RULE_DEFAULTS, RULE_HANDLERS] = [
@@ -480,8 +480,8 @@ async function init(packageJson, queries, options) {
       if (!(options.coverSize = PROCESS_IMAGE_SIZE(options.coverSize))) throw err;
     }
 
-    options.downloader = PROCESS_DOWNLOADER_ORDER((options.downloader || '').split(','), item => {
-      throw new Error(`downloader specification within the \`--downloader\` must be valid. found [${item}]`);
+    options.sources = PROCESS_DOWNLOADER_SOURCES((options.sources || '').split(','), item => {
+      throw new Error(`source specification within the \`--sources\` arg must be valid. found [${item}]`);
     });
   } catch (err) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', err.message || err);
@@ -501,6 +501,8 @@ async function init(packageJson, queries, options) {
     },
     dirs: {
       output: '.',
+      check: ['.'],
+      cache: '<tmp>',
     },
     playlist: {
       always: false, // always create playlists for queries
@@ -526,13 +528,13 @@ async function init(packageJson, queries, options) {
     downloader: {
       memCache: true,
       cacheSize: 209715200,
-      order: ['yt_music', 'youtube'],
+      sources: ['yt_music', 'youtube'],
     },
   };
   try {
     if (await maybeStat(options.config)) {
       Config = _mergeWith(Config, JSON.parse(await fs.readFile(options.config)), (a, b, k) =>
-        k === 'order' && [a, b].every(Array.isArray) ? b.concat(a) : undefined,
+        ['sources', 'check'].includes(k) && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined,
       );
     } else {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
@@ -540,9 +542,9 @@ async function init(packageJson, queries, options) {
     }
     const errMessage = new Error(`[key: image, value: ${JSON.stringify(Config.image)}]`);
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
-    Config.downloader.order = PROCESS_DOWNLOADER_ORDER(Config.downloader.order, item => {
-      if (item) throw new Error(`Downloader order within the config file must be valid. found [${item}]`);
-      throw new Error(`Downloader order must be an array of strings`);
+    Config.downloader.sources = PROCESS_DOWNLOADER_SOURCES(Config.downloader.sources, item => {
+      if (item) throw new Error(`Download sources within the config file must be valid. found [${item}]`);
+      throw new Error(`Download sources must be an array of strings`);
     });
     options.filter.extend(Config.filters);
   } catch (err) {
@@ -553,10 +555,15 @@ async function init(packageJson, queries, options) {
 
   Config.image = _merge(Config.image, options.coverSize);
   Config.concurrency = _merge(Config.concurrency, options.concurrency);
-  Config.dirs = _merge(Config.dirs, {
-    output: options.directory,
-    cache: options.cacheDir,
-  });
+  Config.dirs = _mergeWith(
+    Config.dirs,
+    {
+      output: options.directory,
+      check: options.checkDir,
+      cache: options.cacheDir,
+    },
+    (a, b, k) => (k === 'check' && [a, b].every(Array.isArray) ? a.concat(b) : undefined),
+  );
   Config.opts = _merge(Config.opts, {
     netCheck: options.netCheck,
     attemptAuth: options.auth,
@@ -575,9 +582,9 @@ async function init(packageJson, queries, options) {
     {
       memCache: options.memCache !== undefined ? !!options.memCache : undefined,
       cacheSize: options.memCache,
-      order: options.downloader,
+      sources: options.sources,
     },
-    (a, b, k) => (k === 'order' ? Array.from(new Set(b.concat(a))) : b !== undefined ? b : undefined),
+    (a, b, k) => (k === 'sources' && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined),
   );
 
   if (Config.opts.netCheck && !(await isOnline()))
@@ -594,6 +601,16 @@ async function init(packageJson, queries, options) {
     })) === null
   )
     process.exit(5);
+
+  const CHECK_DIRECTORIES = Array.from(
+    new Set((Config.dirs.check || []).map(path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))),
+  );
+
+  for (let checkDir of CHECK_DIRECTORIES)
+    if (!(await maybeStat(checkDir)))
+      stackLogger.error(`\x1b[31m[!]\x1b[0m Check Directory [${checkDir}] doesn't exist`), process.exit(5);
+
+  if (!CHECK_DIRECTORIES.includes(BASE_DIRECTORY)) CHECK_DIRECTORIES.unshift(BASE_DIRECTORY);
 
   let freyrCore;
   try {
@@ -628,7 +645,7 @@ async function init(packageJson, queries, options) {
     schema,
   });
 
-  const sourceStack = freyrCore.sortSources(Config.downloader.order);
+  const sourceStack = freyrCore.sortSources(Config.downloader.sources);
 
   let atomicParsley;
 
@@ -1127,11 +1144,24 @@ async function init(packageJson, queries, options) {
     }
 
     if (props.fileExists) {
+      let otherLocations = props.fileExistsIn.filter(path => path !== meta.outFile.path);
+      let outputFilePathExists = props.fileExistsIn.includes(meta.outFile.path);
+      let prefix = outputFilePathExists ? 'Also ' : '';
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: true};
+        if (otherLocations.length === 1) trackLogger.log(`| [\u00bb] ${prefix}Found In: ${otherLocations[0]}`);
+        else if (otherLocations.length > 1) {
+          trackLogger.log(`| [\u00bb] ${prefix}Found In:`);
+          for (let path of otherLocations) trackLogger.log(`| [\u00bb]  - ${path}`);
+        }
+        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: outputFilePathExists};
       }
-      trackLogger.log('| [\u2022] Track exists. Overwriting...');
+      trackLogger.log(`| [\u2022] Track exists. ${outputFilePathExists ? 'Overwriting' : 'Recreating'}...`);
+      if (otherLocations.length === 1) trackLogger.log(`| [\u2022] ${prefix}Found In: ${otherLocations[0]}`);
+      else if (otherLocations.length > 1) {
+        trackLogger.log(`| [\u2022] ${prefix}Found In:`);
+        for (let path of otherLocations) trackLogger.log(`| [\u2022]  - ${path}`);
+      }
     }
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
@@ -1182,10 +1212,6 @@ async function init(packageJson, queries, options) {
           err: new Error("local-typed tracks aren't supported"),
           meta: {track: {uri: track[symbols.errorStack].uri}},
         };
-      const outFileDir = xpath.join(
-        BASE_DIRECTORY,
-        ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
-      );
       const trackBaseName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
       const trackName = trackBaseName.concat(
         isPlaylist || (track.compilation && track.album_artist === 'Various Artists')
@@ -1193,14 +1219,25 @@ async function init(packageJson, queries, options) {
           : '',
       );
       const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.m4a`;
-      const outFilePath = xpath.join(outFileDir, outFileName);
-      const fileExists = !!(await maybeStat(outFilePath));
+      const trackPath = xpath.join(
+        ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
+      );
+      const outFilePath = xpath.join(BASE_DIRECTORY, trackPath, outFileName);
+      const fileExistsIn = (
+        await Promise.all(
+          CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName)).map(async path => [
+            path,
+            !!(await maybeStat(xpath.join(path))),
+          ]),
+        )
+      ).flatMap(([dir, exists]) => (exists ? [dir] : []));
+      let fileExists = !!fileExistsIn.length;
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
       const meta = {trackName, outFile: {path: outFilePath}, track, service};
       return trackQueue
-        .push({track, meta, props: {collectSources, fileExists, processTrack, logger}})
+        .push({track, meta, props: {collectSources, fileExists, fileExistsIn, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
         .catch(errObject => ({meta, [symbols.errorCode]: 10, ...errObject}));
     },
@@ -1542,6 +1579,15 @@ function prepCli(packageJson) {
     .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
     .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
     .option('-d, --directory <DIR>', 'save tracks to DIR/..')
+    .option(
+      '-D, --check-dir <DIR>',
+      [
+        'check if tracks already exist in another DIR (repeatable, optionally comma-separated)',
+        '(useful if you maintain multiple libraries)',
+        '(example: `-D dir1 -D dir2 -D dir3,dir4`)',
+      ].join('\n'),
+      (spec, stack) => (stack || []).concat(spec.split(',')),
+    )
     .option('-c, --cover <NAME>', 'custom name for the cover art, excluding the extension', 'cover')
     .option(
       '--cover-size <SIZE>',
@@ -1555,8 +1601,8 @@ function prepCli(packageJson) {
       'm4a',
     )
     .option(
-      '-D, --downloader <SERVICE>',
-      ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
+      '-S, --sources <SERVICE>',
+      ['specify a preferred audio source or a `,`-separated preference order', `(valid: ${VALIDS.sources})`].join('\n'),
       'yt_music',
     )
     .option(
