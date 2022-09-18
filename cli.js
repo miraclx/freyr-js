@@ -1144,20 +1144,22 @@ async function init(packageJson, queries, options) {
     }
 
     if (props.fileExists) {
+      let otherLocations = props.fileExistsIn.filter(path => path !== meta.outFile.path);
+      let prefix = props.fileExistsIn.includes(meta.outFile.path) ? 'Also ' : '';
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        if (props.fileExistsIn.length === 1) trackLogger.log(`| [\u00bb] Found In: ${props.fileExistsIn[0]}`);
-        else if (props.fileExistsIn.length > 1) {
-          trackLogger.log(`| [\u00bb] Found In:`);
-          for (let path of props.fileExistsIn) trackLogger.log(`| [\u00bb]  - ${path}`);
+        if (otherLocations.length === 1) trackLogger.log(`| [\u00bb] ${prefix}Found In: ${otherLocations[0]}`);
+        else if (otherLocations.length > 1) {
+          trackLogger.log(`| [\u00bb] ${prefix}Found In:`);
+          for (let path of otherLocations) trackLogger.log(`| [\u00bb]  - ${path}`);
         }
-        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: true};
+        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: props.fileExistsIn.includes(meta.outFile.path)};
       }
       trackLogger.log('| [\u2022] Track exists. Overwriting...');
-      if (props.fileExistsIn.length === 1) trackLogger.log(`| [\u2022] Found In: ${props.fileExistsIn[0]}`);
-      else if (props.fileExistsIn.length > 1) {
-        trackLogger.log(`| [\u2022] Found In:`);
-        for (let path of props.fileExistsIn) trackLogger.log(`| [\u2022]  - ${path}`);
+      if (otherLocations.length === 1) trackLogger.log(`| [\u2022] ${prefix}Found In: ${otherLocations[0]}`);
+      else if (otherLocations.length > 1) {
+        trackLogger.log(`| [\u2022] ${prefix}Found In:`);
+        for (let path of otherLocations) trackLogger.log(`| [\u2022]  - ${path}`);
       }
     }
     trackLogger.log('| \u27a4 Collating sources...');
@@ -1220,7 +1222,7 @@ async function init(packageJson, queries, options) {
         ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
       );
       const outFilePath = xpath.join(BASE_DIRECTORY, trackPath, outFileName);
-      let fileExistsIn = (
+      const fileExistsIn = (
         await Promise.all(
           CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName)).map(async path => [
             path,
@@ -1229,7 +1231,6 @@ async function init(packageJson, queries, options) {
         )
       ).flatMap(([dir, exists]) => (exists ? [dir] : []));
       let fileExists = !!fileExistsIn.length;
-      fileExistsIn = fileExistsIn.filter(path => path !== outFilePath);
       const processTrack = !fileExists || options.force;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
