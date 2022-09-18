@@ -1586,7 +1586,7 @@ function prepCli(packageJson) {
         '(useful if you maintain multiple libraries)',
         '(example: `-D dir1 -D dir2`)',
       ].join('\n'),
-      (spec, stack) => (stack || []).concat(spec),
+      (spec, stack) => (stack || []).concat(spec.split(',')),
     )
     .option('-c, --cover <NAME>', 'custom name for the cover art, excluding the extension', 'cover')
     .option(
