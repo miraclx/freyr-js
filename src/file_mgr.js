@@ -11,22 +11,18 @@ import symbols from './symbols.js';
 const openfiles = {};
 const removeHandlers = [];
 
-function garbageCollector(args) {
-  while (removeHandlers.length) removeHandlers.pop()(args);
+export async function garbageCollector(args) {
+  await Promise.all(removeHandlers.splice(0, Infinity).map(fn => fn(args)));
 }
 
 let hookedUpListeners = false;
-function hookupListeners() {
-  if (!hookedUpListeners) {
-    hookedUpListeners = true;
-    let fn = () => (garbageCollector(), process.removeListener('exit', fn));
-    process.addListener('exit', fn);
-  }
-}
-
-export function forgetAll() {
-  garbageCollector({forget: true});
-}
+const hookupListeners = () =>
+  !hookedUpListeners && (hookedUpListeners = true)
+    ? process.addListener('beforeExit', garbageCollector.bind(null, void 0)).addListener('exit', () => {
+        let err = new Error('[file_mgr] Somehow, there are still files that need to be removed');
+        if (removeHandlers.length) throw err;
+      })
+    : void 0;
 
 export default function genFile(opts) {
   let inner = async mode => {
@@ -50,14 +46,14 @@ export default function genFile(opts) {
     } else file.refs += 1;
     if (file.closed) [file.closed, file.handle] = [false, await fs.open(path, mode)];
     hookupListeners();
-    const garbageHandler = async ({keep, forget = false} = {}) => {
+    const garbageHandler = async ({keep} = {}) => {
       file.keep ||= keep !== undefined ? keep : opts.keep;
       if ((file.refs = Math.max(0, file.refs - 1))) return;
       if (file.closed) return;
       let handle = file.handle;
       delete file.handle;
       file.closed = true;
-      if (forget) delete openfiles[id];
+      delete openfiles[id];
       await handle.close();
       if (!file.keep) await fs.unlink(path);
     };
@@ -66,8 +62,8 @@ export default function genFile(opts) {
       [symbols.fileId]: id,
       path,
       handle: file.handle,
-      remove: async args => {
-        await garbageHandler({...args, keep: false});
+      remove: async () => {
+        await garbageHandler({keep: false});
         removeHandlers.splice(removeHandlers.indexOf(garbageHandler), 1);
       },
     };
