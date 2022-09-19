@@ -1011,8 +1011,6 @@ async function init(packageJson, queries, options) {
         });
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};
-      } finally {
-        await files.image.file.remove();
       }
     },
   );
@@ -1052,8 +1050,6 @@ async function init(packageJson, queries, options) {
           await fs.writeFile(meta.outFile.handle, ffmpeg.FS('readFile', outfile));
         } catch (err) {
           throw {err, [symbols.errorCode]: 7};
-        } finally {
-          await files.audio.file.remove();
         }
       },
     ),
@@ -1536,6 +1532,7 @@ async function init(packageJson, queries, options) {
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===============================');
   }
+  await fileMgr.garbageCollect();
 }
 
 function prepCli(packageJson) {

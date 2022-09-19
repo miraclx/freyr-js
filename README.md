@@ -253,13 +253,16 @@ Options:
                                (`infinite` for infinite) (default: 10)
   -t, --meta-retries <N>       set number of retries for collating track feeds (`infinite` for infinite) (default: 5)
   -d, --directory <DIR>        save tracks to DIR/..
+  -D, --check-dir <DIR>        check if tracks already exist in another DIR (repeatable, optionally comma-separated)
+                               (useful if you maintain multiple libraries)
+                               (example: `-D dir1 -D dir2 -D dir3,dir4`)
   -c, --cover <NAME>           custom name for the cover art, excluding the extension (default: "cover")
   --cover-size <SIZE>          preferred cover art dimensions
                                (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
   -C, --no-cover               skip saving a cover art
   -x, --format <FORMAT>        preferred audio output format (to export) (unimplemented)
                                (valid: mp3,m4a,flac) (default: "m4a")
-  -D, --downloader <SERVICE>   specify a preferred download source or a `,`-separated preference order
+  -S, --sources <SERVICE>      specify a preferred download source or a `,`-separated preference order
                                (valid: youtube,yt_music) (default: "yt_music")
   -l, --filter <MATCH>         filter matches off patterns (repeatable and optionally `,`-separated)
                                (value omission implies `true` if applicable)
