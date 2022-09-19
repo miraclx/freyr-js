@@ -11,14 +11,14 @@ import symbols from './symbols.js';
 const openfiles = {};
 const removeHandlers = [];
 
-export async function garbageCollector(args) {
+async function garbageCollect(args) {
   await Promise.all(removeHandlers.splice(0, Infinity).map(fn => fn(args)));
 }
 
 let hookedUpListeners = false;
 const hookupListeners = () =>
   !hookedUpListeners && (hookedUpListeners = true)
-    ? process.addListener('beforeExit', garbageCollector.bind(null, void 0)).addListener('exit', () => {
+    ? process.addListener('beforeExit', garbageCollect.bind(null, void 0)).addListener('exit', () => {
         let err = new Error('[file_mgr] Somehow, there are still files that need to be removed');
         if (removeHandlers.length) throw err;
       })
@@ -92,6 +92,8 @@ export default function genFile(opts) {
     ]),
   );
 }
+
+genFile.garbageCollect = garbageCollect;
 
 async function test() {
   const filename = 'freyr_mgr_temp_file';
