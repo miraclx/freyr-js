@@ -331,7 +331,9 @@ function PROCESS_IMAGE_SIZE(value) {
 
 function PROCESS_DOWNLOADER_SOURCES(value, throwEr) {
   if (!Array.isArray(value)) return throwEr();
-  return value.filter(Boolean).map(item => (!VALIDS.sources.includes(item) ? throwEr(item) : item));
+  return value
+    .filter(Boolean)
+    .map(item => (!VALIDS.sources.includes(item.startsWith('!') ? item.slice(1) : item) ? throwEr(item) : item));
 }
 
 const [RULE_DEFAULTS, RULE_HANDLERS] = [
@@ -708,7 +710,12 @@ async function init(packageJson, queries, options) {
     process.exit(6);
   }
 
-  const sourceStack = freyrCore.sortSources(Config.downloader.sources);
+  const sourceStack = freyrCore.sortSources(
+    ...Config.downloader.sources.reduce(
+      (a, b) => (b.startsWith('!') ? [a[0], a[1].concat(b.slice(1))] : [a[0].concat(b), a[1]]),
+      [[], []],
+    ),
+  );
 
   let atomicParsley;
 
@@ -1661,7 +1668,10 @@ function prepCli(packageJson) {
     )
     .option(
       '-S, --sources <SERVICE>',
-      ['specify a preferred audio source or a `,`-separated preference order', `(valid: ${VALIDS.sources})`].join('\n'),
+      [
+        'specify a preferred audio source or a `,`-separated preference order',
+        `(valid: ${VALIDS.sources}) (prefix with \`!\` to exclude)`,
+      ].join('\n'),
       'yt_music',
     )
     .option(
