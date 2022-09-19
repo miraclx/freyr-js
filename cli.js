@@ -320,12 +320,6 @@ async function PROCESS_INPUT_ARG(input_arg) {
   return PARSE_INPUT_LINES(lines);
 }
 
-async function PROCESS_CONFIG_ARG(config_arg) {
-  const local_config = xpath.join(__dirname, 'conf.json');
-  if (!config_arg) return local_config;
-  return PROCESS_INPUT_FILE(config_arg, 'Config', false);
-}
-
 function PROCESS_IMAGE_SIZE(value) {
   if (!['string', 'number'].includes(typeof value)) value = `${value.width}x${value.height}`;
   let parts = value.toString().split(/(?<=\d+)x(?=\d+)/);
@@ -455,7 +449,7 @@ async function init(packageJson, queries, options) {
     options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = await PROCESS_INPUT_ARG(options.input);
-    options.config = await PROCESS_CONFIG_ARG(options.config);
+    if (options.config) options.config = await PROCESS_INPUT_FILE(options.config, 'Config', false);
     if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
     options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase});
     options.concurrency = Object.fromEntries(
@@ -488,58 +482,127 @@ async function init(packageJson, queries, options) {
     process.exit(2);
   }
 
-  let Config = {
-    server: {
-      hostname: 'localhost',
-      port: 36346,
-      useHttps: false,
+  const schema = {
+    config: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        server: {
+          type: 'object',
+          properties: {
+            hostname: {type: 'string'},
+            port: {type: 'integer'},
+            useHttps: {type: 'boolean'},
+          },
+        },
+        opts: {
+          type: 'object',
+          properties: {
+            netCheck: {type: 'boolean'},
+            attemptAuth: {type: 'boolean'},
+            autoOpenBrowser: {type: 'boolean'},
+          },
+        },
+        dirs: {
+          type: 'object',
+          properties: {
+            output: {type: 'string'},
+            check: {
+              type: 'array',
+              items: {type: 'string'},
+            },
+            cache: {type: 'string'},
+          },
+        },
+        playlist: {
+          type: 'object',
+          properties: {
+            always: {type: 'boolean'},
+            append: {type: 'boolean'},
+            escape: {type: 'boolean'},
+            forceAppend: {type: 'boolean'},
+            // directory to write playlist to
+            dir: {type: 'string'},
+            // namespace to prefix playlist entries with
+            namespace: {type: 'string'},
+          },
+        },
+        image: {
+          type: 'object',
+          properties: {
+            width: {type: 'integer'},
+            height: {type: 'integer'},
+          },
+        },
+        filters: {
+          type: 'array',
+          items: {type: 'string'},
+        },
+        concurrency: {
+          type: 'object',
+          properties: {
+            queries: {type: 'integer'}, // always create playlists for queries
+            tracks: {type: 'integer'}, // append to end of file for regular queries
+            trackStage: {type: 'integer'}, // whether or not to escape invalid characters
+            downloader: {type: 'integer'}, // whether or not to forcefully append collections as well
+            encoder: {type: 'integer'}, // directory to write playlist to
+            embedder: {type: 'integer'}, // namespace to prefix playlist entries with
+          },
+        },
+        downloader: {
+          type: 'object',
+          properties: {
+            memCache: {type: 'boolean'},
+            cacheSize: {type: 'integer'},
+            sources: {
+              type: 'array',
+              items: {type: 'string'},
+            },
+          },
+        },
+      },
     },
-    opts: {
-      netCheck: true,
-      attemptAuth: true,
-      autoOpenBrowser: true,
-    },
-    dirs: {
-      output: '.',
-      check: ['.'],
-      cache: '<tmp>',
-    },
-    playlist: {
-      always: false, // always create playlists for queries
-      append: true, // append to end of file for regular queries
-      escape: true, // whether or not to escape invalid characters
-      forceAppend: false, // whether or not to forcefully append collections as well
-      dir: null, // directory to write playlist to
-      namespace: null, // namespace to prefix playlist entries with
-    },
-    image: {
-      width: 640,
-      height: 640,
-    },
-    filters: [],
-    concurrency: {
-      queries: 1,
-      tracks: 1,
-      trackStage: 6,
-      downloader: 4,
-      encoder: 6,
-      embedder: 10,
-    },
-    downloader: {
-      memCache: true,
-      cacheSize: 209715200,
-      sources: ['yt_music', 'youtube'],
+    services: {
+      type: 'object',
+      additionalProperties: false,
+      default: {},
+      properties: {},
     },
   };
+  FreyrCore.ENGINES.forEach(engine => {
+    schema.services.default[engine[symbols.meta].ID] = {};
+    schema.services.properties[engine[symbols.meta].ID] = {
+      type: 'object',
+      additionalProperties: false,
+      properties: engine[symbols.meta].PROP_SCHEMA || {},
+    };
+  });
+
+  let Config = JSON.parse(await fs.readFile(xpath.join(__dirname, 'conf.json')));
+
+  let schemaDefault = _merge({}, Config);
+  delete schemaDefault['services'];
+  schema.config.default = schemaDefault;
+
+  const freyrCoreConfig = new Conf({
+    projectName: 'FreyrCLI',
+    projectSuffix: '',
+    configName: 'd3fault',
+    fileExtension: 'x4p',
+    schema,
+    serialize: v => JSON.stringify(v, null, 2),
+  });
+
+  let configStack = [Config, freyrCoreConfig.get('config')];
+
   try {
-    if (await maybeStat(options.config)) {
-      Config = _mergeWith(Config, JSON.parse(await fs.readFile(options.config)), (a, b, k) =>
-        ['sources', 'check'].includes(k) && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined,
-      );
-    } else {
-      stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
-      process.exit(3);
-    }
+    if (options.config)
+      if (await maybeStat(options.config)) {
+        configStack.push(JSON.parse(await fs.readFile(options.config)));
+      } else {
+        stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
+        process.exit(3);
+      }
     const errMessage = new Error(`[key: image, value: ${JSON.stringify(Config.image)}]`);
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
     Config.downloader.sources = PROCESS_DOWNLOADER_SOURCES(Config.downloader.sources, item => {
@@ -552,6 +615,10 @@ async function init(packageJson, queries, options) {
     stackLogger.error(err.message || err);
     process.exit(3);
   }
+
+  Config = _mergeWith(...configStack, (a, b, k) =>
+    ['sources', 'check'].includes(k) && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined,
+  );
 
   Config.image = _merge(Config.image, options.coverSize);
   Config.concurrency = _merge(Config.concurrency, options.concurrency);
@@ -620,30 +687,6 @@ async function init(packageJson, queries, options) {
     stackLogger.error(err.message || err);
     process.exit(6);
   }
-
-  const schema = {
-    services: {
-      type: 'object',
-      additionalProperties: false,
-      default: {},
-      properties: {},
-    },
-  };
-  freyrCore.ENGINES.forEach(engine => {
-    schema.services.default[engine[symbols.meta].ID] = {};
-    schema.services.properties[engine[symbols.meta].ID] = {
-      type: 'object',
-      additionalProperties: false,
-      properties: engine[symbols.meta].PROP_SCHEMA || {},
-    };
-  });
-  const freyrCoreConfig = new Conf({
-    projectName: 'FreyrCLI',
-    projectSuffix: '',
-    configName: 'd3fault',
-    fileExtension: 'x4p',
-    schema,
-  });
 
   const sourceStack = freyrCore.sortSources(Config.downloader.sources);
 
