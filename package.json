@@ -56,6 +56,7 @@
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.4",
     "bluebird": "^3.7.2",
+    "cachedir": "^2.3.0",
     "commander": "^9.3.0",
     "conf": "^10.1.2",
     "cookie-parser": "^1.4.6",

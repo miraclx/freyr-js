@@ -13,6 +13,7 @@ import merge2 from 'merge2';
 import mkdirp from 'mkdirp';
 import xbytes from 'xbytes';
 import Promise from 'bluebird';
+import cachedir from 'cachedir';
 import cStringd from 'stringd-colors';
 import prettyMs from 'pretty-ms';
 import minimatch from 'minimatch';
@@ -457,7 +458,7 @@ async function init(packageJson, queries, options) {
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
           if (!VALIDS.concurrency.includes(k))
-            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
+            throw Error(`Key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
           return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
         }),
     );
@@ -475,8 +476,11 @@ async function init(packageJson, queries, options) {
     }
 
     options.sources = PROCESS_DOWNLOADER_SOURCES((options.sources || '').split(','), item => {
-      throw new Error(`source specification within the \`--sources\` arg must be valid. found [${item}]`);
+      throw new Error(`Source specification within the \`--sources\` arg must be valid. found [${item}]`);
     });
+
+    if (options.rmCache && typeof options.rmCache !== 'boolean')
+      throw new Error(`Invalid value for \`--rm-cache\`. found [${options.rmCache}]`);
   } catch (err) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', err.message || err);
     process.exit(2);
@@ -511,7 +515,13 @@ async function init(packageJson, queries, options) {
               type: 'array',
               items: {type: 'string'},
             },
-            cache: {type: 'string'},
+            cache: {
+              type: 'object',
+              properties: {
+                path: {type: 'string'},
+                keep: {type: 'boolean'},
+              },
+            },
           },
         },
         playlist: {
@@ -627,7 +637,10 @@ async function init(packageJson, queries, options) {
     {
       output: options.directory,
       check: options.checkDir,
-      cache: options.cacheDir,
+      cache: {
+        path: options.cacheDir,
+        keep: !options.rmCache,
+      },
     },
     (a, b, k) => (k === 'check' && [a, b].every(Array.isArray) ? a.concat(b) : undefined),
   );
@@ -678,6 +691,13 @@ async function init(packageJson, queries, options) {
       stackLogger.error(`\x1b[31m[!]\x1b[0m Check Directory [${checkDir}] doesn't exist`), process.exit(5);
 
   if (!CHECK_DIRECTORIES.includes(BASE_DIRECTORY)) CHECK_DIRECTORIES.unshift(BASE_DIRECTORY);
+
+  Config.dirs.cache.path =
+    Config.dirs.cache.path === '<tmp>'
+      ? undefined
+      : Config.dirs.cache.path === '<cache>'
+      ? cachedir('FreyrCLI')
+      : Config.dirs.cache.path;
 
   let freyrCore;
   try {
@@ -897,14 +917,13 @@ async function init(packageJson, queries, options) {
     'cli:downloadQueue',
     Config.concurrency.downloader,
     async ({track, meta, feedMeta, trackLogger}) => {
-      const baseCacheDir = 'fr3yrcach3';
-
+      const baseCacheDir = Config.dirs.cache.path || 'fr3yrcach3';
       let imageFile;
       let imageBytesWritten = 0;
       try {
         imageFile = await fileMgr({
           filename: `freyrcli-${meta.fingerprint}.x4i`,
-          tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+          tmpdir: !Config.dirs.cache.path,
           dirname: baseCacheDir,
           keep: true,
         }).writeOnce(async imageFile => {
@@ -938,7 +957,7 @@ async function init(packageJson, queries, options) {
       try {
         rawAudio = await fileMgr({
           filename: `freyrcli-${meta.fingerprint}.x4a`,
-          tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
+          tmpdir: !Config.dirs.cache.path,
           dirname: baseCacheDir,
           keep: true,
         }).writeOnce(async rawAudio => {
@@ -1575,7 +1594,7 @@ async function init(packageJson, queries, options) {
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===============================');
   }
-  await fileMgr.garbageCollect();
+  await fileMgr.garbageCollect({keep: Config.dirs.cache.keep});
 }
 
 function prepCli(packageJson) {
@@ -1694,7 +1713,10 @@ function prepCli(packageJson) {
       (spec, stack) => (stack || []).concat(spec.split(',')),
     )
     .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
-    .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
+    .option('--cache-dir <DIR>', 'specify alternative cache directory\n`<tmp>` for tempdir, `<cache>` for system cache')
+    .option('--rm-cache [RM]', 'remove original downloaded files in cache directory (default: false)', v =>
+      ['true', '1', 'yes', 'y'].includes(v) ? true : ['false', '0', 'no', 'n'].includes(v) ? false : v,
+    )
     .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
     .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
     .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)

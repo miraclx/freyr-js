@@ -23,7 +23,10 @@
     "check": [
       "."
     ],
-    "cache": "<tmp>"
+    "cache": {
+      "path": "<cache>",
+      "keep": true
+    }
   },
   "playlist": {
     "always": false,
