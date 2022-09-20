@@ -40,12 +40,17 @@ async function query(entity_type, entity, args) {
 }
 
 async function lookupISRC(isrc, storefront) {
-  let {
-    recording: {
-      id: trackId,
-      'release-list': {release: releases},
-    },
-  } = (await query('isrc', isrc, {inc: ['releases']})).isrc['recording-list'];
+  let hello = (await query('isrc', isrc, {inc: ['releases']})).isrc['recording-list'];
+  let trackId;
+  let releases;
+  // This should be explained
+  if (Array.isArray(hello.recording)) {
+    trackId = hello.recording[0].id;
+    releases = hello.recording[0]['release-list'].release;
+  } else {
+    trackId = hello.recording.id;
+    releases = hello.recording['release-list'].release;
+  }
   releases = Array.isArray(releases) ? releases : [releases];
 
   // find one whose storefront matches and is probably digital media, otherwise take the first one
