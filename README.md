@@ -15,11 +15,10 @@
   [![CodeFactor Grade](https://www.codefactor.io/repository/github/miraclx/freyr-js/badge/master)](https://www.codefactor.io/repository/github/miraclx/freyr-js/overview/master)
   [![License](https://img.shields.io/github/license/miraclx/freyr-js)](https://github.com/miraclx/freyr-js)
   [![CI checks](https://github.com/miraclx/freyr-js/actions/workflows/tests.yml/badge.svg)](https://github.com/miraclx/freyr-js/actions/workflows/tests.yml)
-  [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/freyrcli/freyrjs)](https://hub.docker.com/r/freyrcli/freyrjs/builds)
 
   [![NPM Downloads](https://badgen.net/npm/dm/freyr)](https://www.npmjs.com/package/freyr)
   [![Docker Cloud Pull Status](https://img.shields.io/docker/pulls/freyrcli/freyrjs.svg)](https://hub.docker.com/r/freyrcli/freyrjs)
-  [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v12-brightgreen)](https://github.com/miraclx/freyr-js)
+  [![NodeJS Version](https://img.shields.io/badge/node-%3E%3D%20v16-brightgreen)](https://github.com/miraclx/freyr-js)
   [![Python Version](https://img.shields.io/badge/python-%3E%3D%20v3.2-blue)](https://github.com/miraclx/freyr-js)
 
   [![Total Lines Of Code](https://tokei.rs/b1/github/miraclx/freyr-js?category=code)](https://github.com/miraclx/freyr-js)
@@ -113,7 +112,7 @@ Here's a list of the metadata that freyr can extract from each streaming service
   </details>
 
   <details>
-  <summary>nodejs >= v12.0.0</summary>
+  <summary>nodejs >= v16.0.0</summary>
 
   Download for your individual platforms here <https://nodejs.org/en/download/>
 
@@ -121,31 +120,12 @@ Here's a list of the metadata that freyr can extract from each streaming service
 
   ```bash
   # install node with this nvm command
-  # freyr works with a minimum of v12
+  # freyr works with a minimum of v16
   $ nvm install --lts
   ```
 
   - Android (Termux): `apt install nodejs`
   - Alpine Linux: `sudo apk add nodejs`
-
-  </details>
-
-  <details>
-  <summary>ffmpeg >= v0.9</summary>
-
-  <!-- textlint-disable -->
-  Download for your individual platforms here <https://ffmpeg.org/download.html>
-  <!-- textlint-enable -->
-
-  - Windows + macOS:
-    - Ensure to extract the `ffmpeg` binary from the compressed file, if it's in one.
-    - make sure it's available in your `PATH`
-    - otherwise, set `FFMPEG_PATH` to explicitly specify binary to use
-  - Linux: _(check individual package managers)_
-    - Debian: The `ppa:mc3man/trusty-media` PPA provides recent builds
-    - Arch Linux: `sudo pacman -S ffmpeg`
-    - Android (Termux): `apt install ffmpeg`
-    - Alpine Linux: `sudo apk add ffmpeg`
 
   </details>
 
@@ -273,14 +253,17 @@ Options:
                                (`infinite` for infinite) (default: 10)
   -t, --meta-retries <N>       set number of retries for collating track feeds (`infinite` for infinite) (default: 5)
   -d, --directory <DIR>        save tracks to DIR/..
+  -D, --check-dir <DIR>        check if tracks already exist in another DIR (repeatable, optionally comma-separated)
+                               (useful if you maintain multiple libraries)
+                               (example: `-D dir1 -D dir2 -D dir3,dir4`)
   -c, --cover <NAME>           custom name for the cover art, excluding the extension (default: "cover")
   --cover-size <SIZE>          preferred cover art dimensions
                                (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
   -C, --no-cover               skip saving a cover art
   -x, --format <FORMAT>        preferred audio output format (to export) (unimplemented)
                                (valid: mp3,m4a,flac) (default: "m4a")
-  -D, --downloader <SERVICE>   specify a preferred download source or a `,`-separated preference order
-                               (valid: youtube,yt_music) (default: "yt_music")
+  -S, --sources <SERVICE>      specify a preferred audio source or a `,`-separated preference order
+                               (valid: youtube,yt_music) (prefix with `!` to exclude) (default: "yt_music")
   -l, --filter <MATCH>         filter matches off patterns (repeatable and optionally `,`-separated)
                                (value omission implies `true` if applicable)
                                (format: <key=value>) (example: title="when we all fall asleep*",type=album)
@@ -308,14 +291,15 @@ Options:
   --tags                       tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)
                                (format: <key=value>) (reserved keys: [exclude, account])
   --via-tor                    tunnel network traffic through the tor network (unimplemented)
-  --cache-dir <DIR>            specify alternative cache directory, `<tmp>` for tempdir
+  --cache-dir <DIR>            specify alternative cache directory
+                               `<tmp>` for tempdir, `<cache>` for system cache
+  --rm-cache [RM]              remove original downloaded files in cache directory (default: false)
   -m, --mem-cache <SIZE>       max size of bytes to be cached in-memory for each download chunk
   --no-mem-cache               disable in-memory chunk caching (restricts to sequential download)
   --timeout <N>                network inactivity timeout (ms) (default: 10000)
   --no-auth                    skip authentication procedure
   --no-browser                 disable auto-launching of user browser
   --no-net-check               disable internet connection check
-  --ffmpeg <PATH>              explicit path to the ffmpeg binary
   --atomic-parsley <PATH>      explicit path to the atomic-parsley binary
   --no-stats                   don't show the stats on completion
   --pulsate-bar                show a pulsating bar
@@ -325,7 +309,6 @@ Options:
 
 Environment Variables:
   SHOW_DEBUG_STACK             show extended debug information
-  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`
   ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
 
 Info:
@@ -676,17 +659,19 @@ Successfully written to [queue_of_uris.txt]
 
 Persistent configuration such as authentication keys and their validity period are stored within a session specific configuration file.
 
-This configuration file resides within the user config directory per-platform. e.g `$HOME/.config/FreyrCLI/d3fault.x4p` for Linux.
+This configuration file resides within the user config directory per-platform.
+
+- `$HOME/.config/FreyrCLI/d3fault.x4p` for Linux.
+- `$HOME/Library/Preferences/FreyrCLI/d3fault.x4p` for macOS.
 
 </details>
 
 <details>
 <summary id='project-specific-configuration'>Project specific configuration</summary>
 
-All configuration is to be defined within a `conf.json` file in the root of the project.
-This file should be of `JSON` format and is to be structured as such.
+All defaults are defined in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/conf.json) file at the root of the project. This file should be of `JSON` format and is to be structured as such.
 
-Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/conf.json) file.
+Do not edit this file directly, instead run freyr once and edit the user specific configuration (see above).
 
 - `server`: \<object\> The server URL configuration same as on an individual services' callback option.
   - `hostname`: \<string\>
@@ -706,7 +691,10 @@ Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/
 - `filters`: \<[FilterRules](#filterrules)[]\> Filter rules each track must match to be downloaded.
 - `dirs`: \<object\>
   - `output`: \<string\> Default download directory. Default: `"."`
-  - `cache`: \<string\> Default temp download directory. Default: `"<tmp>"`
+  - `check`: \<string[]\> List of directories to check for existing files. Default: `["."]`
+  - `cache`: \<object\>
+    - `path`: \<string\> Path to download pre-processed audio to (`"<tmp>"` for tempdir, `"<cache>"` for system cache). Default: `"<cache>"`
+    - `keep`: \<string\> Whether or not to keep the pre-processed audio. Default: `"true"`
 - `playlist`: \<object\>
   - `always`: \<boolean\> Always create playlists for collections and non-collections alike.
   - `append`: \<boolean\> Append non-collection tracks onto the playlist file.
@@ -720,8 +708,8 @@ Defaults are in the [conf.json](https://github.com/miraclx/freyr-js/blob/master/
 - `downloader`: \<object\>
   - `memCache`: \<boolean\> Whether or not to use in-memory caching for download chunks.
   - `cacheSize`: \<number\> Maximum size of bytes to be cached per download.
-  - `order`: \<array\> Service download sources order.
-    - Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source.
+  - `sources`: \<array\> Service download sources order.
+    - Freyr would check these download sources in the order which they are defined. Failure to get a query from a source would try the next available source. You can exclude a source by prefixing it with a `!` character.
     - supported: `youtube`, `yt_music`
     - default: `[ "yt_music", "youtube" ]`
 - `services`: \<[ServiceConfiguration](#service-configuration): object\>

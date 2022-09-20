@@ -21,7 +21,13 @@
   "filters": [],
   "dirs": {
     "output": ".",
-    "cache": "<tmp>"
+    "check": [
+      "."
+    ],
+    "cache": {
+      "path": "<cache>",
+      "keep": true
+    }
   },
   "playlist": {
     "always": false,
@@ -38,7 +44,7 @@
   "downloader": {
     "memCache": true,
     "cacheSize": 209715200,
-    "order": [
+    "sources": [
       "yt_music",
       "youtube"
     ]

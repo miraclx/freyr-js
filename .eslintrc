@@ -4,6 +4,9 @@
     "es6": true,
     "node": true
   },
+  "globals": {
+    "globalThis": false
+  },
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": "latest",

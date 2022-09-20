@@ -30,11 +30,11 @@ export default class FreyrCore {
     return this.ENGINES.filter(engine => engine[symbols.meta].PROPS.isSourceable);
   }
 
-  static sortSources(order) {
-    order = order ? (Array.isArray(order) ? order : [order]) : [];
+  static sortSources(includeOrder, exclude) {
+    includeOrder = includeOrder ? (Array.isArray(includeOrder) ? includeOrder : [includeOrder]) : [];
     return _sortBy(this.collateSources(), source =>
-      (index => (index < 0 ? Infinity : index))(order.indexOf(source[symbols.meta].ID)),
-    );
+      (index => (index < 0 ? Infinity : index))(includeOrder.indexOf(source[symbols.meta].ID)),
+    ).filter(source => !~exclude.indexOf(source[symbols.meta].ID));
   }
 
   static parseURI(url) {

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- BREAKING: replaced `-D, --downloader` with `-S, --source`, introduced the `-D, --check-dir` flag. <https://github.com/miraclx/freyr-js/pull/350>
+- BREAKING: replaced the `.downloader.order` entry in the config file with `.downloader.sources`. <https://github.com/miraclx/freyr-js/pull/350>
+- BREAKING: freyr no longer uses the temp directory by default to cache assets. <https://github.com/miraclx/freyr-js/pull/354>
+- BREAKING: freyr now persists the cached assets across runs, this will grow over time, but you can clear it at will. <https://github.com/miraclx/freyr-js/pull/354>
+- Implemented ability to check for track existence in other directories. <https://github.com/miraclx/freyr-js/pull/350>
+- Persist configuration options in the user config file. <https://github.com/miraclx/freyr-js/pull/353>
+- Allow excluding download sources. <https://github.com/miraclx/freyr-js/pull/355>
 - Fix YouTube feed sourcing logic after dependency update. <https://github.com/miraclx/freyr-js/pull/299>
 - Update minimum Node.js version to `v14`. <https://github.com/miraclx/freyr-js/pull/293>
 - Remove the temporary image downloaded when an error is detected. <https://github.com/miraclx/freyr-js/commit/5e7f5513bad9fd7366cd5bf562a516584308c74f>

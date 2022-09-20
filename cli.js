@@ -9,11 +9,11 @@ import {promises as fs, constants as fs_constants, createReadStream, createWrite
 import Conf from 'conf';
 import open from 'open';
 import xget from 'libxget';
-import ffmpeg from 'fluent-ffmpeg';
 import merge2 from 'merge2';
 import mkdirp from 'mkdirp';
 import xbytes from 'xbytes';
 import Promise from 'bluebird';
+import cachedir from 'cachedir';
 import cStringd from 'stringd-colors';
 import prettyMs from 'pretty-ms';
 import minimatch from 'minimatch';
@@ -27,6 +27,7 @@ import {isBinaryFile} from 'isbinaryfile';
 import {fileTypeFromFile} from 'file-type';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
+import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg';
 
 import _merge from 'lodash.merge';
 import _mergeWith from 'lodash.mergewith';
@@ -283,10 +284,10 @@ async function processPromise(promise, logger, messageHandlers) {
 }
 
 const VALIDS = {
-  bitrates: FreyrCore.getBitrates(),
-  downloaders: FreyrCore.getEngineMetas()
+  sources: FreyrCore.getEngineMetas()
     .filter(meta => meta.PROPS.isSourceable)
     .map(meta => meta.ID),
+  bitrates: FreyrCore.getBitrates(),
   concurrency: ['queries', 'tracks', 'trackStage', 'downloader', 'encoder', 'embedder'],
 };
 
@@ -340,12 +341,6 @@ async function PROCESS_INPUT_ARG(input_arg) {
   return PARSE_INPUT_LINES(lines);
 }
 
-async function PROCESS_CONFIG_ARG(config_arg) {
-  const local_config = xpath.join(__dirname, 'conf.json');
-  if (!config_arg) return local_config;
-  return PROCESS_INPUT_FILE(config_arg, 'Config', false);
-}
-
 function PROCESS_IMAGE_SIZE(value) {
   if (!['string', 'number'].includes(typeof value)) value = `${value.width}x${value.height}`;
   let parts = value.toString().split(/(?<=\d+)x(?=\d+)/);
@@ -354,9 +349,11 @@ function PROCESS_IMAGE_SIZE(value) {
   return {width: parts[0], height: parts[1] || parts[0]};
 }
 
-function PROCESS_DOWNLOADER_ORDER(value, throwEr) {
+function PROCESS_DOWNLOADER_SOURCES(value, throwEr) {
   if (!Array.isArray(value)) return throwEr();
-  return value.filter(Boolean).map(item => (!VALIDS.downloaders.includes(item) ? throwEr(item) : item));
+  return value
+    .filter(Boolean)
+    .map(item => (!VALIDS.sources.includes(item.startsWith('!') ? item.slice(1) : item) ? throwEr(item) : item));
 }
 
 const [RULE_DEFAULTS, RULE_HANDLERS] = [
@@ -475,7 +472,7 @@ async function init(packageJson, queries, options) {
     options.timeout = CHECK_FLAG_IS_NUM(options.timeout, '--timeout', 'number');
     options.bitrate = CHECK_BIT_RATE_VAL(options.bitrate);
     options.input = await PROCESS_INPUT_ARG(options.input);
-    options.config = await PROCESS_CONFIG_ARG(options.config);
+    if (options.config) options.config = await PROCESS_INPUT_FILE(options.config, 'Config', false);
     if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
     options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase});
     options.concurrency = Object.fromEntries(
@@ -483,7 +480,7 @@ async function init(packageJson, queries, options) {
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
         .map(([k, v]) => {
           if (!VALIDS.concurrency.includes(k))
-            throw Error(`key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
+            throw Error(`Key identifier for the \`-z, --concurrency\` flag must be valid. found [key: ${k}]`);
           return [k, CHECK_FLAG_IS_NUM(v, '-z, --concurrency', 'number')];
         }),
     );
@@ -500,70 +497,150 @@ async function init(packageJson, queries, options) {
       if (!(options.coverSize = PROCESS_IMAGE_SIZE(options.coverSize))) throw err;
     }
 
-    options.downloader = PROCESS_DOWNLOADER_ORDER((options.downloader || '').split(','), item => {
-      throw new Error(`downloader specification within the \`--downloader\` must be valid. found [${item}]`);
+    options.sources = PROCESS_DOWNLOADER_SOURCES((options.sources || '').split(','), item => {
+      throw new Error(`Source specification within the \`--sources\` arg must be valid. found [${item}]`);
     });
+
+    if (options.rmCache && typeof options.rmCache !== 'boolean')
+      throw new Error(`Invalid value for \`--rm-cache\`. found [${options.rmCache}]`);
   } catch (err) {
     stackLogger.error('\x1b[31m[i]\x1b[0m', err.message || err);
     process.exit(2);
   }
 
-  let Config = {
-    server: {
-      hostname: 'localhost',
-      port: 36346,
-      useHttps: false,
+  const schema = {
+    config: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        server: {
+          type: 'object',
+          properties: {
+            hostname: {type: 'string'},
+            port: {type: 'integer'},
+            useHttps: {type: 'boolean'},
+          },
+        },
+        opts: {
+          type: 'object',
+          properties: {
+            netCheck: {type: 'boolean'},
+            attemptAuth: {type: 'boolean'},
+            autoOpenBrowser: {type: 'boolean'},
+            musicBrainz: {type: 'boolean'},
+          },
+        },
+        dirs: {
+          type: 'object',
+          properties: {
+            output: {type: 'string'},
+            check: {
+              type: 'array',
+              items: {type: 'string'},
+            },
+            cache: {
+              type: 'object',
+              properties: {
+                path: {type: 'string'},
+                keep: {type: 'boolean'},
+              },
+            },
+          },
+        },
+        playlist: {
+          type: 'object',
+          properties: {
+            always: {type: 'boolean'},
+            append: {type: 'boolean'},
+            escape: {type: 'boolean'},
+            forceAppend: {type: 'boolean'},
+            // directory to write playlist to
+            dir: {type: 'string'},
+            // namespace to prefix playlist entries with
+            namespace: {type: 'string'},
+          },
+        },
+        image: {
+          type: 'object',
+          properties: {
+            width: {type: 'integer'},
+            height: {type: 'integer'},
+          },
+        },
+        filters: {
+          type: 'array',
+          items: {type: 'string'},
+        },
+        concurrency: {
+          type: 'object',
+          properties: {
+            queries: {type: 'integer'}, // always create playlists for queries
+            tracks: {type: 'integer'}, // append to end of file for regular queries
+            trackStage: {type: 'integer'}, // whether or not to escape invalid characters
+            downloader: {type: 'integer'}, // whether or not to forcefully append collections as well
+            encoder: {type: 'integer'}, // directory to write playlist to
+            embedder: {type: 'integer'}, // namespace to prefix playlist entries with
+          },
+        },
+        downloader: {
+          type: 'object',
+          properties: {
+            memCache: {type: 'boolean'},
+            cacheSize: {type: 'integer'},
+            sources: {
+              type: 'array',
+              items: {type: 'string'},
+            },
+          },
+        },
+      },
     },
-    opts: {
-      netCheck: true,
-      attemptAuth: true,
-      autoOpenBrowser: true,
-      musicBrainz: false,
-    },
-    dirs: {
-      output: '.',
-    },
-    playlist: {
-      always: false, // always create playlists for queries
-      append: true, // append to end of file for regular queries
-      escape: true, // whether or not to escape invalid characters
-      forceAppend: false, // whether or not to forcefully append collections as well
-      dir: null, // directory to write playlist to
-      namespace: null, // namespace to prefix playlist entries with
-    },
-    image: {
-      width: 640,
-      height: 640,
-    },
-    filters: [],
-    concurrency: {
-      queries: 1,
-      tracks: 1,
-      trackStage: 6,
-      downloader: 4,
-      encoder: 6,
-      embedder: 10,
-    },
-    downloader: {
-      memCache: true,
-      cacheSize: 209715200,
-      order: ['yt_music', 'youtube'],
+    services: {
+      type: 'object',
+      additionalProperties: false,
+      default: {},
+      properties: {},
     },
   };
+  FreyrCore.ENGINES.forEach(engine => {
+    schema.services.default[engine[symbols.meta].ID] = {};
+    schema.services.properties[engine[symbols.meta].ID] = {
+      type: 'object',
+      additionalProperties: false,
+      properties: engine[symbols.meta].PROP_SCHEMA || {},
+    };
+  });
+
+  let Config = JSON.parse(await fs.readFile(xpath.join(__dirname, 'conf.json')));
+
+  let schemaDefault = _merge({}, Config);
+  delete schemaDefault['services'];
+  schema.config.default = schemaDefault;
+
+  const freyrCoreConfig = new Conf({
+    projectName: 'FreyrCLI',
+    projectSuffix: '',
+    configName: 'd3fault',
+    fileExtension: 'x4p',
+    schema,
+    serialize: v => JSON.stringify(v, null, 2),
+  });
+
+  let configStack = [Config, freyrCoreConfig.get('config')];
+
   try {
-    if (await maybeStat(options.config)) {
-      Config = _mergeWith(Config, JSON.parse(await fs.readFile(options.config)), (a, b, k) =>
-        k === 'order' && [a, b].every(Array.isArray) ? b.concat(a) : undefined,
-      );
-    } else {
-      stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
-      process.exit(3);
-    }
+    if (options.config)
+      if (await maybeStat(options.config)) {
+        configStack.push(JSON.parse(await fs.readFile(options.config)));
+      } else {
+        stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${xpath.relative('.', options.config)}] not found`);
+        process.exit(3);
+      }
     const errMessage = new Error(`[key: image, value: ${JSON.stringify(Config.image)}]`);
     if (!(Config.image = PROCESS_IMAGE_SIZE(Config.image))) throw errMessage;
-    Config.downloader.order = PROCESS_DOWNLOADER_ORDER(Config.downloader.order, item => {
-      if (item) throw new Error(`Downloader order within the config file must be valid. found [${item}]`);
-      throw new Error(`Downloader order must be an array of strings`);
+    Config.downloader.sources = PROCESS_DOWNLOADER_SOURCES(Config.downloader.sources, item => {
+      if (item) throw new Error(`Download sources within the config file must be valid. found [${item}]`);
+      throw new Error(`Download sources must be an array of strings`);
     });
     options.filter.extend(Config.filters);
   } catch (err) {
@@ -572,12 +649,24 @@ async function init(packageJson, queries, options) {
     process.exit(3);
   }
 
+  Config = _mergeWith(...configStack, (a, b, k) =>
+    ['sources', 'check'].includes(k) && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined,
+  );
+
   Config.image = _merge(Config.image, options.coverSize);
   Config.concurrency = _merge(Config.concurrency, options.concurrency);
-  Config.dirs = _merge(Config.dirs, {
-    output: options.directory,
-    cache: options.cacheDir,
-  });
+  Config.dirs = _mergeWith(
+    Config.dirs,
+    {
+      output: options.directory,
+      check: options.checkDir,
+      cache: {
+        path: options.cacheDir,
+        keep: !options.rmCache,
+      },
+    },
+    (a, b, k) => (k === 'check' && [a, b].every(Array.isArray) ? a.concat(b) : undefined),
+  );
   Config.opts = _merge(Config.opts, {
     netCheck: options.netCheck,
     attemptAuth: options.auth,
@@ -597,9 +686,9 @@ async function init(packageJson, queries, options) {
     {
       memCache: options.memCache !== undefined ? !!options.memCache : undefined,
       cacheSize: options.memCache,
-      order: options.downloader,
+      sources: options.sources,
     },
-    (a, b, k) => (k === 'order' ? Array.from(new Set(b.concat(a))) : b !== undefined ? b : undefined),
+    (a, b, k) => (k === 'sources' && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined),
   );
 
   if (Config.opts.netCheck && !(await isOnline()))
@@ -617,6 +706,23 @@ async function init(packageJson, queries, options) {
   )
     process.exit(5);
 
+  const CHECK_DIRECTORIES = Array.from(
+    new Set((Config.dirs.check || []).map(path => (xpath.isAbsolute(path) ? path : xpath.relative('.', path || '.') || '.'))),
+  );
+
+  for (let checkDir of CHECK_DIRECTORIES)
+    if (!(await maybeStat(checkDir)))
+      stackLogger.error(`\x1b[31m[!]\x1b[0m Check Directory [${checkDir}] doesn't exist`), process.exit(5);
+
+  if (!CHECK_DIRECTORIES.includes(BASE_DIRECTORY)) CHECK_DIRECTORIES.unshift(BASE_DIRECTORY);
+
+  Config.dirs.cache.path =
+    Config.dirs.cache.path === '<tmp>'
+      ? undefined
+      : Config.dirs.cache.path === '<cache>'
+      ? cachedir('FreyrCLI')
+      : Config.dirs.cache.path;
+
   let freyrCore;
   try {
     freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
@@ -626,42 +732,16 @@ async function init(packageJson, queries, options) {
     process.exit(6);
   }
 
-  const schema = {
-    services: {
-      type: 'object',
-      additionalProperties: false,
-      default: {},
-      properties: {},
-    },
-  };
-  freyrCore.ENGINES.forEach(engine => {
-    schema.services.default[engine[symbols.meta].ID] = {};
-    schema.services.properties[engine[symbols.meta].ID] = {
-      type: 'object',
-      additionalProperties: false,
-      properties: engine[symbols.meta].PROP_SCHEMA || {},
-    };
-  });
-  const freyrCoreConfig = new Conf({
-    projectName: 'FreyrCLI',
-    projectSuffix: '',
-    configName: 'd3fault',
-    fileExtension: 'x4p',
-    schema,
-  });
-
-  const sourceStack = freyrCore.sortSources(Config.downloader.order);
+  const sourceStack = freyrCore.sortSources(
+    ...Config.downloader.sources.reduce(
+      (a, b) => (b.startsWith('!') ? [a[0], a[1].concat(b.slice(1))] : [a[0].concat(b), a[1]]),
+      [[], []],
+    ),
+  );
 
   let atomicParsley;
 
   try {
-    if (options.ffmpeg) {
-      if (!(await maybeStat(options.ffmpeg))) throw new Error(`\x1b[31mffmpeg\x1b[0m: Binary not found [${options.ffmpeg}]`);
-      if (!(await isBinaryFile(options.ffmpeg)))
-        stackLogger.warn('\x1b[33mffmpeg\x1b[0m: Detected non-binary file, trying anyways...');
-      ffmpeg.setFfmpegPath(options.ffmpeg);
-    }
-
     if (options.atomicParsley) {
       if (!(await maybeStat(options.atomicParsley)))
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
@@ -676,7 +756,7 @@ async function init(packageJson, queries, options) {
 
   async function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
-      const validStats = stats.filter(stat => (stat.code === 0 ? stat.complete : !stat.code));
+      const validStats = stats.filter(stat => (stat[symbols.errorCode] === 0 ? stat.complete : !stat[symbols.errorCode]));
       if (validStats.length) {
         logger.print('[\u2022] Creating playlist...');
         const playlistFile = xpath.join(
@@ -697,7 +777,7 @@ async function init(packageJson, queries, options) {
             meta: {
               track: {uri, name, artists, duration},
               service,
-              outFilePath,
+              outFile,
             },
           }) =>
             plStream.write(
@@ -707,7 +787,7 @@ async function init(packageJson, queries, options) {
                 `#EXTINF:${Math.round(duration / 1e3)},${artists[0]} - ${name}`,
                 `${namespace.concat(
                   (entry => (!Config.playlist.escape ? entry : encodeURI(entry).replace(/#/g, '%23')))(
-                    xpath.relative(BASE_DIRECTORY, outFilePath),
+                    xpath.relative(BASE_DIRECTORY, outFile.path),
                   ),
                 )}`,
                 '',
@@ -726,9 +806,8 @@ async function init(packageJson, queries, options) {
 
   function downloadToStream({urlOrFragments, outputFile, logger, opts}) {
     opts = {tag: '', successMessage: '', failureMessage: '', retryMessage: '', ...opts};
-    [opts.tag, opts.errorHandler, opts.retryMessage, opts.failureMessage, opts.successMessage, opts.altMessage] = [
+    [opts.tag, opts.retryMessage, opts.failureMessage, opts.successMessage, opts.altMessage] = [
       opts.tag,
-      opts.errorHandler,
       opts.retryMessage,
       opts.failureMessage,
       opts.successMessage,
@@ -770,7 +849,6 @@ async function init(packageJson, queries, options) {
               if (!options.bar) logger.write('\x1b[G\x1b[K');
               logger.write(opts.failureMessage(err), '\n');
             }
-            opts.errorHandler(err);
             rej(err);
           });
 
@@ -790,11 +868,11 @@ async function init(packageJson, queries, options) {
 
         feed.setHeadHandler(async ({acceptsRanges}) => {
           let [offset, writeStream] = [];
-          if (acceptsRanges) await maybeStat(outputFile).then(({size}) => (offset = size));
+          if (acceptsRanges) await maybeStat(outputFile.path).then(({size}) => (offset = size));
           if (offset) {
             opts.resumeHandler(offset);
-            writeStream = createWriteStream(outputFile, {flags: 'a'});
-          } else writeStream = createWriteStream(outputFile, {flags: 'w'});
+            writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'a'});
+          } else writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'w'});
           feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
           return offset;
         });
@@ -812,7 +890,7 @@ async function init(packageJson, queries, options) {
         } else logger.write(opts.altMessage());
 
         let has_erred = false;
-        const writeStream = createWriteStream(outputFile);
+        const writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'w'});
 
         merge2(
           ...urlOrFragments.map((frag, i) => {
@@ -844,7 +922,6 @@ async function init(packageJson, queries, options) {
                   logger.write('\x1b[G\x1b[K');
                   logger.write(opts.failureMessage(err), '\n');
                 }
-                opts.errorHandler(err);
                 rej(err);
               });
             return !options.bar ? feed : feed.pipe(barGen.next(frag.size));
@@ -869,71 +946,98 @@ async function init(packageJson, queries, options) {
     'cli:downloadQueue',
     Config.concurrency.downloader,
     async ({track, meta, feedMeta, trackLogger}) => {
-      const baseCacheDir = 'fr3yrcach3';
-      const imageFile = await fileMgr({
-        filename: `freyrcli-${meta.fingerprint}.x4i`,
-        tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
-        dirname: baseCacheDir,
-        keep: true,
-      });
-      const imageBytesWritten = await downloadToStream({
-        urlOrFragments: track.getImage(Config.image.width, Config.image.height),
-        outputFile: imageFile.path,
-        logger: trackLogger,
-        opts: {
-          tag: '[Retrieving album art]...',
-          errorHandler: () => imageFile.removeCallback(),
-          retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-          resumeHandler: offset => trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
-          failureMessage: err =>
-            trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
-          successMessage: trackLogger.getText(`| [\u2713] Got album art`),
-          altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
-        },
-      }).catch(err => Promise.reject({err, code: 3}));
-      const rawAudio = await fileMgr({
-        filename: `freyrcli-${meta.fingerprint}.x4a`,
-        tempdir: Config.dirs.cacheDir === '<tmp>' ? undefined : Config.dirs.cacheDir,
-        dirname: baseCacheDir,
-        keep: true,
-      });
-      const audioBytesWritten = await downloadToStream(
-        _merge(
-          {
-            outputFile: rawAudio.path,
-            logger: trackLogger,
-            opts: {
-              tag: `[‘${meta.trackName}’]`,
-              retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
-              resumeHandler: offset =>
-                trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
-              successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
-              altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
-            },
-          },
-          feedMeta.protocol !== 'http_dash_segments'
-            ? {
-                urlOrFragments: feedMeta.url,
-                opts: {
-                  errorHandler: () => rawAudio.removeCallback(),
-                  failureMessage: err =>
-                    trackLogger.getText(`| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`),
-                },
-              }
-            : {
-                urlOrFragments: feedMeta.fragments.map(({path}) => ({
-                  url: `${feedMeta.fragment_base_url}${path}`,
-                  ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
-                })),
-                opts: {
-                  failureMessage: err =>
-                    trackLogger.getText(
-                      `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
-                    ),
-                },
+      const baseCacheDir = Config.dirs.cache.path || 'fr3yrcach3';
+      let imageFile;
+      let imageBytesWritten = 0;
+      try {
+        imageFile = await fileMgr({
+          filename: `freyrcli-${meta.fingerprint}.x4i`,
+          tmpdir: !Config.dirs.cache.path,
+          dirname: baseCacheDir,
+          keep: true,
+        }).writeOnce(async imageFile => {
+          try {
+            imageBytesWritten = await downloadToStream({
+              urlOrFragments: track.getImage(Config.image.width, Config.image.height),
+              outputFile: imageFile,
+              logger: trackLogger,
+              opts: {
+                tag: '[Retrieving album art]...',
+                retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+                resumeHandler: offset =>
+                  trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
+                failureMessage: err =>
+                  trackLogger.getText(`| [\u2715] Failed to get album art${err ? ` [${err.code || err.message}]` : ''}`),
+                successMessage: trackLogger.getText(`| [\u2713] Got album art`),
+                altMessage: trackLogger.getText('| \u27a4 Downloading album art...'),
               },
-        ),
-      ).catch(err => Promise.reject({err, code: 4}));
+            });
+          } catch (err) {
+            await imageFile.remove();
+            throw err;
+          }
+        });
+      } catch (err) {
+        throw {err, [symbols.errorCode]: 3};
+      }
+
+      let rawAudio;
+      let audioBytesWritten = 0;
+      try {
+        rawAudio = await fileMgr({
+          filename: `freyrcli-${meta.fingerprint}.x4a`,
+          tmpdir: !Config.dirs.cache.path,
+          dirname: baseCacheDir,
+          keep: true,
+        }).writeOnce(async rawAudio => {
+          try {
+            audioBytesWritten = await downloadToStream(
+              _merge(
+                {
+                  outputFile: rawAudio,
+                  logger: trackLogger,
+                  opts: {
+                    tag: `[‘${meta.trackName}’]`,
+                    retryMessage: data => trackLogger.getText(`| ${getRetryMessage(data)}`),
+                    resumeHandler: offset =>
+                      trackLogger.log(cStringd(`| :{color(yellow)}{i}:{color:close(yellow)} Resuming at ${offset}`)),
+                    successMessage: trackLogger.getText('| [\u2713] Got raw track file'),
+                    altMessage: trackLogger.getText('| \u27a4 Downloading track...'),
+                  },
+                },
+                feedMeta.protocol !== 'http_dash_segments'
+                  ? {
+                      urlOrFragments: feedMeta.url,
+                      opts: {
+                        failureMessage: err =>
+                          trackLogger.getText(
+                            `| [\u2715] Failed to get raw media stream${err ? ` [${err.code || err.message}]` : ''}`,
+                          ),
+                      },
+                    }
+                  : {
+                      urlOrFragments: feedMeta.fragments.map(({path}) => ({
+                        url: `${feedMeta.fragment_base_url}${path}`,
+                        ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
+                      })),
+                      opts: {
+                        failureMessage: err =>
+                          trackLogger.getText(
+                            `| [\u2715] Segment error while getting raw media${err ? ` [${err.code || err.message}]` : ''}`,
+                          ),
+                      },
+                    },
+              ),
+            );
+          } catch (err) {
+            await rawAudio.remove();
+            throw err;
+          }
+        });
+      } catch (err) {
+        throw {err, [symbols.errorCode]: 4};
+      }
+
       return {
         image: {file: imageFile, bytesWritten: imageBytesWritten},
         audio: {file: rawAudio, bytesWritten: audioBytesWritten},
@@ -945,9 +1049,9 @@ async function init(packageJson, queries, options) {
     'cli:postprocessor:embedQueue',
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
+      try {
       if (options.format == 'flac') {
-        return Promise.promisify(embedTagLib)(
-          meta.outFilePath,
+        await Promise.promisify(embedTagLib)(meta.outFile.path,
           new Map([
             ['album', track.album],
             ['albumArtists', track.artists],
@@ -978,11 +1082,9 @@ async function init(packageJson, queries, options) {
             ['trackCount', track.total_tracks],
             ['year', new Date(track.release_date).getFullYear()],
           ]),
-        )
-          .finally(() => files.image.file.removeCallback())
-          .catch(err => Promise.reject({err, code: 8}));
+        );
       } else {
-        return Promise.promisify(atomicParsley)(meta.outFilePath, {
+        await Promise.promisify(atomicParsley)(meta.outFile.path, {
           overWrite: '', // overwrite the file
 
           title: track.name, // ©nam
@@ -1042,46 +1144,81 @@ async function init(packageJson, queries, options) {
           //   ['artist', track.musicBrainz.artistSortOrder], // soar
           //   ['albumartist', track.musicBrainz.artistSortOrder], // soaa
           // ],
-        })
-          .finally(() => files.image.file.removeCallback())
-          .catch(err => Promise.reject({err, code: 8}));
+        });
+      }
+      } catch (err) {
+        throw {err, [symbols.errorCode]: 8};
       }
     },
   );
 
+  delete globalThis.fetch;
+
   const encodeQueue = new AsyncQueue(
     'cli:postprocessor:encodeQueue',
     Config.concurrency.encoder,
-    async ({track, meta, files}) => {
-      return new Promise((res, rej) =>
-        ffmpeg()
-          .addInput(files.audio.file.path)
-          .audioCodec(options.format == 'flac' ? 'flac' : 'aac')
-          .audioBitrate(options.bitrate)
-          .audioFrequency(44100)
-          .noVideo()
-          .setDuration(TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'))
-          .toFormat(options.format == 'flac' ? 'flac' : 'ipod')
-          .saveToFile(meta.outFilePath)
-          .on('error', err => rej({err, code: 7}))
-          .on('end', res),
-      ).finally(() => files.audio.file.removeCallback());
-    },
+    AsyncQueue.provision(
+      async () => {
+        let ffmpeg = createFFmpeg({log: false});
+        await ffmpeg.load();
+        return ffmpeg;
+      },
+      async (ffmpeg, {track, meta, files}) => {
+        let infile = xpath.basename(files.audio.file.path);
+        let outfile = xpath.basename(files.audio.file.path.replace(/\.x4a$/, '.m4a'));
+        try {
+          ffmpeg.FS('writeFile', infile, await fetchFile(files.audio.file.path));
+          await ffmpeg.run(
+            '-i',
+            infile,
+            '-acodec',
+            options.format == 'flac' ? 'flac' : 'aac',
+            '-b:a',
+            options.bitrate,
+            '-ar',
+            '44100',
+            '-vn',
+            '-t',
+            TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
+            '-f',
+            options.format == 'flac' ? 'flac' : 'ipod',
+            outfile,
+          );
+          await fs.writeFile(meta.outFile.handle, ffmpeg.FS('readFile', outfile));
+        } catch (err) {
+          throw {err, [symbols.errorCode]: 7};
+        }
+      },
+    ),
   );
 
-  const postProcessor = new AsyncQueue('cli:postProcessor', 4, async ({track, meta, files, audioSource}) => {
-    await mkdirp(meta.outFileDir).catch(err => Promise.reject({err, code: 6}));
-    const wroteImage =
-      !!options.cover &&
-      (await (async outArtPath =>
-        (await maybeStat(outArtPath).then(stat => stat && stat.isFile())) ||
-        (await fs.copyFile(files.image.file.path, outArtPath), true))(
-        xpath.join(meta.outFileDir, `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
-      ));
-    await encodeQueue.push({track, meta, files});
-    await embedQueue.push({track, meta, files, audioSource});
-    return {wroteImage, finalSize: (await fs.stat(meta.outFilePath)).size};
-  });
+  const postProcessor = new AsyncQueue(
+    'cli:postProcessor',
+    Math.max(Config.concurrency.encoder, Config.concurrency.embedder),
+    async ({track, meta, files, audioSource}) => {
+      await mkdirp(xpath.dirname(meta.outFile.path)).catch(err => Promise.reject({err, [symbols.errorCode]: 6}));
+      const wroteImage =
+        !!options.cover &&
+        (await (async outArtPath =>
+          (await maybeStat(outArtPath).then(stat => stat && stat.isFile())) ||
+          (await fs.copyFile(files.image.file.path, outArtPath), true))(
+          xpath.join(xpath.dirname(meta.outFile.path), `${options.cover}.${(await fileTypeFromFile(files.image.file.path)).ext}`),
+        ));
+      await fileMgr({
+        path: meta.outFile.path,
+      }).writeOnce(async audioFile => {
+        meta.outFile = audioFile;
+        try {
+          await encodeQueue.push({track, meta, files});
+          await embedQueue.push({track, meta, files, audioSource});
+        } catch (err) {
+          await audioFile.remove();
+          throw err;
+        }
+      });
+      return {wroteImage, finalSize: (await fs.stat(meta.outFile.path)).size};
+    },
+  );
 
   function buildSourceCollectorFor(track, selector) {
     async function handleSource(iterator, lastErr) {
@@ -1136,15 +1273,28 @@ async function init(packageJson, queries, options) {
     const filterStat = options.filter(track, false);
     if (!filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
-      return {meta, code: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
+      return {meta, [symbols.errorCode]: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
     }
 
     if (props.fileExists) {
+      let otherLocations = props.fileExistsIn.filter(path => path !== meta.outFile.path);
+      let outputFilePathExists = props.fileExistsIn.includes(meta.outFile.path);
+      let prefix = outputFilePathExists ? 'Also ' : '';
       if (!props.processTrack) {
         trackLogger.log('| [\u00bb] Track exists. Skipping...');
-        return {meta, code: 0, skip_reason: 'exists', complete: true};
+        if (otherLocations.length === 1) trackLogger.log(`| [\u00bb] ${prefix}Found In: ${otherLocations[0]}`);
+        else if (otherLocations.length > 1) {
+          trackLogger.log(`| [\u00bb] ${prefix}Found In:`);
+          for (let path of otherLocations) trackLogger.log(`| [\u00bb]  - ${path}`);
+        }
+        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: outputFilePathExists};
       }
-      trackLogger.log('| [\u2022] Track exists. Overwriting...');
+      trackLogger.log(`| [\u2022] Track exists. ${outputFilePathExists ? 'Overwriting' : 'Recreating'}...`);
+      if (otherLocations.length === 1) trackLogger.log(`| [\u2022] ${prefix}Found In: ${otherLocations[0]}`);
+      else if (otherLocations.length > 1) {
+        trackLogger.log(`| [\u2022] ${prefix}Found In:`);
+        for (let path of otherLocations) trackLogger.log(`| [\u2022]  - ${path}`);
+      }
     }
     track.musicBrainz =
       (await processPromise(props.extraTrackMeta, trackLogger, {
@@ -1160,12 +1310,12 @@ async function init(packageJson, queries, options) {
         onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]\n`,
       }),
     );
-    if ('err' in audioSource) return {meta, code: 1, err: audioSource.err}; // zero sources found
+    if ('err' in audioSource) return {meta, [symbols.errorCode]: 1, err: audioSource.err}; // zero sources found
     const audioFeeds = await processPromise(audioSource.feeds, trackLogger, {
       onInit: '| \u27a4 Awaiting audiofeeds...',
       noVal: () => '[Unable to collect source feeds]\n',
     });
-    if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, code: 2};
+    if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, [symbols.errorCode]: 2};
 
     const [feedMeta] = audioFeeds.formats
       .filter(meta => 'abr' in meta && !('vbr' in meta))
@@ -1174,11 +1324,15 @@ async function init(packageJson, queries, options) {
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue
       .push({track, meta, feedMeta, trackLogger})
-      .catch(errObject => Promise.reject({meta, code: 5, ...(errObject.code ? errObject : {err: errObject})}));
+      .catch(errObject =>
+        Promise.reject({meta, [symbols.errorCode]: 5, ...(symbols.errorCode in errObject ? errObject : {err: errObject})}),
+      );
     trackLogger.log(`| [\u2022] Post Processing...`);
     return {
       files,
-      postprocess: postProcessor.push({track, meta, files, audioSource}).catch(errObject => ({code: 9, ...errObject})),
+      postprocess: postProcessor
+        .push({track, meta, files, audioSource})
+        .catch(errObject => ({[symbols.errorCode]: 9, ...(symbols.errorCode in errObject ? errObject : {err: errObject})})),
     };
   });
 
@@ -1189,18 +1343,14 @@ async function init(packageJson, queries, options) {
       try {
         if (!(track = await track)) throw new Error('no data recieved from track');
       } catch (err) {
-        return {code: -1, err};
+        return {[symbols.errorCode]: -1, err};
       }
       if ((track[symbols.errorStack] || {}).code === 1)
         return {
-          code: -1,
+          [symbols.errorCode]: -1,
           err: new Error("local-typed tracks aren't supported"),
           meta: {track: {uri: track[symbols.errorStack].uri}},
         };
-      const outFileDir = xpath.join(
-        BASE_DIRECTORY,
-        ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
-      );
       const trackBaseName = `${prePadNum(track.track_number, track.total_tracks, 2)} ${track.name}`;
       const trackName = trackBaseName.concat(
         isPlaylist || (track.compilation && track.album_artist === 'Various Artists')
@@ -1209,8 +1359,19 @@ async function init(packageJson, queries, options) {
       );
       const fileExtension = options.format == 'flac' ? 'flac' : 'm4a';
       const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.${fileExtension}`;
-      const outFilePath = xpath.join(outFileDir, outFileName);
-      const fileExists = !!(await maybeStat(outFilePath));
+      const trackPath = xpath.join(
+        ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
+      );
+      const outFilePath = xpath.join(BASE_DIRECTORY, trackPath, outFileName);
+      const fileExistsIn = (
+        await Promise.all(
+          CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName)).map(async path => [
+            path,
+            !!(await maybeStat(xpath.join(path))),
+          ]),
+        )
+      ).flatMap(([dir, exists]) => (exists ? [dir] : []));
+      let fileExists = !!fileExistsIn.length;
       const processTrack = !fileExists || options.force;
       let collectSources, extraTrackMeta;
       if (processTrack) {
@@ -1220,11 +1381,11 @@ async function init(packageJson, queries, options) {
           Promise.resolve(extraTrackMeta).catch(() => {}); // diffuse any caught error in the meantime
         }
       }
-      const meta = {trackName, outFileDir, outFilePath, track, service};
+      const meta = {trackName, outFile: {path: outFilePath}, track, service};
       return trackQueue
-        .push({track, meta, props: {collectSources, extraTrackMeta, fileExists, processTrack, logger}})
+        .push({track, meta, props: {collectSources, extraTrackMeta, fileExists, fileExistsIn, processTrack, logger}})
         .then(trackObject => ({...trackObject, meta}))
-        .catch(errObject => ({meta, code: 10, ...errObject}));
+        .catch(errObject => ({meta, [symbols.errorCode]: 10, ...errObject}));
     },
   );
 
@@ -1410,34 +1571,34 @@ async function init(packageJson, queries, options) {
       await Promise.mapSeries(trackStats, async trackStat => {
         if (trackStat.postprocess) {
           trackStat.postprocess = await trackStat.postprocess;
-          if ('code' in trackStat.postprocess) {
-            trackStat.code = trackStat.postprocess.code;
+          if (symbols.errorCode in trackStat.postprocess) {
+            trackStat[symbols.errorCode] = trackStat.postprocess[symbols.errorCode];
             trackStat.err = trackStat.postprocess.err;
           }
         }
-        if (trackStat.code) {
+        if (trackStat[symbols.errorCode]) {
           const reason =
-            trackStat.code === -1
+            trackStat[symbols.errorCode] === -1
               ? 'Failed getting track data'
-              : trackStat.code === 1
+              : trackStat[symbols.errorCode] === 1
               ? 'Failed collecting sources'
-              : trackStat.code === 2
+              : trackStat[symbols.errorCode] === 2
               ? 'Error while collecting sources feeds'
-              : trackStat.code === 3
+              : trackStat[symbols.errorCode] === 3
               ? 'Error downloading album art'
-              : trackStat.code === 4
+              : trackStat[symbols.errorCode] === 4
               ? 'Error downloading raw audio'
-              : trackStat.code === 5
+              : trackStat[symbols.errorCode] === 5
               ? 'Unknown Download Error'
-              : trackStat.code === 6
+              : trackStat[symbols.errorCode] === 6
               ? 'Error ensuring directory integrity'
-              : trackStat.code === 7
+              : trackStat[symbols.errorCode] === 7
               ? 'Error while encoding audio'
-              : trackStat.code === 8
+              : trackStat[symbols.errorCode] === 8
               ? 'Failed while embedding metadata'
-              : trackStat.code === 9
-              ? 'Unknown postprocessing error'
-              : 'Unknown track processing error';
+              : trackStat[symbols.errorCode] === 9
+              ? 'Unexpected postprocessing error'
+              : 'Unexpected track processing error';
           embedLogger.error(
             `\u2022 [\u2715] ${trackStat.meta && trackStat.meta.trackName ? `${trackStat.meta.trackName}` : '<unknown track>'}${
               trackStat.meta && trackStat.meta.track.uri ? ` [${trackStat.meta.track.uri}]` : ''
@@ -1445,7 +1606,7 @@ async function init(packageJson, queries, options) {
               trackStat.err ? ` [${trackStat.err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || trackStat.err}]` : ''
             })`,
           );
-        } else if (trackStat.code === 0)
+        } else if (trackStat[symbols.errorCode] === 0)
           embedLogger.log(`\u2022 [\u00bb] ${trackStat.meta.trackName} (skipped: ${trackStat.skip_reason})`);
         else
           embedLogger.log(
@@ -1492,10 +1653,10 @@ async function init(packageJson, queries, options) {
         total.mediaSize += audio;
         total.imageSize += image;
       }
-      if (current.code === 0)
+      if (current[symbols.errorCode] === 0)
         if (current.complete) total.passed += 1;
         else total.skipped += 1;
-      else if (!('code' in current)) (total.new += 1), (total.passed += 1);
+      else if (!(symbols.errorCode in current)) (total.new += 1), (total.passed += 1);
       else total.failed += 1;
       return total;
     },
@@ -1521,6 +1682,7 @@ async function init(packageJson, queries, options) {
     stackLogger.log(` [\u2022] Output bitrate: ${options.bitrate}`);
     stackLogger.log('===============================');
   }
+  await fileMgr.garbageCollect({keep: Config.dirs.cache.keep});
 }
 
 function prepCli(packageJson) {
@@ -1564,6 +1726,15 @@ function prepCli(packageJson) {
     .option('-r, --retries <N>', 'set number of retries for each chunk before giving up (`infinite` for infinite)', 10)
     .option('-t, --meta-retries <N>', 'set number of retries for collating track feeds (`infinite` for infinite)', 5)
     .option('-d, --directory <DIR>', 'save tracks to DIR/..')
+    .option(
+      '-D, --check-dir <DIR>',
+      [
+        'check if tracks already exist in another DIR (repeatable, optionally comma-separated)',
+        '(useful if you maintain multiple libraries)',
+        '(example: `-D dir1 -D dir2 -D dir3,dir4`)',
+      ].join('\n'),
+      (spec, stack) => (stack || []).concat(spec.split(',')),
+    )
     .option('-c, --cover <NAME>', 'custom name for the cover art, excluding the extension', 'cover')
     .option(
       '--cover-size <SIZE>',
@@ -1577,8 +1748,11 @@ function prepCli(packageJson) {
       'm4a',
     )
     .option(
-      '-D, --downloader <SERVICE>',
-      ['specify a preferred download source or a `,`-separated preference order', `(valid: ${VALIDS.downloaders})`].join('\n'),
+      '-S, --sources <SERVICE>',
+      [
+        'specify a preferred audio source or a `,`-separated preference order',
+        `(valid: ${VALIDS.sources}) (prefix with \`!\` to exclude)`,
+      ].join('\n'),
       'yt_music',
     )
     .option('-m, --musicbrainz', 'attempt to source and embed extra metadata from MusicBrainz')
@@ -1631,7 +1805,10 @@ function prepCli(packageJson) {
       (spec, stack) => (stack || []).concat(spec.split(',')),
     )
     .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
-    .option('--cache-dir <DIR>', 'specify alternative cache directory, `<tmp>` for tempdir')
+    .option('--cache-dir <DIR>', 'specify alternative cache directory\n`<tmp>` for tempdir, `<cache>` for system cache')
+    .option('--rm-cache [RM]', 'remove original downloaded files in cache directory (default: false)', v =>
+      ['true', '1', 'yes', 'y'].includes(v) ? true : ['false', '0', 'no', 'n'].includes(v) ? false : v,
+    )
     .option('-M, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
     .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
     .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
@@ -1639,7 +1816,6 @@ function prepCli(packageJson) {
     .option('--no-browser', 'disable auto-launching of user browser')
     .option('--no-net-check', 'disable internet connection check')
     .option('--no-bar', 'disable the progress bar')
-    .option('--ffmpeg <PATH>', 'explicit path to the ffmpeg binary')
     .option('--atomic-parsley <PATH>', 'explicit path to the atomic-parsley binary')
     .option('--no-stats', "don't show the stats on completion")
     .option('--pulsate-bar', 'show a pulsating bar')
@@ -1655,7 +1831,6 @@ function prepCli(packageJson) {
       console.log('');
       console.log('Environment Variables:');
       console.log('  SHOW_DEBUG_STACK             show extended debug information');
-      console.log('  FFMPEG_PATH                  custom ffmpeg path, alternatively use `--ffmpeg`');
       console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
       console.log('');
       console.log('Info:');
