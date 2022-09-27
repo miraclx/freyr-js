@@ -6,9 +6,10 @@ import {YouTube, YouTubeMusic} from './services/youtube.js';
 import Deezer from './services/deezer.js';
 import Spotify from './services/spotify.js';
 import AppleMusic from './services/apple_music.js';
+import MusicBrainz from './services/musicbrainz.js';
 
 export default class FreyrCore {
-  static ENGINES = [Deezer, Spotify, AppleMusic, YouTube, YouTubeMusic];
+  static ENGINES = [Deezer, Spotify, AppleMusic, YouTube, YouTubeMusic, MusicBrainz];
 
   static getBitrates() {
     return Array.from(
