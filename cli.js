@@ -1716,6 +1716,17 @@ function prepCli(packageJson) {
     .option('--playlist-force-append', 'force append collection tracks to the playlist file')
     .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
     .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
+    /*
+    .option(
+      '--tags',
+      [
+        'tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)',
+        '(format: <key=value>) (reserved keys: [exclude, account])',
+      ].join('\n'),
+      (spec, stack) => (stack || []).concat(spec.split(',')),
+    )
+    .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
+    */
     .option('--cache-dir <DIR>', 'specify alternative cache directory\n`<tmp>` for tempdir, `<cache>` for system cache')
     .option('--rm-cache [RM]', 'remove original downloaded files in cache directory (default: false)', v =>
       ['true', '1', 'yes', 'y'].includes(v) ? true : ['false', '0', 'no', 'n'].includes(v) ? false : v,
