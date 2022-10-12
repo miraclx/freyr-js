@@ -1662,11 +1662,6 @@ function prepCli(packageJson) {
     )
     .option('-C, --no-cover', 'skip saving a cover art')
     .option(
-      '-x, --format <FORMAT>',
-      ['preferred audio output format (to export) (unimplemented)', '(valid: mp3,m4a,flac)'].join('\n'),
-      'm4a',
-    )
-    .option(
       '-S, --sources <SERVICE>',
       [
         'specify a preferred audio source or a `,`-separated preference order',
@@ -1714,15 +1709,6 @@ function prepCli(packageJson) {
     .option('--playlist-force-append', 'force append collection tracks to the playlist file')
     .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
     .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
-    .option(
-      '--tags',
-      [
-        'tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)',
-        '(format: <key=value>) (reserved keys: [exclude, account])',
-      ].join('\n'),
-      (spec, stack) => (stack || []).concat(spec.split(',')),
-    )
-    .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
     .option('--cache-dir <DIR>', 'specify alternative cache directory\n`<tmp>` for tempdir, `<cache>` for system cache')
     .option('--rm-cache [RM]', 'remove original downloaded files in cache directory (default: false)', v =>
       ['true', '1', 'yes', 'y'].includes(v) ? true : ['false', '0', 'no', 'n'].includes(v) ? false : v,
@@ -1755,78 +1741,6 @@ function prepCli(packageJson) {
       console.log('  When downloading playlists, the tracks are downloaded individually into');
       console.log('  their respective folders. However, a m3u8 playlist file is generated in');
       console.log('  the base directory with the name of the playlist that lists the tracks');
-    });
-
-  program
-    .command('serve', {hidden: true})
-    .arguments('[port]')
-    .description('Launch freyr server on an HTTP interface (unimplemented)', {
-      port: 'specify alternative port [default: 3797]',
-    })
-    .option('-b, --bind <ADDRESS>', 'address to bind to')
-    .option('-d, --directory <DIR>', 'working directory')
-    .option('-c, --config <FILE>', 'configuration file')
-    .option('-t, --tmp <DIR>', 'temporary directory for unprocessed artifacts', '<tmp>')
-    .option('-a, --archive <WHEN>', 'when to pack file(s) in an archive (valid: auto,always,never))', 'auto')
-    .option('-z, --compression [algorithm]', 'compression algorithm to use (valid: gzip,lz4)', 'gzip')
-    .option('-Z, --no-compression', 'disable compression altogether')
-    .option('--no-cache', 'disable file caching')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:serve]');
-    });
-
-  const program_context = program
-    .command('context', {hidden: true})
-    .description('Create and manage music contexts (unimplemented)')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:context]');
-    });
-
-  program_context
-    .command('new')
-    .arguments('<name>')
-    .description('create a new music context (unimplemented)')
-    .option('-k, --pass <KEY>', 'encrypted password for the context, if any')
-    .option('--no-pass', 'do not ask for a key to encrypt the context')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:context new]');
-    });
-
-  program
-    .command('search', {hidden: true})
-    .description('Search for and optionally download music interactively (unimplemented)')
-    .option('-q, --query <PATTERN>', 'non-interactive search filter pattern to be matched')
-    .option('-n, --max <MAX>', 'return a maximum of MAX match results')
-    .option('-o, --output <FILE>', 'save search results in a batch file for later instead of autodownload')
-    .option('-p, --pretty', 'include whitespaces and commented metadata in search result output')
-    .option(
-      '-l, --filter <PATTERN>',
-      'key-value constraints that all search results must match (repeatable and optionally `,`-separated)',
-      (spec, stack) => (stack || []).concat(spec),
-    )
-    .option('-L, --filter-case', 'enable case sensitivity for glob matches on the filters (unimplemented)')
-    .option('--profile <PROFILE>', 'configuration context with which to process the search and download')
-    .action((_args, _cmd) => {
-      throw Error('Unimplemented: [CLI:search]');
-    })
-    .on('--help', () => {
-      console.log('');
-      console.log('Info:');
-      console.log('  See `freyr help filter` for more information on constructing filter PATTERNs');
-      console.log('');
-      console.log('  Optionally, args and options provided after `--` are passed as options to the freyr download interface');
-      console.log('  Options like `--profile` share its value with the downloader');
-      console.log('');
-      console.log('Examples:');
-      console.log('  # search interactively and download afterwards with custom download flags');
-      console.log('  $ freyr search -- -d ~/Music');
-      console.log('');
-      console.log('  # search non-interactively and download afterwards');
-      console.log("  $ freyr search --query 'billie eilish @ type=album, title=*was older, duration=3s.., explicit=false'");
-      console.log('');
-      console.log('  # search interactively, save a maximum of 5 results to file and download later');
-      console.log('  $ freyr search -n 5 -o queue.txt');
-      console.log('  $ freyr -i queue.txt');
     });
 
   const program_filter = program
@@ -1874,79 +1788,6 @@ function prepCli(packageJson) {
       console.log("  # filter non-explicit tracks from 'Billie Eilish' ending with 'To Die'");
       console.log('  # whose duration is between 1:30 and 3:00 minutes');
       console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = 1:30..3:00, explicit = false'");
-    });
-
-  const config = program
-    .command('profile', {hidden: true})
-    .description('Manage profile configuration contexts storing persistent user configs and auth keys (unimplemented)')
-    .on('--help', () => {
-      console.log('');
-      console.log('Examples:');
-      console.log('  $ freyr -q profile new test');
-      console.log('    ? Enter an encryption key: **********');
-      console.log('  /home/miraclx/.config/FreyrCLI/test.x4p');
-      console.log('');
-      console.log('  # unless unencrypted, will ask to decrypt profile');
-      console.log('  $ freyr -q --profile test deezer:playlist:1963962142');
-      console.log('    ? Enter an encryption key: **********');
-      console.log('  [...]');
-    });
-  config
-    .command('new')
-    .arguments('<name>')
-    .description('create a new profile context (unimplemented)')
-    .option('-k, --pass <KEY>', 'encrypted password for the new profile')
-    .option('--no-pass', 'do not ask for a key to encrypt the config')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:profiles new]');
-    });
-  config
-    .command('get')
-    .arguments('<name>')
-    .description('return the raw configuration content for the profile, decrypts if necessary (unimplemented)')
-    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-    .option(
-      '-p, --pretty [SPEC]',
-      'pretty print the JSON output. (key omission implies space indentation)\n(format(SPEC): <[key=]value>) (valid(key): space,tab)',
-      'space=2',
-    )
-    .action(() => {
-      throw Error('Unimplemented: [CLI:profiles get]');
-    });
-  config
-    .command('remove')
-    .alias('rm')
-    .arguments('<name>')
-    .description('deletes the profile context, decrypts if necessary (unimplemented)')
-    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:profiles reset]');
-    });
-  config
-    .command('reset')
-    .alias('rs')
-    .arguments('<name>')
-    .description('resets the profile context, decrypts if necessary (unimplemented)')
-    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:profiles reset]');
-    });
-  config
-    .command('unset')
-    .alias('un')
-    .arguments('<name> <field>')
-    .description('unsets a field within the profile context, decrypts if necessary (unimplemented)')
-    .option('-k, --pass <KEY>', 'encrypted password for the profile, if any')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:profiles unset]');
-    });
-  config
-    .command('list')
-    .alias('ls')
-    .description('list all available profiles (unimplemented)')
-    .option('--raw', 'return raw JSON output')
-    .action(() => {
-      throw Error('Unimplemented: [CLI:profiles list]');
     });
 
   program
