@@ -24,7 +24,7 @@
       ]
     },
     {
-      "groupName": "ffmpeg",
+      "groupName": "ffmpeg-wasm",
       "matchPackagePrefixes": [
         "@ffmpeg/"
       ]
