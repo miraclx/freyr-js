@@ -319,13 +319,14 @@ atomically@^1.7.0:
   resolved "https://registry.npmjs.org/atomically/-/atomically-1.7.0.tgz"
   integrity sha512-Xcz9l0z7y9yQ9rdDaxlmaI4uJHf/T8g9hOEzJcsEqX2SjCj4J20uK7+ldkDHMbpJDK76wF7xEIgxc/vSlsfw5w==
 
-axios@0.27.2, axios@^0.21.1:
-  version "0.27.2"
-  resolved "https://registry.npmjs.org/axios/-/axios-0.27.2.tgz"
-  integrity sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==
+axios@1.1.3, axios@^0.21.1:
+  version "1.1.3"
+  resolved "https://registry.npmjs.org/axios/-/axios-1.1.3.tgz"
+  integrity sha512-00tXVRwKx/FZr/IDVFt4C+f9FYairX517WoGCL6dpOntqLkZofjhu43F/Xl44UOpqa+9sLFDrG/XAnFsUYgkDA==
   dependencies:
-    follow-redirects "^1.14.9"
+    follow-redirects "^1.15.0"
     form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
 
 axios@^0.26.0:
   version "0.26.1"
@@ -1198,7 +1199,7 @@ flatted@^3.1.0:
   resolved "https://registry.npmjs.org/flatted/-/flatted-3.2.2.tgz"
   integrity sha512-JaTY/wtrcSyvXJl4IMFHPKyFur1sE9AUqc0QnhOaJ0CxHtAoIV8pYDzeEfAaNEtGkOfq4gr3LBFmdXW5mOQFnA==
 
-follow-redirects@^1.14.8, follow-redirects@^1.14.9:
+follow-redirects@^1.14.8, follow-redirects@^1.15.0:
   version "1.15.0"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.0.tgz"
   integrity sha512-aExlJShTV4qOUOL7yF1U5tvLCB0xQuudbf6toyYA0E/acBNw71mvjFTnLaRp50aQaYocMR0a/RMMBIHeZnGyjQ==
@@ -2169,6 +2170,11 @@ proxy-addr@~2.0.7:
   dependencies:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
+
+proxy-from-env@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
+  integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
 public-ip@^6.0.1:
   version "6.0.1"
