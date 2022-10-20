@@ -72,8 +72,12 @@ export default class AsyncQueue {
   static provision(genFn, worker) {
     let resources = [];
     let fn = async (...args) => {
-      let resource = resources.shift() || (await genFn());
-      if (args[0] === ResourceDropSignal) return void (resources = []);
+      let resource;
+      if (args[0] === ResourceDropSignal) {
+        while ((resource = resources.shift())) await genFn(true, resource);
+        return;
+      }
+      resource = resources.shift() || (await genFn(false, null));
       try {
         return await worker(resource, ...args);
       } finally {
@@ -175,12 +179,16 @@ export default class AsyncQueue {
   }
 
   /**
-   * Clear pending tasks and forces the queue to go idle.
+   * Clear pending tasks and forces the queue to go idle, cleans up any associated resources.
    * The queue should not be pushed back to after this method call.
    */
-  abort() {
+  async abort() {
     this.#store.queue.kill();
-    if (this.#store.worker && this.#store.worker[IsProvisionedProxy]) this.#store.worker(ResourceDropSignal);
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    if (this.#store.worker && this.#store.worker[IsProvisionedProxy]) await this.#store.worker(ResourceDropSignal);
   }
 
   /**

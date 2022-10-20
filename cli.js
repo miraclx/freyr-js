@@ -1130,7 +1130,8 @@ async function init(packageJson, queries, options) {
     'cli:postprocessor:encodeQueue',
     Config.concurrency.encoder,
     AsyncQueue.provision(
-      async () => {
+      async (cleanup, resource) => {
+        if (cleanup) return resource.exit();
         let ffmpeg = createFFmpeg({log: false});
         await ffmpeg.load();
         return ffmpeg;
@@ -1690,6 +1691,7 @@ async function init(packageJson, queries, options) {
     stackLogger.log('===============================');
   }
   await fileMgr.garbageCollect({keep: Config.dirs.cache.keep});
+  await encodeQueue.cleanup();
 }
 
 function prepCli(packageJson) {
