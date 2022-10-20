@@ -113,7 +113,7 @@ async function run_tests(suite, args, i) {
       let logFile = await fileMgr({
         path: join(test_stage_path, `${service}-${type}-${attempt}.log`),
         keep: true,
-      }).open(fs_constants.W_OK);
+      }).open(fs_constants.O_WRONLY | fs_constants.O_TRUNC);
 
       logFile.stream = createWriteStream(null, {fd: logFile.handle});
 
