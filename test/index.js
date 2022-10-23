@@ -142,8 +142,8 @@ async function run_tests(suite, args, i) {
       let child,
         handler = () => {};
 
+      let extra_node_args = process.env['NODE_ARGS'] ? process.env['NODE_ARGS'].split(' ') : [];
       if (!docker_image) {
-        let extra_node_args = process.env['NODE_ARGS'] ? process.env['NODE_ARGS'].split(' ') : [];
         child = spawn(
           'node',
           [
@@ -174,6 +174,7 @@ async function run_tests(suite, args, i) {
           `${test_stage_path}:/data`,
           '--env',
           'SHOW_DEBUG_STACK=1',
+          ...(extra_node_args.length ? ['--env', `NODE_ARGS=${extra_node_args.join(' ')}`] : []),
           '--',
           docker_image,
           ...child_args,
