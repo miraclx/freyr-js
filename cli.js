@@ -1987,12 +1987,12 @@ function prepCli(packageJson) {
     .on('--help', () => {
       console.log('');
       console.log('Examples:');
-      console.log('  $ freyr -q profile new test');
+      console.log('  $ freyr profile new test');
       console.log('    ? Enter an encryption key: **********');
       console.log('  /home/miraclx/.config/FreyrCLI/test.x4p');
       console.log('');
       console.log('  # unless unencrypted, will ask to decrypt profile');
-      console.log('  $ freyr -q --profile test deezer:playlist:1963962142');
+      console.log('  $ freyr --profile test deezer:playlist:1963962142');
       console.log('    ? Enter an encryption key: **********');
       console.log('  [...]');
     });
@@ -2124,17 +2124,17 @@ function prepCli(packageJson) {
     .on('--help', () => {
       console.log('');
       console.log('Examples:');
-      console.log('  $ freyr -q urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
+      console.log('  $ freyr urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
       console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
       console.log('');
-      console.log('  $ freyr -q urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
+      console.log('  $ freyr urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
       console.log('  apple_music:track:1510821685');
       console.log('');
       console.log(
         [
           '  $ echo https://www.deezer.com/en/artist/5340439 \\',
           '         https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb \\',
-          '      | freyr -q urify -t',
+          '      | freyr urify -t',
         ].join('\n'),
       );
       console.log('  deezer:artist:5340439');
