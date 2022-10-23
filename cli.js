@@ -2106,7 +2106,7 @@ function prepCli(packageJson) {
           if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
             await urify(await PROCESS_INPUT_ARG(!process.stdin.isTTY ? '-' : args.input));
           else if (process.stdin.isTTY && args.input === '-') {
-            console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
+            console.error('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
             await new Promise((res, rej) =>
               process.stdin
                 .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
@@ -2116,8 +2116,8 @@ function prepCli(packageJson) {
           }
         })
         .then(() => {
-          console.log('\x1b[32m[+]\x1b[0m Urify complete');
-          if (args.output) console.log(`Successfully written to [${args.output}]`);
+          console.error('\x1b[32m[+]\x1b[0m Urify complete');
+          if (args.output) console.error(`Successfully written to [${args.output}]`);
           if (output !== process.stdout) output.end();
         });
     })
