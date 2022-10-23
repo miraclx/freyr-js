@@ -174,7 +174,7 @@ async function run_tests(suite, args, i) {
           `${test_stage_path}:/data`,
           '--env',
           'SHOW_DEBUG_STACK=1',
-          ...(extra_node_args.length ? ['--env', `NODE_ARGS=${extra_node_args.join(' ')}`] : []),
+          ...(extra_node_args.length ? ['--env', `FREYR_NODE_ARGS=${extra_node_args.join(' ')}`] : []),
           '--',
           docker_image,
           ...child_args,
