@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$DOCKER_DESKTOP" = "true" ]; then
   COLS=$(stty size 2>&- | cut -d" " -f2)

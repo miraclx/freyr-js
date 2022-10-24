@@ -21,10 +21,10 @@ RUN go install github.com/tj/node-prune@1159d4c \
 FROM alpine:3.16.2 as base
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache nodejs python3 \
+RUN apk add --no-cache bash nodejs python3 \
   && find /usr/lib/python3* \
-      \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
-      -exec rm -r {} \+
+  \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
+  -exec rm -r {} \+
 COPY --from=prep /atomicparsley/AtomicParsley /bin/AtomicParsley
 
 COPY . /freyr
