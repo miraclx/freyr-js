@@ -38,13 +38,16 @@ function tee(stream1, stream2) {
   return stream;
 }
 
+let abortCode = Symbol('ExitCode');
+
 async function pRetry(tries, fn) {
   let result,
     rawErr,
     abortSymbol = Symbol('RetryAbort');
   for (let [i] of Array.apply(null, {length: tries}).entries()) {
     try {
-      return await fn(i + 1, rawErr, () => {
+      return await fn(i + 1, rawErr, blob => {
+        if (blob && abortCode in blob) (result = Promise.reject(blob)).catch(() => {});
         throw abortSymbol;
       });
     } catch (err) {
@@ -216,7 +219,7 @@ async function run_tests(suite, args, i) {
             closed = true;
             child.off('close', close_handler);
             process.off('SIGINT', sigint_handler).off('SIGTERM', sigterm_handler).off('SIGHUP', sighup_handler);
-            if (docker_image && code === 137) process.exit(130);
+            if (docker_image && code === 137) abort({[abortCode]: 130});
             for (let [signal, signame] of [
               [130, 'SIGINT'],
               [143, 'SIGTERM'],
@@ -278,18 +281,25 @@ async function main(args) {
   suite = JSON.parse(await fs.readFile(test_suite || join(__dirname, 'default.json')));
 
   if (!['-h', '--help'].some(args.includes.bind(args))) {
+    let exitCode;
     try {
       if (noService !== (await run_tests(suite, args))) return;
     } catch (err) {
-      console.error('An error occurred!');
-      if (errorCauses in err) {
-        let causes = err[errorCauses];
-        delete err[errorCauses];
-        console.error('', err);
-        for (let cause of causes) console.error('', cause);
-      } else console.error('', err);
-      process.exit(1);
+      if (abortCode in err) exitCode = err[abortCode];
+      else {
+        console.error('An error occurred!');
+        if (errorCauses in err) {
+          let causes = err[errorCauses];
+          delete err[errorCauses];
+          console.error('', err);
+          for (let cause of causes) console.error('', cause);
+        } else console.error('', err);
+        exitCode = 1;
+      }
+    } finally {
+      await fileMgr.garbageCollect();
     }
+    if (exitCode) process.exit(exitCode);
   }
 
   console.log('freyr-test');
