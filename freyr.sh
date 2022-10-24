@@ -20,4 +20,4 @@ if [ "$DOCKER_DESKTOP" = "true" ]; then
   tail -f /dev/null
 fi
 
-node ${FREYR_NODE_ARGS[@]} -- "$(dirname "$0")"/cli.js "$@"
+node "${FREYR_NODE_ARGS[@]}" -- "$(dirname "$0")"/cli.js "$@"
