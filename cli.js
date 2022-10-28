@@ -1098,7 +1098,7 @@ async function init(packageJson, queries, options) {
               ['albumArtists', track.artists],
               ['albumArtistsSort', track.musicBrainz?.artistSortOrder],
               ['composers', track.composers],
-              ['copyright', track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text],
+              ['copyright', track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text],
               [
                 'description',
                 `${meta.service[symbols.meta].DESC}: ${track.uri} , ${audioSource.service[symbols.meta].DESC}: ${
