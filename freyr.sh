@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$DOCKER_DESKTOP" = "true" ]; then
   COLS=$(stty size 2>&- | cut -d" " -f2)
@@ -20,4 +20,4 @@ if [ "$DOCKER_DESKTOP" = "true" ]; then
   tail -f /dev/null
 fi
 
-node "$(dirname "$0")"/cli.js "$@"
+node "${FREYR_NODE_ARGS[@]}" -- "$(dirname "$0")"/cli.js "$@"

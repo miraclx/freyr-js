@@ -72,7 +72,7 @@ export default function genFile(opts) {
     read: () => inner(fs_constants.O_RDONLY),
     /** File will be written to once, unless forcefully forgotten. */
     writeOnce: async writerGen => {
-      let fileRef = await inner(fs_constants.O_WRONLY);
+      let fileRef = await inner(fs_constants.O_WRONLY | fs_constants.O_TRUNC);
       let file = openfiles[fileRef[symbols.fileId]];
       await (file.writer ||= fileRef.writer = writerGen(fileRef));
       return fileRef;

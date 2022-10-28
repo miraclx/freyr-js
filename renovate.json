@@ -22,6 +22,12 @@
         "ffurrer2/extract-release-notes",
         "marocchino/sticky-pull-request-comment"
       ]
+    },
+    {
+      "groupName": "ffmpeg-wasm",
+      "matchPackagePrefixes": [
+        "@ffmpeg/"
+      ]
     }
   ]
 }

@@ -101,7 +101,10 @@ function parseMeta(params) {
 }
 
 function extendPathOnEnv(path) {
-  return {...process.env, PATH: [process.env.PATH, path].join(process.platform === 'win32' ? ';' : ':')};
+  return {
+    ...process.env,
+    PATH: [process.env.PATH, path].join(process.platform === 'win32' ? ';' : ':'),
+  };
 }
 
 function ensureBinExtIfWindows(isWin, command) {
@@ -111,7 +114,9 @@ function ensureBinExtIfWindows(isWin, command) {
 function check_bin_is_existent(bin, path) {
   const isWin = process.platform === 'win32';
   const command = isWin ? 'where' : 'which';
-  const {status} = spawnSync(ensureBinExtIfWindows(isWin, command), [bin], {env: extendPathOnEnv(path)});
+  const {status} = spawnSync(ensureBinExtIfWindows(isWin, command), [bin], {
+    env: extendPathOnEnv(path),
+  });
   if ([127, null].includes(status)) throw Error(`Unable to locate the command [${command}] within your PATH`);
   return status === 0;
 }
@@ -134,7 +139,10 @@ function wrapCliInterface(binaryNames, binaryPath) {
       );
   }
   return (file, args, cb) => {
-    if (typeof file === 'string') spawn(binaryPath, [file, ...parseMeta(args)], {env: extendPathOnEnv(path)}).on('close', cb);
+    if (typeof file === 'string')
+      spawn(binaryPath, [file, ...parseMeta(args)], {
+        env: extendPathOnEnv(path),
+      }).on('close', cb);
   };
 }
 
@@ -186,9 +194,9 @@ function prepProgressGen(options) {
       bar: {separator: '|'},
       // eslint-disable-next-line prettier/prettier
       template: [
-        ':{indent} [:{bullet}] :{label} :{flipper}',
-        ':{indent}  | :{bullet} :{_tag}',
-        ':{bars}'
+        ":{indent} [:{bullet}] :{label} :{flipper}",
+        ":{indent}  | :{bullet} :{_tag}",
+        ":{bars}",
       ],
       clean: true,
       flipper: [...Array(10)].map((...[, i]) => `:{color}${':{bullet}'.repeat(i + 1)}:{color:close}`),
@@ -416,7 +424,9 @@ function CHECK_FILTER_FIELDS(arrayOfFields, props = {}) {
               RULE_HANDLERS[rule] ||
               ((spec, object) => {
                 if (!(rule in object)) return;
-                return minimatch(`${object[rule]}`, spec, {nocase: !props.filterCase});
+                return minimatch(`${object[rule]}`, spec, {
+                  nocase: !props.filterCase,
+                });
               })
             )(value, trackObject, props);
             if (status !== undefined && !status) throw new Error(`expected \`${value}\``);
@@ -474,7 +484,9 @@ async function init(packageJson, queries, options) {
     options.input = await PROCESS_INPUT_ARG(options.input);
     if (options.config) options.config = await PROCESS_INPUT_FILE(options.config, 'Config', false);
     if (options.memCache) options.memCache = CHECK_FLAG_IS_NUM(options.memCache, '--mem-cache', 'number');
-    options.filter = CHECK_FILTER_FIELDS(options.filter, {filterCase: options.filterCase});
+    options.filter = CHECK_FILTER_FIELDS(options.filter, {
+      filterCase: options.filterCase,
+    });
     options.concurrency = Object.fromEntries(
       (options.concurrency || [])
         .map(item => (([k, v]) => (v ? [k, v] : ['tracks', k]))(item.split('=')))
@@ -485,7 +497,9 @@ async function init(packageJson, queries, options) {
         }),
     );
     if (options.storefront) {
-      const data = countryData.lookup.countries({alpha2: options.storefront.toUpperCase()});
+      const data = countryData.lookup.countries({
+        alpha2: options.storefront.toUpperCase(),
+      });
       if (data.length) options.storefront = data[0].alpha2.toLowerCase();
       else throw new Error('Country specification with the `--storefront` option is invalid');
     }
@@ -764,7 +778,10 @@ async function init(packageJson, queries, options) {
           `${filenamify(filename, {replacement: '_'})}.m3u8`,
         );
         const isNew = !(await maybeStat(playlistFile).then(({size}) => size)) || !(!options.playlistNoappend || shouldAppend);
-        const plStream = createWriteStream(playlistFile, {encoding: 'utf8', flags: !isNew ? 'a' : 'w'});
+        const plStream = createWriteStream(playlistFile, {
+          encoding: 'utf8',
+          flags: !isNew ? 'a' : 'w',
+        });
         if (isNew) {
           plStream.write('#EXTM3U\n');
           if (playlistTitle) plStream.write(`#${playlistTitle.replace(/\n/gm, '\n# ')}\n`);
@@ -805,7 +822,13 @@ async function init(packageJson, queries, options) {
   if (options.bar) progressGen = prepProgressGen(options);
 
   function downloadToStream({urlOrFragments, outputFile, logger, opts}) {
-    opts = {tag: '', successMessage: '', failureMessage: '', retryMessage: '', ...opts};
+    opts = {
+      tag: '',
+      successMessage: '',
+      failureMessage: '',
+      retryMessage: '',
+      ...opts,
+    };
     [opts.tag, opts.retryMessage, opts.failureMessage, opts.successMessage, opts.altMessage] = [
       opts.tag,
       opts.retryMessage,
@@ -871,8 +894,15 @@ async function init(packageJson, queries, options) {
           if (acceptsRanges) await maybeStat(outputFile.path).then(({size}) => (offset = size));
           if (offset) {
             opts.resumeHandler(offset);
-            writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'a'});
-          } else writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'w'});
+            writeStream = createWriteStream(null, {
+              fd: outputFile.handle,
+              flags: 'a',
+            });
+          } else
+            writeStream = createWriteStream(null, {
+              fd: outputFile.handle,
+              flags: 'w',
+            });
           feed.pipe(writeStream).on('finish', () => ((completed = true), res(writeStream.bytesWritten)));
           return offset;
         });
@@ -890,7 +920,10 @@ async function init(packageJson, queries, options) {
         } else logger.write(opts.altMessage());
 
         let has_erred = false;
-        const writeStream = createWriteStream(null, {fd: outputFile.handle, flags: 'w'});
+        const writeStream = createWriteStream(null, {
+          fd: outputFile.handle,
+          flags: 'w',
+        });
 
         merge2(
           ...urlOrFragments.map((frag, i) => {
@@ -903,7 +936,10 @@ async function init(packageJson, queries, options) {
             })
               .on('retry', data => {
                 if (opts.retryMessage !== false) {
-                  data = opts.retryMessage({ref: `${i}[${data.index + 1}]`, ...data});
+                  data = opts.retryMessage({
+                    ref: `${i}[${data.index + 1}]`,
+                    ...data,
+                  });
                   if (options.bar) barGen.print(data);
                   else {
                     logger.write('\x1b[G\x1b[K');
@@ -1018,7 +1054,11 @@ async function init(packageJson, queries, options) {
                   : {
                       urlOrFragments: feedMeta.fragments.map(({path}) => ({
                         url: `${feedMeta.fragment_base_url}${path}`,
-                        ...(([, min, max]) => ({min: +min, max: +max, size: +max - +min + 1}))(path.match(/range\/(\d+)-(\d+)$/)),
+                        ...(([, min, max]) => ({
+                          min: +min,
+                          max: +max,
+                          size: +max - +min + 1,
+                        }))(path.match(/range\/(\d+)-(\d+)$/)),
                       })),
                       opts: {
                         failureMessage: err =>
@@ -1159,7 +1199,8 @@ async function init(packageJson, queries, options) {
     'cli:postprocessor:encodeQueue',
     Config.concurrency.encoder,
     AsyncQueue.provision(
-      async () => {
+      async (cleanup, resource) => {
+        if (cleanup) return resource.exit();
         let ffmpeg = createFFmpeg({log: false});
         await ffmpeg.load();
         return ffmpeg;
@@ -1251,7 +1292,9 @@ async function init(packageJson, queries, options) {
           if ([undefined, null].includes(feeds)) throw new Error(`service returned no valid feeds for source`);
           return {sources, source, feeds, service: result.service};
         });
-        result.results = result.sources.catch(err => ({next: handleSource(iterator, err)}));
+        result.results = result.sources.catch(err => ({
+          next: handleSource(iterator, err),
+        }));
       }
       return result;
     }
@@ -1274,7 +1317,12 @@ async function init(packageJson, queries, options) {
     const filterStat = options.filter(track, false);
     if (!filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
-      return {meta, [symbols.errorCode]: 0, skip_reason: `filtered out: ${filterStat.reason.message}`, complete: false};
+      return {
+        meta,
+        [symbols.errorCode]: 0,
+        skip_reason: `filtered out: ${filterStat.reason.message}`,
+        complete: false,
+      };
     }
 
     if (props.fileExists) {
@@ -1288,7 +1336,12 @@ async function init(packageJson, queries, options) {
           trackLogger.log(`| [\u00bb] ${prefix}Found In:`);
           for (let path of otherLocations) trackLogger.log(`| [\u00bb]  - ${path}`);
         }
-        return {meta, [symbols.errorCode]: 0, skip_reason: 'exists', complete: outputFilePathExists};
+        return {
+          meta,
+          [symbols.errorCode]: 0,
+          skip_reason: 'exists',
+          complete: outputFilePathExists,
+        };
       }
       trackLogger.log(`| [\u2022] Track exists. ${outputFilePathExists ? 'Overwriting' : 'Recreating'}...`);
       if (otherLocations.length === 1) trackLogger.log(`| [\u2022] ${prefix}Found In: ${otherLocations[0]}`);
@@ -1323,17 +1376,20 @@ async function init(packageJson, queries, options) {
       .sort((meta1, meta2) => meta2.abr - meta1.abr);
 
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
-    const files = await downloadQueue
-      .push({track, meta, feedMeta, trackLogger})
-      .catch(errObject =>
-        Promise.reject({meta, [symbols.errorCode]: 5, ...(symbols.errorCode in errObject ? errObject : {err: errObject})}),
-      );
+    const files = await downloadQueue.push({track, meta, feedMeta, trackLogger}).catch(errObject =>
+      Promise.reject({
+        meta,
+        [symbols.errorCode]: 5,
+        ...(symbols.errorCode in errObject ? errObject : {err: errObject}),
+      }),
+    );
     trackLogger.log(`| [\u2022] Post Processing...`);
     return {
       files,
-      postprocess: postProcessor
-        .push({track, meta, files, audioSource})
-        .catch(errObject => ({[symbols.errorCode]: 9, ...(symbols.errorCode in errObject ? errObject : {err: errObject})})),
+      postprocess: postProcessor.push({track, meta, files, audioSource}).catch(errObject => ({
+        [symbols.errorCode]: 9,
+        ...(symbols.errorCode in errObject ? errObject : {err: errObject}),
+      })),
     };
   });
 
@@ -1359,7 +1415,9 @@ async function init(packageJson, queries, options) {
           : '',
       );
       const fileExtension = options.format == 'flac' ? 'flac' : 'm4a';
-      const outFileName = `${filenamify(trackBaseName, {replacement: '_'})}.${fileExtension}`;
+      const outFileName = `${filenamify(trackBaseName, {
+        replacement: '_',
+      })}.${fileExtension}`;
       const trackPath = xpath.join(
         ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
       );
@@ -1382,11 +1440,31 @@ async function init(packageJson, queries, options) {
           Promise.resolve(extraTrackMeta).catch(() => {}); // diffuse any caught error in the meantime
         }
       }
-      const meta = {trackName, outFile: {path: outFilePath}, track, service};
+      const meta = {
+        trackName,
+        outFile: {path: outFilePath},
+        track,
+        service,
+      };
       return trackQueue
-        .push({track, meta, props: {collectSources, extraTrackMeta, fileExists, fileExistsIn, processTrack, logger}})
+        .push({
+          track,
+          meta,
+          props: {
+            collectSources,
+            extraTrackMeta,
+            fileExists,
+            fileExistsIn,
+            processTrack,
+            logger,
+          },
+        })
         .then(trackObject => ({...trackObject, meta}))
-        .catch(errObject => ({meta, [symbols.errorCode]: 10, ...errObject}));
+        .catch(errObject => ({
+          meta,
+          [symbols.errorCode]: 10,
+          ...errObject,
+        }));
     },
   );
 
@@ -1504,7 +1582,9 @@ async function init(packageJson, queries, options) {
       const authHandler = service.newAuth();
       const url = await authHandler.getUrl;
       if (Config.opts.autoOpenBrowser)
-        await processPromise(open(url), loginLogger, {onInit: `[\u2022] Attempting to open [ ${url} ] within browser...`});
+        await processPromise(open(url), loginLogger, {
+          onInit: `[\u2022] Attempting to open [ ${url} ] within browser...`,
+        });
       else loginLogger.log(`[\u2022] Open [ ${url} ] in a browser to proceed with authentication`);
       await processPromise(authHandler.userToAuth(), loginLogger, {
         onInit: '[\u2022] Awaiting user authentication...',
@@ -1516,8 +1596,9 @@ async function init(packageJson, queries, options) {
       logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
       const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`).tick();
       service.canTryLogin()
-        ? (await processPromise(service.login(), loginLogger, {onInit: '[\u2022] Logging in...'})) ||
-          (await coreAuth(loginLogger))
+        ? (await processPromise(service.login(), loginLogger, {
+            onInit: '[\u2022] Logging in...',
+          })) || (await coreAuth(loginLogger))
         : await coreAuth(loginLogger);
     }
     return service.isAuthed();
@@ -1661,7 +1742,16 @@ async function init(packageJson, queries, options) {
       else total.failed += 1;
       return total;
     },
-    {outSize: 0, mediaSize: 0, imageSize: 0, netSize: 0, passed: 0, new: 0, failed: 0, skipped: 0},
+    {
+      outSize: 0,
+      mediaSize: 0,
+      imageSize: 0,
+      netSize: 0,
+      passed: 0,
+      new: 0,
+      failed: 0,
+      skipped: 0,
+    },
   );
   if (options.stats) {
     stackLogger.log('============ Stats ============');
@@ -1684,6 +1774,7 @@ async function init(packageJson, queries, options) {
     stackLogger.log('===============================');
   }
   await fileMgr.garbageCollect({keep: Config.dirs.cache.keep});
+  await encodeQueue.cleanup();
 }
 
 function prepCli(packageJson) {
@@ -1797,6 +1888,7 @@ function prepCli(packageJson) {
     .option('--playlist-force-append', 'force append collection tracks to the playlist file')
     .option('-s, --storefront <COUNTRY>', 'country storefront code (example: us,uk,ru)')
     .option('-T, --no-tree', "don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`")
+    /* Unimplemented Feature
     .option(
       '--tags',
       [
@@ -1805,7 +1897,10 @@ function prepCli(packageJson) {
       ].join('\n'),
       (spec, stack) => (stack || []).concat(spec.split(',')),
     )
+    */
+    /* Unimplemented Feature
     .option('--via-tor', 'tunnel network traffic through the tor network (unimplemented)')
+    */
     .option('--cache-dir <DIR>', 'specify alternative cache directory\n`<tmp>` for tempdir, `<cache>` for system cache')
     .option('--rm-cache [RM]', 'remove original downloaded files in cache directory (default: false)', v =>
       ['true', '1', 'yes', 'y'].includes(v) ? true : ['false', '0', 'no', 'n'].includes(v) ? false : v,
@@ -1840,6 +1935,7 @@ function prepCli(packageJson) {
       console.log('  the base directory with the name of the playlist that lists the tracks');
     });
 
+  /* Unimplemented Feature
   program
     .command('serve', {hidden: true})
     .arguments('[port]')
@@ -1857,14 +1953,18 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:serve]');
     });
+  */
 
+  /* Unimplemented Feature
   const program_context = program
     .command('context', {hidden: true})
     .description('Create and manage music contexts (unimplemented)')
     .action(() => {
       throw Error('Unimplemented: [CLI:context]');
     });
+  */
 
+  /* Unimplemented Feature
   program_context
     .command('new')
     .arguments('<name>')
@@ -1874,7 +1974,9 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:context new]');
     });
+  */
 
+  /* Unimplemented Feature
   program
     .command('search', {hidden: true})
     .description('Search for and optionally download music interactively (unimplemented)')
@@ -1911,6 +2013,7 @@ function prepCli(packageJson) {
       console.log('  $ freyr search -n 5 -o queue.txt');
       console.log('  $ freyr -i queue.txt');
     });
+  */
 
   const program_filter = program
     .command('filter')
@@ -1959,21 +2062,25 @@ function prepCli(packageJson) {
       console.log("  $ freyr filter 'artist = Billie Eilish, title = *To Die, duration = 1:30..3:00, explicit = false'");
     });
 
+  /* Unimplemented Feature
   const config = program
     .command('profile', {hidden: true})
     .description('Manage profile configuration contexts storing persistent user configs and auth keys (unimplemented)')
     .on('--help', () => {
       console.log('');
       console.log('Examples:');
-      console.log('  $ freyr -q profile new test');
+      console.log('  $ freyr profile new test');
       console.log('    ? Enter an encryption key: **********');
       console.log('  /home/miraclx/.config/FreyrCLI/test.x4p');
       console.log('');
       console.log('  # unless unencrypted, will ask to decrypt profile');
-      console.log('  $ freyr -q --profile test deezer:playlist:1963962142');
+      console.log('  $ freyr --profile test deezer:playlist:1963962142');
       console.log('    ? Enter an encryption key: **********');
       console.log('  [...]');
     });
+  */
+
+  /* Unimplemented Feature
   config
     .command('new')
     .arguments('<name>')
@@ -1983,6 +2090,9 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:profiles new]');
     });
+  */
+
+  /* Unimplemented Feature
   config
     .command('get')
     .arguments('<name>')
@@ -1996,6 +2106,9 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:profiles get]');
     });
+  */
+
+  /* Unimplemented Feature
   config
     .command('remove')
     .alias('rm')
@@ -2005,6 +2118,9 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:profiles reset]');
     });
+  */
+
+  /* Unimplemented Feature
   config
     .command('reset')
     .alias('rs')
@@ -2014,6 +2130,9 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:profiles reset]');
     });
+  */
+
+  /* Unimplemented Feature
   config
     .command('unset')
     .alias('un')
@@ -2023,6 +2142,9 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:profiles unset]');
     });
+  */
+
+  /* Unimplemented Feature
   config
     .command('list')
     .alias('ls')
@@ -2031,6 +2153,7 @@ function prepCli(packageJson) {
     .action(() => {
       throw Error('Unimplemented: [CLI:profiles list]');
     });
+  */
 
   program
     .command('urify')
@@ -2065,7 +2188,7 @@ function prepCli(packageJson) {
           if ((process.stdin.isTTY && args.input !== '-') || !process.stdin.isTTY)
             await urify(await PROCESS_INPUT_ARG(!process.stdin.isTTY ? '-' : args.input));
           else if (process.stdin.isTTY && args.input === '-') {
-            console.log('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
+            console.error('\x1b[32m[\u2022]\x1b[0m Stdin tty open');
             await new Promise((res, rej) =>
               process.stdin
                 .on('data', data => urify(PARSE_INPUT_LINES([data.toString()])))
@@ -2075,25 +2198,25 @@ function prepCli(packageJson) {
           }
         })
         .then(() => {
-          console.log('\x1b[32m[+]\x1b[0m Urify complete');
-          if (args.output) console.log(`Successfully written to [${args.output}]`);
+          console.error('\x1b[32m[+]\x1b[0m Urify complete');
+          if (args.output) console.error(`Successfully written to [${args.output}]`);
           if (output !== process.stdout) output.end();
         });
     })
     .on('--help', () => {
       console.log('');
       console.log('Examples:');
-      console.log('  $ freyr -q urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
+      console.log('  $ freyr urify -t https://open.spotify.com/album/2D23kwwoy2JpZVuJwzE42B');
       console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
       console.log('');
-      console.log('  $ freyr -q urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
+      console.log('  $ freyr urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
       console.log('  apple_music:track:1510821685');
       console.log('');
       console.log(
         [
           '  $ echo https://www.deezer.com/en/artist/5340439 \\',
           '         https://music.apple.com/us/playlist/todays-hits/pl.f4d106fed2bd41149aaacabb233eb5eb \\',
-          '      | freyr -q urify -t',
+          '      | freyr urify -t',
         ].join('\n'),
       );
       console.log('  deezer:artist:5340439');
