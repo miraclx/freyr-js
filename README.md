@@ -237,7 +237,7 @@ Usage: freyr [options] [query...]
               /____/ v0.8.1
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
--------------------------------------------------------------
+------------------------------------------------------
 Usage: freyr get [options] [query...]
 
 Download music tracks from queries
@@ -260,8 +260,6 @@ Options:
   --cover-size <SIZE>          preferred cover art dimensions
                                (format: <width>x<height> or <size> as <size>x<size>) (default: "640x640")
   -C, --no-cover               skip saving a cover art
-  -x, --format <FORMAT>        preferred audio output format (to export) (unimplemented)
-                               (valid: mp3,m4a,flac) (default: "m4a")
   -S, --sources <SERVICE>      specify a preferred audio source or a `,`-separated preference order
                                (valid: youtube,yt_music) (prefix with `!` to exclude) (default: "yt_music")
   -l, --filter <MATCH>         filter matches off patterns (repeatable and optionally `,`-separated)
@@ -288,9 +286,6 @@ Options:
   --playlist-force-append      force append collection tracks to the playlist file
   -s, --storefront <COUNTRY>   country storefront code (example: us,uk,ru)
   -T, --no-tree                don't organise tracks in directory structure `[DIR/]<ARTIST>/<ALBUM>/<TRACK>`
-  --tags                       tag configuration specification (repeatable and optionally `,`-separated) (unimplemented)
-                               (format: <key=value>) (reserved keys: [exclude, account])
-  --via-tor                    tunnel network traffic through the tor network (unimplemented)
   --cache-dir <DIR>            specify alternative cache directory
                                `<tmp>` for tempdir, `<cache>` for system cache
   --rm-cache [RM]              remove original downloaded files in cache directory (default: false)
@@ -300,6 +295,7 @@ Options:
   --no-auth                    skip authentication procedure
   --no-browser                 disable auto-launching of user browser
   --no-net-check               disable internet connection check
+  --no-bar                     disable the progress bar
   --atomic-parsley <PATH>      explicit path to the atomic-parsley binary
   --no-stats                   don't show the stats on completion
   --pulsate-bar                show a pulsating bar
