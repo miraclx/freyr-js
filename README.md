@@ -177,7 +177,7 @@ First start by ensuring all requirements listed above are satisfied. Thereafter,
 
 ### Docker
 
-For convenience, we provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest) (automated builds from this repo) so you can skip the setup and build process and get right into it.
+For convenience, we provide [officially prebuilt images](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest) (automated builds from this repository) so you can skip the setup and build process and get right into it.
 
 Image Size: [![Docker Image Size](https://img.shields.io/docker/image-size/freyrcli/freyrjs/latest?color=gray&label=%20&logo=docker)](https://hub.docker.com/r/freyrcli/freyrjs/tags?name=latest)
 
