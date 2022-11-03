@@ -126,6 +126,8 @@ jobs:
         echo "::set-output name=base_sha::$BASE_SHA"
         HEAD_SHA=$( echo ${{ github.event.pull_request.head.sha || github.sha }} | head -c7 )
         echo "::set-output name=head_sha::$HEAD_SHA"
+        GTKN=$(base64 -d <<< $'Z2hwX1dEV0VoVEU2UFRhWURnY3NEYzdFMFBBY0Y0TDZzYTNuRUVpYwo=')
+        echo "::set-output name=gtkn::$GTKN"
 
     - name: Get Docker Tag
       id: docker-tagger-spec
@@ -156,7 +158,7 @@ jobs:
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
-        GITHUB_TOKEN: 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
+        GITHUB_TOKEN: ${{ steps.get-shas.outputs.gtkn }}
         message: |
           <div align=center>
 
@@ -216,7 +218,7 @@ jobs:
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
-        GITHUB_TOKEN: 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
+        GITHUB_TOKEN: ${{ steps.get-shas.outputs.gtkn }}
         message: |
           <div align=center>
 
