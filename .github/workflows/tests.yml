@@ -156,6 +156,7 @@ jobs:
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
+        GITHUB_TOKEN: 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
         message: |
           <div align=center>
 
@@ -215,6 +216,7 @@ jobs:
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
       if: github.event_name == 'pull_request'
       with:
+        GITHUB_TOKEN: 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
         message: |
           <div align=center>
 
