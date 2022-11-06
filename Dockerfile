@@ -6,7 +6,7 @@ COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
 RUN yarn install --prod --frozen-lockfile
 
-FROM golang:1.19.2-alpine3.16 as prep
+FROM golang:1.19.3-alpine3.16 as prep
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache git g++ make cmake linux-headers
