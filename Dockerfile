@@ -1,4 +1,4 @@
-FROM node:19.0.0-alpine3.16 as installer
+FROM node:19.1.0-alpine3.16 as installer
 
 RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmod +x /usr/bin/python3
 # ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
@@ -18,7 +18,7 @@ RUN go install github.com/tj/node-prune@1159d4c \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
-FROM alpine:3.16.2 as base
+FROM alpine:3.17.0 as base
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache bash nodejs python3 \
