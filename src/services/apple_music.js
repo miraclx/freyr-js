@@ -295,12 +295,9 @@ export default class AppleMusic {
       Promise.mapSeries(
         (await this.#store.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
         async artist => {
-          artist.albums = await this.depaginate(artist.relationships.albums, nextUrl => {
-            let err = new Error('Unimplemented: artist albums pagination');
-            [err.artistId, err.artistHref, err.nextUrl] = [artist.id, artist.href, nextUrl];
-            throw err;
-            // this.#store.core.artists.get(`${artist.id}/${nextUrl.split(artist.href)[1]}`, {storefront});
-          });
+          artist.albums = await this.depaginate(artist.relationships.albums, nextUrl =>
+            this.#store.core.artists.get(`${artist.id}${nextUrl.split(artist.href)[1]}`, {storefront}),
+          );
           return this.wrapArtistData(artist);
         },
       ),
@@ -313,7 +310,7 @@ export default class AppleMusic {
         (await this.#store.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
         async playlist => {
           playlist.tracks = await this.depaginate(playlist.relationships.tracks, nextUrl =>
-            this.#store.core.playlists.get(`${playlist.id}/${nextUrl.split(playlist.href)[1]}`, {storefront}),
+            this.#store.core.playlists.get(`${playlist.id}${nextUrl.split(playlist.href)[1]}`, {storefront}),
           );
           return this.wrapPlaylistData(playlist);
         },
