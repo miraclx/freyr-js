@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BREAKING: replaced the `.downloader.order` entry in the config file with `.downloader.sources`. <https://github.com/miraclx/freyr-js/pull/350>
 - BREAKING: freyr no longer uses the temp directory by default to cache assets. <https://github.com/miraclx/freyr-js/pull/354>
 - BREAKING: freyr now persists the cached assets across runs, this will grow over time, but you can clear it at will. <https://github.com/miraclx/freyr-js/pull/354>
-- Replaced native `ffmpeg` with bundled WASM version. <https://github.com/miraclx/freyr-js/pull/305>
+- Replaced native `ffmpeg` with bundled Wasm version. <https://github.com/miraclx/freyr-js/pull/305>
 - Implemented Apple Music pagination. <https://github.com/miraclx/freyr-js/pull/348>, <https://github.com/miraclx/freyr-js/pull/400>
 - Implemented ability to check for track existence in other directories. <https://github.com/miraclx/freyr-js/pull/350>
 - Allow excluding download sources. <https://github.com/miraclx/freyr-js/pull/355>
