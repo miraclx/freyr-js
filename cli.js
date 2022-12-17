@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable consistent-return, camelcase, prefer-promise-reject-errors */
 import xurl from 'url';
+import util from 'util';
 import xpath from 'path';
 import crypto from 'crypto';
 import {spawn, spawnSync} from 'child_process';
@@ -250,7 +251,11 @@ async function processPromise(promise, logger, messageHandlers) {
     if (messageHandlers.onErr !== false)
       handleResultOf(result.reason(), messageHandlers.onErr, reason => [
         '(failed%s)',
-        reason ? `: [${reason['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || reason}]` : '',
+        reason
+          ? `: [${
+              'SHOW_DEBUG_STACK' in process.env ? util.formatWithOptions({colors: true}, reason) : reason['message'] || reason
+            }]`
+          : '',
         '\n',
       ]);
     return null;
@@ -1602,7 +1607,13 @@ async function init(packageJson, queries, options) {
             `\u2022 [\u2715] ${trackStat.meta && trackStat.meta.trackName ? `${trackStat.meta.trackName}` : '<unknown track>'}${
               trackStat.meta && trackStat.meta.track.uri ? ` [${trackStat.meta.track.uri}]` : ''
             } (failed:${reason ? ` ${reason}` : ''}${
-              trackStat.err ? ` [${trackStat.err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] || trackStat.err}]` : ''
+              trackStat.err
+                ? ` [${
+                    'SHOW_DEBUG_STACK' in process.env
+                      ? util.formatWithOptions({colors: true}, trackStat.err)
+                      : trackStat.err['message'] || trackStat.err
+                  }]`
+                : ''
             })`,
           );
         } else if (trackStat[symbols.errorCode] === 0)
@@ -2168,7 +2179,11 @@ async function main(argv) {
   } catch (err) {
     console.error(
       `\x1b[31m[!] Fatal Error\x1b[0m: ${
-        typeof err === 'undefined' ? '[uncaught]' : err ? err['SHOW_DEBUG_STACK' in process.env ? 'stack' : 'message'] : err
+        typeof err === 'undefined'
+          ? '[uncaught]'
+          : 'SHOW_DEBUG_STACK' in err
+          ? util.formatWithOptions({colors: true}, err)
+          : err['message']
       }`,
     );
   }
