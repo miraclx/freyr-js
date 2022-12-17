@@ -268,7 +268,7 @@ jobs:
         DEFAULT_BRANCH: master
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-        LINTER_RULES_PATH: /
-        JSCPD_CONFIG_FILE: .github/linters/.jscpd.json
+        JSCPD_CONFIG_FILE: .jscpd.json
+        GITLEAKS_CONFIG_FILE: .gitleaks.toml
         VALIDATE_JAVASCRIPT_ES: false
         VALIDATE_JAVASCRIPT_STANDARD: false
