@@ -326,6 +326,7 @@ async function main(args) {
   console.log('Enviroment Variables:');
   console.log();
   console.log('  DOCKER_ARGS             arguments to pass to `docker run`');
+  console.log('  NODE_ARGS               arguments to pass to `node`');
   console.log();
   console.log('Example:');
   console.log();
