@@ -19,9 +19,9 @@ export default class AppleMusic {
       isSearchable: false,
       isSourceable: false,
     },
-    // https://www.debuggex.com/r/BcVR1cjFQmNgJn-E
+    // https://www.debuggex.com/r/nbRgm3fyDn2oampX
     VALID_URL:
-      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/([^/]+)\/.+)|(?:apple_music:(track|album|artist|playlist):(.+)))/,
+      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):(\w+)))/,
     PROP_SCHEMA: {},
   };
 
