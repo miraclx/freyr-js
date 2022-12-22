@@ -50,11 +50,11 @@
       ]
     },
     "album": {
-      "uri": "https://music.apple.com/us/album/im-sorry-im-not-sorry-ep/1491795443",
+      "uri": "https://music.apple.com/de/album/1581087024?l=en",
       "expect": [
         "[•] Collation Complete",
-        "[•] Total tracks: [04]",
-        "✓ Passed:  [04]",
+        "[•] Total tracks: [14]",
+        "✓ Passed:  [14]",
         "✕ Failed:  [00]"
       ]
     },
