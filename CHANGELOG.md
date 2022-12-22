@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fix bug with Apple Music's URI parser. <https://github.com/miraclx/freyr-js/pull/403>
+
 ## [0.9.0] - 2022-12-18
 
 - BREAKING: replaced `-D, --downloader` with `-S, --source`, introduced the `-D, --check-dir` flag. <https://github.com/miraclx/freyr-js/pull/350>
