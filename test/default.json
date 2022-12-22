@@ -50,7 +50,7 @@
       ]
     },
     "album": {
-      "uri": "https://music.apple.com/de/album/1581087024?l=en",
+      "uri": "https://music.apple.com/de/album/=/1581087024?l=en",
       "expect": [
         "[•] Collation Complete",
         "[•] Total tracks: [14]",
