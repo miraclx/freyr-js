@@ -92,7 +92,7 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "eslint": "8.30.0",
+    "eslint": "8.31.0",
     "eslint-plugin-prettier": "4.2.1",
     "prettier": "2.8.1"
   },
@@ -105,11 +105,11 @@
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "1.2.1"
+      "axios": "1.2.2"
     }
   },
   "resolutions": {
-    "@yujinakayama/apple-music/axios": "1.2.1",
+    "@yujinakayama/apple-music/axios": "1.2.2",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.3",
     "yt-search/node-fzf/string-width": "5.1.2"
