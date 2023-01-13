@@ -1160,6 +1160,8 @@ async function init(packageJson, queries, options) {
             TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
             '-f',
             'ipod',
+            '-aac_pns',
+            '0',
             outfile,
           );
           await fs.writeFile(meta.outFile.handle, ffmpeg.FS('readFile', outfile));
