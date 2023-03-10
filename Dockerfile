@@ -1,9 +1,8 @@
 FROM node:19.4.0-alpine3.16 as installer
 
-RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmod +x /usr/bin/python3
-# ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
+ARG YOUTUBE_DL_SKIP_PYTHON_CHECK=1
 RUN yarn install --prod --frozen-lockfile
 
 FROM golang:1.19.5-alpine3.16 as prep
