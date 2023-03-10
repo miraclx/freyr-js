@@ -1035,13 +1035,13 @@ async function init(packageJson, queries, options) {
                       },
                     }
                   : {
-                      urlOrFragments: feedMeta.fragments.map(({url}) => ({
-                        url,
+                      urlOrFragments: feedMeta.fragments.map(({url, path}) => ({
+                        url: url ?? `${feedMeta.fragment_base_url}${path}`,
                         ...(([, min, max]) => ({
                           min: +min,
                           max: +max,
                           size: +max - +min + 1,
-                        }))(url.match(/range=(\d+)-(\d+)$/)),
+                        }))(path?.match(/range\/(\d+)-(\d+)$/) ?? url.match(/range=(\d+)-(\d+)$/)),
                       })),
                       opts: {
                         failureMessage: err =>
