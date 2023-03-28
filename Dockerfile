@@ -1,12 +1,11 @@
-FROM node:18.9.0-alpine3.16 as installer
+FROM node:19.4.0-alpine3.16 as installer
 
-RUN printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' > /usr/bin/python3 && chmod +x /usr/bin/python3
-# ^-- Workaround to bypass youtube-dl-exec's postinstall check for a supported python installation
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
+ARG YOUTUBE_DL_SKIP_PYTHON_CHECK=1
 RUN yarn install --prod --frozen-lockfile
 
-FROM golang:1.19.1-alpine3.16 as prep
+FROM golang:1.19.5-alpine3.16 as prep
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache git g++ make cmake linux-headers
@@ -18,13 +17,13 @@ RUN go install github.com/tj/node-prune@1159d4c \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
-FROM alpine:3.16.2 as base
+FROM alpine:3.17.1 as base
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache nodejs python3 \
+RUN apk add --no-cache bash nodejs python3 \
   && find /usr/lib/python3* \
-      \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
-      -exec rm -r {} \+
+  \( -type d -name __pycache__ -o -type f -name '*.whl' \) \
+  -exec rm -r {} \+
 COPY --from=prep /atomicparsley/AtomicParsley /bin/AtomicParsley
 
 COPY . /freyr
