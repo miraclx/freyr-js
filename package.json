@@ -77,7 +77,7 @@
     "lodash.sortby": "^4.7.0",
     "merge2": "^1.4.1",
     "minimatch": "^6.0.0",
-    "mkdirp": "^1.0.4",
+    "mkdirp": "^2.0.0",
     "node-cache": "^5.1.2",
     "open": "^8.4.0",
     "pretty-ms": "^8.0.0",
