@@ -1112,7 +1112,7 @@ async function init(packageJson, queries, options) {
           // ownr? <owner>
           purchaseDate: 'timestamp', // purd
           apID: 'cli@freyr.git', // apID
-          copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
+          copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
           encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
           encodedBy: 'd3vc0dr', // ©enc
           artwork: files.image.file.path, // covr
