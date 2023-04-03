@@ -79,7 +79,7 @@
     "minimatch": "^6.0.0",
     "mkdirp": "^2.0.0",
     "node-cache": "^5.1.2",
-    "open": "^8.4.0",
+    "open": "^9.0.0",
     "pretty-ms": "^8.0.0",
     "public-ip": "^6.0.1",
     "spotify-uri": "^3.0.2",
