@@ -1,4 +1,4 @@
-FROM node:19.4.0-alpine3.16 as installer
+FROM node:19.8.1-alpine3.16 as installer
 
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
