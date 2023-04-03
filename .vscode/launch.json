@@ -5,57 +5,46 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "name": "Spotify - Track",
             "request": "launch",
-            "name": "Short Query (Spotify)",
+            "runtimeArgs": [
+                "test",
+                "spotify.track"
+            ],
+            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/cli.js",
-            "args": [
-                "spotify:artist:6M2wZ9GZgrQXHCFfjv46we",
-                "--no-auth"
-            ],
+            "type": "node",
             "preLaunchTask": "npm: install"
         },
         {
-            "type": "node",
+            "name": "Deezer - Artist",
             "request": "launch",
-            "name": "Short Query (MusicBrainz)",
+            "runtimeArgs": [
+                "test",
+                "deezer.artist"
+            ],
+            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/cli.js",
-            "args": [
-                "mb:release:be580d1c-181f-4ad9-9bfd-172c3960979e"
-            ],
+            "type": "node",
             "preLaunchTask": "npm: install"
         },
         {
-            "type": "node",
+            "name": "Apple Music - Album",
             "request": "launch",
-            "name": "Short Query (Deezer)",
+            "runtimeArgs": [
+                "test",
+                "apple_music.album"
+            ],
+            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/cli.js",
-            "args": [
-                "deezer:artist:182"
-            ],
+            "type": "node",
             "preLaunchTask": "npm: install"
         },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "URI Query (Apple Music)",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/cli.js",
-            "args": [
-                "https://music.apple.com/us/artist/red-hot-chili-peppers/889780"
-            ],
-            "preLaunchTask": "npm: install"
-        }
     ]
 }
