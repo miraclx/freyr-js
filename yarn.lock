@@ -2417,9 +2417,9 @@ speedometer@~1.0.0:
   integrity sha1-zWccsGdSwivKM3Di8zREC+T8YuI=
 
 spotify-uri@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.npmjs.org/spotify-uri/-/spotify-uri-3.0.2.tgz"
-  integrity sha512-1RrJkUr+uVYJtJiMvh/Jq42GQikJBZN87ki3ZYzybF9452fb5EfAihdMSIAHGU55+YQUl5Vqb1VLJDzEdottAw==
+  version "3.0.3"
+  resolved "https://registry.npmjs.org/spotify-uri/-/spotify-uri-3.0.3.tgz"
+  integrity sha512-mMstJ4dAMki6GbUjg94kp/h9ZH+7T7+ro/KUC00WVh+WKoLgMRrTKLkWMIwCZNO53Xa8DRHQw/6jwYtRZrVI3g==
 
 statuses@2.0.1:
   version "2.0.1"
