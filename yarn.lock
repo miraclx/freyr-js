@@ -1909,7 +1909,7 @@ node-fzf@0.11.0, node-fzf@~0.5.1:
   resolved "https://registry.npmjs.org/node-fzf/-/node-fzf-0.11.0.tgz"
   integrity sha512-djlXFlrGSrGCHVHOr4iPRkfPuZXac6Elv0wBtKEJ383Dd/rj+9zaCu4JDZQVSGvoDRRSfJYL4roK9SLjTxeOIg==
   dependencies:
-    cli-color "~2.0.0"
+    cli-color "~1.2.0"
     keypress "~0.2.1"
     minimist "~1.2.5"
     redstar "0.0.2"
@@ -2785,9 +2785,9 @@ youtube-dl-exec@^2.4.0:
     simple-get "~4.0.1"
 
 yt-search@^2.10.3:
-  version "2.10.3"
-  resolved "https://registry.npmjs.org/yt-search/-/yt-search-2.10.3.tgz"
-  integrity sha512-msITxMhn+1f3RIlS2R0d5/275grX0nUgaD570Fap3gvPmwfvR9w31JG8B9++4Xtm6BLAzhdITK7kAWRInef8QQ==
+  version "2.10.4"
+  resolved "https://registry.npmjs.org/yt-search/-/yt-search-2.10.4.tgz"
+  integrity sha512-cJeSdCxQYEV+gKxCeWbOcqgkHtyxLRF2Pt/57AJValzaf07JbJmRIoT9SR/XG2Ed6HIEEuD06WcgZS+6qRvajQ==
   dependencies:
     async.parallellimit "~0.5.2"
     boolstring "~1.0.2"
