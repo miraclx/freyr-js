@@ -2778,7 +2778,7 @@ youtube-dl-exec@^2.4.0:
     is-unix "~2.0.1"
     simple-get "~4.0.1"
 
-yt-search@^2.10.4:
+yt-search@^2.10.3:
   version "2.10.4"
   resolved "https://registry.yarnpkg.com/yt-search/-/yt-search-2.10.4.tgz#cb2718c4235b0e4bf61a9b00b87bd57dec1bfcf8"
   integrity sha512-cJeSdCxQYEV+gKxCeWbOcqgkHtyxLRF2Pt/57AJValzaf07JbJmRIoT9SR/XG2Ed6HIEEuD06WcgZS+6qRvajQ==
