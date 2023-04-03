@@ -39,7 +39,7 @@
   resolved "https://registry.npmjs.org/@ffmpeg/core/-/core-0.11.0.tgz"
   integrity sha512-9Tt/+2PMpkGPXUK8n6He9G8Y+qR6qmCPSCw9iEKZxHHOvJ9BE/r0Fccj+YgDZTlyu6rXxc9x6EqCaFBIt7qzjA==
 
-"@ffmpeg/ffmpeg@^0.11.6":
+"@ffmpeg/ffmpeg@^0.11.0":
   version "0.11.6"
   resolved "https://registry.yarnpkg.com/@ffmpeg/ffmpeg/-/ffmpeg-0.11.6.tgz#9cbe42dfb5132fca74ae5570ebeee2341f8c6e51"
   integrity sha512-uN8J8KDjADEavPhNva6tYO9Fj0lWs9z82swF3YXnTxWMBoFLGq3LZ6FLlIldRKEzhOBKnkVfA8UnFJuvGvNxcA==
