@@ -16,6 +16,7 @@
                 "<node_internals>/**"
             ],
             "type": "node",
+            "outputCapture": "std",
             "preLaunchTask": "npm: install"
         },
         {
@@ -30,6 +31,7 @@
                 "<node_internals>/**"
             ],
             "type": "node",
+            "outputCapture": "std",
             "preLaunchTask": "npm: install"
         },
         {
@@ -44,6 +46,7 @@
                 "<node_internals>/**"
             ],
             "type": "node",
+            "outputCapture": "std",
             "preLaunchTask": "npm: install"
         },
     ]
