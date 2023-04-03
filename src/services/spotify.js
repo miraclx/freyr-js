@@ -2,7 +2,7 @@
 import Promise from 'bluebird';
 import NodeCache from 'node-cache';
 import * as spotifyUri from 'spotify-uri';
-import SpotifyWebApi from 'spotify-web-api-node';
+import SpotifyWebApi from '@miraclx/spotify-web-api-node';
 
 import symbols from '../symbols.js';
 
