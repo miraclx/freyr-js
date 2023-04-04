@@ -50,13 +50,13 @@
   },
   "services": {
     "spotify": {
-      "clientId": "888aa4540c09464abc9ed8bbe2a5f18a",
-      "clientSecret": "84e7ab36abed48318bfb2eae7b32415d",
-      "refreshToken": "AQARHDcUz57eA9O30HIrpMJPoVMtAIkYEuuRSpFCOlYYUfyYeqQ6wiagiOwRxhIySl_p_r4tcXuwvwxr9cvFG8wHOJo5D6jcn5EqV6kaFxPWeT2ktUFQWV_06AABatyj6II"
+      "clientId": "3ee9cf67e90346a191bfe735581a5aa0",
+      "clientSecret": "14206998339649fabd3c4057b84edbf2",
+      "refreshToken": "AQCbeNs5NiGfHa6He0BlOdoQwEIdo2lwBmefEvpvqVy8WlL2HV7rmGbb30_oaZHMDf9MgXtGjI0gV_QukL33PE8c2bGqJHeMqdHBUjKWhxOW19snJkGUiyxen8UvmDG-OP4"
     },
     "apple_music": {
       "storefront": "us",
-      "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjc4MzE5MTI4LCJleHAiOjE2ODU1NzY3MjgsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.xrwll_CfP29g7wKsk0L3jLRWiFgtpxc53n-YT1fCjFIkBsGYel7NKgRL4Zgv-6ehft-UG31_3gWlN2e0P8KLuw"
+      "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjc5NTA5Mjg4LCJleHAiOjE2ODY3NjY4ODgsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.F1w2FKUOP8AiWiL7fJ-Acp-4qav5UuhFwBJQ7fpJoC0yzyroXwfEraXhLknhCvcO0iY4PtKdmzi6HYRS4s6HnQ"
     },
     "deezer": {
       "retries": 2

@@ -1,11 +1,11 @@
-FROM node:19.4.0-alpine3.16 as installer
+FROM node:19.8.1-alpine3.16 as installer
 
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
 ARG YOUTUBE_DL_SKIP_PYTHON_CHECK=1
 RUN yarn install --prod --frozen-lockfile
 
-FROM golang:1.19.5-alpine3.16 as prep
+FROM golang:1.20.2-alpine3.16 as prep
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache git g++ make cmake linux-headers
@@ -17,7 +17,7 @@ RUN go install github.com/tj/node-prune@1159d4c \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
-FROM alpine:3.17.1 as base
+FROM alpine:3.17.3 as base
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache bash nodejs python3 \
