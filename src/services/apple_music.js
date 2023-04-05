@@ -246,17 +246,15 @@ export default class AppleMusic {
         storefront,
       );
       return Promise.mapSeries(tracks, async track => {
-        track.artists = await this.depaginate(track.relationships.artists, nextUrl => {
-          let err = new Error('Unimplemented: track artists pagination');
-          [err.trackId, err.trackHref, err.nextUrl] = [track.id, track.href, nextUrl];
-          throw err;
-          // this.#store.core.tracks.get(`${track.id}/${nextUrl.split(track.href)[1]}`, {storefront});
-        });
+        track.artists = await this.depaginate(
+          track.relationships.artists,
+          async nextUrl => await this.#store.core.songs.get(`${track.id}${nextUrl.split(track.href)[1]}`, {storefront}),
+        );
         track.albums = await this.depaginate(track.relationships.albums, nextUrl => {
           let err = new Error('Unimplemented: track albums pagination');
           [err.trackId, err.trackHref, err.nextUrl] = [track.id, track.href, nextUrl];
           throw err;
-          // this.#store.core.tracks.get(`${track.id}/${nextUrl.split(track.href)[1]}`, {storefront});
+          // this.#store.core.songs.get(`${track.id}${nextUrl.split(track.href)[1]}`, {storefront});
         });
         return this.wrapTrackMeta(
           track,
@@ -275,7 +273,7 @@ export default class AppleMusic {
             let err = new Error('Unimplemented: album tracks pagination');
             [err.albumId, err.albumHref, err.nextUrl] = [album.id, album.href, nextUrl];
             throw err;
-            // this.#store.core.albums.get(`${album.id}/${nextUrl.split(album.href)[1]}`, {storefront});
+            // this.#store.core.albums.get(`${album.id}${nextUrl.split(album.href)[1]}`, {storefront});
           });
           return this.wrapAlbumData(album);
         },
