@@ -24,7 +24,10 @@ function stripText(data) {
   return [
     ...new Set(
       data.reduce(
-        (all, text) => ((text = StripChar.RSspecChar(text)) ? all.concat([text.replace(/\s{2,}/g, ' ').toLowerCase()]) : all),
+        (all, text) =>
+          (text = StripChar.RSspecChar(text.normalize('NFD').replace(/\p{Diacritic}/gu, '')))
+            ? all.concat([text.replace(/\s{2,}/g, ' ').toLowerCase()])
+            : all,
         [],
       ),
     ),
