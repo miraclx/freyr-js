@@ -1226,7 +1226,12 @@ async function init(packageJson, queries, options) {
       const result = {service: null, sources: null, lastErr};
       if ((result.service = iterator.next().value)) {
         result.sources = Promise.resolve(
-          result.service.search(track.artists, track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''), track.duration),
+          result.service.search(
+            track.artists,
+            track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''),
+            track.album,
+            track.duration,
+          ),
         ).then(sources => {
           if ([undefined, null].includes(sources)) throw new Error(`incompatible source response. recieved [${sources}]`);
           // arrays returned from service source calls should have at least one item
