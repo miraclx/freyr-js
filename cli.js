@@ -604,7 +604,8 @@ async function init(packageJson, queries, options) {
     schema.services.default[engine[symbols.meta].ID] = {};
     schema.services.properties[engine[symbols.meta].ID] = {
       type: 'object',
-      additionalProperties: false,
+      // todo! restore strictness after https://github.com/sindresorhus/conf/issues/173 is resolved
+      // additionalProperties: false,
       properties: engine[symbols.meta].PROP_SCHEMA || {},
     };
   });
@@ -617,11 +618,31 @@ async function init(packageJson, queries, options) {
 
   const freyrCoreConfig = new Conf({
     projectName: 'FreyrCLI',
+    projectVersion: packageJson.version,
     projectSuffix: '',
     configName: 'd3fault',
     fileExtension: 'x4p',
     schema,
     serialize: v => JSON.stringify(v, null, 2),
+    beforeEachMigration: (_, context) => {
+      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Migrating config file to v${context.toVersion}...`);
+      else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
+    },
+    migrations: {
+      '0.9.1': store => {
+        let spotify = store.get('services.spotify');
+        if (spotify.refresh_token) {
+          spotify.refreshToken = spotify.refresh_token;
+          delete spotify.refresh_token;
+        }
+        if (spotify.access_token) {
+          spotify.accessToken = spotify.access_token;
+          delete spotify.access_token;
+        }
+        store.set('services.spotify', spotify);
+        stackLogger.write('[done]\n');
+      },
+    },
   });
 
   let configStack = [Config, freyrCoreConfig.get('config')];
