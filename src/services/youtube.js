@@ -20,16 +20,18 @@ class YouTubeSearchError extends Error {
   }
 }
 
-function _getSearchArgs(artists, track, duration) {
+function _getSearchArgs(artists, track, album, duration) {
   if (typeof track === 'number') [track, duration] = [, track];
+  if (typeof album === 'number') [album, duration] = [, album];
   if (!Array.isArray(artists))
     if (track && artists) artists = [artists];
     else [artists, track] = [[], artists || track];
   if (typeof track !== 'string') throw new Error('<track> must be a valid string');
+  if (typeof album !== 'string') throw new Error('<album> must be a valid string');
   if (artists.some(artist => typeof artist !== 'string'))
     throw new Error('<artist>, if defined must be a valid array of strings');
   if (duration && typeof duration !== 'number') throw new Error('<duration>, if defined must be a valid number');
-  return [artists, track, duration];
+  return [artists, track, album, duration];
 }
 
 /**
@@ -279,19 +281,21 @@ export class YouTubeMusic {
    * Search the YouTube Music service for matches
    * @param {string|string[]} [artists] An artist or list of artists
    * @param {string} [track] Track name
+   * @param {string} [album] Album name
    * @param {number} [duration] Duration in milliseconds
    *
    * If `track` is a number, it becomes duration, leaving `track` undefined.
+   * If `album` is a number, it becomes duration, leaving `album` undefined.
    * If `artists` is a string and `track` is undefined, it becomes `track`, leaving artists empty.
    * If `artists` is non-array but `track` is defined, artists becomes an item in the artists array.
    *
    * @returns {YouTubeSearchResult} YouTubeMusicSearchResults
    */
-  async search(artists, track, duration) {
-    [artists, track, duration] = _getSearchArgs(artists, track, duration);
+  async search(artists, track, album, duration) {
+    [artists, track, duration] = _getSearchArgs(artists, track, album, duration);
 
-    const results = await this.#search({query: [track, ...artists].join(' ')});
-    const strippedMeta = textUtils.stripText([...track.split(' '), ...artists]);
+    const results = await this.#search({query: [track, album, ...artists].join(' ')});
+    const strippedMeta = textUtils.stripText([...track.split(' '), album, ...artists]);
     const validSections = [
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
@@ -303,8 +307,12 @@ export class YouTubeMusic {
         ['song', 'video'].includes(item.type) &&
         textUtils.getWeight(
           strippedMeta,
-          textUtils.stripText([...item.title.split(' '), ...item.artists.map(artist => artist.name)]),
-        ) > 70,
+          textUtils.stripText([
+            ...item.title.split(' '),
+            ...(item.album?.name.split(' ') ?? []),
+            ...item.artists.map(artist => artist.name),
+          ]),
+        ) > 65,
     );
     function calculateAccuracyFor(item) {
       let accuracy = 0;
@@ -383,12 +391,13 @@ export class YouTube {
    * @param {number} [duration] Duration in milliseconds
    *
    * If `track` is a number, it becomes duration, leaving `track` undefined.
+   * If `album` is a number, it becomes duration, leaving `album` undefined.
    * If `artists` is a string and `track` is undefined, it becomes `track`, leaving artists empty.
    * If `artists` is non-array but `track` is defined, artists becomes an item in the artists array.
    *
    * @returns {YouTubeSearchResult} YouTubeSearchResults
    */
-  async search(artists, track, duration) {
+  async search(artists, track, _album, duration) {
     [artists, track, duration] = _getSearchArgs(artists, track, duration);
 
     const strippedArtists = textUtils.stripText(artists);
