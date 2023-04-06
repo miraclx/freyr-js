@@ -5,7 +5,7 @@ WORKDIR /freyr
 ARG YOUTUBE_DL_SKIP_PYTHON_CHECK=1
 RUN yarn install --prod --frozen-lockfile
 
-FROM golang:1.20.2-alpine3.16 as prep
+FROM golang:1.20.3-alpine3.16 as prep
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache git g++ make cmake linux-headers
