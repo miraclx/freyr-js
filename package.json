@@ -105,11 +105,11 @@
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "1.3.4"
+      "axios": "1.3.5"
     }
   },
   "resolutions": {
-    "@yujinakayama/apple-music/axios": "1.3.4",
+    "@yujinakayama/apple-music/axios": "1.3.5",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.3",
     "yt-search/node-fzf/string-width": "5.1.2"
