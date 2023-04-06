@@ -96,7 +96,7 @@ function parseMeta(params) {
 function extendPathOnEnv(path) {
   return {
     ...process.env,
-    PATH: [process.env.PATH, path].join(process.platform === 'win32' ? ';' : ':'),
+    PATH: [path, process.env.PATH].join(process.platform === 'win32' ? ';' : ':'),
   };
 }
 
