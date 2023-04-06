@@ -13,7 +13,8 @@ COPY --from=installer /freyr/node_modules /freyr/node_modules
 RUN go install github.com/tj/node-prune@1159d4c \
   && node-prune --include '*.map' /freyr/node_modules \
   && node-prune /freyr/node_modules \
-  && git clone --branch 20210715.151551.e7ad03a --depth 1 https://github.com/wez/atomicparsley /atomicparsley \
+  # todo! revert to upstream when https://github.com/wez/atomicparsley/pull/63 is merged and a release is cut
+  && git clone --branch 20230114.175602.21bde60 --depth 1 https://github.com/miraclx/atomicparsley /atomicparsley \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
