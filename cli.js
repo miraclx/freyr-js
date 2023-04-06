@@ -130,7 +130,7 @@ function wrapCliInterface(binaryNames, binaryPath) {
         `Unable to find an executable named ${(a =>
           [a.slice(0, -1).join(', '), ...a.slice(-1)].filter(e => e != '').join(' or '))(binaryNames)}. Please install.`,
       );
-  }
+  } else binaryPath = xpath.resolve(binaryPath);
   return (file, args, cb) => {
     if (typeof file === 'string')
       spawn(binaryPath, [file, ...parseMeta(args)], {
@@ -760,13 +760,14 @@ async function init(packageJson, queries, options) {
   let atomicParsley;
 
   try {
-    if (options.atomicParsley) {
-      if (!(await maybeStat(options.atomicParsley)))
+    let atomicParsleyPath = options.atomicParsley || process.env.ATOMIC_PARSLEY_PATH;
+    if (atomicParsleyPath) {
+      if (!(await maybeStat(atomicParsleyPath)))
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
-      if (!(await isBinaryFile(options.atomicParsley)))
+      if (!(await isBinaryFile(atomicParsleyPath)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
     }
-    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], options.atomicParsley);
+    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], atomicParsleyPath);
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
