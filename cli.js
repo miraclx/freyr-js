@@ -104,7 +104,7 @@ function parseMeta(params) {
 function extendPathOnEnv(path) {
   return {
     ...process.env,
-    PATH: [process.env.PATH, path].join(process.platform === 'win32' ? ';' : ':'),
+    PATH: [path, process.env.PATH].join(process.platform === 'win32' ? ';' : ':'),
   };
 }
 
@@ -138,7 +138,7 @@ function wrapCliInterface(binaryNames, binaryPath) {
         `Unable to find an executable named ${(a =>
           [a.slice(0, -1).join(', '), ...a.slice(-1)].filter(e => e != '').join(' or '))(binaryNames)}. Please install.`,
       );
-  }
+  } else binaryPath = xpath.resolve(binaryPath);
   return (file, args, cb) => {
     if (typeof file === 'string')
       spawn(binaryPath, [file, ...parseMeta(args)], {
@@ -625,7 +625,8 @@ async function init(packageJson, queries, options) {
     schema.services.default[engine[symbols.meta].ID] = {};
     schema.services.properties[engine[symbols.meta].ID] = {
       type: 'object',
-      additionalProperties: false,
+      // todo! restore strictness after https://github.com/sindresorhus/conf/issues/173 is resolved
+      // additionalProperties: false,
       properties: engine[symbols.meta].PROP_SCHEMA || {},
     };
   });
@@ -638,11 +639,31 @@ async function init(packageJson, queries, options) {
 
   const freyrCoreConfig = new Conf({
     projectName: 'FreyrCLI',
+    projectVersion: packageJson.version,
     projectSuffix: '',
     configName: 'd3fault',
     fileExtension: 'x4p',
     schema,
     serialize: v => JSON.stringify(v, null, 2),
+    beforeEachMigration: (_, context) => {
+      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Migrating config file to v${context.toVersion}...`);
+      else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
+    },
+    migrations: {
+      '0.9.1': store => {
+        let spotify = store.get('services.spotify');
+        if (spotify.refresh_token) {
+          spotify.refreshToken = spotify.refresh_token;
+          delete spotify.refresh_token;
+        }
+        if (spotify.access_token) {
+          spotify.accessToken = spotify.access_token;
+          delete spotify.access_token;
+        }
+        store.set('services.spotify', spotify);
+        stackLogger.write('[done]\n');
+      },
+    },
   });
 
   let configStack = [Config, freyrCoreConfig.get('config')];
@@ -761,13 +782,14 @@ async function init(packageJson, queries, options) {
   let atomicParsley;
 
   try {
-    if (options.atomicParsley) {
-      if (!(await maybeStat(options.atomicParsley)))
+    let atomicParsleyPath = options.atomicParsley || process.env.ATOMIC_PARSLEY_PATH;
+    if (atomicParsleyPath) {
+      if (!(await maybeStat(atomicParsleyPath)))
         throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
-      if (!(await isBinaryFile(options.atomicParsley)))
+      if (!(await isBinaryFile(atomicParsleyPath)))
         stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
     }
-    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], options.atomicParsley);
+    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], atomicParsleyPath);
   } catch (err) {
     stackLogger.error(err.message);
     process.exit(7);
@@ -1057,13 +1079,13 @@ async function init(packageJson, queries, options) {
                       },
                     }
                   : {
-                      urlOrFragments: feedMeta.fragments.map(({path}) => ({
-                        url: `${feedMeta.fragment_base_url}${path}`,
+                      urlOrFragments: feedMeta.fragments.map(({url, path}) => ({
+                        url: url ?? `${feedMeta.fragment_base_url}${path}`,
                         ...(([, min, max]) => ({
                           min: +min,
                           max: +max,
                           size: +max - +min + 1,
-                        }))(path.match(/range\/(\d+)-(\d+)$/)),
+                        }))(path?.match(/range\/(\d+)-(\d+)$/) ?? url.match(/range=(\d+)-(\d+)$/)),
                       })),
                       opts: {
                         failureMessage: err =>
@@ -1272,7 +1294,12 @@ async function init(packageJson, queries, options) {
       const result = {service: null, sources: null, lastErr};
       if ((result.service = iterator.next().value)) {
         result.sources = Promise.resolve(
-          result.service.search(track.artists, track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''), track.duration),
+          result.service.search(
+            track.artists,
+            track.name.replace(/\s*\((((feat|ft).)|with).+\)/, ''),
+            track.album,
+            track.duration,
+          ),
         ).then(sources => {
           if ([undefined, null].includes(sources)) throw new Error(`incompatible source response. recieved [${sources}]`);
           // arrays returned from service source calls should have at least one item

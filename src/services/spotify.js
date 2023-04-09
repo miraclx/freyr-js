@@ -2,7 +2,7 @@
 import Promise from 'bluebird';
 import NodeCache from 'node-cache';
 import * as spotifyUri from 'spotify-uri';
-import SpotifyWebApi from 'spotify-web-api-node';
+import SpotifyWebApi from '@miraclx/spotify-web-api-node';
 
 import symbols from '../symbols.js';
 
@@ -22,8 +22,8 @@ export default class Spotify {
       /(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:(?:open|play|embed)\.)spotify.com)\/(?:artist|track|album|playlist)\/(?:[0-9A-Za-z]{22}))|(?:spotify:(?:artist|track|album|playlist):(?:[0-9A-Za-z]{22}))/,
     PROP_SCHEMA: {
       expiry: {type: 'integer'},
-      access_token: {type: 'string'},
-      refresh_token: {type: 'string'},
+      accessToken: {type: 'string'},
+      refreshToken: {type: 'string'},
     },
   };
 
@@ -53,8 +53,8 @@ export default class Spotify {
 
   loadConfig(config) {
     if (config.expiry) this.#store.expiry = config.expiry;
-    if (config.access_token) this.#store.core.setAccessToken(config.access_token);
-    if (config.refresh_token) this.#store.core.setRefreshToken(config.refresh_token);
+    if (config.accessToken) this.#store.core.setAccessToken(config.accessToken);
+    if (config.refreshToken) this.#store.core.setRefreshToken(config.refreshToken);
   }
 
   hasOnceAuthed() {
@@ -83,7 +83,7 @@ export default class Spotify {
         this.#store.core.setRefreshToken(data.body.refresh_token);
         this.#store.core.setAccessToken(data.body.access_token);
         this.#store.isAuthenticated = true;
-        return {refresh_token: data.body.refresh_token, expiry: this.#store.expiry};
+        return {refreshToken: data.body.refresh_token, expiry: this.#store.expiry};
       },
     };
   }
@@ -103,8 +103,8 @@ export default class Spotify {
   getProps() {
     return {
       expiry: this.#store.expiry,
-      access_token: this.#store.core.getAccessToken(),
-      refresh_token: this.#store.core.getRefreshToken(),
+      accessToken: this.#store.core.getAccessToken(),
+      refreshToken: this.#store.core.getRefreshToken(),
     };
   }
 
