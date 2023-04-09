@@ -79,6 +79,7 @@
     "minimatch": "^8.0.0",
     "mkdirp": "^2.0.0",
     "node-cache": "^5.1.2",
+    "node-taglib-sharp": "^5.0.0",
     "open": "^9.0.0",
     "pretty-ms": "^8.0.0",
     "public-ip": "^6.0.1",
@@ -87,6 +88,7 @@
     "stringd-colors": "^1.10.0",
     "stripchar": "^1.2.1",
     "xbytes": "^1.8.0",
+    "xml2js": "^0.4.23",
     "xprogress": "^0.19.1",
     "youtube-dl-exec": "^2.4.0",
     "yt-search": "^2.10.3"

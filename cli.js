@@ -19,6 +19,7 @@ import cStringd from 'stringd-colors';
 import prettyMs from 'pretty-ms';
 import minimatch from 'minimatch';
 import filenamify from 'filenamify';
+import TagLib from 'node-taglib-sharp';
 import TimeFormat from 'hh-mm-ss';
 import ProgressBar from 'xprogress';
 import countryData from 'country-data';
@@ -39,6 +40,7 @@ import FreyrCore from './src/freyr.js';
 import AuthServer from './src/cli_server.js';
 import AsyncQueue from './src/async_queue.js';
 import parseRange from './src/parse_range.js';
+import musicBrainz from './src/musicbrainz.js';
 import StackLogger from './src/stack_logger.js';
 import streamUtils from './src/stream_utils.js';
 import parseSearchFilter from './src/filter_parser.js';
@@ -88,7 +90,13 @@ function parseMeta(params) {
   return Object.entries(params || {})
     .filter(([, value]) => ![undefined, null].includes(value))
     .map(([key, value]) =>
-      Array.isArray(value) ? value.map(tx => (tx ? [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])] : '')) : [`--${key}`, value],
+      Array.isArray(value)
+        ? value
+            .filter(val => val !== undefined)
+            .map((tx, args) =>
+              (args = Array.isArray(tx) ? tx : [tx]).every(val => val !== undefined) ? [`--${key}`, ...args] : [],
+            )
+        : [`--${key}`, value],
     )
     .flat(Infinity);
 }
@@ -137,6 +145,18 @@ function wrapCliInterface(binaryNames, binaryPath) {
         env: extendPathOnEnv(path),
       }).on('close', cb);
   };
+}
+
+function embedTagLib(file, meta, cb) {
+  let myfile = TagLib.File.createFromPath(file);
+
+  meta.forEach((value, key) => {
+    if (value) myfile.tag[key] = value;
+  });
+
+  myfile.save();
+  myfile.dispose();
+  cb();
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -526,6 +546,7 @@ async function init(packageJson, queries, options) {
             netCheck: {type: 'boolean'},
             attemptAuth: {type: 'boolean'},
             autoOpenBrowser: {type: 'boolean'},
+            musicBrainz: {type: 'boolean'},
           },
         },
         dirs: {
@@ -690,6 +711,7 @@ async function init(packageJson, queries, options) {
     netCheck: options.netCheck,
     attemptAuth: options.auth,
     autoOpenBrowser: options.browser,
+    musicBrainz: options.musicbrainz,
   });
   Config.playlist = _merge(Config.playlist, {
     always: !!options.playlist,
@@ -1095,56 +1117,103 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
-        await Promise.promisify(atomicParsley)(meta.outFile.path, {
-          overWrite: '', // overwrite the file
+        if (options.format == 'flac') {
+          await Promise.promisify(embedTagLib)(
+            meta.outFile.path,
+            new Map([
+              ['album', track.album],
+              ['albumArtists', track.artists],
+              ['albumArtistsSort', track.musicBrainz?.artistSortOrder],
+              ['composers', track.composers],
+              ['copyright', track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text],
+              [
+                'description',
+                `${meta.service[symbols.meta].DESC}: ${track.uri} , ${audioSource.service[symbols.meta].DESC}: ${
+                  audioSource.source.videoId
+                }`,
+              ],
+              ['disc', track.disc_number],
+              ['discCount', track.disc_number],
+              ['genres', track.genres],
+              ['isrc', track.isrc],
+              ['musicBrainzArtistId', track.musicBrainz?.artistId],
+              ['musicBrainzReleaseArtistId', track.musicBrainz?.artistId],
+              ['musicBrainzReleaseCountry', track.musicBrainz?.releaseCountry],
+              ['musicBrainzReleaseGroupId', track.musicBrainz?.releaseGroupId],
+              ['musicBrainzReleaseId', track.musicBrainz?.releaseId],
+              ['musicBrainzReleaseStatus', track.musicBrainz?.releaseStatus],
+              ['musicBrainzReleaseType', track.musicBrainz?.releaseType],
+              ['musicBrainzTrackId', track.musicBrainz?.trackId],
+              ['performers', track.artists],
+              ['title', track.name],
+              ['track', track.track_number],
+              ['trackCount', track.total_tracks],
+              ['year', new Date(track.release_date).getFullYear()],
+            ]),
+          );
+        } else {
+          await Promise.promisify(atomicParsley)(meta.outFile.path, {
+            overWrite: '', // overwrite the file
 
-          title: track.name, // ©nam
-          artist: track.artists[0], // ©ART
-          composer: track.composers, // ©wrt
-          album: track.album, // ©alb
-          genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
-          tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
-          disk: `${track.disc_number}/${track.disc_number}`, // disk
-          year: new Date(track.release_date).toISOString().split('T')[0], // ©day
-          compilation: track.compilation, // ©cpil
-          gapless: options.gapless, // pgap
-          rDNSatom: [
-            // ----
-            ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
-            [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-            [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
-            [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-            [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
-            [
-              `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
-              'name=PROVIDER',
-              'domain=com.apple.iTunes',
+            title: track.name, // ©nam
+            artist: track.artists[0], // ©ART
+            composer: track.composers, // ©wrt
+            album: track.album, // ©alb
+            genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
+            tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
+            disk: `${track.disc_number}/${track.disc_number}`, // disk
+            year: new Date(track.release_date).toISOString().split('T')[0], // ©day
+            compilation: track.compilation, // ©cpil
+            gapless: options.gapless, // pgap
+            rDNSatom: [
+              // ----
+              ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
+              [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
+              [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
+              [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
+              // There is a bug in Atomic Parsley currently preventing MusicBrainz tagging
+              //[track.musicBrainz.trackId, 'name="MusicBrainz Track Id"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.artistId, 'name="MusicBrainz Artist Id"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.artistId, 'name="MusicBrainz Album Artist Id"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.releaseId, 'name="MusicBrainz Album Id"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.releaseGroupId, 'name="MusicBrainz Release Group Id"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.barcode, 'name=BARCODE', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.releaseStatus, 'name="MusicBrainz Album Status"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.releaseCountry, 'name="MusicBrainz Album Release Country"', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.script, 'name=SCRIPT', 'domain=com.apple.iTunes'],
+              //[track.musicBrainz.media, 'name=MEDIA', 'domain=com.apple.iTunes'],
+              [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
+              [
+                `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
+                'name=PROVIDER',
+                'domain=com.apple.iTunes',
+              ],
             ],
-          ],
-          advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
-            ? track.contentRating
-            : track.contentRating === true
-            ? 'explicit'
-            : 'Inoffensive',
-          stik: 'Normal', // stik
-          // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
-          // sfID: 0, // ~~~~: store front ID
-          // cnID: 0, // cnID: catalog ID
-          albumArtist: track.album_artist, // aART
-          // ownr? <owner>
-          purchaseDate: 'timestamp', // purd
-          apID: 'cli@freyr.git', // apID
-          copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
-          encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
-          encodedBy: 'd3vc0dr', // ©enc
-          artwork: files.image.file.path, // covr
-          // sortOrder: [
-          //   ['name', 'NAME'], // sonm
-          //   ['album', 'NAME'], // soal
-          //   ['artist', 'NAME'], // soar
-          //   ['albumartist', 'NAME'], // soaa
-          // ],
-        });
+            advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+              ? track.contentRating
+              : track.contentRating === true
+              ? 'explicit'
+              : 'Inoffensive',
+            stik: 'Normal', // stik
+            // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
+            // sfID: 0, // ~~~~: store front ID
+            // cnID: 0, // cnID: catalog ID
+            albumArtist: track.album_artist, // aART
+            // ownr? <owner>
+            purchaseDate: 'timestamp', // purd
+            apID: 'cli@freyr.git', // apID
+            copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0].text, // cprt
+            encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
+            encodedBy: 'd3vc0dr', // ©enc
+            artwork: files.image.file.path, // covr
+            // sortOrder: [
+            //   ['name', 'NAME'], // sonm
+            //   ['album', 'NAME'], // soal
+            //   ['artist', track.musicBrainz.artistSortOrder], // soar
+            //   ['albumartist', track.musicBrainz.artistSortOrder], // soaa
+            // ],
+          });
+        }
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};
       }
@@ -1172,7 +1241,7 @@ async function init(packageJson, queries, options) {
             '-i',
             infile,
             '-acodec',
-            'aac',
+            options.format == 'flac' ? 'flac' : 'aac',
             '-b:a',
             options.bitrate,
             '-ar',
@@ -1181,9 +1250,7 @@ async function init(packageJson, queries, options) {
             '-t',
             TimeFormat.fromMs(track.duration, 'hh:mm:ss.sss'),
             '-f',
-            'ipod',
-            '-aac_pns',
-            '0',
+            options.format == 'flac' ? 'flac' : 'ipod',
             outfile,
           );
           await fs.writeFile(meta.outFile.handle, ffmpeg.FS('readFile', outfile));
@@ -1315,6 +1382,12 @@ async function init(packageJson, queries, options) {
         for (let path of otherLocations) trackLogger.log(`| [\u2022]  - ${path}`);
       }
     }
+    track.musicBrainz =
+      (await processPromise(props.extraTrackMeta, trackLogger, {
+        onInit: '| \u27a4 Sourcing extra metadata...',
+        noVal: () => '[skipped]\n',
+        onErr: err => `[failed, ${err.statusCode ? `(${err.statusCode}) ` : ''}${err.message}]\n`,
+      })) || {};
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
@@ -1373,9 +1446,10 @@ async function init(packageJson, queries, options) {
           ? ` \u2012 ${track.artists.join(', ')}`
           : '',
       );
+      const fileExtension = options.format == 'flac' ? 'flac' : 'm4a';
       const outFileName = `${filenamify(trackBaseName, {
         replacement: '_',
-      })}.m4a`;
+      })}.${fileExtension}`;
       const trackPath = xpath.join(
         ...(options.tree ? [track.album_artist, track.album].map(name => filenamify(name, {replacement: '_'})) : []),
       );
@@ -1390,8 +1464,14 @@ async function init(packageJson, queries, options) {
       ).flatMap(([dir, exists]) => (exists ? [dir] : []));
       let fileExists = !!fileExistsIn.length;
       const processTrack = !fileExists || options.force;
-      let collectSources;
-      if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
+      let collectSources, extraTrackMeta;
+      if (processTrack) {
+        collectSources = buildSourceCollectorFor(track, results => results[0]);
+        if (Config.opts.musicBrainz && track.isrc) {
+          extraTrackMeta = musicBrainz.lookupISRC(track.isrc, options.storefront || 'us');
+          Promise.resolve(extraTrackMeta).catch(() => {}); // diffuse any caught error in the meantime
+        }
+      }
       const meta = {
         trackName,
         outFile: {path: outFilePath},
@@ -1404,6 +1484,7 @@ async function init(packageJson, queries, options) {
           meta,
           props: {
             collectSources,
+            extraTrackMeta,
             fileExists,
             fileExistsIn,
             processTrack,
@@ -1791,13 +1872,11 @@ function prepCli(packageJson) {
       '640x640',
     )
     .option('-C, --no-cover', 'skip saving a cover art')
-    /* Unimplemented Feature
     .option(
       '-x, --format <FORMAT>',
       ['preferred audio output format (to export) (unimplemented)', '(valid: mp3,m4a,flac)'].join('\n'),
       'm4a',
     )
-    */
     .option(
       '-S, --sources <SERVICE>',
       [
@@ -1806,6 +1885,7 @@ function prepCli(packageJson) {
       ].join('\n'),
       'yt_music',
     )
+    .option('-m, --musicbrainz', 'attempt to source and embed extra metadata from MusicBrainz')
     .option(
       '-l, --filter <MATCH>',
       [
@@ -1863,7 +1943,7 @@ function prepCli(packageJson) {
     .option('--rm-cache [RM]', 'remove original downloaded files in cache directory (default: false)', v =>
       ['true', '1', 'yes', 'y'].includes(v) ? true : ['false', '0', 'no', 'n'].includes(v) ? false : v,
     )
-    .option('-m, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
+    .option('-M, --mem-cache <SIZE>', 'max size of bytes to be cached in-memory for each download chunk')
     .option('--no-mem-cache', 'disable in-memory chunk caching (restricts to sequential download)')
     .option('--timeout <N>', 'network inactivity timeout (ms)', 10000)
     .option('--no-auth', 'skip authentication procedure')
