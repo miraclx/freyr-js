@@ -56,7 +56,7 @@
     },
     "apple_music": {
       "storefront": "us",
-      "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjc5NTA5Mjg4LCJleHAiOjE2ODY3NjY4ODgsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.F1w2FKUOP8AiWiL7fJ-Acp-4qav5UuhFwBJQ7fpJoC0yzyroXwfEraXhLknhCvcO0iY4PtKdmzi6HYRS4s6HnQ"
+      "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjg2ODU3MzYwLCJleHAiOjE2OTQxMTQ5NjAsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.p-w8E36TJT0zGhIsT_yWRJkouUIProcnx8OR4mXMHUUKUY-Evi4mmhpPam9ZINbmES3YIH1s7yc8PbCTKaALnQ"
     },
     "deezer": {
       "retries": 2
