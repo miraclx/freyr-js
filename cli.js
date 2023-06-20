@@ -20,7 +20,6 @@ import prettyMs from 'pretty-ms';
 import minimatch from 'minimatch';
 import filenamify from 'filenamify';
 import TimeFormat from 'hh-mm-ss';
-import ProgressBar from 'xprogress';
 import countryData from 'country-data';
 import {publicIp} from 'public-ip';
 import {isBinaryFile} from 'isbinaryfile';
@@ -28,6 +27,7 @@ import {fileTypeFromFile} from 'file-type';
 import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
 import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg';
+import ProgressBar, {getPersistentStdout} from 'xprogress';
 
 import _merge from 'lodash.merge';
 import _mergeWith from 'lodash.mergewith';
@@ -165,10 +165,11 @@ function prePadNum(val, total, min = 2) {
   return `${val}`.padStart(Math.max(`${total}`.length, min), '0');
 }
 
-function prepProgressGen(options) {
+function prepProgressGen(options, writeStream) {
   return (size, slots, opts, indentLen, isFragment) => {
     const forceFirst = options.singleBar || slots.length === 1 || slots.length > 20;
     return ProgressBar.stream(size, slots, {
+      writeStream,
       forceFirst,
       length: 47,
       pulsate: options.pulsateBar || !Number.isFinite(size),
@@ -709,6 +710,9 @@ async function init(packageJson, queries, options) {
     (a, b, k) => (k === 'sources' && [a, b].every(Array.isArray) ? Array.from(new Set(b.concat(a))) : undefined),
   );
 
+  let barWriteStream;
+  if (options.bar && null === (barWriteStream = getPersistentStdout())) options.bar = false;
+
   if (Config.opts.netCheck && !(await isOnline()))
     stackLogger.error('\x1b[31m[!]\x1b[0m Failed To Detect An Internet Connection'), process.exit(4);
 
@@ -824,7 +828,7 @@ async function init(packageJson, queries, options) {
   }
 
   let progressGen;
-  if (options.bar) progressGen = prepProgressGen(options);
+  if (options.bar) progressGen = prepProgressGen(options, barWriteStream);
 
   function downloadToStream({urlOrFragments, outputFile, logger, opts}) {
     opts = {
