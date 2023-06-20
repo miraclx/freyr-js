@@ -1585,7 +1585,7 @@ is-wsl@^2.2.0:
 isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
-  integrity sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
+  integrity sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==
 
 isbinaryfile@^5.0.0:
   version "5.0.0"
@@ -1671,10 +1671,10 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-libxget@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.npmjs.org/libxget/-/libxget-0.10.0.tgz"
-  integrity sha512-kJv2pYpbmL+pVHdK69GIFj/8kXYUOXj59cUfaIV+jKWkBFug59fEa0zkSU2yADfUWT0W72ZyPj/N5wHY8lJXNA==
+libxget@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.npmjs.org/libxget/-/libxget-0.11.0.tgz"
+  integrity sha512-qWw/N8BwL0wldWMBKzsPHlDBHZ1N/397GBjI6ZaEFg/jhSrIPksjYmJyQgE3SpzixgJNm5jfztY4ql+0/Wm1UA==
   dependencies:
     axios "^0.26.0"
     commander "^6.2.1"
@@ -1687,7 +1687,7 @@ libxget@^0.10.0:
     mime-types "^2.1.28"
     stringd-colors "^1.10.0"
     xbytes "^1.7.0"
-    xprogress "^0.19.1"
+    xprogress "^0.20.0"
     xresilient "^0.8.2"
 
 linkedlist@^1.0.1:
@@ -2126,7 +2126,7 @@ process-nextick-args@~2.0.0:
 progress-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/progress-stream/-/progress-stream-2.0.0.tgz"
-  integrity sha1-+sY6Cz0R3qy7CWmrzJOyFLzhntU=
+  integrity sha512-xJwOWR46jcXUq6EH9yYyqp+I52skPySOeHfkxOZ2IY1AiBi/sFJhbhAKHoV3OTw/omQ45KTio9215dRJ2Yxd3Q==
   dependencies:
     speedometer "~1.0.0"
     through2 "~2.0.3"
@@ -2201,9 +2201,9 @@ readable-stream@^3.6.0:
     util-deprecate "^1.0.1"
 
 readable-stream@~2.3.6:
-  version "2.3.7"
-  resolved "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.7.tgz"
-  integrity sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==
+  version "2.3.8"
+  resolved "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz"
+  integrity sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==
   dependencies:
     core-util-is "~1.0.0"
     inherits "~2.0.3"
@@ -2414,7 +2414,7 @@ speedometer@^1.1.0:
 speedometer@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/speedometer/-/speedometer-1.0.0.tgz"
-  integrity sha1-zWccsGdSwivKM3Di8zREC+T8YuI=
+  integrity sha512-lgxErLl/7A5+vgIIXsh9MbeukOaCb2axgQ+bKCdIE+ibNT4XNYGNCR1qFEGq6F+YDASXK3Fh/c5FgtZchFolxw==
 
 spotify-uri@^3.0.2:
   version "3.0.3"
@@ -2734,10 +2734,10 @@ xbytes@^1.6.1, xbytes@^1.7.0, xbytes@^1.8.0:
   resolved "https://registry.npmjs.org/xbytes/-/xbytes-1.8.0.tgz"
   integrity sha512-o/8qiLr54dYJaX/OB47vvb6cfkqFCdoXXhQdzPc8pF7ulsBGOHRTjgFqVceaw+EcjX1fskToTdFHAUhoeZB6xg==
 
-xprogress@^0.19.1:
-  version "0.19.1"
-  resolved "https://registry.npmjs.org/xprogress/-/xprogress-0.19.1.tgz"
-  integrity sha512-wW+6UIZoC/od7ErcgbVvz1XSASc6R7h/XBSUf6DLHAnJMhgDv7QP7NgXzPIcsUg2RmWZKylN5wyWnSRxqezFTA==
+xprogress@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.npmjs.org/xprogress/-/xprogress-0.20.0.tgz"
+  integrity sha512-maZcSG60gayzUvQCiloytWTBc5IN0Yl7MZBoKl9lbigCHCr85FHYHdDHKa9ngPGdro13ZGc7Gyn9DDdhwby+/A==
   dependencies:
     lodash.merge "^4.6.2"
     pad-ratio "^2.0.0"
