@@ -19,7 +19,8 @@ jobs:
     - name: Install Dependencies via Yarn
       run: |
         rm -rf node_modules
-        yarn install --frozen-lockfile
+        yarn install
+        git diff --exit-code yarn.lock
 
     - name: Install Dependencies via NPM
       run: |
