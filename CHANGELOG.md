@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2023-06-20
+
+- Changed Spotify credentials, introduced migrations to mitigate any complications. <https://github.com/miraclx/freyr-js/pull/454>, <https://github.com/miraclx/freyr-js/pull/470>
+- Improved the YouTube Music track weighing logic, we should get 30% more accurate results. <https://github.com/miraclx/freyr-js/pull/472>
+- Freyr now supports paginated track artists. <https://github.com/miraclx/freyr-js/pull/471>
+- Accented words like `Solidarité` now get properly normalized, helping more accurate lookups. <https://github.com/miraclx/freyr-js/pull/473>
 - Fix bug with Apple Music's URI parser. <https://github.com/miraclx/freyr-js/pull/403>
+- Freyr now treats binaries in `bins/{posix,windows}` as being of higher priority than those in `PATH`. <https://github.com/miraclx/freyr-js/pull/474>
+- Freyr now properly handles tracks that have no copyright information. <https://github.com/miraclx/freyr-js/pull/467>
+- Freyr now auto-disables the progress bar when it detects the absence of a compatible TTY, avoiding errors wherever possible. <https://github.com/miraclx/freyr-js/pull/506/files>
+- Allow overriding the atomicparsley binary used with the `ATOMIC_PARSLEY_PATH` environment variable. <https://github.com/miraclx/freyr-js/pull/475>
+- Updated `AtomicParsley` in the Docker images, fixing a class of errors. <https://github.com/miraclx/freyr-js/pull/476>
 
 ## [0.9.0] - 2022-12-18
 
@@ -82,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.9.0...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/miraclx/freyr-js/releases/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.7.0...v0.8.0

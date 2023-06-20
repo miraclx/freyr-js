@@ -234,7 +234,7 @@ Usage: freyr [options] [query...]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.9.0
+              /____/ v0.10.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 ------------------------------------------------------
@@ -328,7 +328,7 @@ Info:
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.9.0
+              /____/ v0.10.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
@@ -389,7 +389,7 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.9.0
+              /____/ v0.10.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
@@ -474,7 +474,7 @@ Checking directory permissions...[done]
   / /_/ ___/ _ \/ / / / ___/
  / __/ /  /  __/ /_/ / /
 /_/ /_/   \___/\__, /_/
-              /____/ v0.9.0
+              /____/ v0.10.0
 
 freyr - (c) Miraculous Owonubi <omiraculous@gmail.com>
 -------------------------------------------------------------
@@ -1126,7 +1126,7 @@ For more information and documentation about docker, please refer to its officia
 
 ## License
 
-[Apache 2.0][license] © **Miraculous Owonubi** ([@miraclx][author-url]) \<omiraculous@gmail.com\>
+[Apache 2.0][license] © **Miraculous Owonubi** ([@miraclx][author-url]) \<<omiraculous@gmail.com>\>
 
 [license]:  LICENSE "Apache 2.0 License"
 [author-url]: https://github.com/miraclx

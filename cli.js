@@ -630,7 +630,7 @@ async function init(packageJson, queries, options) {
       else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
     },
     migrations: {
-      '0.9.1': store => {
+      '0.10.0': store => {
         let spotify = store.get('services.spotify');
         if (spotify.refresh_token) {
           spotify.refreshToken = spotify.refresh_token;
