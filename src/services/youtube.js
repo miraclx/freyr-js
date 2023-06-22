@@ -58,6 +58,7 @@ function genAsyncGetFeedsFn(url) {
       socketTimeout: 20,
       cacheDir: false,
       dumpSingleJson: true,
+      noWarnings: true,
     });
 }
 
@@ -292,7 +293,7 @@ export class YouTubeMusic {
    * @returns {YouTubeSearchResult} YouTubeMusicSearchResults
    */
   async search(artists, track, album, duration) {
-    [artists, track, duration] = _getSearchArgs(artists, track, album, duration);
+    [artists, track, album, duration] = _getSearchArgs(artists, track, album, duration);
 
     const results = await this.#search({query: [track, album, ...artists].join(' ')});
     const strippedMeta = textUtils.stripText([...track.split(' '), album, ...artists]);
