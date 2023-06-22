@@ -398,7 +398,7 @@ export class YouTube {
    * @returns {YouTubeSearchResult} YouTubeSearchResults
    */
   async search(artists, track, album, duration) {
-    [artists, track, duration] = _getSearchArgs(artists, track, album, duration);
+    [artists, track, album, duration] = _getSearchArgs(artists, track, album, duration);
 
     const strippedArtists = textUtils.stripText(artists);
     const strippedMeta = [...textUtils.stripText(track.split(' ')), ...strippedArtists];
