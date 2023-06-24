@@ -631,8 +631,13 @@ async function init(packageJson, queries, options) {
     },
     migrations: {
       '0.10.0': store => {
-        // dump any old config for Spotify before this point
+        // https://github.com/miraclx/freyr-js/pull/454
+        // Dump any old config for Spotify before this point
         store.set('services.spotify', {});
+        // https://github.com/miraclx/freyr-js/pull/527
+        // Check dirs shouldn't default to current directory, but rather the output directory
+        if ((c => Array.isArray(c) && c.length === 1 && c[0] === '.')(store.get('config.dirs.check')))
+          store.set('config.dirs.check', []);
         stackLogger.write('[done]\n');
       },
     },
@@ -1376,7 +1381,7 @@ async function init(packageJson, queries, options) {
       const outFilePath = xpath.join(BASE_DIRECTORY, trackPath, outFileName);
       const fileExistsIn = (
         await Promise.all(
-          CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName)).map(async path => [
+          [outFilePath, ...CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName))].map(async path => [
             path,
             !!(await maybeStat(xpath.join(path))),
           ]),
