@@ -1415,11 +1415,13 @@ async function init(packageJson, queries, options) {
           },
         })
         .then(trackObject => ({...trackObject, meta}))
-        .catch(errObject => ({
-          meta,
-          [symbols.errorCode]: 10,
-          ...errObject,
-        }));
+        .catch(errObject => {
+          return {
+            meta,
+            [symbols.errorCode]: 10,
+            ...(symbols.errorCode in errObject ? errObject : {err: errObject}),
+          };
+        });
     },
   );
 
