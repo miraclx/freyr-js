@@ -626,7 +626,7 @@ async function init(packageJson, queries, options) {
     schema,
     serialize: v => JSON.stringify(v, null, 2),
     beforeEachMigration: (_, context) => {
-      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Migrating config file to v${context.toVersion}...`);
+      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Initializing config file...`);
       else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
     },
     migrations: {
