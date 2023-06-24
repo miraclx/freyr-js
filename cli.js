@@ -1376,7 +1376,7 @@ async function init(packageJson, queries, options) {
       const outFilePath = xpath.join(BASE_DIRECTORY, trackPath, outFileName);
       const fileExistsIn = (
         await Promise.all(
-          CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName)).map(async path => [
+          [outFilePath, ...CHECK_DIRECTORIES.map(dir => xpath.join(dir, trackPath, outFileName))].map(async path => [
             path,
             !!(await maybeStat(xpath.join(path))),
           ]),
