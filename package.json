@@ -67,7 +67,7 @@
     "express": "^4.18.1",
     "file-type": "^18.0.0",
     "filenamify": "^6.0.0",
-    "got": "^12.1.0",
+    "got": "^13.0.0",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.3.3",
     "isbinaryfile": "^5.0.0",
