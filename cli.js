@@ -626,21 +626,13 @@ async function init(packageJson, queries, options) {
     schema,
     serialize: v => JSON.stringify(v, null, 2),
     beforeEachMigration: (_, context) => {
-      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Migrating config file to v${context.toVersion}...`);
+      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Initializing config file...`);
       else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
     },
     migrations: {
       '0.9.1': store => {
-        let spotify = store.get('services.spotify');
-        if (spotify.refresh_token) {
-          spotify.refreshToken = spotify.refresh_token;
-          delete spotify.refresh_token;
-        }
-        if (spotify.access_token) {
-          spotify.accessToken = spotify.access_token;
-          delete spotify.access_token;
-        }
-        store.set('services.spotify', spotify);
+        // dump any old config for Spotify before this point
+        store.set('services.spotify', {});
         stackLogger.write('[done]\n');
       },
     },
