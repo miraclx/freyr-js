@@ -1,10 +1,10 @@
-import {join, resolve, dirname} from 'path';
 import {tmpdir} from 'os';
+import {join, resolve, dirname} from 'path';
 import {createHash, randomBytes} from 'crypto';
 import {promises as fs, constants as fs_constants} from 'fs';
 
-import mkdirp from 'mkdirp';
 import esMain from 'es-main';
+import {mkdirp} from 'mkdirp';
 
 import symbols from './symbols.js';
 
