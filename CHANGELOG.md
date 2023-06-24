@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix bug with Apple Music's URI parser. <https://github.com/miraclx/freyr-js/pull/403>
 - Freyr now treats binaries in `bins/{posix,windows}` as being of higher priority than those in `PATH`. <https://github.com/miraclx/freyr-js/pull/474>
 - Freyr now properly handles tracks that have no copyright information. <https://github.com/miraclx/freyr-js/pull/467>
+- Freyr now properly checks the base dir instead of the current working dir for existing tracks. <https://github.com/miraclx/freyr-js/pull/527>
 - Updated logic for extracting source feeds from yt-dlp's response. <https://github.com/miraclx/freyr-js/pull/515>
 - Freyr now auto-disables the progress bar when it detects the absence of a compatible TTY, avoiding errors wherever possible. <https://github.com/miraclx/freyr-js/pull/506>
 - Allow overriding the atomicparsley binary used with the `ATOMIC_PARSLEY_PATH` environment variable. <https://github.com/miraclx/freyr-js/pull/475>
