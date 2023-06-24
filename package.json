@@ -66,7 +66,7 @@
     "es-main": "^1.0.2",
     "express": "^4.18.1",
     "file-type": "^18.0.0",
-    "filenamify": "^5.1.1",
+    "filenamify": "^6.0.0",
     "got": "^12.1.0",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.3.3",
