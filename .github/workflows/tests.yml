@@ -146,10 +146,8 @@ jobs:
       id: tag-for-report
       if: github.event_name == 'pull_request'
       run: |
-        PR_TAG=$( echo "${{ steps.docker-meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
-        echo "tag<<EOF" >> "$GITHUB_OUTPUT"
-        echo "$PR_TAG" >> "$GITHUB_OUTPUT"
-        echo "EOF" >> "$GITHUB_OUTPUT"
+        PR_TAG=$( echo "${{ steps.docker-meta.outputs.tags }}" | head -1 | sed 's/freyrcli\/freyrjs-git://g' )
+        echo "tag=$PR_TAG" >> "$GITHUB_OUTPUT"
 
     - name: Report Docker Image Build Status
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
