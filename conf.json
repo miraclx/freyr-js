@@ -20,9 +20,7 @@
   "filters": [],
   "dirs": {
     "output": ".",
-    "check": [
-      "."
-    ],
+    "check": [],
     "cache": {
       "path": "<cache>",
       "keep": true
