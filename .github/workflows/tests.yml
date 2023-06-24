@@ -120,17 +120,17 @@ jobs:
       id: get-shas
       run: |
         BASE_SHA=$( echo ${{ github.event.pull_request.base.sha || github.sha }} | head -c7 )
-        echo "::set-output name=base_sha::$BASE_SHA"
+        echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
         HEAD_SHA=$( echo ${{ github.event.pull_request.head.sha || github.sha }} | head -c7 )
-        echo "::set-output name=head_sha::$HEAD_SHA"
+        echo "head_sha=$HEAD_SHA" >> $GITHUB_OUTPUT
 
     - name: Get Docker Tag
       id: docker-tagger-spec
       run: |
         if [[ "${{ github.event_name }}" == 'push' ]]; then
-          echo "::set-output name=spec::type=ref,event=branch"
+          echo "spec=type=ref,event=branch" >> $GITHUB_OUTPUT
         elif [[ "${{ github.event_name }}" == 'pull_request' ]]; then
-          echo "::set-output name=spec::type=ref,event=pr"
+          echo "spec=type=ref,event=pr" >> $GITHUB_OUTPUT
         fi
 
     - name: Extract Metadata (tags, labels) For Docker
@@ -147,7 +147,7 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         PR_TAG=$( echo "${{ steps.docker-meta.outputs.tags }}" | sed 's/freyrcli\/freyrjs-git://g' )
-        echo "::set-output name=tag::$PR_TAG"
+        echo "tag=$PR_TAG" >> $GITHUB_OUTPUT
 
     - name: Report Docker Image Build Status
       uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
