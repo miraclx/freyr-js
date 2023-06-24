@@ -11,17 +11,17 @@ import Conf from 'conf';
 import open from 'open';
 import xget from 'libxget';
 import merge2 from 'merge2';
-import mkdirp from 'mkdirp';
 import xbytes from 'xbytes';
 import Promise from 'bluebird';
 import cachedir from 'cachedir';
 import cStringd from 'stringd-colors';
 import prettyMs from 'pretty-ms';
-import minimatch from 'minimatch';
 import filenamify from 'filenamify';
 import TimeFormat from 'hh-mm-ss';
 import countryData from 'country-data';
+import {mkdirp} from 'mkdirp';
 import {publicIp} from 'public-ip';
+import {minimatch} from 'minimatch';
 import {isBinaryFile} from 'isbinaryfile';
 import {fileTypeFromFile} from 'file-type';
 import {program as commander} from 'commander';
@@ -626,21 +626,13 @@ async function init(packageJson, queries, options) {
     schema,
     serialize: v => JSON.stringify(v, null, 2),
     beforeEachMigration: (_, context) => {
-      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Migrating config file to v${context.toVersion}...`);
+      if (context.fromVersion === '0.0.0') stackLogger.print(`[•] Initializing config file...`);
       else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
     },
     migrations: {
       '0.10.0': store => {
-        let spotify = store.get('services.spotify');
-        if (spotify.refresh_token) {
-          spotify.refreshToken = spotify.refresh_token;
-          delete spotify.refresh_token;
-        }
-        if (spotify.access_token) {
-          spotify.accessToken = spotify.access_token;
-          delete spotify.access_token;
-        }
-        store.set('services.spotify', spotify);
+        // dump any old config for Spotify before this point
+        store.set('services.spotify', {});
         stackLogger.write('[done]\n');
       },
     },
@@ -1334,9 +1326,7 @@ async function init(packageJson, queries, options) {
     });
     if (!audioFeeds || audioFeeds.err) return {meta, err: (audioFeeds || {}).err, [symbols.errorCode]: 2};
 
-    const [feedMeta] = audioFeeds.formats
-      .filter(meta => 'abr' in meta && !('vbr' in meta))
-      .sort((meta1, meta2) => meta2.abr - meta1.abr);
+    const [feedMeta] = audioFeeds.formats.filter(meta => meta.abr && !meta.vbr).sort((meta1, meta2) => meta2.abr - meta1.abr);
 
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue.push({track, meta, feedMeta, trackLogger}).catch(errObject =>
@@ -1415,11 +1405,13 @@ async function init(packageJson, queries, options) {
           },
         })
         .then(trackObject => ({...trackObject, meta}))
-        .catch(errObject => ({
-          meta,
-          [symbols.errorCode]: 10,
-          ...errObject,
-        }));
+        .catch(errObject => {
+          return {
+            meta,
+            [symbols.errorCode]: 10,
+            ...(symbols.errorCode in errObject ? errObject : {err: errObject}),
+          };
+        });
     },
   );
 
