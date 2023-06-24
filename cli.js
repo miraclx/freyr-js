@@ -631,16 +631,8 @@ async function init(packageJson, queries, options) {
     },
     migrations: {
       '0.9.1': store => {
-        let spotify = store.get('services.spotify');
-        if (spotify.refresh_token) {
-          spotify.refreshToken = spotify.refresh_token;
-          delete spotify.refresh_token;
-        }
-        if (spotify.access_token) {
-          spotify.accessToken = spotify.access_token;
-          delete spotify.access_token;
-        }
-        store.set('services.spotify', spotify);
+        // dump any old config for Spotify before this point
+        store.set('services.spotify', {});
         stackLogger.write('[done]\n');
       },
     },
