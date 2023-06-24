@@ -1350,9 +1350,9 @@ hh-mm-ss@^1.2.0:
     zero-fill "^2.2.3"
 
 html-entities@^2.3.3:
-  version "2.3.3"
-  resolved "https://registry.npmjs.org/html-entities/-/html-entities-2.3.3.tgz"
-  integrity sha512-DV5Ln36z34NNTDgnz0EWGBLZENelNAtkiFA4kyNOG2tDI6Mz1uSWiq1wAKdyjnJwyDiDO7Fa2SO1CTxPXL8VxA==
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-2.3.6.tgz#966391d58e5737c77bca4025e31721b496ab7454"
+  integrity sha512-9o0+dcpIw2/HxkNuYKxSJUF/MMRZQECK4GnF+oQOmJ83yCVHTWgCH5aOXxK5bozNRmM8wtgryjHD3uloPBDEGw==
 
 htmlparser2@^6.1.0:
   version "6.1.0"
