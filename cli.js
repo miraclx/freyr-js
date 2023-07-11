@@ -2157,7 +2157,7 @@ function prepCli(packageJson) {
           }
         })
         .then(() => {
-          console.error('\x1b[32m[+]\x1b[0m Urify complete');
+          console.error('\x1b[32m[+]\x1b[0m Urify Complete');
           if (args.output) console.error(`Successfully written to [${args.output}]`);
           if (output !== process.stdout) output.end();
         });

@@ -42,7 +42,7 @@ export default class AppleMusic {
     this.#store.core = new Client({developerToken: config.developerToken});
     for (let instance of [this.#store.core.albums, this.#store.core.artists, this.#store.core.playlists, this.#store.core.songs])
       instance.axiosInstance.interceptors.request.use(conf => ((conf.headers.origin = 'https://music.apple.com'), conf));
-    this.#store.defaultStorefront = config.storefront || 'us';
+    this.#store.defaultStorefront = config.storefront;
     this.#store.isAuthenticated = !!config.developerToken;
   }
 
@@ -100,7 +100,7 @@ export default class AppleMusic {
       refID,
       key: match[3] || null,
       uri: `apple_music:${type}:${id || refID}`,
-      storefront: match[1] || storefront || this.#store.defaultStorefront,
+      storefront: match[1] || storefront || this.#store.defaultStorefront || 'us',
       collection_type,
     };
   }
