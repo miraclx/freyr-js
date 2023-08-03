@@ -94,7 +94,7 @@
   "devDependencies": {
     "eslint": "8.43.0",
     "eslint-plugin-prettier": "4.2.1",
-    "prettier": "2.8.8"
+    "prettier": "3.0.1"
   },
   "overrides": {
     "public-ip": {
