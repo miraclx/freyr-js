@@ -630,7 +630,7 @@ async function init(packageJson, queries, options) {
       else stackLogger.print(`[•] Migrating config file from v${context.fromVersion} → v${context.toVersion}...`);
     },
     migrations: {
-      '0.9.1': store => {
+      '0.10.0': store => {
         // https://github.com/miraclx/freyr-js/pull/454
         // Dump any old config for Spotify before this point
         store.set('services.spotify', {});
