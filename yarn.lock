@@ -1947,7 +1947,7 @@ node-fzf@0.11.0, node-fzf@~0.5.1:
   resolved "https://registry.npmjs.org/node-fzf/-/node-fzf-0.11.0.tgz"
   integrity sha512-djlXFlrGSrGCHVHOr4iPRkfPuZXac6Elv0wBtKEJ383Dd/rj+9zaCu4JDZQVSGvoDRRSfJYL4roK9SLjTxeOIg==
   dependencies:
-    cli-color "~2.0.0"
+    cli-color "~1.2.0"
     keypress "~0.2.1"
     minimist "~1.2.5"
     redstar "0.0.2"
