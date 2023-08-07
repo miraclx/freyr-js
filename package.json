@@ -82,7 +82,7 @@
     "open": "^9.0.0",
     "pretty-ms": "^8.0.0",
     "public-ip": "^6.0.1",
-    "spotify-uri": "^3.0.2",
+    "spotify-uri": "^4.0.0",
     "stringd": "^2.2.0",
     "stringd-colors": "^1.10.0",
     "stripchar": "^1.2.1",
@@ -92,9 +92,9 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "eslint": "8.43.0",
-    "eslint-plugin-prettier": "4.2.1",
-    "prettier": "2.8.8"
+    "eslint": "8.46.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "prettier": "3.0.1"
   },
   "overrides": {
     "public-ip": {

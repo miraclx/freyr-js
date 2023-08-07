@@ -2157,7 +2157,7 @@ function prepCli(packageJson) {
           }
         })
         .then(() => {
-          console.error('\x1b[32m[+]\x1b[0m Urify complete');
+          console.error('\x1b[32m[+]\x1b[0m Urify Complete');
           if (args.output) console.error(`Successfully written to [${args.output}]`);
           if (output !== process.stdout) output.end();
         });
@@ -2169,7 +2169,7 @@ function prepCli(packageJson) {
       console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
       console.log('');
       console.log('  $ freyr urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
-      console.log('  apple_music:track:1510821685');
+      console.log('  apple_music:track:1510821672i1510821685');
       console.log('');
       console.log(
         [
