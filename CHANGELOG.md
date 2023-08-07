@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved the YouTube Music track weighing logic, we should get 30% more accurate results. <https://github.com/miraclx/freyr-js/pull/472>
 - Freyr now supports paginated track artists. <https://github.com/miraclx/freyr-js/pull/471>
 - Accented words like `Solidarité` now get properly normalized, helping more accurate lookups. <https://github.com/miraclx/freyr-js/pull/473>
-- Fix bug with Apple Music's URI parser. <https://github.com/miraclx/freyr-js/pull/403>
+- Fix bug with Apple Music & Deezer URI parser. <https://github.com/miraclx/freyr-js/pull/403>, <https://github.com/miraclx/freyr-js/pull/549>
 - Freyr now treats binaries in `bins/{posix,windows}` as being of higher priority than those in `PATH`. <https://github.com/miraclx/freyr-js/pull/474>
 - Freyr now properly handles tracks that have no copyright information. <https://github.com/miraclx/freyr-js/pull/467>
 - Freyr now properly checks the base dir instead of the current working dir for existing tracks. <https://github.com/miraclx/freyr-js/pull/527>
