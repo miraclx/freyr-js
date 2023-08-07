@@ -2169,7 +2169,7 @@ function prepCli(packageJson) {
       console.log('  spotify:album:2D23kwwoy2JpZVuJwzE42B');
       console.log('');
       console.log('  $ freyr urify -t https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685');
-      console.log('  apple_music:track:1510821685');
+      console.log('  apple_music:track:1510821672i1510821685');
       console.log('');
       console.log(
         [

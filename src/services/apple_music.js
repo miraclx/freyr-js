@@ -21,7 +21,7 @@ export default class AppleMusic {
     },
     // https://www.debuggex.com/r/nbRgm3fyDn2oampX
     VALID_URL:
-      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):(\w+)))/,
+      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):([\w.]+)))/,
     PROP_SCHEMA: {},
   };
 
@@ -90,17 +90,21 @@ export default class AppleMusic {
     if (!match) return null;
     const isURI = !!match[4];
     const parsedURL = xurl.parse(uri, true);
-    const collection_type = match[isURI ? 4 : 2];
-    const id = (isURI && match[4] === 'track' ? match[5] : parsedURL.query.i) || null;
+    let collection_type = match[isURI ? 4 : 2];
+    let id = (isURI && match[4] === 'track' ? match[5] : parsedURL.query.i) || null;
     const type = isURI ? match[4] : collection_type === 'album' && id ? 'track' : collection_type;
-    const refID = isURI ? (type !== 'track' ? match[5] : null) : path.basename(parsedURL.pathname);
+    collection_type = type === 'track' && !id ? 'album' : collection_type;
+    let refID = isURI ? (type !== 'track' ? match[5] : null) : path.basename(parsedURL.pathname);
+    if (type === 'track' && !refID) if (id.match(/^(\d+)i(\d+)$/)) [refID, id] = id.split('i');
+    storefront = match[1] || storefront || (#store in this && this.#store.defaultStorefront) || 'us';
     return {
       id,
       type,
       refID,
       key: match[3] || null,
-      uri: `apple_music:${type}:${id || refID}`,
-      storefront: match[1] || storefront || this.#store.defaultStorefront || 'us',
+      uri: `apple_music:${type}:${id ? `${refID}i` : refID}${id || ''}`,
+      url: `https://music.apple.com/${storefront}/${collection_type}/${refID}${id ? `?i=${id}` : ''}`,
+      storefront,
       collection_type,
     };
   }
@@ -108,7 +112,7 @@ export default class AppleMusic {
   wrapTrackMeta(trackInfo, albumInfo = {}) {
     return {
       id: trackInfo.id,
-      uri: `apple_music:track:${trackInfo.id}`,
+      uri: `apple_music:track:${albumInfo.id}i${trackInfo.id}`,
       link: trackInfo.attributes.url,
       name: trackInfo.attributes.name,
       artists: [trackInfo.attributes.artistName],
