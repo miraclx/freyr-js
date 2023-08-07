@@ -365,14 +365,14 @@ big-integer@^1.6.44:
   resolved "https://registry.npmjs.org/big-integer/-/big-integer-1.6.51.tgz"
   integrity sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==
 
-bin-version-check@~5.0.0:
-  version "5.0.0"
-  resolved "https://registry.npmjs.org/bin-version-check/-/bin-version-check-5.0.0.tgz"
-  integrity sha512-Q3FMQnS5eZmrBGqmDXLs4dbAn/f+52voP6ykJYmweSA60t6DyH4UTSwZhtbK5UH+LBoWvDljILUQMLRUtsynsA==
+bin-version-check@~5.1.0:
+  version "5.1.0"
+  resolved "https://registry.npmjs.org/bin-version-check/-/bin-version-check-5.1.0.tgz"
+  integrity sha512-bYsvMqJ8yNGILLz1KP9zKLzQ6YpljV3ln1gqhuLkUtyfGi3qXKGuK2p+U4NAvjVFzDFiBBtOpCOSFNuYYEGZ5g==
   dependencies:
     bin-version "^6.0.0"
-    semver "^7.3.5"
-    semver-truncate "^2.0.0"
+    semver "^7.5.3"
+    semver-truncate "^3.0.0"
 
 bin-version@^6.0.0:
   version "6.0.0"
@@ -2376,22 +2376,17 @@ semver-regex@^4.0.5:
   resolved "https://registry.npmjs.org/semver-regex/-/semver-regex-4.0.5.tgz"
   integrity sha512-hunMQrEy1T6Jr2uEVjrAIqjwWcQTgOAcIM52C8MY1EZSD3DDNft04XzvYKPqjED65bNVVko0YI38nYeEHCX3yw==
 
-semver-truncate@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/semver-truncate/-/semver-truncate-2.0.0.tgz"
-  integrity sha512-Rh266MLDYNeML5h90ttdMwfXe1+Nc4LAWd9X1KdJe8pPHP4kFmvLZALtsMNHNdvTyQygbEC0D59sIz47DIaq8w==
+semver-truncate@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/semver-truncate/-/semver-truncate-3.0.0.tgz"
+  integrity sha512-LJWA9kSvMolR51oDE6PN3kALBNaUdkxzAGcexw8gjMA8xr5zUqK0JiR3CgARSqanYF3Z1YHvsErb1KDgh+v7Rg==
   dependencies:
-    semver "^6.0.0"
+    semver "^7.3.5"
 
-semver@^6.0.0:
-  version "6.3.0"
-  resolved "https://registry.npmjs.org/semver/-/semver-6.3.0.tgz"
-  integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
-
-semver@^7.3.2, semver@^7.3.5, semver@^7.3.8:
-  version "7.3.8"
-  resolved "https://registry.npmjs.org/semver/-/semver-7.3.8.tgz"
-  integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
+semver@^7.3.2, semver@^7.3.5, semver@^7.3.8, semver@^7.5.3:
+  version "7.5.4"
+  resolved "https://registry.npmjs.org/semver/-/semver-7.5.4.tgz"
+  integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
   dependencies:
     lru-cache "^6.0.0"
 
@@ -2830,11 +2825,11 @@ yocto-queue@^0.1.0:
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
 youtube-dl-exec@^2.4.0:
-  version "2.4.5"
-  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.4.5.tgz"
-  integrity sha512-O6apTrlfPwm8sgrVVKY8moKgnMUG63LH5UrXNW+97GbN1JMMX1+bbvd3uuEGWCT1CD2lq1rj7i64NF97Vx6Z2A==
+  version "2.4.6"
+  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.4.6.tgz"
+  integrity sha512-Ytsi4DR7uPyZiw4n40MLsElWW13vINl/+YoKwkMlkaTQSJsHr8/18z7aB9s2Lca7eaT0Q4Fdpt/zaI1Tt5NGUg==
   dependencies:
-    bin-version-check "~5.0.0"
+    bin-version-check "~5.1.0"
     dargs "~7.0.0"
     execa "~5.1.0"
     is-unix "~2.0.1"
