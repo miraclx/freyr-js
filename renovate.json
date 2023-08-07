@@ -28,6 +28,13 @@
       "matchPackagePrefixes": [
         "@ffmpeg/"
       ]
+    },
+    {
+      "groupName": "eslint-plugin-prettier",
+      "matchPackagePrefixes": [
+        "prettier",
+        "eslint-plugin-prettier"
+      ]
     }
   ]
 }
