@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.0] - 2023-06-20
+## [0.10.0] - 2023-08-08
 
 - Changed Spotify credentials, introduced migrations to mitigate any complications. <https://github.com/miraclx/freyr-js/pull/454>, <https://github.com/miraclx/freyr-js/pull/470>, <https://github.com/miraclx/freyr-js/pull/526>
 - Improved the YouTube Music track weighing logic, we should get 30% more accurate results. <https://github.com/miraclx/freyr-js/pull/472>
