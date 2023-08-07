@@ -1398,9 +1398,9 @@ hh-mm-ss@^1.2.0:
     zero-fill "^2.2.3"
 
 html-entities@^2.3.3:
-  version "2.3.6"
-  resolved "https://registry.npmjs.org/html-entities/-/html-entities-2.3.6.tgz"
-  integrity sha512-9o0+dcpIw2/HxkNuYKxSJUF/MMRZQECK4GnF+oQOmJ83yCVHTWgCH5aOXxK5bozNRmM8wtgryjHD3uloPBDEGw==
+  version "2.4.0"
+  resolved "https://registry.npmjs.org/html-entities/-/html-entities-2.4.0.tgz"
+  integrity sha512-igBTJcNNNhvZFRtm8uA6xMY6xYleeDwn3PeBCkDz7tHttv4F2hsDI2aPgNERWzvRcNYHNT3ymRaQzllmXj4YsQ==
 
 htmlparser2@^6.1.0:
   version "6.1.0"
