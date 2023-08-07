@@ -1899,7 +1899,7 @@ node-fzf@0.11.0, node-fzf@~0.5.1:
   resolved "https://registry.npmjs.org/node-fzf/-/node-fzf-0.11.0.tgz"
   integrity sha512-djlXFlrGSrGCHVHOr4iPRkfPuZXac6Elv0wBtKEJ383Dd/rj+9zaCu4JDZQVSGvoDRRSfJYL4roK9SLjTxeOIg==
   dependencies:
-    cli-color "~1.2.0"
+    cli-color "~2.0.0"
     keypress "~0.2.1"
     minimist "~1.2.5"
     redstar "0.0.2"
@@ -2411,10 +2411,10 @@ speedometer@~1.0.0:
   resolved "https://registry.npmjs.org/speedometer/-/speedometer-1.0.0.tgz"
   integrity sha512-lgxErLl/7A5+vgIIXsh9MbeukOaCb2axgQ+bKCdIE+ibNT4XNYGNCR1qFEGq6F+YDASXK3Fh/c5FgtZchFolxw==
 
-spotify-uri@^3.0.2:
-  version "3.0.4"
-  resolved "https://registry.npmjs.org/spotify-uri/-/spotify-uri-3.0.4.tgz"
-  integrity sha512-wtofZNzMjPXR1KD2/gw8F/7ng1QwxpfFbrVgcRaAh0oSJ6ZGC5ln+IBptIRuti1dYGOxJqEIvDc88ctLvTSWiQ==
+spotify-uri@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/spotify-uri/-/spotify-uri-4.0.0.tgz"
+  integrity sha512-ZAJKcnfx73glWG+3SCDRvW4nkVMzA2hqZwJtSDZ/o87EoGawh/CZ8YkqZIoVcLkg94suicEa/ZOiBFSz1MJ6Pg==
 
 statuses@2.0.1:
   version "2.0.1"
