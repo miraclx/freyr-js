@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2023-08-08
+
+- Added support for Apple Music song urls - `https://music.apple.com/us/song/1699712652`. <https://github.com/miraclx/freyr-js/pull/552>
+- Embed a locale in the URLs generated from parsing Deezer URLs. <https://github.com/miraclx/freyr-js/pull/553>
+
 ## [0.10.0] - 2023-08-08
 
 - Changed Spotify credentials, introduced migrations to mitigate any complications. <https://github.com/miraclx/freyr-js/pull/454>, <https://github.com/miraclx/freyr-js/pull/470>, <https://github.com/miraclx/freyr-js/pull/526>
@@ -97,7 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.0...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/miraclx/freyr-js/releases/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/miraclx/freyr-js/releases/compare/v0.8.0...v0.8.1
