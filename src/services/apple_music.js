@@ -19,9 +19,9 @@ export default class AppleMusic {
       isSearchable: false,
       isSourceable: false,
     },
-    // https://www.debuggex.com/r/nbRgm3fyDn2oampX
+    // https://www.debuggex.com/r/Pv_Prjinkz1m2FOB
     VALID_URL:
-      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):([\w.]+)))/,
+      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(song|album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):([\w.]+)))/,
     PROP_SCHEMA: {},
   };
 
@@ -90,20 +90,17 @@ export default class AppleMusic {
     if (!match) return null;
     const isURI = !!match[4];
     const parsedURL = xurl.parse(uri, true);
-    let collection_type = match[isURI ? 4 : 2];
-    let id = (isURI && match[4] === 'track' ? match[5] : parsedURL.query.i) || null;
-    const type = isURI ? match[4] : collection_type === 'album' && id ? 'track' : collection_type;
-    collection_type = type === 'track' && !id ? 'album' : collection_type;
-    let refID = isURI ? (type !== 'track' ? match[5] : null) : path.basename(parsedURL.pathname);
-    if (type === 'track' && !refID) if (id.match(/^(\d+)i(\d+)$/)) [refID, id] = id.split('i');
+    const collection_type = isURI ? match[4] : match[2] === 'song' ? 'track' : match[2];
+    const id = isURI ? match[5] : parsedURL.query.i || path.basename(parsedURL.pathname);
+    const type = isURI ? match[4] : parsedURL.query.i || collection_type;
+    const scope = collection_type == 'track' || (collection_type == 'album' && parsedURL.query.i) ? 'song' : collection_type;
     storefront = match[1] || storefront || (#store in this && this.#store.defaultStorefront) || 'us';
     return {
       id,
       type,
-      refID,
       key: match[3] || null,
-      uri: `apple_music:${type}:${id ? `${refID}i` : refID}${id || ''}`,
-      url: `https://music.apple.com/${storefront}/${collection_type}/${refID}${id ? `?i=${id}` : ''}`,
+      uri: `apple_music:${type}:${id}`,
+      url: `https://music.apple.com/${storefront}/${scope}/${id}`,
       storefront,
       collection_type,
     };
