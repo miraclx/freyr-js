@@ -187,7 +187,7 @@ export default class Deezer {
     const id = isURI ? match[5] : path.basename(parsedURL.pathname);
     storefront = match[1] || storefront || 'en';
     const type = match[isURI ? 4 : 2];
-    return {id, type, uri: `deezer:${type}:${id}`, url: `https://www.deezer.com/${storefront}/${type}/${id}`};
+    return {id, type, uri: `deezer:${type}:${id}`, url: `https://www.deezer.com/${storefront}/${type}/${id}`, storefront};
   }
 
   wrapTrackMeta(trackInfo, albumInfo = {}) {
