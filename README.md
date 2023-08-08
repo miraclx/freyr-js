@@ -952,14 +952,22 @@ To preview filter rules specification, use the `filter` subcommand.
         <td> <code> spotify:playlist:37i9dQZF1DXcBWIGoYBM5M </code> </td>
       </tr>
       <tr>
-        <td rowspan=8> Apple Music </td>
-        <td rowspan=2> track </td>
+        <td rowspan=10> Apple Music </td>
+        <td rowspan=4> track </td>
         <td> URL </td>
         <td> <a href="https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685"> https://music.apple.com/us/album/say-so-feat-nicki-minaj/1510821672?i=1510821685 </a> </td>
       </tr>
       <tr>
         <td> URI </td>
-        <td> <code> apple_music:track:1510821672i1510821685 </code> </td>
+        <td> <code> apple_music:track:1510821685 </code> </td>
+      </tr>
+      <tr>
+        <td> URL </td>
+        <td> <a href="https://music.apple.com/us/song/1510821685"> https://music.apple.com/us/song/1510821685 </a> </td>
+      </tr>
+      <tr>
+        <td> URI </td>
+        <td> <code> apple_music:track:1510821685 </code> </td>
       </tr>
       <tr>
         <td rowspan=2> album </td>
