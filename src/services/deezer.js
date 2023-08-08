@@ -125,7 +125,7 @@ export default class Deezer {
     },
     // https://www.debuggex.com/r/IuFIxSZGFJ07tOkR
     VALID_URL:
-      /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/[a-z]{2})?\/(track|album|artist|playlist)\/(\d+))|(?:deezer:(track|album|artist|playlist):(\d+))/,
+      /(?:(?:(?:https?:\/\/)?(?:www\.)?)deezer.com(?:\/([a-z]{2}))?\/(track|album|artist|playlist)\/(\d+))|(?:deezer:(track|album|artist|playlist):(\d+))/,
     PROP_SCHEMA: {},
   };
 
@@ -179,14 +179,15 @@ export default class Deezer {
     return this.parseURI(uri).type;
   }
 
-  parseURI(uri) {
+  parseURI(uri, storefront) {
     const match = uri.match(Deezer[symbols.meta].VALID_URL);
     if (!match) return null;
-    const isURI = !!match[3];
+    const isURI = !!match[4];
     const parsedURL = url.parse(uri, true);
-    const id = isURI ? match[4] : path.basename(parsedURL.pathname);
-    const type = match[isURI ? 3 : 1];
-    return {id, type, uri: `deezer:${type}:${id}`, url: `https://www.deezer.com/${type}/${id}`};
+    const id = isURI ? match[5] : path.basename(parsedURL.pathname);
+    storefront = match[1] || storefront || 'en';
+    const type = match[isURI ? 4 : 2];
+    return {id, type, uri: `deezer:${type}:${id}`, url: `https://www.deezer.com/${storefront}/${type}/${id}`, storefront};
   }
 
   wrapTrackMeta(trackInfo, albumInfo = {}) {
