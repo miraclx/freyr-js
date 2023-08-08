@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.1] - 2023-08-08
 
-- Added support for Apple Music song urls - `https://music.apple.com/us/song/1699712652`. <https://github.com/miraclx/freyr-js/pull/552>
+- Added support for Apple Music song URLs - `https://music.apple.com/us/song/1699712652`. <https://github.com/miraclx/freyr-js/pull/552>
 - Embed a locale in the URLs generated from parsing Deezer URLs. <https://github.com/miraclx/freyr-js/pull/553>
 
 ## [0.10.0] - 2023-08-08
