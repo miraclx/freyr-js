@@ -19,9 +19,9 @@ export default class AppleMusic {
       isSearchable: false,
       isSourceable: false,
     },
-    // https://www.debuggex.com/r/nbRgm3fyDn2oampX
+    // https://www.debuggex.com/r/Pv_Prjinkz1m2FOB
     VALID_URL:
-      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):([\w.]+)))/,
+      /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(song|album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):([\w.]+)))/,
     PROP_SCHEMA: {},
   };
 
@@ -90,20 +90,17 @@ export default class AppleMusic {
     if (!match) return null;
     const isURI = !!match[4];
     const parsedURL = xurl.parse(uri, true);
-    let collection_type = match[isURI ? 4 : 2];
-    let id = (isURI && match[4] === 'track' ? match[5] : parsedURL.query.i) || null;
-    const type = isURI ? match[4] : collection_type === 'album' && id ? 'track' : collection_type;
-    collection_type = type === 'track' && !id ? 'album' : collection_type;
-    let refID = isURI ? (type !== 'track' ? match[5] : null) : path.basename(parsedURL.pathname);
-    if (type === 'track' && !refID) if (id.match(/^(\d+)i(\d+)$/)) [refID, id] = id.split('i');
-    storefront = match[1] || storefront || (#store in this && this.#store.defaultStorefront) || 'us';
+    const collection_type = isURI ? match[4] : match[2] === 'song' ? 'track' : match[2];
+    const id = isURI ? match[5] : parsedURL.query.i || path.basename(parsedURL.pathname);
+    const type = isURI ? match[4] : collection_type == 'album' && parsedURL.query.i ? 'track' : collection_type;
+    const scope = collection_type == 'track' || (collection_type == 'album' && parsedURL.query.i) ? 'song' : collection_type;
+    storefront = match[1] || storefront || (#store in this ? this.#store.defaultStorefront : 'us');
     return {
       id,
       type,
-      refID,
       key: match[3] || null,
-      uri: `apple_music:${type}:${id ? `${refID}i` : refID}${id || ''}`,
-      url: `https://music.apple.com/${storefront}/${collection_type}/${refID}${id ? `?i=${id}` : ''}`,
+      uri: `apple_music:${type}:${id}`,
+      url: `https://music.apple.com/${storefront}/${scope}/${id}`,
       storefront,
       collection_type,
     };
@@ -117,7 +114,7 @@ export default class AppleMusic {
       name: trackInfo.attributes.name,
       artists: [trackInfo.attributes.artistName],
       album: albumInfo.name,
-      album_uri: `apple_music:album:${albumInfo.id || this.parseURI(trackInfo.attributes.url).refID}`,
+      album_uri: `apple_music:album:${albumInfo.id}`,
       album_type: albumInfo.type,
       images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
@@ -206,7 +203,7 @@ export default class AppleMusic {
       const parsed = this.parseURI(_uri, store);
       if (!parsed) return [];
       parsed.value = this.#store.cache.get(parsed.uri);
-      return [[parsed.id || parsed.refID, parsed]];
+      return [[parsed.id, parsed]];
     });
     const packs = uris.filter(([, {value}]) => !value).map(([, parsed]) => parsed);
     uris = Object.fromEntries(uris);
@@ -246,7 +243,7 @@ export default class AppleMusic {
     return this.processData(uris, 300, store, async (items, storefront) => {
       const {data: tracks} = await this.#store.core.songs.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront});
       await this.getAlbum(
-        items.map(item => `apple_music:album:${item.refID}`),
+        tracks.flatMap(item => item.relationships.albums.data.map(item => `apple_music:album:${item.id}`)),
         storefront,
       );
       return Promise.mapSeries(tracks, async track => {
@@ -260,9 +257,14 @@ export default class AppleMusic {
           throw err;
           // this.#store.core.songs.get(`${track.id}${nextUrl.split(track.href)[1]}`, {storefront});
         });
+        if (track.albums.length > 1) {
+          let err = new Error('Unimplemented: track with multiple albums');
+          [err.trackId, err.trackHref] = [track.id, track.href];
+          throw err;
+        }
         return this.wrapTrackMeta(
           track,
-          await this.getAlbum(`apple_music:album:${this.parseURI(track.attributes.url).refID}`, storefront),
+          await this.getAlbum(`apple_music:album:${track.relationships.albums.data[0].id}`, storefront),
         );
       });
     });
@@ -271,7 +273,7 @@ export default class AppleMusic {
   async getAlbum(uris, store) {
     return this.processData(uris, 100, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.#store.core.albums.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
+        (await this.#store.core.albums.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront})).data,
         async album => {
           album.tracks = await this.depaginate(album.relationships.tracks, nextUrl => {
             let err = new Error('Unimplemented: album tracks pagination');
@@ -295,7 +297,7 @@ export default class AppleMusic {
   async getArtist(uris, store) {
     return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.#store.core.artists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
+        (await this.#store.core.artists.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront})).data,
         async artist => {
           artist.albums = await this.depaginate(artist.relationships.albums, nextUrl =>
             this.#store.core.artists.get(`${artist.id}${nextUrl.split(artist.href)[1]}`, {storefront}),
@@ -309,7 +311,7 @@ export default class AppleMusic {
   async getPlaylist(uris, store) {
     return this.processData(uris, 25, store, async (items, storefront) =>
       Promise.mapSeries(
-        (await this.#store.core.playlists.get(`?ids=${items.map(item => item.refID).join(',')}`, {storefront})).data,
+        (await this.#store.core.playlists.get(`?ids=${items.map(item => item.id).join(',')}`, {storefront})).data,
         async playlist => {
           playlist.tracks = await this.depaginate(playlist.relationships.tracks, nextUrl =>
             this.#store.core.playlists.get(`${playlist.id}${nextUrl.split(playlist.href)[1]}`, {storefront}),
