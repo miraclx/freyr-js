@@ -1,4 +1,4 @@
-import FreyrCore from './src/freyr.js';
+import FreyrCore from '../src/freyr.js';
 
 let corpus = [
   {

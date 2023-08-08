@@ -92,9 +92,9 @@ export default class AppleMusic {
     const parsedURL = xurl.parse(uri, true);
     const collection_type = isURI ? match[4] : match[2] === 'song' ? 'track' : match[2];
     const id = isURI ? match[5] : parsedURL.query.i || path.basename(parsedURL.pathname);
-    const type = isURI ? match[4] : parsedURL.query.i || collection_type;
+    const type = isURI ? match[4] : collection_type == 'album' && parsedURL.query.i ? 'track' : collection_type;
     const scope = collection_type == 'track' || (collection_type == 'album' && parsedURL.query.i) ? 'song' : collection_type;
-    storefront = match[1] || storefront || (#store in this && this.#store.defaultStorefront) || 'us';
+    storefront = match[1] || storefront || (#store in this ? this.#store.defaultStorefront : 'us');
     return {
       id,
       type,
