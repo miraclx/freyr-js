@@ -92,7 +92,7 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "eslint": "8.46.0",
+    "eslint": "8.47.0",
     "eslint-plugin-prettier": "5.0.0",
     "prettier": "3.0.1"
   },
