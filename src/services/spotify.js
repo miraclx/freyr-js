@@ -229,6 +229,10 @@ export default class Spotify {
       return [parsedURI.id, this.#store.cache.get(uri)];
     });
     const ids = uris.filter(([, value]) => !value).map(([id]) => id);
+    let results = new Map();
+    for (const [id, result] of uris) {
+      results.set(id, result);
+    }
     uris = Object.fromEntries(uris);
     if (ids.length)
       (
@@ -241,10 +245,9 @@ export default class Spotify {
         )
       )
         .flat(1)
-        .forEach(item => (!item ? null : (this.#store.cache.set(item.uri, item), (uris[item.id] = item))));
-
-    const ret = Object.values(uris);
-    return !wasArr ? ret[0] : ret;
+        .forEach(item => (!item ? null : (this.#store.cache.set(item.uri, item), results.set(item.id, item))));
+    results = [...results.values()];
+    return !wasArr ? results[0] : results;
   }
 
   async getTrack(uris, country) {
