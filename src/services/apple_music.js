@@ -202,10 +202,14 @@ export default class AppleMusic {
     uris = (wasArr ? uris : [uris]).flatMap(_uri => {
       const parsed = this.parseURI(_uri, store);
       if (!parsed) return [];
-      parsed.value = this.#store.cache.get(parsed.uri);
+      parsed.result = this.#store.cache.get(parsed.uri);
       return [[parsed.id, parsed]];
     });
-    const packs = uris.filter(([, {value}]) => !value).map(([, parsed]) => parsed);
+    const packs = uris.filter(([, {result}]) => !result).map(([, parsed]) => parsed);
+    let results = new Map();
+    for (const [id, {result}] of uris) {
+      results.set(id, result);
+    }
     uris = Object.fromEntries(uris);
     if (packs.length)
       (
@@ -228,9 +232,9 @@ export default class AppleMusic {
         )
       )
         .flat(2)
-        .forEach(item => (item ? this.#store.cache.set(uris[item.id].uri, (uris[item.id].value = item)) : null));
-    const ret = Object.values(uris).map(item => item.value);
-    return !wasArr ? ret[0] : ret;
+        .forEach(item => (item ? (this.#store.cache.set(uris[item.id].uri, item), results.set(item.id, item)) : null));
+    results = [...results.values()];
+    return !wasArr ? results[0] : results;
   }
 
   async depaginate(paginatedObject, nextHandler) {
