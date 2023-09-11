@@ -1,5 +1,3 @@
-import {StripChar} from 'stripchar';
-
 /**
  * Stripout invalid characters, symbols and unnecessary spaces
  *
@@ -25,7 +23,10 @@ function stripText(data) {
     ...new Set(
       data.reduce(
         (all, text) =>
-          (text = StripChar.RSspecChar(text.normalize('NFD').replace(/\p{Diacritic}/gu, '')))
+          (text = text
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '')
+            .replace(/[^\p{Letter} \p{Number}]/gu, ''))
             ? all.concat([text.replace(/\s{2,}/g, ' ').toLowerCase()])
             : all,
         [],
