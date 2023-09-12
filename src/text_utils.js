@@ -23,10 +23,7 @@ function stripText(data) {
     ...new Set(
       data.reduce(
         (all, text) =>
-          (text = text
-            .normalize('NFD')
-            .replace(/\p{Diacritic}/gu, '')
-            .replace(/[^\p{Letter} \p{Number}]/gu, ''))
+          (text = text.normalize('NFD').replace(/\p{Diacritic}|[^\p{Letter} \p{Number}]/gu, ''))
             ? all.concat([text.replace(/\s{2,}/g, ' ').toLowerCase()])
             : all,
         [],
