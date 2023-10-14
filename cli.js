@@ -28,6 +28,7 @@ import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
 import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg';
 import ProgressBar, {getPersistentStdout} from 'xprogress';
+import meta_writer from '@orsetto/meta-writer';
 
 import _merge from 'lodash.merge';
 import _mergeWith from 'lodash.mergewith';
@@ -758,22 +759,6 @@ async function init(packageJson, queries, options) {
     ),
   );
 
-  let atomicParsley;
-
-  try {
-    let atomicParsleyPath = options.atomicParsley || process.env.ATOMIC_PARSLEY_PATH;
-    if (atomicParsleyPath) {
-      if (!(await maybeStat(atomicParsleyPath)))
-        throw new Error(`\x1b[31mAtomicParsley\x1b[0m: Binary not found [${options.atomicParsley}]`);
-      if (!(await isBinaryFile(atomicParsleyPath)))
-        stackLogger.warn('\x1b[33mAtomicParsley\x1b[0m: Detected non-binary file, trying anyways...');
-    }
-    atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], atomicParsleyPath);
-  } catch (err) {
-    stackLogger.error(err.message);
-    process.exit(7);
-  }
-
   async function createPlaylist(header, stats, logger, filename, playlistTitle, shouldAppend) {
     if (options.playlist !== false) {
       const validStats = stats.filter(stat => (stat[symbols.errorCode] === 0 ? stat.complete : !stat[symbols.errorCode]));
@@ -1096,56 +1081,58 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
-        await Promise.promisify(atomicParsley)(meta.outFile.path, {
+        await meta_writer({
           overWrite: '', // overwrite the file
 
-          title: track.name, // ©nam
-          artist: track.artists[0], // ©ART
-          composer: track.composers, // ©wrt
-          album: track.album, // ©alb
-          genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
-          tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
-          disk: `${track.disc_number}/${track.disc_number}`, // disk
-          year: new Date(track.release_date).toISOString().split('T')[0], // ©day
-          compilation: track.compilation, // ©cpil
-          gapless: options.gapless, // pgap
-          rDNSatom: [
+          TrackTitle: track.name, // ©nam
+          TrackArtist: track.artists[0], // ©ART
+          Composer: track.composers, // ©wrt
+          AlbumTitle: track.album, // ©alb
+          Genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [''])[0]), // ©gen | gnre
+          TrackNumber: `${track.track_number}`, // trkn
+          TrackTotal: `${track.total_tracks}`,
+          DiscNumber: `${track.disc_number}`, // disk
+          DiscTotal: `${track.disc_number}`,
+          RecordingDate: new Date(track.release_date).toISOString().split('T')[0], // ©day
+          
+          AlbumArtist: track.album_artist, // aART
+          CopyrightMessage: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
+          EncoderSoftware: `freyr-js cli v${packageJson.version}`, // ©too
+          EncodedBy: 'd3vc0dr', // ©enc
+          FrontCover: files.image.file.path, // covr
+
+          // Ilst tags
+          'cpil': track.compilation, // cpil
+          stik: 'Normal', // stik
+          pgap: options.gapless, // pgap
+          rDNS: [
             // ----
-            ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
-            [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-            [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
-            [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
-            [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
-            [
-              `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
-              'name=PROVIDER',
-              'domain=com.apple.iTunes',
-            ],
+            {mean: 'com.apple.iTunes', name: 'MEDIA', data: 'Digital Media' },
+            {mean: 'com.apple.iTunes', name: 'ISRC', data: track.isrc },
+            {mean: 'com.apple.iTunes', name: 'ARTISTS', data: track.artists[0] },
+            {mean: 'com.apple.iTunes', name: 'LABEL', data: track.label },
+            {mean: 'com.apple.iTunes', name: 'SOURCE', data: `${meta.service[symbols.meta].DESC}: ${track.uri}` },
+            {mean: 'com.apple.iTunes', name: 'PROVIDER', data: `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}` }
           ],
-          advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+          ParentalAdvisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
             ? track.contentRating
             : track.contentRating === true
             ? 'explicit'
             : 'Inoffensive',
-          stik: 'Normal', // stik
           // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
           // sfID: 0, // ~~~~: store front ID
           // cnID: 0, // cnID: catalog ID
-          albumArtist: track.album_artist, // aART
           // ownr? <owner>
-          purchaseDate: 'timestamp', // purd
+          purd: 'timestamp', // purd
           apID: 'cli@freyr.git', // apID
-          copyright: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
-          encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
-          encodedBy: 'd3vc0dr', // ©enc
-          artwork: files.image.file.path, // covr
           // sortOrder: [
           //   ['name', 'NAME'], // sonm
           //   ['album', 'NAME'], // soal
           //   ['artist', 'NAME'], // soar
           //   ['albumartist', 'NAME'], // soaa
           // ],
-        });
+        },
+        meta.outFile.path);
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};
       }
@@ -1886,7 +1873,6 @@ function prepCli(packageJson) {
       console.log('');
       console.log('Environment Variables:');
       console.log('  SHOW_DEBUG_STACK             show extended debug information');
-      console.log('  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`');
       console.log('');
       console.log('Info:');
       console.log('  When downloading playlists, the tracks are downloaded individually into');
