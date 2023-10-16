@@ -4,7 +4,6 @@ import xurl from 'url';
 import util from 'util';
 import xpath from 'path';
 import crypto from 'crypto';
-import {spawn, spawnSync} from 'child_process';
 import {promises as fs, constants as fs_constants, createReadStream, createWriteStream} from 'fs';
 
 import Conf from 'conf';
@@ -83,61 +82,6 @@ async function isOnline() {
   } catch {
     return false;
   }
-}
-
-function parseMeta(params) {
-  return Object.entries(params || {})
-    .filter(([, value]) => ![undefined, null].includes(value))
-    .map(([key, value]) =>
-      Array.isArray(value) ? value.map(tx => (tx ? [`--${key}`, ...(Array.isArray(tx) ? tx : [tx])] : '')) : [`--${key}`, value],
-    )
-    .flat(Infinity);
-}
-
-function extendPathOnEnv(path) {
-  return {
-    ...process.env,
-    PATH: [path, process.env.PATH].join(process.platform === 'win32' ? ';' : ':'),
-  };
-}
-
-function ensureBinExtIfWindows(isWin, command) {
-  return command.replace(/(\.exe)?$/, isWin ? '.exe' : '$1');
-}
-
-function check_bin_is_existent(bin, path) {
-  const isWin = process.platform === 'win32';
-  const command = isWin ? 'where' : 'which';
-  const {status} = spawnSync(ensureBinExtIfWindows(isWin, command), [bin], {
-    env: extendPathOnEnv(path),
-  });
-  if ([127, null].includes(status)) throw Error(`Unable to locate the command [${command}] within your PATH`);
-  return status === 0;
-}
-
-function wrapCliInterface(binaryNames, binaryPath) {
-  binaryNames = Array.isArray(binaryNames) ? binaryNames : [binaryNames];
-  const isWin = process.platform === 'win32';
-  const path = xpath.join(__dirname, 'bins', isWin ? 'windows' : 'posix');
-
-  if (!binaryPath) {
-    for (let name of binaryNames) {
-      if (!check_bin_is_existent(name, path)) continue;
-      binaryPath = ensureBinExtIfWindows(isWin, name);
-      break;
-    }
-    if (!binaryPath)
-      throw new Error(
-        `Unable to find an executable named ${(a =>
-          [a.slice(0, -1).join(', '), ...a.slice(-1)].filter(e => e != '').join(' or '))(binaryNames)}. Please install.`,
-      );
-  } else binaryPath = xpath.resolve(binaryPath);
-  return (file, args, cb) => {
-    if (typeof file === 'string')
-      spawn(binaryPath, [file, ...parseMeta(args)], {
-        env: extendPathOnEnv(path),
-      }).on('close', cb);
-  };
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -1081,56 +1025,62 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
-        await meta_writer({
-          TrackTitle: track.name, // ©nam
-          TrackArtist: track.artists[0], // ©ART
-          Composer: track.composers, // ©wrt
-          AlbumTitle: track.album, // ©alb
-          Genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [''])[0]), // ©gen | gnre
-          TrackNumber: `${track.track_number}`, // trkn
-          TrackTotal: `${track.total_tracks}`,
-          DiscNumber: `${track.disc_number}`, // disk
-          DiscTotal: `${track.disc_number}`,
-          RecordingDate: new Date(track.release_date).toISOString().split('T')[0], // ©day
-          
-          AlbumArtist: track.album_artist, // aART
-          CopyrightMessage: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
-          EncoderSoftware: `freyr-js cli v${packageJson.version}`, // ©too
-          EncodedBy: 'd3vc0dr', // ©enc
-          FrontCover: files.image.file.path, // covr
+        await meta_writer(
+          {
+            TrackTitle: track.name, // ©nam
+            TrackArtist: track.artists[0], // ©ART
+            Composer: track.composers, // ©wrt
+            AlbumTitle: track.album, // ©alb
+            Genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [''])[0]), // ©gen | gnre
+            TrackNumber: `${track.track_number}`, // trkn
+            TrackTotal: `${track.total_tracks}`,
+            DiscNumber: `${track.disc_number}`, // disk
+            DiscTotal: `${track.disc_number}`,
+            RecordingDate: new Date(track.release_date).toISOString().split('T')[0], // ©day
 
-          // Ilst tags
-          'cpil': track.compilation, // cpil
-          stik: 'Normal', // stik
-          pgap: options.gapless, // pgap
-          rDNS: [
-            // ----
-            {mean: 'com.apple.iTunes', name: 'MEDIA', data: 'Digital Media' },
-            {mean: 'com.apple.iTunes', name: 'ISRC', data: track.isrc },
-            {mean: 'com.apple.iTunes', name: 'ARTISTS', data: track.artists[0] },
-            {mean: 'com.apple.iTunes', name: 'LABEL', data: track.label },
-            {mean: 'com.apple.iTunes', name: 'SOURCE', data: `${meta.service[symbols.meta].DESC}: ${track.uri}` },
-            {mean: 'com.apple.iTunes', name: 'PROVIDER', data: `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}` }
-          ],
-          ParentalAdvisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
-            ? track.contentRating
-            : track.contentRating === true
-            ? 'explicit'
-            : 'Inoffensive',
-          // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
-          // sfID: 0, // ~~~~: store front ID
-          // cnID: 0, // cnID: catalog ID
-          // ownr? <owner>
-          purd: 'timestamp', // purd
-          apID: 'cli@freyr.git', // apID
-          // sortOrder: [
-          //   ['name', 'NAME'], // sonm
-          //   ['album', 'NAME'], // soal
-          //   ['artist', 'NAME'], // soar
-          //   ['albumartist', 'NAME'], // soaa
-          // ],
-        },
-        meta.outFile.path);
+            AlbumArtist: track.album_artist, // aART
+            CopyrightMessage: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
+            EncoderSoftware: `freyr-js cli v${packageJson.version}`, // ©too
+            EncodedBy: 'd3vc0dr', // ©enc
+            FrontCover: files.image.file.path, // covr
+
+            // Ilst tags
+            cpil: track.compilation, // cpil
+            stik: 'Normal', // stik
+            pgap: options.gapless, // pgap
+            rDNS: [
+              // ----
+              {mean: 'com.apple.iTunes', name: 'MEDIA', data: 'Digital Media'},
+              {mean: 'com.apple.iTunes', name: 'ISRC', data: track.isrc},
+              {mean: 'com.apple.iTunes', name: 'ARTISTS', data: track.artists[0]},
+              {mean: 'com.apple.iTunes', name: 'LABEL', data: track.label},
+              {mean: 'com.apple.iTunes', name: 'SOURCE', data: `${meta.service[symbols.meta].DESC}: ${track.uri}`},
+              {
+                mean: 'com.apple.iTunes',
+                name: 'PROVIDER',
+                data: `${audioSource.service[symbols.meta].DESC}: ${audioSource.source.videoId}`,
+              },
+            ],
+            ParentalAdvisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+              ? track.contentRating
+              : track.contentRating === true
+              ? 'explicit'
+              : 'Inoffensive',
+            // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
+            // sfID: 0, // ~~~~: store front ID
+            // cnID: 0, // cnID: catalog ID
+            // ownr? <owner>
+            purd: 'timestamp', // purd
+            apID: 'cli@freyr.git', // apID
+            // sortOrder: [
+            //   ['name', 'NAME'], // sonm
+            //   ['album', 'NAME'], // soal
+            //   ['artist', 'NAME'], // soar
+            //   ['albumartist', 'NAME'], // soaa
+            // ],
+          },
+          meta.outFile.path,
+        );
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};
       }
