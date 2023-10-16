@@ -1082,8 +1082,6 @@ async function init(packageJson, queries, options) {
     async ({track, meta, files, audioSource}) => {
       try {
         await meta_writer({
-          overWrite: '', // overwrite the file
-
           TrackTitle: track.name, // ©nam
           TrackArtist: track.artists[0], // ©ART
           Composer: track.composers, // ©wrt
