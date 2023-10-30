@@ -84,6 +84,11 @@ async function isOnline() {
   }
 }
 
+function parseMeta(params) {
+  return Object.fromEntries(Object.entries(params || {})
+    .filter(([, value]) => !['', undefined, null].includes(value)));
+}
+
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
   return cStringd(
     [
@@ -1026,24 +1031,24 @@ async function init(packageJson, queries, options) {
     async ({track, meta, files, audioSource}) => {
       try {
         await meta_writer(
-          {
+          parseMeta({
             TrackTitle: track.name, // ©nam
             TrackArtist: track.artists[0], // ©ART
             Composer: track.composers, // ©wrt
             AlbumTitle: track.album, // ©alb
-            Genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [''])[0]), // ©gen | gnre
+            Genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
             TrackNumber: `${track.track_number}`, // trkn
             TrackTotal: `${track.total_tracks}`,
             DiscNumber: `${track.disc_number}`, // disk
             DiscTotal: `${track.disc_number}`,
             RecordingDate: new Date(track.release_date).toISOString().split('T')[0], // ©day
-
+  
             AlbumArtist: track.album_artist, // aART
             CopyrightMessage: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
             EncoderSoftware: `freyr-js cli v${packageJson.version}`, // ©too
             EncodedBy: 'd3vc0dr', // ©enc
             FrontCover: files.image.file.path, // covr
-
+  
             // Ilst tags
             cpil: track.compilation, // cpil
             stik: 'Normal', // stik
@@ -1070,7 +1075,7 @@ async function init(packageJson, queries, options) {
             // sfID: 0, // ~~~~: store front ID
             // cnID: 0, // cnID: catalog ID
             // ownr? <owner>
-            purd: 'timestamp', // purd
+            purd: new Date().toISOString(), // purd
             apID: 'cli@freyr.git', // apID
             // sortOrder: [
             //   ['name', 'NAME'], // sonm
@@ -1078,7 +1083,7 @@ async function init(packageJson, queries, options) {
             //   ['artist', 'NAME'], // soar
             //   ['albumartist', 'NAME'], // soaa
             // ],
-          },
+          }),
           meta.outFile.path,
         );
       } catch (err) {
