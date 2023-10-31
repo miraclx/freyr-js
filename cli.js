@@ -27,7 +27,7 @@ import {program as commander} from 'commander';
 import {decode as entityDecode} from 'html-entities';
 import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg';
 import ProgressBar, {getPersistentStdout} from 'xprogress';
-import meta_writer from '@orsetto/meta-writer';
+import metaWriter from '@orsetto/meta-writer';
 
 import _merge from 'lodash.merge';
 import _mergeWith from 'lodash.mergewith';
@@ -85,8 +85,7 @@ async function isOnline() {
 }
 
 function parseMeta(params) {
-  return Object.fromEntries(Object.entries(params || {})
-    .filter(([, value]) => !['', undefined, null].includes(value)));
+  return Object.fromEntries(Object.entries(params || {}).filter(([, value]) => !['', undefined, null].includes(value)));
 }
 
 function getRetryMessage({meta, ref, retryCount, maxRetries, bytesRead, totalBytes, lastErr}) {
@@ -1030,7 +1029,7 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
-        await meta_writer(
+        await metaWriter(
           parseMeta({
             TrackTitle: track.name, // ©nam
             TrackArtist: track.artists[0], // ©ART
@@ -1042,13 +1041,13 @@ async function init(packageJson, queries, options) {
             DiscNumber: `${track.disc_number}`, // disk
             DiscTotal: `${track.disc_number}`,
             RecordingDate: new Date(track.release_date).toISOString().split('T')[0], // ©day
-  
+
             AlbumArtist: track.album_artist, // aART
             CopyrightMessage: track.copyrights.sort(({type}) => (type === 'P' ? -1 : 1))[0]?.text, // cprt
             EncoderSoftware: `freyr-js cli v${packageJson.version}`, // ©too
             EncodedBy: 'd3vc0dr', // ©enc
             FrontCover: files.image.file.path, // covr
-  
+
             // Ilst tags
             cpil: track.compilation, // cpil
             stik: 'Normal', // stik
