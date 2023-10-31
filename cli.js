@@ -1574,9 +1574,9 @@ async function init(packageJson, queries, options) {
     const contentType = service.identifyType(query);
     queryLogger.log(`Detected [${contentType}]`);
     let queryStats = await pFlatten(
-      (contentType === 'track'
+      (contentType === 'track' || contentType === 'recording'
         ? trackHandler
-        : contentType === 'album'
+        : contentType === 'album' || contentType === 'release-group' || contentType === 'release'
         ? albumHandler
         : contentType === 'artist'
         ? artistHandler
