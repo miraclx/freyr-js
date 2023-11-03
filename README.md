@@ -129,27 +129,6 @@ Here's a list of the metadata that freyr can extract from each streaming service
 
   </details>
 
-  <details>
-  <summary>AtomicParsley >= 20230114</summary>
-
-  First, download the latest release for your individual platforms here <https://github.com/miraclx/atomicparsley/releases/latest>
-
-  Then;
-
-  - Windows:
-    - unzip and place the `AtomicParsley.exe` in your `PATH`.
-    - or the `bins/windows` folder of this project directory. Create the folder(s) if they don't exist.
-  - Linux + macOS:
-    - unzip and place the `AtomicParsley` in your `PATH`.
-    - or the `bins/posix` folder of this project directory. Create the folder(s) if they don't exist.
-  - Alternatively:
-    - Debian: `sudo apt-get install atomicparsley`
-    - Arch Linux: `sudo pacman -S atomicparsley`
-    - Android (Termux): `apt install atomicparsley`
-    - Build from source: See [wez/AtomicParsley](https://github.com/miraclx/atomicparsley)
-
-  </details>
-
   > _Please note that [YouTube Music](https://music.youtube.com/) must be available in your region for freyr to successfully work, this is because freyr sources raw audio from [YouTube Music](https://music.youtube.com/)._
 
   ---
@@ -305,7 +284,6 @@ Options:
 
 Environment Variables:
   SHOW_DEBUG_STACK             show extended debug information
-  ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
 
 Info:
   When downloading playlists, the tracks are downloaded individually into
