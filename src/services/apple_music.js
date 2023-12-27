@@ -144,8 +144,8 @@ export default class AppleMusic {
         albumObject.attributes.artistName === 'Various Artists' && albumObject.relationships.artists.data.length === 0
           ? 'compilation'
           : albumObject.attributes.isSingle
-          ? 'single'
-          : 'album',
+            ? 'single'
+            : 'album',
       genres: albumObject.attributes.genreNames,
       copyrights: [{type: 'P', text: albumObject.attributes.copyright}],
       images: albumObject.attributes.artwork,

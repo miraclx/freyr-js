@@ -167,16 +167,16 @@ export class YouTubeMusic {
           layerName === 'Top result'
             ? 'top'
             : layerName === 'Songs'
-            ? 'songs'
-            : layerName === 'Videos'
-            ? 'videos'
-            : layerName === 'Albums'
-            ? 'albums'
-            : layerName === 'Artists'
-            ? 'artists'
-            : layerName === 'Playlists'
-            ? 'playlists'
-            : `other${layerName ? `(${layerName})` : ''}`,
+              ? 'songs'
+              : layerName === 'Videos'
+                ? 'videos'
+                : layerName === 'Albums'
+                  ? 'albums'
+                  : layerName === 'Artists'
+                    ? 'artists'
+                    : layerName === 'Playlists'
+                      ? 'playlists'
+                      : `other${layerName ? `(${layerName})` : ''}`,
           {
             contents: (layer.contents || []).map(content => {
               content = content.musicResponsiveListItemRenderer;
