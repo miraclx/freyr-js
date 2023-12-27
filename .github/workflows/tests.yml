@@ -59,7 +59,7 @@ jobs:
         outputs: type=docker,dest=/tmp/freyr-dev.tar
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: freyr-dev
         path: /tmp/freyr-dev.tar
