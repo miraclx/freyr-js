@@ -229,8 +229,8 @@ export default class Deezer {
         artistObject.name === 'Various Artists' && artistObject.id === 5080
           ? 'compilation'
           : albumObject.record_type === 'single'
-          ? 'single'
-          : 'album',
+            ? 'single'
+            : 'album',
       genres: ((albumObject.genres || {}).data || []).map(genre => genre.name),
       copyrights: [{type: 'P', text: albumObject.copyright}], // find workaround
       images: [albumObject.cover_small, albumObject.cover_medium, albumObject.cover_big, albumObject.cover_xl],
