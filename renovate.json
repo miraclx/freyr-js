@@ -31,9 +31,19 @@
     },
     {
       "groupName": "eslint-plugin-prettier",
-      "matchPackagePrefixes": [
+      "matchPackageNames": [
         "prettier",
         "eslint-plugin-prettier"
+      ]
+    },
+    {
+      "groupName": "actions/upload-download-artifact",
+      "matchFiles": [
+        ".github/workflows/tests.yml"
+      ],
+      "matchPackageNames": [
+        "actions/upload-artifact",
+        "actions/download-artifact"
       ]
     }
   ]
