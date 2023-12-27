@@ -50,14 +50,14 @@ parseRange.time = function parseTimeRange(spec, strictSyntax = false) {
       ? val.includes(':')
         ? val.split(':').reduce((acc, time) => 60 * acc + +time) * 1000
         : val.endsWith('h')
-        ? parseInt(val.slice(0, -1), 10) * 3600000
-        : val.endsWith('m')
-        ? parseInt(val.slice(0, -1), 10) * 60000
-        : val.endsWith('ms')
-        ? parseInt(val.slice(0, -2), 10)
-        : val.endsWith('s')
-        ? parseInt(val.slice(0, -1), 10) * 1000
-        : parseInt(val, 10) * 1000
+          ? parseInt(val.slice(0, -1), 10) * 3600000
+          : val.endsWith('m')
+            ? parseInt(val.slice(0, -1), 10) * 60000
+            : val.endsWith('ms')
+              ? parseInt(val.slice(0, -2), 10)
+              : val.endsWith('s')
+                ? parseInt(val.slice(0, -1), 10) * 1000
+                : parseInt(val, 10) * 1000
       : val;
   let {min, max, inclusive} = parseRange(spec);
   [min = -Infinity, max = Infinity, inclusive = inclusive] = [min, max].map(cast);

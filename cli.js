@@ -739,8 +739,8 @@ async function init(packageJson, queries, options) {
     Config.dirs.cache.path === '<tmp>'
       ? undefined
       : Config.dirs.cache.path === '<cache>'
-      ? cachedir('FreyrCLI')
-      : Config.dirs.cache.path;
+        ? cachedir('FreyrCLI')
+        : Config.dirs.cache.path;
 
   let freyrCore;
   try {
@@ -1125,8 +1125,8 @@ async function init(packageJson, queries, options) {
           advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
             ? track.contentRating
             : track.contentRating === true
-            ? 'explicit'
-            : 'Inoffensive',
+              ? 'explicit'
+              : 'Inoffensive',
           stik: 'Normal', // stik
           // geID: 0, // geID: genreID. See `AtomicParsley --genre-list`
           // sfID: 0, // ~~~~: store front ID
@@ -1583,10 +1583,10 @@ async function init(packageJson, queries, options) {
       (contentType === 'track'
         ? trackHandler
         : contentType === 'album'
-        ? albumHandler
-        : contentType === 'artist'
-        ? artistHandler
-        : playlistHandler)(query, {service, queryLogger})
+          ? albumHandler
+          : contentType === 'artist'
+            ? artistHandler
+            : playlistHandler)(query, {service, queryLogger})
         .then(stats => (Array.isArray(stats) ? stats : [stats]))
         .catch(err =>
           queryLogger.error(
@@ -1621,24 +1621,24 @@ async function init(packageJson, queries, options) {
             trackStat[symbols.errorCode] === -1
               ? 'Failed getting track data'
               : trackStat[symbols.errorCode] === 1
-              ? 'Failed collecting sources'
-              : trackStat[symbols.errorCode] === 2
-              ? 'Error while collecting sources feeds'
-              : trackStat[symbols.errorCode] === 3
-              ? 'Error downloading album art'
-              : trackStat[symbols.errorCode] === 4
-              ? 'Error downloading raw audio'
-              : trackStat[symbols.errorCode] === 5
-              ? 'Unknown Download Error'
-              : trackStat[symbols.errorCode] === 6
-              ? 'Error ensuring directory integrity'
-              : trackStat[symbols.errorCode] === 7
-              ? 'Error while encoding audio'
-              : trackStat[symbols.errorCode] === 8
-              ? 'Failed while embedding metadata'
-              : trackStat[symbols.errorCode] === 9
-              ? 'Unexpected postprocessing error'
-              : 'Unexpected track processing error';
+                ? 'Failed collecting sources'
+                : trackStat[symbols.errorCode] === 2
+                  ? 'Error while collecting sources feeds'
+                  : trackStat[symbols.errorCode] === 3
+                    ? 'Error downloading album art'
+                    : trackStat[symbols.errorCode] === 4
+                      ? 'Error downloading raw audio'
+                      : trackStat[symbols.errorCode] === 5
+                        ? 'Unknown Download Error'
+                        : trackStat[symbols.errorCode] === 6
+                          ? 'Error ensuring directory integrity'
+                          : trackStat[symbols.errorCode] === 7
+                            ? 'Error while encoding audio'
+                            : trackStat[symbols.errorCode] === 8
+                              ? 'Failed while embedding metadata'
+                              : trackStat[symbols.errorCode] === 9
+                                ? 'Unexpected postprocessing error'
+                                : 'Unexpected track processing error';
           embedLogger.error(
             `\u2022 [\u2715] ${trackStat.meta && trackStat.meta.trackName ? `${trackStat.meta.trackName}` : '<unknown track>'}${
               trackStat.meta && trackStat.meta.track.uri ? ` [${trackStat.meta.track.uri}]` : ''
@@ -2218,8 +2218,8 @@ async function main(argv) {
         typeof err === 'undefined'
           ? '[uncaught]'
           : 'SHOW_DEBUG_STACK' in err
-          ? util.formatWithOptions({colors: true}, err)
-          : err['message']
+            ? util.formatWithOptions({colors: true}, err)
+            : err['message']
       }`,
     );
   }
