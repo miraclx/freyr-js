@@ -67,7 +67,7 @@
     "express": "^4.18.1",
     "file-type": "^18.0.0",
     "filenamify": "^6.0.0",
-    "got": "^13.0.0",
+    "got": "^14.0.0",
     "hh-mm-ss": "^1.2.0",
     "html-entities": "^2.3.3",
     "isbinaryfile": "^5.0.0",
@@ -97,7 +97,7 @@
   },
   "overrides": {
     "public-ip": {
-      "got": "13.0.0"
+      "got": "14.0.0"
     },
     "yt-search": {
       "node-fzf": {
@@ -112,7 +112,7 @@
   },
   "resolutions": {
     "@yujinakayama/apple-music/axios": "1.6.3",
-    "public-ip/got": "13.0.0",
+    "public-ip/got": "14.0.0",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.3",
     "yt-search/node-fzf/string-width": "7.0.0"
