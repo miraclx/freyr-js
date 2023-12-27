@@ -1333,6 +1333,12 @@ async function init(packageJson, queries, options) {
 
     const [feedMeta] = audioFeeds.formats.filter(meta => meta.abr && !meta.vbr).sort((meta1, meta2) => meta2.abr - meta1.abr);
 
+    if (!feedMeta) {
+      let err = new Error('No suitable audio format found');
+      trackLogger.log(`| [\u2715] ${err.message}`);
+      return {meta, err, [symbols.errorCode]: 2};
+    }
+
     meta.fingerprint = crypto.createHash('md5').update(`${audioSource.source.videoId} ${feedMeta.format_id}`).digest('hex');
     const files = await downloadQueue.push({track, meta, feedMeta, trackLogger}).catch(errObject =>
       Promise.reject({
