@@ -59,7 +59,7 @@
     "bluebird": "^3.7.2",
     "cachedir": "^2.3.0",
     "commander": "^11.0.0",
-    "conf": "^11.0.0",
+    "conf": "^12.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "country-data": "0.0.31",
@@ -91,7 +91,7 @@
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
-    "eslint": "8.53.0",
+    "eslint": "8.56.0",
     "eslint-plugin-prettier": "5.0.1",
     "prettier": "3.0.3"
   },
@@ -103,18 +103,18 @@
       "node-fzf": {
         ".": "0.11.0",
         "cli-color": "2.0.3",
-        "string-width": "6.1.0"
+        "string-width": "7.0.0"
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "1.6.0"
+      "axios": "1.6.3"
     }
   },
   "resolutions": {
-    "@yujinakayama/apple-music/axios": "1.6.0",
+    "@yujinakayama/apple-music/axios": "1.6.3",
     "public-ip/got": "13.0.0",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.3",
-    "yt-search/node-fzf/string-width": "6.1.0"
+    "yt-search/node-fzf/string-width": "7.0.0"
   }
 }
