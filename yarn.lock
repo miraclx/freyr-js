@@ -538,7 +538,7 @@ clean-stack@^4.0.0:
 
 cli-color@2.0.3, cli-color@~2.0.0:
   version "2.0.3"
-  resolved "https://registry.yarnpkg.com/cli-color/-/cli-color-2.0.3.tgz#73769ba969080629670f3f2ef69a4bf4e7cc1879"
+  resolved "https://registry.npmjs.org/cli-color/-/cli-color-2.0.3.tgz"
   integrity sha512-OkoZnxyC4ERN3zLzZaY9Emb7f/MhBOIpePv0Ycok0fJYT+Ouo00UBEIwsVsr0yoow++n5YWlSUgST9GKhNHiRQ==
   dependencies:
     d "^1.0.1"
@@ -1060,7 +1060,7 @@ event-emitter@^0.3.5:
     d "1"
     es5-ext "~0.10.14"
 
-execa@^5.0.0, execa@~5.1.0:
+execa@^5.0.0:
   version "5.1.1"
   resolved "https://registry.npmjs.org/execa/-/execa-5.1.1.tgz"
   integrity sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==
@@ -1964,7 +1964,7 @@ node-fzf@0.11.0, node-fzf@~0.5.1:
   resolved "https://registry.npmjs.org/node-fzf/-/node-fzf-0.11.0.tgz"
   integrity sha512-djlXFlrGSrGCHVHOr4iPRkfPuZXac6Elv0wBtKEJ383Dd/rj+9zaCu4JDZQVSGvoDRRSfJYL4roK9SLjTxeOIg==
   dependencies:
-    cli-color "~2.0.0"
+    cli-color "~1.2.0"
     keypress "~0.2.1"
     minimist "~1.2.5"
     redstar "0.0.2"
@@ -2637,6 +2637,11 @@ timers-ext@^0.1.7:
     es5-ext "~0.10.46"
     next-tick "1"
 
+tinyspawn@~1.2.1:
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/tinyspawn/-/tinyspawn-1.2.2.tgz"
+  integrity sha512-QInaMwwUk/Vr+pbM5ZwqoUcS7zRZz/hQkCBMQf4N2miI4TqIbh7OyI6dSgSPTdseeafvpmZjWWlUJx9s+pk/zA==
+
 titleize@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/titleize/-/titleize-3.0.0.tgz"
@@ -2832,15 +2837,15 @@ yocto-queue@^0.1.0:
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
 youtube-dl-exec@^2.4.0:
-  version "2.4.6"
-  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.4.6.tgz"
-  integrity sha512-Ytsi4DR7uPyZiw4n40MLsElWW13vINl/+YoKwkMlkaTQSJsHr8/18z7aB9s2Lca7eaT0Q4Fdpt/zaI1Tt5NGUg==
+  version "2.5.3"
+  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.5.3.tgz"
+  integrity sha512-rmrpiPA/VXMdUvvIGTbHKuKMgVCjsM17K9ON80JZrL8o+dDP8cpSuOdJ+vHodudyGcUEeGLVXSgYyK4YWTk7mQ==
   dependencies:
     bin-version-check "~5.1.0"
     dargs "~7.0.0"
-    execa "~5.1.0"
     is-unix "~2.0.1"
     simple-get "~4.0.1"
+    tinyspawn "~1.2.1"
 
 yt-search@^2.10.3:
   version "2.10.4"
