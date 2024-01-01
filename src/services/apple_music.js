@@ -109,7 +109,7 @@ export default class AppleMusic {
   wrapTrackMeta(trackInfo, albumInfo = {}) {
     return {
       id: trackInfo.id,
-      uri: `apple_music:track:${albumInfo.id}i${trackInfo.id}`,
+      uri: `apple_music:track:${trackInfo.id}`,
       link: trackInfo.attributes.url,
       name: trackInfo.attributes.name,
       artists: [trackInfo.attributes.artistName],
