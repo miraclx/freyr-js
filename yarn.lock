@@ -1531,10 +1531,10 @@ is-stream@^2.0.0:
   resolved "https://registry.npmjs.org/is-stream/-/is-stream-2.0.1.tgz"
   integrity sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==
 
-is-unix@~2.0.1:
-  version "2.0.1"
-  resolved "https://registry.npmjs.org/is-unix/-/is-unix-2.0.1.tgz"
-  integrity sha512-RyKp5JtlRnfOvnKtfBMPLw9ocqDe1NlPQ8Bt+geVzKGfMnLGj8z/Y2HOmk/aMf47P4EbrEt9dN6YGTT1fx4mZA==
+is-unix@~2.0.10:
+  version "2.0.10"
+  resolved "https://registry.npmjs.org/is-unix/-/is-unix-2.0.10.tgz"
+  integrity sha512-CcasZSEOQUoE7JHy56se4wyRhdJfjohuMWYmceSTaDY4naKyd1fpLiY8rJsIT6AKfVstQAhHJOfPx7jcUxK61Q==
 
 is-url@^1.2.4:
   version "1.2.4"
@@ -2502,10 +2502,10 @@ timers-ext@^0.1.7:
     es5-ext "~0.10.46"
     next-tick "1"
 
-tinyspawn@~1.2.1:
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/tinyspawn/-/tinyspawn-1.2.2.tgz"
-  integrity sha512-QInaMwwUk/Vr+pbM5ZwqoUcS7zRZz/hQkCBMQf4N2miI4TqIbh7OyI6dSgSPTdseeafvpmZjWWlUJx9s+pk/zA==
+tinyspawn@~1.2.4:
+  version "1.2.4"
+  resolved "https://registry.npmjs.org/tinyspawn/-/tinyspawn-1.2.4.tgz"
+  integrity sha512-JZRdfjvlVPNWg2HEVadAMBXRKdngN6D8LPj+0RNd7VKWBoEJM3zYhZziQ02XxiDcVVT+QkyOhaGjC6Q3P5AJ/Q==
 
 toidentifier@1.0.1:
   version "1.0.1"
@@ -2685,15 +2685,15 @@ yocto-queue@^0.1.0:
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
 youtube-dl-exec@^2.4.0:
-  version "2.5.3"
-  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.5.3.tgz"
-  integrity sha512-rmrpiPA/VXMdUvvIGTbHKuKMgVCjsM17K9ON80JZrL8o+dDP8cpSuOdJ+vHodudyGcUEeGLVXSgYyK4YWTk7mQ==
+  version "2.5.4"
+  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.5.4.tgz"
+  integrity sha512-O/FxleNLoKq/1j+DHqP4EfZNQin5txDnpl6csyGl4UPpvDWO0Hcb/Y27pcFhYLtSFSV4/9BfHue2lvTc7Mz5jQ==
   dependencies:
     bin-version-check "~5.1.0"
     dargs "~7.0.0"
-    is-unix "~2.0.1"
+    is-unix "~2.0.10"
     simple-get "~4.0.1"
-    tinyspawn "~1.2.1"
+    tinyspawn "~1.2.4"
 
 yt-search@^2.10.3:
   version "2.10.4"
