@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.2] - 2024-01-01
+
+- Ensure tracks maintain their order from collections to playlist file output. <https://github.com/miraclx/freyr-js/pull/569>
+- Support non-latin letters in source search. <https://github.com/miraclx/freyr-js/pull/574>
+- Failure to acquire an audio source is now handled gracefully. <https://github.com/miraclx/freyr-js/commit/fc2925627736f2965fbd162e457cad62d366b49e>
+- Updated Apple Music access token. <https://github.com/miraclx/freyr-js/pull/610>, <https://github.com/miraclx/freyr-js/pull/583>
+
 ## [0.10.1] - 2023-08-08
 
 - Added support for Apple Music song URLs - `https://music.apple.com/us/song/1699712652`. <https://github.com/miraclx/freyr-js/pull/552>
@@ -102,7 +109,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.1...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/miraclx/freyr-js/releases/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/miraclx/freyr-js/releases/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/miraclx/freyr-js/releases/compare/v0.8.1...v0.9.0
