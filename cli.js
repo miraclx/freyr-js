@@ -1537,7 +1537,12 @@ async function init(packageJson, queries, options) {
   const authQueue = new AsyncQueue('cli:authQueue', 1, async (service, logger) => {
     async function coreAuth(loginLogger) {
       if (!Config.opts.attemptAuth) return;
-      const authHandler = service.newAuth();
+      let authHandler;
+      try {
+        authHandler = service.newAuth();
+      } catch {
+        return;
+      }
       const url = await authHandler.getUrl;
       if (Config.opts.autoOpenBrowser)
         await processPromise(open(url), loginLogger, {

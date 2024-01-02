@@ -2,6 +2,7 @@
 import xurl from 'url';
 import path from 'path';
 
+import got from 'got';
 import Promise from 'bluebird';
 import NodeCache from 'node-cache';
 import {Client} from '@yujinakayama/apple-music';
@@ -22,7 +23,9 @@ export default class AppleMusic {
     // https://www.debuggex.com/r/Pv_Prjinkz1m2FOB
     VALID_URL:
       /(?:(?:(?:(?:https?:\/\/)?(?:www\.)?)(?:(?:music|(?:geo\.itunes))\.apple.com)\/([a-z]{2})\/(song|album|artist|playlist)\/(?:([^/]+)\/)?\w+)|(?:apple_music:(track|album|artist|playlist):([\w.]+)))/,
-    PROP_SCHEMA: {},
+    PROP_SCHEMA: {
+      developerToken: {type: 'string'},
+    },
   };
 
   [symbols.meta] = AppleMusic[symbols.meta];
@@ -30,6 +33,8 @@ export default class AppleMusic {
   #store = {
     cache: new NodeCache(),
     core: null,
+    axiosInstance: null,
+    expiry: null,
     defaultStorefront: null,
     isAuthenticated: false,
   };
@@ -37,23 +42,35 @@ export default class AppleMusic {
   constructor(config) {
     if (!config) throw new Error(`[AppleMusic] Please define a configuration object`);
     if (typeof config !== 'object') throw new Error(`[AppleMusic] Please define a configuration as an object`);
-    if (!config.developerToken)
-      throw new Error(`[AppleMusic] Please define [developerToken] as a property within the configuration`);
-    this.#store.core = new Client({developerToken: config.developerToken});
-    for (let instance of [this.#store.core.albums, this.#store.core.artists, this.#store.core.playlists, this.#store.core.songs])
-      instance.axiosInstance.interceptors.request.use(conf => ((conf.headers.origin = 'https://music.apple.com'), conf));
+    this.#store.core = new Client({});
+    this.#store.axiosInstance = this.#store.core.songs.axiosInstance;
+    for (let instance of [this.#store.core.albums, this.#store.core.artists, this.#store.core.playlists])
+      instance.axiosInstance = this.#store.axiosInstance;
+    this.#store.axiosInstance.defaults.headers['Origin'] = 'https://music.apple.com';
     this.#store.defaultStorefront = config.storefront;
-    this.#store.isAuthenticated = !!config.developerToken;
   }
 
-  loadConfig(_config) {}
+  expiresAt(developerToken) {
+    let segments = developerToken.split('.');
+    let payload = Buffer.from(segments[1] || '', 'base64');
+    let parsed = JSON.parse(payload.toString());
+    return parsed.exp * 1000;
+  }
+
+  loadConfig(config) {
+    if (config.developerToken) {
+      this.#store.expiry = this.expiresAt(config.developerToken);
+      this.#store.core.configuration.developerToken = config.developerToken;
+      this.#store.axiosInstance.defaults.headers['Authorization'] = `Bearer ${config.developerToken}`;
+    }
+  }
 
   hasOnceAuthed() {
-    throw Error('Unimplemented: [AppleMusic:hasOnceAuthed()]');
+    return this.#store.isAuthenticated;
   }
 
   isAuthed() {
-    return this.#store.isAuthenticated;
+    return Date.now() < this.#store.expiry;
   }
 
   newAuth() {
@@ -61,19 +78,32 @@ export default class AppleMusic {
   }
 
   canTryLogin() {
-    return !!this.#store.core.configuration.developerToken;
+    return true;
   }
 
   hasProps() {
-    return false;
+    return this.#store.isAuthenticated;
   }
 
   getProps() {
-    throw Error('Unimplemented: [AppleMusic:getProps()]');
+    return {
+      developerToken: this.#store.core.configuration.developerToken,
+    };
   }
 
   async login() {
-    throw Error('Unimplemented: [AppleMusic:login()]');
+    let browsePage = await got('https://music.apple.com/us/browse').text();
+    let scriptUri;
+    if (!(scriptUri = browsePage.match(/assets\/index-[a-z0-9]{8}\.js/)?.[0]))
+      throw new Error('Unable to extract core script from Apple Music');
+    let script = await got(`https://music.apple.com/${scriptUri}`).text();
+    let developerToken;
+    if (!(developerToken = script.match(/eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ[^"]+/)?.[0]))
+      throw new Error('Unable to extract developerToken from Apple Music core script');
+    this.#store.expiry = this.expiresAt(developerToken);
+    this.#store.core.configuration.developerToken = developerToken;
+    this.#store.axiosInstance.defaults.headers['Authorization'] = `Bearer ${developerToken}`;
+    return (this.#store.isAuthenticated = true);
   }
 
   validateType(uri) {
@@ -94,7 +124,7 @@ export default class AppleMusic {
     const id = isURI ? match[5] : parsedURL.query.i || path.basename(parsedURL.pathname);
     const type = isURI ? match[4] : collection_type == 'album' && parsedURL.query.i ? 'track' : collection_type;
     const scope = collection_type == 'track' || (collection_type == 'album' && parsedURL.query.i) ? 'song' : collection_type;
-    storefront = match[1] || storefront || (#store in this ? this.#store.defaultStorefront : 'us');
+    storefront = match[1] || storefront || (#store in this ? this.#store.defaultStorefront : null) || 'us';
     return {
       id,
       type,
