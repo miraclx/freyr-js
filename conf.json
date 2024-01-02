@@ -53,7 +53,8 @@
       "refreshToken": "AQCbeNs5NiGfHa6He0BlOdoQwEIdo2lwBmefEvpvqVy8WlL2HV7rmGbb30_oaZHMDf9MgXtGjI0gV_QukL33PE8c2bGqJHeMqdHBUjKWhxOW19snJkGUiyxen8UvmDG-OP4"
     },
     "apple_music": {
-      "storefront": "us"
+      "storefront": "us",
+      "developerToken": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNzAyNTAyMjM0LCJleHAiOjE3MDk3NTk4MzQsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.zzeMLmez71PLinP9GozYSQnF7NYyCiXHB9tKL3-cyu3LzyeRnYz0ejLj4CrNJs0dlNkFg9_mwKmMLueUAR-KRg"
     },
     "deezer": {
       "retries": 2

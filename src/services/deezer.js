@@ -146,7 +146,7 @@ export default class Deezer {
     throw Error('Unimplemented: [Deezer:hasOnceAuthed()]');
   }
 
-  isAuthed() {
+  async isAuthed() {
     return true;
   }
 

@@ -1556,8 +1556,9 @@ async function init(packageJson, queries, options) {
         onInit: '[\u2022] Awaiting user authentication...',
       });
     }
-    service.loadConfig(freyrCoreConfig.get(`services.${service[symbols.meta].ID}`));
-    if (service.isAuthed()) logger.write('[authenticated]\n');
+    if (await service.isAuthed()) logger.write('[authenticated]\n');
+    else service.loadConfig(freyrCoreConfig.get(`services.${service[symbols.meta].ID}`));
+    if (await service.isAuthed()) logger.write('[authenticated]\n');
     else {
       logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
       const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`).tick();
