@@ -792,7 +792,7 @@ The `storefront` option defines the default storefront to be used in the absence
 
 After successfully acquiring the developer token, include the `developerToken` to the `apple_music` object that's a property of the `services` object in the `conf.json` file. [See [Configuration](#configuration)]
 
-An expired developer token in the `conf.json` would make freyr fallback to fetching it from the Apple Music website.
+An expired developer token in the `conf.json` would make freyr fallback to fetching it from the Apple Music site.
 </details>
 
 <details>
