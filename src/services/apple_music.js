@@ -42,8 +42,14 @@ export default class AppleMusic {
   constructor(config) {
     if (!config) throw new Error(`[AppleMusic] Please define a configuration object`);
     if (typeof config !== 'object') throw new Error(`[AppleMusic] Please define a configuration as an object`);
-    this.#store.core = new Client({});
-    this.#store.axiosInstance = this.#store.core.songs.axiosInstance;
+    this.#store.core = new Client({developerToken: config.developerToken});
+    try {
+      this.#store.expiry = this.expiresAt(config.developerToken);
+    } catch (e) {
+      let err = new Error('Failed to parse token expiration date');
+      err.cause = e;
+      throw err;
+    }
     for (let instance of [this.#store.core.albums, this.#store.core.artists, this.#store.core.playlists])
       instance.axiosInstance = this.#store.axiosInstance;
     this.#store.axiosInstance.defaults.headers['Origin'] = 'https://music.apple.com';
@@ -82,7 +88,7 @@ export default class AppleMusic {
   }
 
   hasProps() {
-    return this.#store.isAuthenticated;
+    return true;
   }
 
   getProps() {

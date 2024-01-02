@@ -504,7 +504,10 @@ async function init(packageJson, queries, options) {
     if (options.rmCache && typeof options.rmCache !== 'boolean')
       throw new Error(`Invalid value for \`--rm-cache\`. found [${options.rmCache}]`);
   } catch (err) {
-    stackLogger.error('\x1b[31m[i]\x1b[0m', err.message || err);
+    stackLogger.error(
+      '\x1b[31m[i]\x1b[0m',
+      'SHOW_DEBUG_STACK' in process.env ? util.formatWithOptions({colors: true}, err) : err['message'] || err,
+    );
     process.exit(2);
   }
 
@@ -662,7 +665,7 @@ async function init(packageJson, queries, options) {
     options.filter.extend(Config.filters);
   } catch (err) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Configuration file [${options.config}] wrongly formatted`);
-    stackLogger.error(err.message || err);
+    stackLogger.error('SHOW_DEBUG_STACK' in process.env ? util.formatWithOptions({colors: true}, err) : err['message'] || err);
     process.exit(3);
   }
 
@@ -747,7 +750,7 @@ async function init(packageJson, queries, options) {
     freyrCore = new FreyrCore(Config.services, AuthServer, Config.server);
   } catch (err) {
     stackLogger.error(`\x1b[31m[!]\x1b[0m Failed to initialize a Freyr Instance`);
-    stackLogger.error(err.message || err);
+    stackLogger.error('SHOW_DEBUG_STACK' in process.env ? util.formatWithOptions({colors: true}, err) : err['message'] || err);
     process.exit(6);
   }
 
@@ -770,7 +773,7 @@ async function init(packageJson, queries, options) {
     }
     atomicParsley = wrapCliInterface(['AtomicParsley', 'atomicparsley'], atomicParsleyPath);
   } catch (err) {
-    stackLogger.error(err.message);
+    stackLogger.error('SHOW_DEBUG_STACK' in process.env ? util.formatWithOptions({colors: true}, err) : err['message'] || err);
     process.exit(7);
   }
 
