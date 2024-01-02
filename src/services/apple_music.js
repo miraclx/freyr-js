@@ -42,7 +42,15 @@ export default class AppleMusic {
   constructor(config) {
     if (!config) throw new Error(`[AppleMusic] Please define a configuration object`);
     if (typeof config !== 'object') throw new Error(`[AppleMusic] Please define a configuration as an object`);
-    this.#store.core = new Client({});
+    if (config.developerToken)
+      try {
+        this.#store.expiry = this.expiresAt(config.developerToken);
+      } catch (e) {
+        let err = new Error('Failed to parse token expiration date');
+        err.cause = e;
+        throw err;
+      }
+    this.#store.core = new Client({developerToken: config.developerToken});
     this.#store.axiosInstance = this.#store.core.songs.axiosInstance;
     for (let instance of [this.#store.core.albums, this.#store.core.artists, this.#store.core.playlists])
       instance.axiosInstance = this.#store.axiosInstance;
@@ -69,8 +77,14 @@ export default class AppleMusic {
     return this.#store.isAuthenticated;
   }
 
-  isAuthed() {
-    return Date.now() < this.#store.expiry;
+  async isAuthed() {
+    if (Date.now() < this.#store.expiry)
+      try {
+        let test_id = 1626195797; // https://music.apple.com/us/song/united-in-grief/1626195797
+        let res = await this.#store.core.songs.get(test_id, {storefront: 'us'});
+        return res.data?.[0]?.id == test_id;
+      } catch {}
+    return false;
   }
 
   newAuth() {
@@ -82,7 +96,7 @@ export default class AppleMusic {
   }
 
   hasProps() {
-    return this.#store.isAuthenticated;
+    return true;
   }
 
   getProps() {

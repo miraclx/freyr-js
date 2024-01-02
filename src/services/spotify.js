@@ -65,7 +65,7 @@ export default class Spotify {
     return Date.now() < this.#store.expiry;
   }
 
-  isAuthed() {
+  async isAuthed() {
     return this.accessTokenIsValid();
   }
 
