@@ -782,7 +782,7 @@ An invalid `refreshToken`, when specified, would fallback to requesting account 
   - `storefront`: \<string\>
   - `developerToken`: \<string\>
 
-Freyr would automatically fetch a developer token from the Apple Music website, which should suffice for all intents and purposes. But if you prefer to use a custom developer token, please refer to the Apple Music documentation on this topic.
+Freyr would automatically fetch a developer token from the Apple Music site, which should suffice for all intents and purposes. But if you prefer to use a custom developer token, please refer to the Apple Music documentation on this topic.
 
 The `storefront` option defines the default storefront to be used in the absence of a specification.
 
@@ -1120,7 +1120,7 @@ Optionally, you can use these interesting flags to customize the experience.
 
 The freyr source would be available in the `/freyr` directory within the container along with a globally registered command `freyr` for calling the script.
 
-For more information and documentation about docker, please refer to its official website:
+For more information and documentation about docker, please refer to its official site:
 
 - <https://www.docker.com/>
 - <https://docs.docker.com/>
