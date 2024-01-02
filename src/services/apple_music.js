@@ -80,7 +80,7 @@ export default class AppleMusic {
   async isAuthed() {
     if (Date.now() < this.#store.expiry)
       try {
-        let test_id = 1626195797;
+        let test_id = 1626195797; // https://music.apple.com/us/song/united-in-grief/1626195797
         let res = await this.#store.core.songs.get(test_id, {storefront: 'us'});
         return res.data?.[0]?.id == test_id;
       } catch {}
