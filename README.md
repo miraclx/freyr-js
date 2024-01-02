@@ -803,7 +803,7 @@ An expired developer token in the `conf.json` would make freyr fallback to fetch
 
 Authentication unrequired. API is freely accessible.
 
-Because of the 50 requests / 5 seconds limit enforced on an IP-basis for Deezer's API [See [#32](https://github.com/miraclx/freyr-js/issues/6)],
+Because of the 50 requests / 5 seconds limit enforced on an IP-basis for Deezer's API [See [#32](https://github.com/miraclx/freyr-js/issues/32)],
 occasionally a `Quota limit exceeded` error would be thrown by the API server.
 
 To combat this, freyr employs request batching, managed delays and finally, retries when things go awry.
