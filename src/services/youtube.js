@@ -321,7 +321,7 @@ export class YouTubeMusic {
       let accuracy = 0;
       // get weighted delta from expected duration
       accuracy += weight - (duration ? Math.abs(duration - item.duration_ms) / duration : 0.5) * 100;
-      // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
+      // if item is a song, bump remaining by 50%, if video, bump up by 25%, anything else - by 5%
       accuracy += (cur => ((item.type === 'song' ? 50 : item.type === 'video' ? 25 : 5) / 100) * cur)(100 - accuracy);
       // TODO: CALCULATE ACCURACY BY AUTHOR
       return accuracy;
