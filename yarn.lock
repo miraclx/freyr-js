@@ -2685,9 +2685,9 @@ yocto-queue@^0.1.0:
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
 youtube-dl-exec@^2.4.0:
-  version "2.5.4"
-  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.5.4.tgz"
-  integrity sha512-O/FxleNLoKq/1j+DHqP4EfZNQin5txDnpl6csyGl4UPpvDWO0Hcb/Y27pcFhYLtSFSV4/9BfHue2lvTc7Mz5jQ==
+  version "2.5.5"
+  resolved "https://registry.npmjs.org/youtube-dl-exec/-/youtube-dl-exec-2.5.5.tgz"
+  integrity sha512-3M5w1RD/ggcMjkB0zFrjOWuDB4JfsJsuXRau6so5jZwR4N/vpcTPDibfQayM9rVTp9SieqhdI8j8nFA+zvC22A==
   dependencies:
     bin-version-check "~5.1.0"
     dargs "~7.0.0"
