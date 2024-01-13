@@ -1283,13 +1283,12 @@ async function init(packageJson, queries, options) {
 
   const trackQueue = new AsyncQueue('cli:trackQueue', Config.concurrency.tracks, async ({track, meta, props}) => {
     const trackLogger = props.logger.log(`\u2022 [${meta.trackName}]`).tick(3);
-    const filterStat = options.filter(track, false);
-    if (!filterStat.status) {
+    if (!props.filterStat.status) {
       trackLogger.log("| [\u2022] Didn't match filter. Skipping...");
       return {
         meta,
         [symbols.errorCode]: 0,
-        skip_reason: `filtered out: ${filterStat.reason.message}`,
+        skip_reason: `filtered out: ${props.filterStat.reason.message}`,
         complete: false,
       };
     }
@@ -1397,7 +1396,8 @@ async function init(packageJson, queries, options) {
         )
       ).flatMap(([dir, exists]) => (exists ? [dir] : []));
       let fileExists = !!fileExistsIn.length;
-      const processTrack = !fileExists || options.force;
+      const filterStat = options.filter(track, false);
+      const processTrack = (!fileExists || options.force) && filterStat.status;
       let collectSources;
       if (processTrack) collectSources = buildSourceCollectorFor(track, results => results[0]);
       const meta = {
@@ -1415,6 +1415,7 @@ async function init(packageJson, queries, options) {
             fileExists,
             fileExistsIn,
             processTrack,
+            filterStat,
             logger,
           },
         })
