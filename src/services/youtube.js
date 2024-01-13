@@ -121,7 +121,7 @@ export class YouTubeMusic {
     TITLE_TEXT: ['title', 'runs', 0, 'text'],
   };
 
-  #search = async function search(queryObject, params, tag) {
+  #search = async function search(queryObject, params) {
     /**
      * VideoID Types?
      * OMV: Official Music Video
@@ -191,7 +191,7 @@ export class YouTubeMusic {
 
               const result = {};
 
-              let type = getItemText(content, 1).toLowerCase();
+              let type = layerName === 'Songs' ? 'song' : getItemText(content, 1).toLowerCase();
               if (type === 'single') type = 'album';
 
               if (['song', 'video', 'album', 'artist', 'playlist'].includes(type)) result.type = type;
@@ -263,14 +263,12 @@ export class YouTubeMusic {
                               icit: continuationObject.clickTrackingParams,
                               continuation: continuationObject.continuation,
                             },
-                            tag || layerName.slice(0, -1),
                           )
                         ).other;
                       },
                   expand: !layer.bottomEndpoint
                     ? undefined
-                    : async () =>
-                        (await this.#search(layer.bottomEndpoint.searchEndpoint, {}, tag || layerName.slice(0, -1))).other,
+                    : async () => (await this.#search(layer.bottomEndpoint.searchEndpoint, {})).other,
                 }),
           },
         ];
@@ -301,34 +299,38 @@ export class YouTubeMusic {
       ...((results.top || {}).contents || []), // top recommended songs
       ...((results.songs || {}).contents || []), // song section
       ...((results.videos || {}).contents || []), // videos section
-    ].filter(
-      item =>
-        item &&
-        'title' in item &&
-        ['song', 'video'].includes(item.type) &&
-        textUtils.getWeight(
-          strippedMeta,
-          textUtils.stripText([
-            ...item.title.split(' '),
-            ...(item.album?.name.split(' ') ?? []),
-            ...item.artists.map(artist => artist.name),
-          ]),
-        ) > 65,
-    );
-    function calculateAccuracyFor(item) {
+    ]
+      .map(
+        item =>
+          item &&
+          'title' in item &&
+          ['song', 'video'].includes(item.type) && {
+            ...item,
+            weight: textUtils.getWeight(
+              strippedMeta,
+              textUtils.stripText([
+                ...item.title.split(' '),
+                ...(item.album?.name.split(' ') ?? []),
+                ...item.artists.map(artist => artist.name),
+              ]),
+            ),
+          },
+      )
+      .filter(Boolean);
+    function calculateAccuracyFor(item, weight) {
       let accuracy = 0;
       // get weighted delta from expected duration
-      accuracy += 100 - (duration ? Math.abs(duration - item.duration_ms) / duration : 0.5) * 100;
-      // if item is a song, bump remaining by 80%, if video, bump up by 70%, anything else, not so much
-      accuracy += (cur => ((item.type === 'song' ? 80 : item.type === 'video' ? 70 : 10) / 100) * cur)(100 - accuracy);
+      accuracy += weight - (duration ? Math.abs(duration - item.duration_ms) / duration : 0.5) * 100;
+      // if item is a song, bump remaining by 50%, if video, bump up by 25%, anything else - by 5%
+      accuracy += (cur => ((item.type === 'song' ? 50 : item.type === 'video' ? 25 : 5) / 100) * cur)(100 - accuracy);
       // TODO: CALCULATE ACCURACY BY AUTHOR
       return accuracy;
     }
     const classified = Object.values(
       validSections.reduce((final, item) => {
         // prune duplicates
-        if (item && 'videoId' in item && !(item.videoId in final)) {
-          final[item.videoId] = {
+        if (item.weight > 65 && item && 'videoId' in item && !(item.videoId in final)) {
+          let cleanItem = {
             title: item.title,
             type: item.type,
             author: item.artists,
@@ -337,7 +339,7 @@ export class YouTubeMusic {
             videoId: item.videoId,
             getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
-          final[item.videoId].accuracy = calculateAccuracyFor(final[item.videoId]);
+          if ((cleanItem.accuracy = calculateAccuracyFor(cleanItem, item.weight)) > 80) final[item.videoId] = cleanItem;
         }
         return final;
       }, {}),
