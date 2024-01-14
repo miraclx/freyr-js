@@ -154,7 +154,7 @@ export default class Spotify {
           release_date: albumInfo.release_date,
           disc_number: trackInfo.disc_number,
           total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.disc_number), 1),
-          contentRating: trackInfo.explicit === true ? 'explicit' : 'clean',
+          contentRating: trackInfo.explicit === true ? 'explicit' : 'inoffensive',
           isrc: (trackInfo.external_ids || {}).isrc,
           genres: albumInfo.genres,
           label: albumInfo.label,

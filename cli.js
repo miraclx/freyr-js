@@ -1125,7 +1125,7 @@ async function init(packageJson, queries, options) {
               'domain=com.apple.iTunes',
             ],
           ],
-          advisory: ['explicit', 'clean'].includes(track.contentRating) // rtng
+          advisory: ['explicit', 'clean', 'inoffensive'].includes(track.contentRating) // rtng
             ? track.contentRating
             : track.contentRating === true
               ? 'explicit'

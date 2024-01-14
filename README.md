@@ -42,7 +42,7 @@ Depending on the URLs you provide freyr, it will;
 
 1. Extract track metadata (`title`, `album`, `artist`, etc.) from the streaming service (Spotify if you provide a Spotify URL).
 2. Then, it queries sources (e.g. YouTube), classifies the results to find you the best sounding, most accurate audio and downloads that in the raw format.
-3. Next, it processes each track, encoding them in an [Apple AAC](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format (`.m4a` file extension) at a bitrate of `320kbps` for high quality.
+3. Next, it processes each track, encoding them in an [Apple AAC](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format (`.m4a` file extension) at a default bitrate of `320kbps`.
 4. Then, it embeds all the metadata and the album art into each track.
 5. And finally, it organizes all the files into a structured library ([example](https://miraclx.github.io/freyr-demo-library/)).
 
