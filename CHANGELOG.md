@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.3] - 2024-01-14
+
+- Implemented automated authentication for Apple Music. <https://github.com/miraclx/freyr-js/pull/623>, <https://github.com/miraclx/freyr-js/pull/624>
+- Fixed the YouTube Music logic for sourcing tracks. <https://github.com/miraclx/freyr-js/pull/632>
+- Tracks from Deezer now encode copyright information. <https://github.com/miraclx/freyr-js/pull/639>
+- Sort metadata (sonm, soar, soal) are now embedded in the output file. <https://github.com/miraclx/freyr-js/pull/636>
+- Tracks from Spotify now encode copyright in the format `℗ {YEAR} {LABEL}` to match Apple Music. <https://github.com/miraclx/freyr-js/pull/638>
+- Non-explicit Spotify tracks are now tagged "Inoffensive". <https://github.com/miraclx/freyr-js/pull/635>
+- Fix the Apple Music uri format for tracks. <https://github.com/miraclx/freyr-js/pull/622>
+- Fix the total disc number count. <https://github.com/miraclx/freyr-js/pull/634>
+
 ## [0.10.2] - 2024-01-01
 
 - Ensure tracks maintain their order from collections to playlist file output. <https://github.com/miraclx/freyr-js/pull/569>
@@ -109,7 +120,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Release Page: <https://github.com/miraclx/freyr-js/releases/tag/v0.5.0>
 
-[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.2...HEAD
+[unreleased]: https://github.com/miraclx/freyr-js/compare/v0.10.3...HEAD
+[0.10.3]: https://github.com/miraclx/freyr-js/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/miraclx/freyr-js/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/miraclx/freyr-js/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/miraclx/freyr-js/compare/v0.9.0...v0.10.0
