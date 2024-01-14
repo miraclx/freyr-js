@@ -100,8 +100,7 @@ export class DeezerCore {
 
   async _altApiCall(method, opts) {
     const response = await this.wrappedCall(
-      this.requestObject(this.altApiUrl, {
-        method: 'POST',
+      this.requestObject.post(this.altApiUrl, {
         headers: {...(this.#altAuth?.sessionId && {cookie: `sid=${this.#altAuth.sessionId}`})},
         searchParams: {method, api_version: '1.0', api_token: this.#altAuth.token ?? ''},
         json: {lang: 'en', ...opts},
