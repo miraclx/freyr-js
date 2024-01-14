@@ -153,7 +153,7 @@ export default class Spotify {
           total_tracks: albumInfo.ntracks,
           release_date: albumInfo.release_date,
           disc_number: trackInfo.disc_number,
-          contentRating: trackInfo.explicit === true ? 'explicit' : 'clean',
+          contentRating: trackInfo.explicit === true ? 'explicit' : 'inoffensive',
           isrc: (trackInfo.external_ids || {}).isrc,
           genres: albumInfo.genres,
           label: albumInfo.label,
