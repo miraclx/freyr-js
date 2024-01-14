@@ -1108,7 +1108,7 @@ async function init(packageJson, queries, options) {
           album: track.album, // ©alb
           genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
           tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
-          disk: `${track.disc_number}/${track.disc_number}`, // disk
+          disk: `${track.disc_number}${track.total_discs ? `/${track.total_discs}` : ''}`, // disk
           year: new Date(track.release_date).toISOString().split('T')[0], // ©day
           compilation: track.compilation, // ©cpil
           gapless: options.gapless ?? false, // pgap
