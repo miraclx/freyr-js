@@ -1111,7 +1111,7 @@ async function init(packageJson, queries, options) {
           disk: `${track.disc_number}/${track.disc_number}`, // disk
           year: new Date(track.release_date).toISOString().split('T')[0], // ©day
           compilation: track.compilation, // ©cpil
-          gapless: options.gapless, // pgap
+          gapless: options.gapless ?? false, // pgap
           rDNSatom: [
             // ----
             ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
