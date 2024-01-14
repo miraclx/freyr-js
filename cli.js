@@ -1557,18 +1557,17 @@ async function init(packageJson, queries, options) {
         onInit: '[\u2022] Awaiting user authentication...',
       });
     }
-    if (await service.isAuthed()) logger.write('[authenticated]\n');
-    else service.loadConfig(freyrCoreConfig.get(`services.${service[symbols.meta].ID}`));
-    if (await service.isAuthed()) logger.write('[authenticated]\n');
-    else {
-      logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
-      const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`).tick();
-      service.canTryLogin()
-        ? (await processPromise(service.login(), loginLogger, {
-            onInit: '[\u2022] Logging in...',
-          })) || (await coreAuth(loginLogger))
-        : await coreAuth(loginLogger);
-    }
+    if (await service.isAuthed()) return logger.write('[authenticated]\n');
+    service.loadConfig(freyrCoreConfig.get(`services.${service[symbols.meta].ID}`));
+    if (await service.isAuthed()) return logger.write('[authenticated]\n');
+    logger.write(service.hasOnceAuthed() ? '[expired]\n' : '[unauthenticated]\n');
+    const loginLogger = logger.log(`[${service[symbols.meta].DESC} Login]`).tick();
+    service.canTryLogin()
+      ? (await processPromise(service.login(), loginLogger, {
+          onInit: '[\u2022] Logging in...',
+        })) || (await coreAuth(loginLogger))
+      : await coreAuth(loginLogger);
+
     return service.isAuthed();
   });
 
