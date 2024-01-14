@@ -87,15 +87,18 @@ export class DeezerCore {
     return response.body;
   }
 
-  #altAuth = null;
+  #altAuth = {token: null, sessionId: null};
 
   async altApiCall(method, opts) {
-    if (!this.#altAuth) {
-      this.#altAuth = {};
-      let result = await this.altApiCall('deezer.getUserData');
+    if (!this.#altAuth.token) {
+      let result = await this._altApiCall('deezer.getUserData');
       this.#altAuth = {token: result.checkForm, sessionId: result.SESSION_ID};
     }
 
+    return this._altApiCall(method, opts);
+  }
+
+  async _altApiCall(method, opts) {
     const response = await this.wrappedCall(
       this.requestObject(this.altApiUrl, {
         method: 'POST',
