@@ -22,6 +22,7 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 export class DeezerCore {
   legacyApiUrl = 'https://api.deezer.com';
+  altApiUrl = 'https://www.deezer.com/ajax/gw-light.php';
 
   requestObject = got.extend({
     responseType: 'json',
@@ -32,8 +33,13 @@ export class DeezerCore {
 
   #retrySymbol = Symbol('DeezerCoreTrialCount');
 
-  #getIfHasError = response =>
-    response.body && typeof response.body === 'object' && 'error' in response.body && response.body.error;
+  #getIfHasError = response => {
+    if (!(response.body && typeof response.body === 'object' && 'error' in response.body)) return null;
+
+    if (Array.isArray(response.body.error)) return response.body.error.length > 0 ? response.body.error[0] : null;
+
+    return response.body.error;
+  };
 
   validatorQueue = new AsyncQueue('validatorQueue', 1, async now => {
     if (this.#validatorData.queries.length === 50)
@@ -63,8 +69,8 @@ export class DeezerCore {
 
   totalTrials = 5;
 
-  async legacyApiCall(ref, opts) {
-    const response = await this.#sendRequest(ref, opts, this.totalTrials || 5).catch(err => {
+  async wrappedCall(called) {
+    const response = await called.catch(err => {
       throw new WebapiError(
         `${err.syscall ? `${err.syscall} ` : ''}${err.code} ${err.hostname || err.host}`,
         err.response ? err.response.statusCode : null,
@@ -81,8 +87,31 @@ export class DeezerCore {
     return response.body;
   }
 
+  #altAuth = {token: null, sessionId: null};
+
+  async altApiCall(method, opts) {
+    if (!this.#altAuth.token) {
+      let result = await this._altApiCall('deezer.getUserData');
+      this.#altAuth = {token: result.checkForm, sessionId: result.SESSION_ID};
+    }
+
+    return this._altApiCall(method, opts);
+  }
+
+  async _altApiCall(method, opts) {
+    const response = await this.wrappedCall(
+      this.requestObject.post(this.altApiUrl, {
+        headers: {...(this.#altAuth?.sessionId && {cookie: `sid=${this.#altAuth.sessionId}`})},
+        searchParams: {method, api_version: '1.0', api_token: this.#altAuth.token ?? ''},
+        json: {lang: 'en', ...opts},
+      }),
+    );
+
+    return response.results;
+  }
+
   processID(gnFn) {
-    return (id, opts) => this.legacyApiCall(gnFn(id), opts);
+    return (id, opts) => this.wrappedCall(this.#sendRequest(gnFn(id), opts, this.totalTrials || 5));
   }
 
   processList(gnFn) {
@@ -207,6 +236,7 @@ export default class Deezer {
       total_tracks: albumInfo.ntracks,
       release_date: new Date(trackInfo.release_date),
       disc_number: trackInfo.disk_number,
+      total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.altData.DISK_NUMBER), 1),
       contentRating: !!trackInfo.explicit_lyrics,
       isrc: trackInfo.isrc,
       genres: albumInfo.genres,
@@ -218,8 +248,9 @@ export default class Deezer {
     };
   }
 
-  wrapAlbumData(albumObject) {
+  wrapAlbumData(albumObject, altAlbumObject) {
     const artistObject = albumObject.artist || {};
+    let altTracks = Object.fromEntries((altAlbumObject.SONGS?.data || []).map(track => [track.SNG_ID, track]));
     return {
       id: albumObject.id,
       uri: albumObject.link,
@@ -232,12 +263,12 @@ export default class Deezer {
             ? 'single'
             : 'album',
       genres: ((albumObject.genres || {}).data || []).map(genre => genre.name),
-      copyrights: [{type: 'P', text: albumObject.copyright}], // find workaround
+      copyrights: [{type: 'P', text: altAlbumObject.DATA.PRODUCER_LINE}],
       images: [albumObject.cover_small, albumObject.cover_medium, albumObject.cover_big, albumObject.cover_xl],
       label: albumObject.label,
       release_date: new Date(albumObject.release_date),
       ntracks: albumObject.nb_tracks,
-      tracks: albumObject.tracks,
+      tracks: albumObject.tracks.data.map(track => ({...track, altData: altTracks[track.id]})),
       getImage(width, height) {
         const min = (val, max) => Math.min(max, val) || max;
         return this.images
@@ -298,7 +329,13 @@ export default class Deezer {
   albumQueue = new AsyncQueue(
     'deezer:albumQueue',
     4,
-    this.createDataProcessor(async id => this.wrapAlbumData(await this.#store.core.getAlbum(id))),
+    this.createDataProcessor(async id => {
+      let [album, altAlbumData] = await Promise.all([
+        this.#store.core.getAlbum(id),
+        this.#store.core.altApiCall('deezer.pageAlbum', {alb_id: id}),
+      ]);
+      return this.wrapAlbumData(album, altAlbumData);
+    }),
   );
 
   async getAlbum(uris) {
@@ -327,7 +364,7 @@ export default class Deezer {
 
   async getAlbumTracks(uri) {
     const album = await this.getAlbum(uri);
-    return this.trackQueue.push(album.tracks.data.map(track => track.link));
+    return this.trackQueue.push(album.tracks.map(track => track.link));
   }
 
   async getArtistAlbums(uris) {
