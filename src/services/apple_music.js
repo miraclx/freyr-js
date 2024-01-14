@@ -167,6 +167,7 @@ export default class AppleMusic {
       total_tracks: albumInfo.ntracks,
       release_date: albumInfo.release_date,
       disc_number: trackInfo.attributes.discNumber,
+      total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.attributes.discNumber), 1),
       contentRating: trackInfo.attributes.contentRating,
       isrc: trackInfo.attributes.isrc,
       genres: trackInfo.attributes.genreNames,
