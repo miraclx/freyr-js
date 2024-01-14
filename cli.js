@@ -1142,12 +1142,12 @@ async function init(packageJson, queries, options) {
           encodingTool: `freyr-js cli v${packageJson.version}`, // ©too
           encodedBy: 'd3vc0dr', // ©enc
           artwork: files.image.file.path, // covr
-          // sortOrder: [
-          //   ['name', 'NAME'], // sonm
-          //   ['album', 'NAME'], // soal
-          //   ['artist', 'NAME'], // soar
-          //   ['albumartist', 'NAME'], // soaa
-          // ],
+          sortOrder: [
+            ['name', track.name], // sonm
+            ['album', track.album], // soal
+            ['artist', track.artists[0]], // soar
+            // ['albumartist', 'NAME'], // soaa
+          ],
         });
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};
