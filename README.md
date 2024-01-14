@@ -50,22 +50,22 @@ Depending on the URLs you provide freyr, it will;
 
 Here's a list of the metadata that freyr can extract from each streaming service:
 
-|      Meta      | Spotify | Apple Music | Deezer |
-| :------------: | :-----: | :---------: | :----: |
-|    `Title`     |    ✔    |      ✔      |   ✔    |
-|    `Artist`    |    ✔    |      ✔      |   ✔    |
-|   `Composer`   |    ✗    |      ✔      |   ✔    |
-|    `Album`     |    ✔    |      ✔      |   ✔    |
-|    `Genre`     |    ✗    |      ✔      |   ✔    |
-| `Track Number` |    ✔    |      ✔      |   ✔    |
-| `Disk Number`  |    ✔    |      ✔      |   ✔    |
-| `Release Date` |    ✔    |      ✔      |   ✔    |
-|    `Rating`    |    ✔    |      ✔      |   ✔    |
-| `Album Artist` |    ✔    |      ✔      |   ✔    |
-|     `ISRC`     |    ✔    |      ✔      |   ✔    |
-|    `Label`     |    ✔    |      ✔      |   ✔    |
-|  `Copyright`   |    ✔    |      ✔      |   ✗    |
-|  `Cover Art`   |    ✔    |      ✔      |   ✔    |
+|      Meta      | Spotify | Apple Music |      Deezer       |
+| :------------: | :-----: | :---------: | :---------------: |
+|    `Title`     |    ✔    |      ✔      |        ✔          |
+|    `Artist`    |    ✔    |      ✔      |        ✔          |
+|   `Composer`   |    ✗    |      ✔      |        ✔          |
+|    `Album`     |    ✔    |      ✔      |        ✔          |
+|    `Genre`     |    ✗    |      ✔      |        ✔          |
+| `Track Number` |    ✔    |      ✔      |        ✔          |
+| `Disk Number`  |    ✔    |      ✔      |   ✔ (no total)    |
+| `Release Date` |    ✔    |      ✔      |        ✔          |
+|    `Rating`    |    ✔    |      ✔      |        ✔          |
+| `Album Artist` |    ✔    |      ✔      |        ✔          |
+|     `ISRC`     |    ✔    |      ✔      |        ✔          |
+|    `Label`     |    ✔    |      ✔      |        ✔          |
+|  `Copyright`   |    ✔    |      ✔      |        ✗          |
+|  `Cover Art`   |    ✔    |      ✔      |        ✔          |
 
 ## Support the project
 
