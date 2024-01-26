@@ -80,7 +80,7 @@
     "mkdirp": "^3.0.0",
     "node-cache": "^5.1.2",
     "open": "^10.0.0",
-    "pretty-ms": "^8.0.0",
+    "pretty-ms": "^9.0.0",
     "public-ip": "^6.0.1",
     "spotify-uri": "^4.0.0",
     "stringd": "^2.2.0",
