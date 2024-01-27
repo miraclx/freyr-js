@@ -103,7 +103,7 @@
       "node-fzf": {
         ".": "0.11.0",
         "cli-color": "2.0.3",
-        "string-width": "7.0.0"
+        "string-width": "7.1.0"
       }
     },
     "@yujinakayama/apple-music": {
@@ -115,6 +115,6 @@
     "public-ip/got": "13.0.0",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.3",
-    "yt-search/node-fzf/string-width": "7.0.0"
+    "yt-search/node-fzf/string-width": "7.1.0"
   }
 }
