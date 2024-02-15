@@ -1,0 +1,12 @@
+{
+    "name": "freyr-js-dev",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    },
+    "postCreateCommand": {
+        "yarn install": "yarn global add freyr",
+        "install build tools": "sudo apt-get update && sudo apt install cmake -y"
+    },
+    "postStartCommand": "git clone --branch 20210715.151551.e7ad03a --depth 1 https://github.com/wez/atomicparsley $HOME/atomicparsley && cmake -S $HOME/atomicparsley -B $HOME/atomicparsley && cmake --build $HOME/atomicparsley --config Release && sudo ln -s $HOME/atomicparsley/AtomicParsley /usr/bin/AtomicParsley"
+}
