@@ -3,7 +3,8 @@ FROM node:20.2.0-alpine3.16 as installer
 COPY package.json yarn.lock /freyr/
 WORKDIR /freyr
 ARG YOUTUBE_DL_SKIP_PYTHON_CHECK=1
-RUN yarn install --prod --frozen-lockfile
+RUN yarn install --prod --frozen-lockfile \
+  && test -x node_modules/youtube-dl-exec/bin/yt-dlp
 
 FROM golang:1.20.4-alpine3.16 as prep
 
