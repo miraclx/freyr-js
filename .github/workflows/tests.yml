@@ -262,7 +262,7 @@ jobs:
       run: npm ci
 
     - name: Lint Code Base
-      uses: github/super-linter@v5
+      uses: github/super-linter@v6
       env:
         VALIDATE_ALL_CODEBASE: false
         DEFAULT_BRANCH: master
