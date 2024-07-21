@@ -2215,9 +2215,9 @@ proxy-from-env@^1.1.0:
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
 public-ip@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/public-ip/-/public-ip-6.0.1.tgz"
-  integrity sha512-1/Mxa1MKrAQ4jF5IalECSBtB0W1FAtnG+9c5X16jjvV/Gx9fiRy7xXIrHlBGYjnTlai0zdZkM3LrpmASavmAEg==
+  version "6.0.2"
+  resolved "https://registry.npmjs.org/public-ip/-/public-ip-6.0.2.tgz"
+  integrity sha512-+6bkjnf0yQ4+tZV0zJv1017DiIF7y6R4yg17Mrhhkc25L7dtQtXWHgSCrz9BbLL4OeTFbPK4EALXqJUrwCIWXw==
   dependencies:
     aggregate-error "^4.0.1"
     dns-socket "^4.2.2"
