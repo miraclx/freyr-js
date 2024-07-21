@@ -19,7 +19,7 @@ RUN go install github.com/tj/node-prune@1159d4c \
   && cmake -S /atomicparsley -B /atomicparsley \
   && cmake --build /atomicparsley --config Release
 
-FROM alpine:3.19.1 as base
+FROM alpine:3.20.1 as base
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache bash nodejs python3 \
