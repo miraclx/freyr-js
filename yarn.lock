@@ -1395,9 +1395,9 @@ hh-mm-ss@^1.2.0:
   dependencies:
     zero-fill "^2.2.3"
 
-html-entities@^2.5.2:
+html-entities@^2.3.3:
   version "2.5.2"
-  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-2.5.2.tgz#201a3cf95d3a15be7099521620d19dfb4f65359f"
+  resolved "https://registry.npmjs.org/html-entities/-/html-entities-2.5.2.tgz"
   integrity sha512-K//PSRMQk4FZ78Kyau+mZurHn3FH0Vwr+H36eE0rPbeYkRRi9YxceYPhuN60UwWorxyKHhqoAJl2OFKa4BVtaA==
 
 htmlparser2@^6.1.0:
@@ -1925,7 +1925,7 @@ node-fzf@0.11.0, node-fzf@~0.5.1:
   resolved "https://registry.npmjs.org/node-fzf/-/node-fzf-0.11.0.tgz"
   integrity sha512-djlXFlrGSrGCHVHOr4iPRkfPuZXac6Elv0wBtKEJ383Dd/rj+9zaCu4JDZQVSGvoDRRSfJYL4roK9SLjTxeOIg==
   dependencies:
-    cli-color "~2.0.0"
+    cli-color "~1.2.0"
     keypress "~0.2.1"
     minimist "~1.2.5"
     redstar "0.0.2"
