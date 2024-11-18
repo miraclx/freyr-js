@@ -82,7 +82,7 @@ export class YouTubeMusic {
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
       },
     }),
-    apiKey: null,
+    apiConfig: null,
   };
 
   #request = async function request(url, opts) {
@@ -103,13 +103,15 @@ export class YouTubeMusic {
     return response.body;
   };
 
-  #getApiKey = async function getApiKey(force = false) {
-    if (this.#store.apiKey && !force) return this.#store.apiKey;
+  #deriveConfig = async function deriveConfig(force = false) {
+    if (this.#store.apiConfig && !force) return this.#store.apiConfig;
     const body = await this.#request('https://music.youtube.com/', {method: 'get'});
     let match;
-    if ((match = (body || '').match(/(?="INNERTUBE_API_KEY":"(.+?)")/)))
-      return ([, this.#store.apiKey] = match), this.#store.apiKey;
-    throw new YouTubeSearchError('Failed to extract `INNERTUBE_API_KEY`');
+    if ((match = (body || '').match(/ytcfg\.set\s*\(\s*({.+})\s*\)\s*;/))) {
+      this.#store.apiConfig = JSON.parse(match[1]);
+      return this.#store.apiConfig;
+    }
+    throw new YouTubeSearchError('Failed to extract YouTube Music Configuration');
   };
 
   #YTM_PATHS = {
@@ -130,16 +132,19 @@ export class YouTubeMusic {
      */
     if (typeof queryObject !== 'object') throw new Error('<queryObject> must be an object');
     if (params && typeof params !== 'object') throw new Error('<params>, if defined must be an object');
+
+    let {INNERTUBE_API_KEY, INNERTUBE_CLIENT_NAME, INNERTUBE_CLIENT_VERSION} = await this.#deriveConfig();
+
     const response = await this.#request('https://music.youtube.com/youtubei/v1/search', {
       timeout: {request: 10000},
       method: 'post',
-      searchParams: {alt: 'json', key: await this.#getApiKey(), ...params},
+      searchParams: {alt: 'json', key: INNERTUBE_API_KEY, ...params},
       responseType: 'json',
       json: {
         context: {
           client: {
-            clientName: 'WEB_REMIX',
-            clientVersion: '0.1',
+            clientName: INNERTUBE_CLIENT_NAME,
+            clientVersion: INNERTUBE_CLIENT_VERSION,
             hl: 'en',
             gl: 'US',
           },
