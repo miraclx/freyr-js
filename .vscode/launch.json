@@ -1,0 +1,53 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Spotify - Track",
+            "request": "launch",
+            "runtimeArgs": [
+                "test",
+                "spotify.track"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "outputCapture": "std",
+            "preLaunchTask": "npm: install"
+        },
+        {
+            "name": "Deezer - Artist",
+            "request": "launch",
+            "runtimeArgs": [
+                "test",
+                "deezer.artist"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "outputCapture": "std",
+            "preLaunchTask": "npm: install"
+        },
+        {
+            "name": "Apple Music - Album",
+            "request": "launch",
+            "runtimeArgs": [
+                "test",
+                "apple_music.album"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "outputCapture": "std",
+            "preLaunchTask": "npm: install"
+        },
+    ]
+}
