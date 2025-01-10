@@ -107,14 +107,14 @@
       }
     },
     "@yujinakayama/apple-music": {
-      "axios": "1.7.2"
+      "axios": "1.7.4"
     },
     "@ffmpeg/ffmpeg": {
       "node-fetch": "2.7.0"
     }
   },
   "resolutions": {
-    "@yujinakayama/apple-music/axios": "1.7.2",
+    "@yujinakayama/apple-music/axios": "1.7.4",
     "@ffmpeg/ffmpeg/node-fetch": "2.7.0",
     "public-ip/got": "13.0.0",
     "yt-search/node-fzf": "0.11.0",
