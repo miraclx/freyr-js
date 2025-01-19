@@ -59,7 +59,7 @@
     "bluebird": "^3.7.2",
     "cachedir": "^2.3.0",
     "commander": "^11.0.0",
-    "conf": "^12.0.0",
+    "conf": "^13.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "country-data": "0.0.31",
