@@ -1137,3 +1137,21 @@ For more information and documentation about docker, please refer to its officia
 [npm-image-url]: https://nodei.co/npm/freyr.png?stars&downloads
 [downloads-url]: https://npmjs.org/package/freyr
 [downloads-image]: https://badgen.net/npm/dm/freyr -->
+
+### Using YouTube Cookies for Authentication
+
+To bypass YouTube's bot detection mechanism, you can attach your YouTube cookies for authentication. This allows you to download tracks without encountering the "Sign in to confirm you're not a bot" error.
+
+#### Steps to use YouTube cookies:
+
+1. Export your YouTube cookies to a file. You can use browser extensions like [EditThisCookie](https://www.editthiscookie.com/) or [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/).
+
+2. Save the cookies to a file, e.g., `youtube_cookies.txt`.
+
+3. Use the `--cookies` flag to specify the path to the cookies file when running freyr.
+
+Example command:
+
+```bash
+freyr --cookies youtube_cookies.txt [options, arguments and queries...]
+```

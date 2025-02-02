@@ -51,7 +51,7 @@ function _getSearchArgs(artists, track, album, duration) {
  * )} YouTubeSearchResult
  */
 
-function genAsyncGetFeedsFn(url) {
+function genAsyncGetFeedsFn(url, cookies) {
   return () =>
     youtubedl(null, {
       '--': [url],
@@ -59,6 +59,7 @@ function genAsyncGetFeedsFn(url) {
       cacheDir: false,
       dumpSingleJson: true,
       noWarnings: true,
+      cookies: cookies,
     });
 }
 
