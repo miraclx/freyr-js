@@ -59,6 +59,7 @@ function genAsyncGetFeedsFn(url) {
       cacheDir: false,
       dumpSingleJson: true,
       noWarnings: true,
+      jsRuntime: "deno",
     });
 }
 
