@@ -108,7 +108,7 @@ export default class AppleMusic {
   async login() {
     let browsePage = await got('https://music.apple.com/us/browse').text();
     let scriptUri;
-    if (!(scriptUri = browsePage.match(/assets\/index-[a-z0-9]{8}\.js/)?.[0]))
+    if (!(scriptUri = browsePage.match(/assets\/index~[a-z0-9]{10}\.js/)?.[0]))
       throw new Error('Unable to extract core script from Apple Music');
     let script = await got(`https://music.apple.com/${scriptUri}`).text();
     let developerToken;
