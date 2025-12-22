@@ -51,8 +51,8 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@ffmpeg/core": "^0.11.0",
-    "@ffmpeg/ffmpeg": "^0.11.0",
+    "@ffmpeg/core": "0.11.0",
+    "@ffmpeg/ffmpeg": "0.11.6",
     "@miraclx/spotify-web-api-node": "^5.1.0",
     "@yujinakayama/apple-music": "^0.4.1",
     "async": "^3.2.4",
@@ -87,7 +87,7 @@
     "stringd-colors": "^1.10.0",
     "xbytes": "^1.8.0",
     "xprogress": "^0.20.0",
-    "youtube-dl-exec": "^3.0.7",
+    "youtube-dl-exec": "^3.0.28",
     "yt-search": "^2.10.3"
   },
   "devDependencies": {
