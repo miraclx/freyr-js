@@ -158,24 +158,45 @@ export default class AppleMusic {
         ? trackInfo.attributes.artistTokenSet.filter(a => a.type === 'featured').map(a => a.attributes.name)
         : [];
 
+    // Extract all artists including primary and featured
+    const allArtists = trackInfo.attributes.artistName 
+      ? [trackInfo.attributes.artistName, ...featuring]
+      : featuring;
+
+    // Extract artist sort names if available
+    const artistSortNames = trackInfo.relationships?.artists?.data?.map(artist => 
+      artist.attributes.sortName || artist.attributes.name
+    ) || [trackInfo.attributes.artistName];
+
+    // Extract release date with full timestamp
+    const releaseDate = albumInfo.release_date 
+      ? albumInfo.release_date + 'T00:00:00Z' 
+      : trackInfo.attributes.releaseDate 
+        ? (typeof trackInfo.attributes.releaseDate === 'string' 
+          ? trackInfo.attributes.releaseDate 
+          : `${trackInfo.attributes.releaseDate.year}-${String(trackInfo.attributes.releaseDate.month).padStart(2, '0')}-${String(trackInfo.attributes.releaseDate.day).padStart(2, '0')}T00:00:00Z`)
+        : new Date().toISOString();
+
     return {
       id: trackInfo.id,
       uri: `apple_music:track:${trackInfo.id}`,
       link: trackInfo.attributes.url,
       name: trackInfo.attributes.name,
-      artists: [trackInfo.attributes.artistName, ...featuring],
+      artists: allArtists,
       featuring,
+      artistSortNames,
       album: albumInfo.name,
       album_uri: `apple_music:album:${albumInfo.id}`,
       album_type: albumInfo.type,
+      albumSortName: albumInfo.sortName || albumInfo.name,
       images: trackInfo.attributes.artwork,
       duration: trackInfo.attributes.durationInMillis,
       album_artist: albumInfo.artists[0],
       track_number: trackInfo.attributes.trackNumber,
       total_tracks: albumInfo.ntracks,
-      release_date: albumInfo.release_date,
+      release_date: releaseDate,
       disc_number: trackInfo.attributes.discNumber,
-      total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.attributes.discNumber), 1),
+      total_discs: albumInfo.tracks?.reduce((acc, track) => Math.max(acc, track.attributes?.discNumber || 1), 1) || 1,
       contentRating: trackInfo.attributes.contentRating,
       lyrics: trackInfo.attributes.lyrics || null,
       isrc: trackInfo.attributes.isrc,
@@ -185,7 +206,16 @@ export default class AppleMusic {
       copyrights: albumInfo.copyrights,
       composers: trackInfo.attributes.composerName,
       compilation: albumInfo.type === 'compilation',
+      // Subscription-quality metadata
+      grouping: trackInfo.attributes.grouping || null,
+      comments: trackInfo.attributes.comment || null,
+      bpm: trackInfo.attributes.bpm || null,
+      key: trackInfo.attributes.preview?.audio?.metadata?.key || null,
       getImage: albumInfo.getImage,
+      // Apple Music specific
+      appleMusicId: trackInfo.id,
+      appleAlbumId: albumInfo.id,
+      storefront: albumInfo.storefront || 'us',
     };
   }
 
@@ -194,6 +224,7 @@ export default class AppleMusic {
       id: albumObject.id,
       uri: albumObject.attributes.url,
       name: albumObject.attributes.name.replace(/\s-\s(Single|EP)$/, ''),
+      sortName: albumObject.attributes.name, // For sort order
       artists: [albumObject.attributes.artistName],
       type:
         albumObject.attributes.artistName === 'Various Artists' && albumObject.relationships.artists.data.length === 0
@@ -217,6 +248,11 @@ export default class AppleMusic {
               .join('-'))(albumObject.attributes.releaseDate),
       tracks: albumObject.tracks,
       ntracks: albumObject.attributes.trackCount,
+      // Subscription quality metadata
+      description: albumObject.attributes.editorialNotes?.standard || null,
+      copyright: albumObject.attributes.copyright,
+      artistId: albumObject.relationships?.artists?.data?.[0]?.id || null,
+      storefront: null, // Will be set during request
       getImage(width, height) {
         const min = (val, max) => Math.min(max, val) || max;
         const images = albumObject.attributes.artwork;

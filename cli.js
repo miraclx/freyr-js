@@ -1099,24 +1099,36 @@ async function init(packageJson, queries, options) {
     Config.concurrency.embedder,
     async ({track, meta, files, audioSource}) => {
       try {
+        // Build artist string with featured artists
+        const artistString = track.artists?.join(', ') || track.artists?.[0] || '';
+        
+        // Build all artists rDNS atom
+        const allArtistsAtom = track.artists?.length > 1 
+          ? track.artists.map(a => [a, 'name=ARTISTS', 'domain=com.apple.iTunes'])
+          : [[track.artists?.[0], 'name=ARTISTS', 'domain=com.apple.iTunes']];
+
         await Promise.promisify(atomicParsley)(meta.outFile.path, {
           overWrite: '', // overwrite the file
 
           title: track.name, // ©nam
-          artist: track.artists[0], // ©ART
+          artist: track.artists?.[0] || '', // ©ART
+          artistSort: track.artistSortNames?.[0] || track.artists?.[0] || '', // soar
           composer: track.composers, // ©wrt
           album: track.album, // ©alb
+          albumSort: track.albumSortName || track.album, // soal
           genre: (genre => (genre ? genre.concat(' ') : ''))((track.genres || [])[0]), // ©gen | gnre
           tracknum: `${track.track_number}/${track.total_tracks}`, // trkn
           disk: `${track.disc_number}${track.total_discs ? `/${track.total_discs}` : ''}`, // disk
           year: new Date(track.release_date).toISOString().split('T')[0], // ©day
+          releaseDate: track.release_date, // ----
           compilation: track.compilation, // ©cpil
           gapless: options.gapless ?? false, // pgap
+          grouping: track.grouping || '', // ©grp
+          comment: track.comments || '', // cmt
           rDNSatom: [
             // ----
             ['Digital Media', 'name=MEDIA', 'domain=com.apple.iTunes'],
             [track.isrc, 'name=ISRC', 'domain=com.apple.iTunes'],
-            [track.artists[0], 'name=ARTISTS', 'domain=com.apple.iTunes'],
             [track.label, 'name=LABEL', 'domain=com.apple.iTunes'],
             [`${meta.service[symbols.meta].DESC}: ${track.uri}`, 'name=SOURCE', 'domain=com.apple.iTunes'],
             [
@@ -1124,6 +1136,11 @@ async function init(packageJson, queries, options) {
               'name=PROVIDER',
               'domain=com.apple.iTunes',
             ],
+            // Apple Music specific
+            [track.appleMusicId, 'name=AppleMusicId', 'domain=com.apple.iTunes'],
+            [track.appleAlbumId, 'name=AppleAlbumId', 'domain=com.apple.iTunes'],
+            [track.storefront || 'us', 'name=StorefrontId', 'domain=com.apple.iTunes'],
+            ...(track.featuring?.map(artist => [artist, 'name=FEATURING', 'domain=com.apple.iTunes']) || []),
           ],
           advisory: ['explicit', 'clean', 'inoffensive'].includes(track.contentRating) // rtng
             ? track.contentRating
@@ -1148,9 +1165,14 @@ async function init(packageJson, queries, options) {
           sortOrder: [
             ['name', track.name], // sonm
             ['album', track.album], // soal
-            ['artist', track.artists[0]], // soar
-            // ['albumartist', 'NAME'], // soaa
+            ['artist', track.artists?.[0] || ''], // soar
+            ['albumartist', track.album_artist || ''], // soaa
+            ...(track.artistSortNames?.length > 1 
+              ? track.artistSortNames.slice(1).map((sortName, i) => [`artist${i + 2}`, sortName])
+              : []),
           ],
+          // iTunes-specific extended metadata
+          xid: `xid://applemusic/${track.appleMusicId}`, // xid
         });
       } catch (err) {
         throw {err, [symbols.errorCode]: 8};

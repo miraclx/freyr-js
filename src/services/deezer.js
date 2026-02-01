@@ -225,6 +225,11 @@ export default class Deezer {
       ? trackInfo.contributors.filter(c => c.role && c.role.toLowerCase().includes('feat')).map(c => c.name)
       : [];
 
+    // Extract artist sort names
+    const artistSortNames = [trackInfo.artist.name, ...featuring].map(name => 
+      name.split(' ').reverse().join(', ') // Simple sort name transformation
+    );
+
     return {
       id: trackInfo.id,
       uri: `deezer:track:${trackInfo.id}`,
@@ -232,9 +237,11 @@ export default class Deezer {
       name: trackInfo.title,
       artists: [trackInfo.artist.name, ...featuring],
       featuring,
+      artistSortNames,
       album: albumInfo.name,
       album_uri: `deezer:album:${albumInfo.id}`,
       album_type: albumInfo.type,
+      albumSortName: albumInfo.name,
       images: albumInfo.images,
       duration: trackInfo.duration * 1000,
       album_artist: albumInfo.artists[0],
@@ -242,7 +249,7 @@ export default class Deezer {
       total_tracks: albumInfo.ntracks,
       release_date: new Date(trackInfo.release_date),
       disc_number: trackInfo.disk_number,
-      total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.altData?.DISK_NUMBER || 1), 1),
+      total_discs: albumInfo.tracks?.reduce((acc, track) => Math.max(acc, track.altData?.DISK_NUMBER || 1), 1) || 1,
       contentRating: !!trackInfo.explicit_lyrics,
       lyrics: trackInfo.lyrics || null,
       isrc: trackInfo.isrc,
@@ -250,9 +257,16 @@ export default class Deezer {
       genres: albumInfo.genres,
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,
-      composers: trackInfo.contributors.map(composer => composer.name).join(', '),
+      composers: trackInfo.contributors?.map(composer => composer.name).join(', '),
       compilation: albumInfo.type === 'compilation',
       getImage: albumInfo.getImage,
+      // Deezer specific
+      deezerId: trackInfo.id,
+      deezerAlbumId: albumInfo.id,
+      bpm: trackInfo.bpm || null,
+      gain: trackInfo.gain || null,
+      // Subscription quality metadata
+      albumDescription: albumInfo.description || null,
     };
   }
 

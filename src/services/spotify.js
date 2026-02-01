@@ -142,6 +142,11 @@ export default class Spotify {
       ? trackInfo.artists.filter((_, index) => index > 0).map(artist => artist.name)
       : [];
 
+    // Extract artist sort names
+    const artistSortNames = trackInfo.artists?.map(artist => 
+      artist.name.split(' ').reverse().join(', ') // Simple sort name transformation
+    ) || [];
+
     return trackInfo
       ? {
           id: trackInfo.id,
@@ -150,17 +155,19 @@ export default class Spotify {
           name: trackInfo.name,
           artists: trackInfo.artists.map(artist => artist.name),
           featuring,
+          artistSortNames,
           album: albumInfo.name,
           album_uri: albumInfo.uri,
           album_type: albumInfo.type,
+          albumSortName: albumInfo.name,
           images: albumInfo.images,
           duration: trackInfo.duration_ms,
-          album_artist: albumInfo.artists[0],
+          album_artist: albumInfo.artists[0]?.name || '',
           track_number: trackInfo.track_number,
           total_tracks: albumInfo.ntracks,
           release_date: albumInfo.release_date,
           disc_number: trackInfo.disc_number,
-          total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.disc_number), 1),
+          total_discs: albumInfo.tracks?.reduce((acc, track) => Math.max(acc, track.disc_number), 1) || 1,
           contentRating: trackInfo.explicit === true ? 'explicit' : 'inoffensive',
           lyrics: null, // Spotify doesn't provide lyrics directly - requires Musixmatch API integration
           isrc: (trackInfo.external_ids || {}).isrc,
@@ -170,6 +177,12 @@ export default class Spotify {
           composers: null, // Spotify API doesn't provide composer info - consider MusicBrainz fallback
           compilation: albumInfo.type === 'compilation',
           getImage: albumInfo.getImage,
+          // Spotify specific
+          spotifyId: trackInfo.id,
+          spotifyAlbumId: albumInfo.id,
+          popularity: trackInfo.popularity,
+          // Subscription quality metadata
+          preview_url: trackInfo.preview_url,
         }
       : null;
   }
