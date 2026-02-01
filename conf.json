@@ -38,6 +38,14 @@
     "width": 640,
     "height": 640
   },
+  "metadata": {
+    "saveLyrics": true,
+    "lyricsFormat": "lrc",
+    "includeFeatured": true,
+    "coverSize": "1280x1280",
+    "preferExplicit": true,
+    "fetchComposer": true
+  },
   "downloader": {
     "memCache": true,
     "cacheSize": 209715200,
@@ -57,6 +65,12 @@
     },
     "deezer": {
       "retries": 2
+    },
+    "musixmatch": {
+      "apiKey": null
+    },
+    "musicbrainz": {
+      "enabled": true
     }
   }
 }

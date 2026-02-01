@@ -54,6 +54,7 @@ Here's a list of the metadata that freyr can extract from each streaming service
 | :------------: | :-----: | :---------: | :----: |
 |    `Title`     |    ✔    |      ✔      |   ✔    |
 |    `Artist`    |    ✔    |      ✔      |   ✔    |
+|  `Featuring`   |    ✔    |      ✔      |   ✔    |
 |   `Composer`   |    ✗    |      ✔      |   ✔    |
 |    `Album`     |    ✔    |      ✔      |   ✔    |
 |    `Genre`     |    ✗    |      ✔      |   ✔    |
@@ -66,6 +67,10 @@ Here's a list of the metadata that freyr can extract from each streaming service
 |    `Label`     |    ✔    |      ✔      |   ✔    |
 |  `Copyright`   |    ✔    |      ✔      |   ✔    |
 |  `Cover Art`   |    ✔    |      ✔      |   ✔    |
+|    `Lyrics`    |   ¹     |      ✔      |   ✔    |
+| `Music Video`  |    ✗    |      ✔      |   ✔    |
+
+> ¹ Spotify lyrics require Musixmatch API integration
 
 ## Support the project
 

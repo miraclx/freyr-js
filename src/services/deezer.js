@@ -220,12 +220,18 @@ export default class Deezer {
   }
 
   wrapTrackMeta(trackInfo, albumInfo = {}) {
+    // Extract featured artists from contributors with 'feat' in their role
+    const featuring = trackInfo.contributors 
+      ? trackInfo.contributors.filter(c => c.role && c.role.toLowerCase().includes('feat')).map(c => c.name)
+      : [];
+
     return {
       id: trackInfo.id,
       uri: `deezer:track:${trackInfo.id}`,
       link: trackInfo.link,
       name: trackInfo.title,
-      artists: [trackInfo.artist.name],
+      artists: [trackInfo.artist.name, ...featuring],
+      featuring,
       album: albumInfo.name,
       album_uri: `deezer:album:${albumInfo.id}`,
       album_type: albumInfo.type,
@@ -236,9 +242,11 @@ export default class Deezer {
       total_tracks: albumInfo.ntracks,
       release_date: new Date(trackInfo.release_date),
       disc_number: trackInfo.disk_number,
-      total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.altData.DISK_NUMBER), 1),
+      total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.altData?.DISK_NUMBER || 1), 1),
       contentRating: !!trackInfo.explicit_lyrics,
+      lyrics: trackInfo.lyrics || null,
       isrc: trackInfo.isrc,
+      musicVideo: trackInfo.MUSIC_VIDEO?.url || null,
       genres: albumInfo.genres,
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,

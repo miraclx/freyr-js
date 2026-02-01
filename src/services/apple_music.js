@@ -151,12 +151,20 @@ export default class AppleMusic {
   }
 
   wrapTrackMeta(trackInfo, albumInfo = {}) {
+    // Extract featured artists if available
+    const featuring = trackInfo.attributes.featuringArtists 
+      ? trackInfo.attributes.featuringArtists.map(a => a.attributes.name)
+      : trackInfo.attributes.artistTokenSet 
+        ? trackInfo.attributes.artistTokenSet.filter(a => a.type === 'featured').map(a => a.attributes.name)
+        : [];
+
     return {
       id: trackInfo.id,
       uri: `apple_music:track:${trackInfo.id}`,
       link: trackInfo.attributes.url,
       name: trackInfo.attributes.name,
-      artists: [trackInfo.attributes.artistName],
+      artists: [trackInfo.attributes.artistName, ...featuring],
+      featuring,
       album: albumInfo.name,
       album_uri: `apple_music:album:${albumInfo.id}`,
       album_type: albumInfo.type,
@@ -169,7 +177,9 @@ export default class AppleMusic {
       disc_number: trackInfo.attributes.discNumber,
       total_discs: albumInfo.tracks.reduce((acc, track) => Math.max(acc, track.attributes.discNumber), 1),
       contentRating: trackInfo.attributes.contentRating,
+      lyrics: trackInfo.attributes.lyrics || null,
       isrc: trackInfo.attributes.isrc,
+      musicVideo: trackInfo.attributes.musicVideo?.attributes?.url || null,
       genres: trackInfo.attributes.genreNames,
       label: albumInfo.label,
       copyrights: albumInfo.copyrights,
