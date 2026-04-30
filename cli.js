@@ -5,7 +5,7 @@ import util from 'util';
 import xpath from 'path';
 import crypto from 'crypto';
 import {spawn, spawnSync} from 'child_process';
-import {promises as fs, constants as fs_constants, createReadStream, createWriteStream} from 'fs';
+import syncfs, {promises as fs, constants as fs_constants, createReadStream, createWriteStream} from 'fs';
 
 import Conf from 'conf';
 import open from 'open';
@@ -1321,12 +1321,40 @@ async function init(packageJson, queries, options) {
         for (let path of otherLocations) trackLogger.log(`| [\u2022]  - ${path}`);
       }
     }
+
+    let appendToReport = () => {};
+
+    if ('CREATE_REPORT_FILES' in process.env) {
+      const reportPath = meta.outFile.path.replace(/\.m4a$/, '.report.txt');
+
+      syncfs.mkdirSync(xpath.dirname(reportPath), {recursive: true});
+      syncfs.writeFileSync(reportPath, '', 'utf8');
+
+      appendToReport = (content) => {
+        syncfs.writeFileSync(
+          reportPath,
+          syncfs.readFileSync(reportPath, 'utf8')
+            + content,
+          'utf8');
+      };
+    }
+
     trackLogger.log('| \u27a4 Collating sources...');
     const audioSource = await props.collectSources((service, sourcesPromise) =>
       processPromise(sourcesPromise, trackLogger, {
         onInit: `|  \u27a4 [\u2022] ${service[symbols.meta].DESC}...`,
         arrIsEmpty: () => '[Unable to gather sources]\n',
-        onPass: ({sources}) => `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]\n`,
+        onPass: ({sources}) => {
+          sources.forEach(source => {
+            appendToReport(`========================================\n`);
+            appendToReport(`* ${source.title}\n`);
+            appendToReport(`> https://www.youtube.com/watch?v=${source.videoId}\n`);
+            Object.entries(source).forEach(([key, value]) => {
+              appendToReport(`${key} = ${value}\n`);
+            });
+          });
+          return `[success, found ${sources.length} source${sources.length === 1 ? '' : 's'}]\n`;
+        },
       }),
     );
     if ('err' in audioSource) return {meta, [symbols.errorCode]: 1, err: audioSource.err}; // zero sources found

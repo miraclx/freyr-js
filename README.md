@@ -306,6 +306,7 @@ Options:
 Environment Variables:
   SHOW_DEBUG_STACK             show extended debug information
   ATOMIC_PARSLEY_PATH          custom AtomicParsley path, alternatively use `--atomic-parsley`
+  CREATE_REPORT_FILES          create a .report.txt file next to each audio for diagnostic purposes
 
 Info:
   When downloading playlists, the tracks are downloaded individually into
