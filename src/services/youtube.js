@@ -4,6 +4,7 @@ import util from 'util';
 import got from 'got';
 import Promise from 'bluebird';
 import ytSearch from 'yt-search';
+import TimeFormat from 'hh-mm-ss';
 import youtubedl from 'youtube-dl-exec';
 
 import walk from '../walkr.js';
@@ -107,11 +108,41 @@ export class YouTubeMusic {
     if (this.#store.apiConfig && !force) return this.#store.apiConfig;
     const body = await this.#request('https://music.youtube.com/', {method: 'get'});
     let match;
-    if ((match = (body || '').match(/ytcfg\.set\s*\(\s*({.+})\s*\)\s*;/))) {
+    if ((match = (body || '').match(/ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;/))) {
       this.#store.apiConfig = JSON.parse(match[1]);
       return this.#store.apiConfig;
     }
     throw new YouTubeSearchError('Failed to extract YouTube Music Configuration');
+  };
+
+  // YouTube Music search results no longer include a track's duration, so fetch it separately from the
+  // same INNERTUBE backend the search call uses. This is a plain JSON request (no yt-dlp subprocess), so
+  // it stays cheap even when checking every search candidate.
+  #getDurationMs = async function getDurationMs(videoId) {
+    const {INNERTUBE_API_KEY, INNERTUBE_CLIENT_NAME, INNERTUBE_CLIENT_VERSION} = await this.#deriveConfig();
+    const response = await this.#request('https://music.youtube.com/youtubei/v1/player', {
+      timeout: {request: 10000},
+      method: 'post',
+      searchParams: {alt: 'json', key: INNERTUBE_API_KEY},
+      responseType: 'json',
+      json: {
+        context: {
+          client: {
+            clientName: INNERTUBE_CLIENT_NAME,
+            clientVersion: INNERTUBE_CLIENT_VERSION,
+            hl: 'en',
+            gl: 'US',
+          },
+        },
+        videoId,
+      },
+      headers: {
+        referer: `https://music.youtube.com/watch?v=${videoId}`,
+      },
+    });
+    const lengthSeconds = +walk(response, 'videoDetails', 'lengthSeconds');
+    if (!Number.isFinite(lengthSeconds)) throw new YouTubeSearchError(`Unable to determine duration for [${videoId}]`);
+    return lengthSeconds * 1000;
   };
 
   #YTM_PATHS = {
@@ -159,7 +190,17 @@ export class YouTubeMusic {
     const YTM_PATHS = this.#YTM_PATHS;
 
     const shelf = !('continuationContents' in response)
-      ? walk(response, YTM_PATHS.SECTION_LIST).map(section => section.musicShelfRenderer || section)
+      ? (sections => {
+          const musicShelves = sections.filter(section => section.musicShelfRenderer).map(section => section.musicShelfRenderer);
+          // Results now mostly arrive as one `itemSectionRenderer` per item instead of being grouped under a
+          // titled `musicShelfRenderer` shelf; flatten them back into a single synthetic shelf so they're not
+          // silently dropped. (The standalone "top result" `musicCardShelfRenderer` card uses an incompatible
+          // schema and is skipped; its match is typically duplicated among these flattened entries anyway.)
+          const flatItems = sections
+            .filter(section => section.itemSectionRenderer)
+            .flatMap(section => section.itemSectionRenderer.contents);
+          return [...musicShelves, ...(flatItems.length ? [{title: {runs: [{text: 'Search results'}]}, contents: flatItems}] : [])];
+        })(walk(response, YTM_PATHS.SECTION_LIST))
       : [
           walk(response, 'continuationContents', 'musicShelfContinuation') ||
             walk(response, 'continuationContents', 'sectionListContinuation'),
@@ -300,11 +341,11 @@ export class YouTubeMusic {
 
     const results = await this.#search({query: [track, album, ...artists].join(' ')});
     const strippedMeta = textUtils.stripText([...track.split(' '), album, ...artists]);
-    const validSections = [
-      ...((results.top || {}).contents || []), // top recommended songs
-      ...((results.songs || {}).contents || []), // song section
-      ...((results.videos || {}).contents || []), // videos section
-    ]
+    // Shelf labels ('Top result', 'Songs', 'Videos', ...) are no longer a reliable signal of which buckets
+    // hold usable items (see the flattening in `#search` above), so gather candidates from every bucket
+    // instead of cherry-picking specific names; non-song/video items are filtered out below regardless.
+    const validSections = Object.values(results)
+      .flatMap(section => section.contents || [])
       .map(
         item =>
           item &&
@@ -331,26 +372,40 @@ export class YouTubeMusic {
       // TODO: CALCULATE ACCURACY BY AUTHOR
       return accuracy;
     }
-    const classified = Object.values(
+    // prune duplicates and weak text matches before spending a request on each candidate's real duration
+    const candidates = Object.values(
       validSections.reduce((final, item) => {
-        // prune duplicates
-        if (item.weight > 65 && item && 'videoId' in item && !(item.videoId in final)) {
+        if (item.weight > 65 && item && 'videoId' in item && !(item.videoId in final)) final[item.videoId] = item;
+        return final;
+      }, {}),
+    );
+    const classified = (
+      await Promise.map(
+        candidates,
+        async item => {
+          let duration_ms;
+          try {
+            duration_ms = await this.#getDurationMs(item.videoId);
+          } catch {
+            return null; // can't score a match without a real duration to compare against
+          }
           let cleanItem = {
             title: item.title,
             type: item.type,
             author: item.artists,
-            duration: item.duration,
-            duration_ms: item.duration.split(':').reduce((acc, time) => 60 * acc + +time) * 1000,
+            duration: TimeFormat.fromMs(duration_ms, 'mm:ss'),
+            duration_ms,
             videoId: item.videoId,
             getFeeds: genAsyncGetFeedsFn(item.videoId),
           };
-          if ((cleanItem.accuracy = calculateAccuracyFor(cleanItem, item.weight)) > 80) final[item.videoId] = cleanItem;
-        }
-        return final;
-      }, {}),
-      // sort descending by accuracy
-    ).sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
-    return classified;
+          cleanItem.accuracy = calculateAccuracyFor(cleanItem, item.weight);
+          return cleanItem.accuracy > 80 ? cleanItem : null;
+        },
+        {concurrency: 4},
+      )
+    ).filter(Boolean);
+    // sort descending by accuracy
+    return classified.sort((a, b) => (a.accuracy > b.accuracy ? -1 : 1));
   }
 }
 
