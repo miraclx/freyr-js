@@ -110,12 +110,12 @@
       "axios": "1.7.2"
     },
     "@ffmpeg/ffmpeg": {
-      "node-fetch": "2.7.0"
+      "node-fetch": "3.3.2"
     }
   },
   "resolutions": {
     "@yujinakayama/apple-music/axios": "1.7.2",
-    "@ffmpeg/ffmpeg/node-fetch": "2.7.0",
+    "@ffmpeg/ffmpeg/node-fetch": "3.3.2",
     "public-ip/got": "13.0.0",
     "yt-search/node-fzf": "0.11.0",
     "yt-search/node-fzf/cli-color": "2.0.4",
